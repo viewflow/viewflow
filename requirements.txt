@@ -1,0 +1,2 @@
+https://github.com/django/django/archive/1.6b2.zip
+singledispatch

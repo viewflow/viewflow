@@ -1,0 +1,3 @@
+*.pyc
+.tox
+django_viewflow.egg-info
