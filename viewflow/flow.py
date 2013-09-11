@@ -142,14 +142,14 @@ class Join(_Gate):
 
 class Split(_Gate):
     """
-    Activate all outgoing path in-parallel
+    Activate outgoing path in-parallel depends on per-path condition
     """
     def __init__(self):
         super(Split, self).__init__()
         self.__activate_next = []
 
-    def Next(self, node):
-        self.__activate_next.append(node)
+    def Next(self, node, condition=None):
+        self.__activate_next.append((node, condition))
 
 
 class First(_Gate):
