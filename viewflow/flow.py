@@ -136,8 +136,8 @@ class Switch(_Gate):
         super(Split, self).__init__()
         self.__activate_next = []
 
-    def Case(self, node, condition=None):
-        self.__activate_next.append((node, condition))
+    def Case(self, node, cond=None):
+        self.__activate_next.append((node, cond))
 
     def Default(self, node):
         self.__activate_next.append((node, None))
@@ -163,8 +163,11 @@ class Split(_Gate):
         super(Split, self).__init__()
         self.__activate_next = []
 
-    def Next(self, node, condition=None):
-        self.__activate_next.append((node, condition))
+    def Next(self, node, cond=None):
+        self.__activate_next.append((node, cond))
+
+    def Always(self, node):
+        self.__activate_next.append((node, None))
 
 
 class First(_Gate):
