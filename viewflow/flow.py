@@ -128,6 +128,21 @@ class If(_Gate):
         self.__on_false = node
 
 
+class Switch(_Gate):
+	"""
+    Activates first path with matched condition
+	"""
+    def __init__(self):
+        super(Split, self).__init__()
+        self.__activate_next = []
+
+    def Case(self, node, condition=None):
+        self.__activate_next.append((node, condition))
+
+    def Default(self, node):
+        self.__activate_next.append((node, None))
+
+
 class Join(_Gate):
     """
     Wait for all incoming links and activates on complete
