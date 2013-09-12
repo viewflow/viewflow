@@ -3,7 +3,8 @@ from sample import views
 
 
 class Shipmentflow(flow.Flow):
-    start = flow.Start('split_clerk_warehouse')
+    start = flow.Start() \
+        .Activate('split_clerk_warehouse')
 
     # clerk
     split_clerk_warehouse = flow.Split() \
@@ -45,7 +46,7 @@ class Shipmentflow(flow.Flow):
 
 
     # Warehouse worker
-    package_goods = flow.Views(views.package_goods) \
+    package_goods = flow.View(views.package_goods) \
         .Next('join_clerk_warehouse')
 
     join_clerk_warehouse = flow.Join() \

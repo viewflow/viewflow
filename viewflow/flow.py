@@ -1,9 +1,26 @@
 """
 Ubiquitos language for flow construction
 """
+class FlowMeta(object):
+    """
+    Flow options
+    """
+    def __init__(self, meta):
+        pass
 
 
-class Flow(object):
+class FlowMetaClass(type):
+    def __new__(cls, name, bases, attrs):
+        new_class = super(FlowMetaClass, cls).__new__(cls, name, bases, attrs)
+
+        # set up workflow meta
+        meta = getattr(new_class, 'Meta', None)
+        new_class._meta = FlowMeta(meta)
+
+        return new_class
+
+
+class Flow(object, metaclass = FlowMetaClass):
     """
     Base class for flow definition
     """
@@ -57,6 +74,7 @@ class Timer(_Event):
 
     def Next(self, node):
         self.__activate_next.append(node)
+        return self
 
 
 
@@ -71,6 +89,7 @@ class Mailbox(_Event):
 
     def Next(self, node):
         self.__activate_next.append(node)
+        return self
 
 
 class _Task(_Node):
@@ -90,6 +109,7 @@ class View(_Task):
 
     def Next(self, node):
         self.__activate_next.append(node)
+        return self
 
 
 class Job(_Task):
@@ -103,6 +123,7 @@ class Job(_Task):
 
     def Next(self, node):
         self.__activate_next.append(node)
+        return self
 
 
 class _Gate(_Node):
@@ -115,32 +136,36 @@ class If(_Gate):
     """
     Activates one of paths based on condition
     """
-    def __init__(self, condition):
+    def __init__(self, cond):
         super(If, self).__init__()
-        self.__condition = condition
+        self.__condition = cond
         self.__on_true = None
         self.__on_false = None
 
     def OnTrue(self, node):
         self.__on_true = node
+        return self
 
     def OnFalse(self, node):
         self.__on_false = node
+        return self
 
 
 class Switch(_Gate):
-	"""
+    """
     Activates first path with matched condition
-	"""
+    """
     def __init__(self):
         super(Split, self).__init__()
         self.__activate_next = []
 
     def Case(self, node, cond=None):
         self.__activate_next.append((node, cond))
+        return self
 
     def Default(self, node):
         self.__activate_next.append((node, None))
+        return self
 
 
 class Join(_Gate):
@@ -153,6 +178,7 @@ class Join(_Gate):
 
     def Next(self, node):
         self.__activate_next.append(node)
+        return self
 
 
 class Split(_Gate):
@@ -165,9 +191,11 @@ class Split(_Gate):
 
     def Next(self, node, cond=None):
         self.__activate_next.append((node, cond))
+        return self
 
     def Always(self, node):
         self.__activate_next.append((node, None))
+        return self
 
 
 class First(_Gate):
@@ -180,3 +208,4 @@ class First(_Gate):
 
     def Of(self, node):
         self.__activate_list.append(node)
+        return self
