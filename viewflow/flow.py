@@ -1,6 +1,8 @@
 """
 Ubiquitos language for flow construction
 """
+
+
 class FlowMeta(object):
     """
     Flow options
@@ -20,7 +22,7 @@ class FlowMetaClass(type):
         return new_class
 
 
-class Flow(object, metaclass = FlowMetaClass):
+class Flow(object, metaclass=FlowMetaClass):
     """
     Base class for flow definition
     """
@@ -36,7 +38,6 @@ class _Node(object):
     def Role(self, role):
         self.__role = role
         return self
-
 
 
 class _Event(_Node):
@@ -75,7 +76,6 @@ class Timer(_Event):
     def Next(self, node):
         self.__activate_next.append(node)
         return self
-
 
 
 class Mailbox(_Event):
@@ -170,10 +170,11 @@ class Switch(_Gate):
 
 class Join(_Gate):
     """
-    Wait for all incoming links and activates on complete
+    Wait for one or all incoming links and activate next path
     """
-    def __init__(self):
+    def __init__(self, wait_all=False):
         super(Join, self).__init__()
+        self.__wait_all = wait_all
         self.__activate_next = []
 
     def Next(self, node):
