@@ -3,37 +3,13 @@ Ubiquitos language for flow construction
 """
 
 
-class FlowMeta(object):
-    """
-    Flow options
-    """
-    def __init__(self, meta):
-        pass
-
-
-class FlowMetaClass(type):
-    def __new__(cls, name, bases, attrs):
-        new_class = super(FlowMetaClass, cls).__new__(cls, name, bases, attrs)
-
-        # set up workflow meta
-        meta = getattr(new_class, 'Meta', None)
-        new_class._meta = FlowMeta(meta)
-
-        return new_class
-
-
-class Flow(object, metaclass=FlowMetaClass):
-    """
-    Base class for flow definition
-    """
-
-
 class _Node(object):
     """
     Base class for flow objects
     """
     def __init__(self):
-        self.__role = None
+        self._role = None
+        self.name = None
 
     def Role(self, role):
         self.__role = role
@@ -52,10 +28,10 @@ class Start(_Node):
     """
     def __init__(self):
         super(Start, self).__init__()
-        self.__activate_next = []
+        self._activate_next = []
 
     def Activate(self, node):
-        self.__activate_next.append(node)
+        self._activate_next.append(node)
         return self
 
 
@@ -71,10 +47,10 @@ class Timer(_Event):
     """
     def __init__(self, minutes=None, hours=None, days=None):
         super(Timer, self).__init__()
-        self.__activate_next = []
+        self._activate_next = []
 
     def Next(self, node):
-        self.__activate_next.append(node)
+        self._activate_next.append(node)
         return self
 
 
@@ -84,11 +60,11 @@ class Mailbox(_Event):
     """
     def __init__(self, on_receive):
         super(Mailbox, self).__init__()
-        self.__activate_next = []
-        self.__on_receive = on_receive
+        self._activate_next = []
+        self._on_receive = on_receive
 
     def Next(self, node):
-        self.__activate_next.append(node)
+        self._activate_next.append(node)
         return self
 
 
@@ -104,11 +80,11 @@ class View(_Task):
     """
     def __init__(self, view):
         super(View, self).__init__()
-        self.__activate_next = []
-        self.__view = view
+        self._activate_next = []
+        self._view = view
 
     def Next(self, node):
-        self.__activate_next.append(node)
+        self._activate_next.append(node)
         return self
 
 
@@ -118,11 +94,11 @@ class Job(_Task):
     """
     def __init__(self, job):
         super(Job, self).__init__()
-        self.__activate_next = []
-        self.__job = job
+        self._activate_next = []
+        self._job = job
 
     def Next(self, node):
-        self.__activate_next.append(node)
+        self._activate_next.append(node)
         return self
 
 
@@ -138,16 +114,16 @@ class If(_Gate):
     """
     def __init__(self, cond):
         super(If, self).__init__()
-        self.__condition = cond
-        self.__on_true = None
-        self.__on_false = None
+        self._condition = cond
+        self._on_true = None
+        self._on_false = None
 
     def OnTrue(self, node):
-        self.__on_true = node
+        self._on_true = node
         return self
 
     def OnFalse(self, node):
-        self.__on_false = node
+        self._on_false = node
         return self
 
 
@@ -157,14 +133,14 @@ class Switch(_Gate):
     """
     def __init__(self):
         super(Split, self).__init__()
-        self.__activate_next = []
+        self._activate_next = []
 
     def Case(self, node, cond=None):
-        self.__activate_next.append((node, cond))
+        self._activate_next.append((node, cond))
         return self
 
     def Default(self, node):
-        self.__activate_next.append((node, None))
+        self._activate_next.append((node, None))
         return self
 
 
@@ -174,11 +150,11 @@ class Join(_Gate):
     """
     def __init__(self, wait_all=False):
         super(Join, self).__init__()
-        self.__wait_all = wait_all
-        self.__activate_next = []
+        self._wait_all = wait_all
+        self._activate_next = []
 
     def Next(self, node):
-        self.__activate_next.append(node)
+        self._activate_next.append(node)
         return self
 
 
@@ -188,14 +164,14 @@ class Split(_Gate):
     """
     def __init__(self):
         super(Split, self).__init__()
-        self.__activate_next = []
+        self._activate_next = []
 
     def Next(self, node, cond=None):
-        self.__activate_next.append((node, cond))
+        self._activate_next.append((node, cond))
         return self
 
     def Always(self, node):
-        self.__activate_next.append((node, None))
+        self._activate_next.append((node, None))
         return self
 
 
@@ -205,8 +181,8 @@ class First(_Gate):
     """
     def __init__(self):
         super(First, self).__init__()
-        self.__activate_list = []
+        self._activate_list = []
 
     def Of(self, node):
-        self.__activate_list.append(node)
+        self._activate_list.append(node)
         return self

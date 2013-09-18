@@ -1,8 +1,8 @@
-from viewflow import flow
+from viewflow import flow, Flow
 from shipment import views
 
 
-class Shipmentflow(flow.Flow):
+class Shipmentflow(Flow):
     start = flow.Start() \
         .Activate('split_clerk_warehouse')
 
@@ -55,4 +55,3 @@ class Shipmentflow(flow.Flow):
         .Next('end')
 
     end = flow.End()
-

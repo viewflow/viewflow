@@ -56,7 +56,7 @@ def _(flow_node):
 @graphviz_outedges.register(flow.Start)  # NOQA
 def _(flow_node):
     edges = []
-    for target in flow_node.__activate_next:
+    for target in flow_node._activate_next:
         edges.append("Start -> %s" % _nodename(target.name))
 
 
@@ -79,7 +79,7 @@ def _(flow_node):
 @graphviz_outedges.register(flow.Timer)  # NOQA
 def _(flow_node):
     edges = []
-    for target in flow_node.__activate_next:
+    for target in flow_node._activate_next:
         edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
     return '\n'.join(edges)
 
@@ -93,7 +93,7 @@ def _(flow_node):
 @graphviz_outedges.register(flow.Mailbox)  # NOQA
 def _(flow_node):
     edges = []
-    for target in flow_node.__activate_next:
+    for target in flow_node._activate_next:
         edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
     return '\n'.join(edges)
 
@@ -107,7 +107,7 @@ def _(flow_node):
 @graphviz_outedges.register(flow.View)  # NOQA
 def _(flow_node):
     edges = []
-    for target in flow_node.__activate_next:
+    for target in flow_node._activate_next:
         edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
     return '\n'.join(edges)
 
@@ -121,7 +121,7 @@ def _(flow_node):
 @graphviz_outedges.register(flow.Job)  # NOQA
 def _(flow_node):
     edges = []
-    for target in flow_node.__activate_next:
+    for target in flow_node._activate_next:
         edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
     return '\n'.join(edges)
 
@@ -135,10 +135,10 @@ def _(flow_node):
 @graphviz_outedges.register(flow.If)  # NOQA
 def _(flow_node):
     edges = []
-    if flow_node.__on_true:
-        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(flow_node.__on_true.name)))
-    if flow_node.__on_false:
-        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(flow_node.__on_false.name)))
+    if flow_node._on_true:
+        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(flow_node._on_true.name)))
+    if flow_node._on_false:
+        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(flow_node._on_false.name)))
     return '\n'.join(edges)
 
 
@@ -151,14 +151,14 @@ def _(flow_node):
 @graphviz_outedges.register(flow.Switch)  # NOQA
 def _(flow_node):
     edges = []
-    for target, _ in flow_node.__activate_next:
+    for target, _ in flow_node._activate_next:
         edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
     return '\n'.join(edges)
 
 
 @graphviz_node.register(flow.Join)  # NOQA
 def _(flow_node):
-    label = "✚" if flow_node.__wait_all else ""
+    label = "✚" if flow_node._wait_all else ""
     return '%s [label="%s", shape=diamond, style=solid, width="0.3", height="0.3"]' \
         % (_nodename(flow_node), label)
 
@@ -166,7 +166,7 @@ def _(flow_node):
 @graphviz_outedges.register(flow.Join)  # NOQA
 def _(flow_node):
     edges = []
-    for target in flow_node.__activate_next:
+    for target in flow_node._activate_next:
         edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
     return '\n'.join(edges)
 
@@ -180,7 +180,7 @@ def _(flow_node):
 @graphviz_outedges.register(flow.Split)  # NOQA
 def _(flow_node):
     edges = []
-    for target, _ in flow_node.__activate_next:
+    for target, _ in flow_node._activate_next:
         edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
     return '\n'.join(edges)
 
@@ -194,7 +194,7 @@ def _(flow_node):
 @graphviz_outedges.register(flow.First)  # NOQA
 def _(flow_node):
     edges = []
-    for target in flow_node.__activate_next:
+    for target in flow_node._activate_next:
         edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
     return '\n'.join(edges)
 
