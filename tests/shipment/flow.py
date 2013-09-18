@@ -44,7 +44,6 @@ class Shipmentflow(flow.Flow):
     take_extra_insurance = flow.View(views.take_extra_insurance) \
         .Next('join_on_insurance')
 
-
     # Warehouse worker
     package_goods = flow.View(views.package_goods) \
         .Next('join_clerk_warehouse')
