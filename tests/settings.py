@@ -19,7 +19,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'viewflow',
-    'sample'
+    'shipment'
 )
 
 MIDDLEWARE_CLASSES = (

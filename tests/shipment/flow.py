@@ -1,5 +1,5 @@
 from viewflow import flow
-from sample import views
+from shipment import views
 
 
 class Shipmentflow(flow.Flow):
