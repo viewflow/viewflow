@@ -2,7 +2,7 @@
 """
 Drawing graphviz bpmn-like workflow diagrams
 """
-
+import subprocess
 from singledispatch import singledispatch
 from viewflow import flow
 
@@ -22,14 +22,15 @@ def _nodelabel(flow_node):
     result = []
 
     just_added = False
-    for word in flow_node.desctiption.split(' '):
+
+    for word in flow_node.description.split(' '):
         if len(result) != 0 and len(word) <= 3 and not just_added:
             result[len(result)-1] = ('%s %s' % (result[len(result)-1], word)).strip()
             just_added = True
         else:
             just_added = False
             result.append(word)
-    return '\n'.join(result)
+    return '\\n'.join(result)
 
 
 @singledispatch
@@ -57,7 +58,8 @@ def _(flow_node):
 def _(flow_node):
     edges = []
     for target in flow_node._activate_next:
-        edges.append("Start -> %s" % _nodename(target.name))
+        edges.append("Start -> %s" % _nodename(target))
+    return '\n'.join(edges)
 
 
 @graphviz_node.register(flow.End)  # NOQA
@@ -72,7 +74,7 @@ def _(flow_node):
 
 @graphviz_node.register(flow.Timer)  # NOQA
 def _(flow_node):
-    return '%s [shape="circle",width="0.3",height="0.3",label="⌚",fontsize=14,margin=0]' \
+    return '%s [shape="circle",width="0.3",height="0.3",label="⌚",fontsize=14,margin=0];' \
         % _nodename(flow_node)
 
 
@@ -80,13 +82,13 @@ def _(flow_node):
 def _(flow_node):
     edges = []
     for target in flow_node._activate_next:
-        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
+        edges.append("%s -> %s;" % (_nodename(flow_node), _nodename(target)))
     return '\n'.join(edges)
 
 
 @graphviz_node.register(flow.Mailbox)  # NOQA
 def _(flow_node):
-    return '%s [shape="circle",width="0.3",height="0.3",label="✉",fontsize=14,margin=0]' \
+    return '%s [shape="circle",width="0.3",height="0.3",label="✉",fontsize=14,margin=0];' \
         % _nodename(flow_node)
 
 
@@ -94,41 +96,41 @@ def _(flow_node):
 def _(flow_node):
     edges = []
     for target in flow_node._activate_next:
-        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
+        edges.append("%s -> %s;" % (_nodename(flow_node), _nodename(target)))
     return '\n'.join(edges)
 
 
 @graphviz_node.register(flow.View)  # NOQA
 def _(flow_node):
-    return '%s [label="%s"]' \
-        % (_nodename(flow_node), _nodelabel(flow_node.description))
+    return '%s [label="%s"];' \
+        % (_nodename(flow_node), _nodelabel(flow_node))
 
 
 @graphviz_outedges.register(flow.View)  # NOQA
 def _(flow_node):
     edges = []
     for target in flow_node._activate_next:
-        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
+        edges.append("%s -> %s;" % (_nodename(flow_node), _nodename(target)))
     return '\n'.join(edges)
 
 
 @graphviz_node.register(flow.Job)  # NOQA
 def _(flow_node):
-    return '%s [label="%s"]' \
-        % (_nodename(flow_node), _nodelabel(flow_node.description))
+    return '%s [label="%s"];' \
+        % (_nodename(flow_node), _nodelabel(flow_node))
 
 
 @graphviz_outedges.register(flow.Job)  # NOQA
 def _(flow_node):
     edges = []
     for target in flow_node._activate_next:
-        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
+        edges.append("%s -> %s;" % (_nodename(flow_node), _nodename(target)))
     return '\n'.join(edges)
 
 
 @graphviz_node.register(flow.If)  # NOQA
 def _(flow_node):
-    return '%s [label="", shape=diamond, style=solid, width="0.3", height="0.3"]' \
+    return '%s [label="", shape=diamond, style=solid, width="0.3", height="0.3"];' \
         % _nodename(flow_node)
 
 
@@ -136,15 +138,15 @@ def _(flow_node):
 def _(flow_node):
     edges = []
     if flow_node._on_true:
-        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(flow_node._on_true.name)))
+        edges.append("%s -> %s;" % (_nodename(flow_node), _nodename(flow_node._on_true)))
     if flow_node._on_false:
-        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(flow_node._on_false.name)))
+        edges.append("%s -> %s;" % (_nodename(flow_node), _nodename(flow_node._on_false)))
     return '\n'.join(edges)
 
 
 @graphviz_node.register(flow.Switch)  # NOQA
 def _(flow_node):
-    return '%s [label="", shape=diamond, style=solid, width="0.3", height="0.3"]' \
+    return '%s [label="", shape=diamond, style=solid, width="0.3", height="0.3"];' \
         % _nodename(flow_node)
 
 
@@ -152,14 +154,14 @@ def _(flow_node):
 def _(flow_node):
     edges = []
     for target, _ in flow_node._activate_next:
-        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
+        edges.append("%s -> %s;" % (_nodename(flow_node), _nodename(target)))
     return '\n'.join(edges)
 
 
 @graphviz_node.register(flow.Join)  # NOQA
 def _(flow_node):
     label = "✚" if flow_node._wait_all else ""
-    return '%s [label="%s", shape=diamond, style=solid, width="0.3", height="0.3"]' \
+    return '%s [label="%s", shape=diamond, style=solid, width="0.3", height="0.3"];' \
         % (_nodename(flow_node), label)
 
 
@@ -167,13 +169,13 @@ def _(flow_node):
 def _(flow_node):
     edges = []
     for target in flow_node._activate_next:
-        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
+        edges.append("%s -> %s;" % (_nodename(flow_node), _nodename(target)))
     return '\n'.join(edges)
 
 
 @graphviz_node.register(flow.Split)  # NOQA
 def _(flow_node):
-    return '%s [label="✚", shape=diamond, style=solid, width="0.3", height="0.3"]' \
+    return '%s [label="✚", shape=diamond, style=solid, width="0.3", height="0.3"];' \
         % _nodename(flow_node)
 
 
@@ -181,13 +183,13 @@ def _(flow_node):
 def _(flow_node):
     edges = []
     for target, _ in flow_node._activate_next:
-        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
+        edges.append("%s -> %s;" % (_nodename(flow_node), _nodename(target)))
     return '\n'.join(edges)
 
 
 @graphviz_node.register(flow.First)  # NOQA
 def _(flow_node):
-    return '%s [label="✚", shape=diamond, style=solid, width="0.3", height="0.3"]' \
+    return '%s [label="✚", shape=diamond, style=solid, width="0.3", height="0.3"];' \
         % _nodename(flow_node)
 
 
@@ -195,9 +197,34 @@ def _(flow_node):
 def _(flow_node):
     edges = []
     for target in flow_node._activate_next:
-        edges.append("%s -> %s" % (_nodename(flow_node.name), _nodename(target.name)))
+        edges.append("%s -> %s;" % (_nodename(flow_node), _nodename(target)))
     return '\n'.join(edges)
 
 
-def diagram(flow):
-    pass
+def diagram(flow_cls, output_file_name=None):
+    diagramm = """
+    digraph %s {
+        graph [size="10,5", rankdir=LR, splines=ortho,constraint=false ];
+        node [shape=box, style=rounded, fontsize=8];
+    """ % flow_cls.__name__
+
+    for node in flow_cls._meta.nodes():
+        diagramm += "    %s\n" % graphviz_node(node)
+
+    for node in flow_cls._meta.nodes():
+        diagramm += "    %s\n" % graphviz_outedges(node)
+
+    diagramm += """
+    }
+    """
+
+    if output_file_name:        
+        dot = subprocess.Popen(['dot', '-Tpng', '-o', output_file_name],
+                               stdout=subprocess.PIPE,
+                               stdin=subprocess.PIPE,
+                               stderr=subprocess.STDOUT)
+        dot.stdin.write(bytes(diagramm, 'UTF-8'))
+        stdout, _ = dot.communicate()
+        assert not stdout
+
+    return diagramm

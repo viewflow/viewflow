@@ -142,10 +142,17 @@ class View(_Task):
     """
     Human performed task
     """
-    def __init__(self, view):
+    def __init__(self, view, description=None):
         super(View, self).__init__()
         self._activate_next = []
         self._view = view
+        self._description = description
+
+    @property
+    def description(self):
+        if self._description:
+            return self.description
+        return self.name.replace('_', ' ').capitalize()
 
     def _outgoing(self):
         for next_node in self._activate_next:
