@@ -41,9 +41,9 @@ class FlowMetaClass(type):
         incoming = defaultdict(lambda: [])  # node -> [incoming_nodes]
         for _, node in nodes.items():
             for outgoing_edge in node._outgoing():
-                incoming[outgoing_edge.dst].append(outgoing_edge.src)
+                incoming[outgoing_edge.dst].append(outgoing_edge)
         for target, edges in incoming.items():
-            target._incoming = edges
+            target._incoming_edges = edges
 
         # set up workflow meta
         meta = getattr(new_class, 'Meta', None)

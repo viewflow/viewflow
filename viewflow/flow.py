@@ -41,7 +41,7 @@ class _Node(object):
     """
     def __init__(self):
         self._role = None
-        self._incoming = None
+        self._incoming_edges = []
         self.name = None
 
     def Role(self, role):
@@ -58,7 +58,7 @@ class _Node(object):
         """
         Incoming edge iterator
         """
-        return iter(self._incoming)
+        return iter(self._incoming_edges)
 
     def __str__(self):
         if self.name:
