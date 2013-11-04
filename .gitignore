@@ -1,3 +1,4 @@
 *.pyc
 .tox
 django_viewflow.egg-info
+db.sqlite3

@@ -1,4 +1,11 @@
+import copy
 from collections import defaultdict
+from importlib import import_module
+
+from django.conf import settings
+from django.conf.urls import patterns, url
+from django.utils.module_loading import module_has_submodule
+
 from viewflow import flow
 from viewflow.resolve import Resolver
 
@@ -56,3 +63,46 @@ class Flow(object, metaclass=FlowMetaClass):
     """
     Base class for flow definition
     """
+
+
+class FlowSite(object):
+    """
+    Instance for viewflow application
+    """
+    def __init__(self, name='flow', app_name='flow'):
+        self._name = name
+        self._app_name = app_name
+        self._registry = {}  # Map process model -> flow
+
+    def register(self, model, flow):
+        self._registry[model] = flow
+
+    def index(self, request):
+        pass
+
+    def get_urls(self):
+        urlpatterns = patterns('',
+            url(r'^$', self.index, name='index'))  # noqa
+        return urlpatterns
+
+    @property
+    def urls(self):
+        return self.get_urls(), self._app_name, self._name
+
+
+site = FlowSite()
+
+
+def autodiscover():
+    """
+    Import all flows for <app>/flow.py
+    """
+    for app in settings.INSTALLED_APPS:
+        mod = import_module(app)
+        try:
+            before_import_registry = copy.copy(site._registry)
+            import_module('%s.flow' % app)
+        except:
+            site._registry = before_import_registry
+            if module_has_submodule(mod, 'flow'):
+                raise
