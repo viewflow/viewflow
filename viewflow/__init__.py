@@ -4,6 +4,7 @@ from importlib import import_module
 
 from django.conf import settings
 from django.conf.urls import patterns, url
+from django.shortcuts import render
 from django.utils.module_loading import module_has_submodule
 
 from viewflow import flow
@@ -78,7 +79,7 @@ class FlowSite(object):
         self._registry[model] = flow
 
     def index(self, request):
-        pass
+        return render(request, 'viewflow/index.html')
 
     def get_urls(self):
         urlpatterns = patterns('',

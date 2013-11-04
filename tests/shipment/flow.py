@@ -1,8 +1,8 @@
-from viewflow import flow, Flow
-from shipment import views
+from viewflow import site, flow, Flow
+from shipment import models, views
 
 
-class Shipmentflow(Flow):
+class ShipmentFlow(Flow):
     start = flow.Start() \
         .Activate('split_clerk_warehouse')
 
@@ -55,3 +55,6 @@ class Shipmentflow(Flow):
         .Next('end')
 
     end = flow.End()
+
+
+site.register(models.ShipmentProcess, ShipmentFlow)
