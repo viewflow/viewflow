@@ -1,8 +1,20 @@
+from django.shortcuts import get_object_or_404, render
+from viewflow.models import Activation
+
+
 def shipment_type(request, act_id):
     """
     Decide if normal post or special shipment
     """
-    raise NotImplementedError
+    activation = get_object_or_404(Activation, pk=act_id)
+
+    if request.method == 'POST':
+        activation.done(save=True)
+        return activation.redirect_to_next()
+
+    return render(request, 'shipment/shipment_type.html', {
+        'activation': activation
+    })
 
 
 def package_goods(request, act_id):
