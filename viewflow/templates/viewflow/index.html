@@ -23,10 +23,10 @@
         </caption>
         {% for flow in app.flows %}
             <tr>
-            {% if flow.flow_url %}
-                <th scope="row"><a href="{{ model.flow_url }}">{{ model.name }}</a></th>
+            {% if flow.tasks_url %}
+                <th scope="row"><a href="{{ flow.tasks_url }}">{{ flow.name }}</a></th>
             {% else %}
-                <th scope="row">{{ model.name }}</th>
+                <th scope="row">{{ flow.name }}</th>
             {% endif %}
 
             {% if flow.start_url %}

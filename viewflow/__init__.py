@@ -79,7 +79,38 @@ class FlowSite(object):
         self._registry[model] = flow
 
     def index(self, request):
-        return render(request, 'viewflow/index.html')
+        """
+        Displays list of all installed flows page
+        """
+        app_dict = {}
+        for model, flow in self._registry.items():
+            app_label = model._meta.app_label
+            flow_dict = {
+                'name': 'TODO',
+                'tasks_url': 'TODO',
+                'start_url': 'TODO'
+            }
+            
+            if app_label in app_dict:
+                app_dict[app_label]['flows'].append(flow_dict)
+            else:
+                app_dict[app_label] = {
+                    'name': app_label.title(),
+                    'app_url': 'TODO',
+                    'flows': [flow_dict]
+                }
+
+        # Sort the apps alphabetically
+        app_list = list(app_dict.values())
+        app_list.sort(key=lambda x: x['name'])
+
+        # Sort the flows alphabetically within each app
+        for app in app_list:
+            app['flows'].sort(key=lambda x: x['name'])
+
+        return render(request, 'viewflow/index.html', {
+            'app_list': app_list
+        })
 
     def get_urls(self):
         urlpatterns = patterns('',

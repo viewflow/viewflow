@@ -2,7 +2,7 @@ import os
 import tempfile
 from django.test import TestCase
 from viewflow.graphviz import diagram
-from shipment.flow import Shipmentflow
+from shipment.flow import ShipmentFlow
 
 
 class ShipmentFlowConformanceTests(TestCase):
@@ -10,6 +10,6 @@ class ShipmentFlowConformanceTests(TestCase):
         outdir = tempfile.mkdtemp()
         png_filename = os.path.join(outdir, 'output.png')
 
-        diagram(Shipmentflow, png_filename)
+        diagram(ShipmentFlow, png_filename)
 
         self.assertTrue(os.path.exists(png_filename))
