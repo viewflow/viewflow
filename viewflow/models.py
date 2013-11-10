@@ -3,7 +3,7 @@ from viewflow.fields import ClassReferenceField
 
 
 class Process(models.Model):
-    flow_name = ClassReferenceField()
+    flow_cls = ClassReferenceField()
 
 
 class Task(models.Model):
