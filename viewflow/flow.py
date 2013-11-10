@@ -65,6 +65,9 @@ class _Node(object):
             return self.name.title().replace('_', ' ')
         return super(_Node, self).__str__()
 
+    def has_perm(self, request, activation):
+        raise NotImplementedError
+
 
 class _Event(_Node):
     """
