@@ -9,5 +9,6 @@ viewflow.autodiscover()
 urlpatterns = patterns('',
     url(r'^flow/', include(viewflow.site.urls)),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^samples/shipment', include('shipment.urls'))
 )
 
