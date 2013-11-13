@@ -11,6 +11,9 @@ from viewflow import flow
 from viewflow.resolve import Resolver
 
 
+this = flow.This()
+
+
 class FlowMeta(object):
     """
     Flow options

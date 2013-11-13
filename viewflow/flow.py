@@ -3,6 +3,15 @@ Ubiquitos language for flow construction
 """
 
 
+class This(object):
+    """
+    Helper for building forward referencied flow task
+    """
+    def __getattr__(self, name):
+        return name
+
+
+
 class _Edge(object):
     __slots__ = ('_src', '_dst', '_edge_class', '_label')
 

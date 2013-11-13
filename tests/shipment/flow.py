@@ -1,10 +1,10 @@
-from viewflow import site, flow, Flow
+from viewflow import site, flow, this, Flow
 from shipment import models, views
 
 
 class ShipmentFlow(Flow):
     start = flow.Start() \
-        .Activate('split_clerk_warehouse')
+        .Activate(this.split_clerk_warehouse)
 
     # clerk
     split_clerk_warehouse = flow.Split() \
@@ -22,7 +22,7 @@ class ShipmentFlow(Flow):
         .Next(views.assign_carrier)
 
     assign_carrier = flow.View(views.assign_carrier) \
-        .Next('join_delivery_mode')
+        .Next(this.join_delivery_mode)
 
     check_insurance = flow.View(views.check_insurance) \
         .Next('split_on_insurance')
@@ -35,24 +35,24 @@ class ShipmentFlow(Flow):
         .Next('join_on_insurance')
 
     join_on_insurance = flow.Join() \
-        .Next('join_delivery_mode')
+        .Next(this.join_delivery_mode)
 
     join_delivery_mode = flow.Join() \
-        .Next('join_clerk_warehouse')
+        .Next(this.join_clerk_warehouse)
 
     # Logistic manager
     take_extra_insurance = flow.View(views.take_extra_insurance) \
-        .Next('join_on_insurance')
+        .Next(this.join_on_insurance)
 
     # Warehouse worker
     package_goods = flow.View(views.package_goods) \
-        .Next('join_clerk_warehouse')
+        .Next(this.join_clerk_warehouse)
 
     join_clerk_warehouse = flow.Join() \
         .Next(views.move_package)
 
     move_package = flow.View(views.move_package) \
-        .Next('end')
+        .Next(this.end)
 
     end = flow.End()
 
