@@ -1,5 +1,5 @@
-from viewflow import site, flow, this, Flow
-from shipment import models, views
+from viewflow import flow, this, Flow
+from shipment import views
 
 
 class ShipmentFlow(Flow):
@@ -55,6 +55,3 @@ class ShipmentFlow(Flow):
         .Next(this.end)
 
     end = flow.End()
-
-
-site.register(models.ShipmentProcess, ShipmentFlow)

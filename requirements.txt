@@ -1,2 +1,2 @@
-https://github.com/django/django/archive/1.6b2.zip
+git+http://github.com/django/django.git#egg=django
 singledispatch
