@@ -2,7 +2,7 @@ from django.db import models
 from django.test import TestCase
 
 from viewflow import flow, Flow
-from viewflow.fields import ClassReferenceField
+from viewflow.fields import FlowReferenceField
 
 
 def perform_task(request, act_id):
@@ -43,8 +43,8 @@ class TestFlowAdmin(TestCase):
     pass
 
 
-class ClassReferencedModel(models.Model):
-    flow_cls = ClassReferenceField()
+class FlowReferencedModel(models.Model):
+    flow_cls = FlowReferenceField()
 
 
 class TestClassReferenceField(TestCase):
@@ -52,7 +52,8 @@ class TestClassReferenceField(TestCase):
     Custom db field for store referencies to class
     """
     def test_crud_succeed(self):
-        instance = ClassReferencedModel.objects.create(
-            flow_cls=TestClassReferenceField)
-        self.assertEqual(instance.flow_cls, TestClassReferenceField)
+        instance = FlowReferencedModel.objects.create(
+            flow_cls=TestFlow)
+        instance = FlowReferencedModel.objects.get(pk=instance.pk)
+        self.assertEqual(instance.flow_cls, TestFlow)
         

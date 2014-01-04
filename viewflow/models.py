@@ -1,9 +1,9 @@
 from django.db import models
-from viewflow.fields import ClassReferenceField
+from viewflow.fields import FlowReferenceField
 
 
 class Process(models.Model):
-    flow_cls = ClassReferenceField()
+    flow_cls = FlowReferenceField()
 
 
 class Task(models.Model):

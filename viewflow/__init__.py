@@ -51,6 +51,7 @@ class FlowMetaClass(type):
 
         # set up workflow meta
         meta = getattr(new_class, 'Meta', None)
+        
         new_class._meta = FlowMeta(meta, nodes)
 
         return new_class
