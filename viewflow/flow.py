@@ -11,7 +11,6 @@ class This(object):
         return name
 
 
-
 class _Edge(object):
     __slots__ = ('_src', '_dst', '_edge_class', '_label')
 
