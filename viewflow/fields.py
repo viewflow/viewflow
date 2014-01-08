@@ -45,7 +45,7 @@ class TaskDescriptor(object):
         task = instance.__dict__[self.field.name]
 
         if not isinstance(task, _Node):
-            flow_cls = getattr(instance, self.field.flow_cls_ref)
+            flow_cls = self._get_instance_value(instance, self.field.flow_cls_ref)
             task = getattr(flow_cls, task)
         return task
 
@@ -54,6 +54,15 @@ class TaskDescriptor(object):
             value = value.name
 
         instance.__dict__[self.field.name] = value
+
+    def _get_instance_value(self, instance, key):
+        if '__' in key:
+            field, _, subfield_key = key.partition('__')
+            instance = getattr(instance, field)
+            if not instance:
+                raise ValueError('{} have no {} field'.format(instance, field))
+            return self._get_instance_value(instance, subfield_key)
+        return getattr(instance, key)
 
 
 class TaskReferenceField(models.CharField):
