@@ -12,14 +12,15 @@ ALLOWED_HOSTS = []
 
 # Application definition
 INSTALLED_APPS = (
-    'django.contrib.admin',
+    'django.contrib.admin.apps.AdminConfig',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'viewflow.app.ViewflowConfig',
-    'tests.shipment'
+    'shipment',
+    'one_two_theee'
 )
 
 MIDDLEWARE_CLASSES = (
