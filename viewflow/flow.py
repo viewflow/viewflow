@@ -87,8 +87,9 @@ class Start(_Node):
     """
     Start process event
     """
-    def __init__(self):
+    def __init__(self, explicit=False):
         super(Start, self).__init__()
+        self._explicit = explicit
         self._activate_next = []
 
     def _outgoing(self):

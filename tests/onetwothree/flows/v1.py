@@ -1,5 +1,5 @@
 from viewflow import flow, this, Flow
-from onetwothee import views
+from one_two_thee import views
 
 
 class StepFlow(Flow):
