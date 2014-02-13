@@ -19,8 +19,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'viewflow.app.ViewflowConfig',
+    # Samples
     'shipment',
-    'one_two_theee'
+    'onetwothree'
 )
 
 MIDDLEWARE_CLASSES = (
@@ -53,3 +54,6 @@ USE_TZ = False
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'tests/templates'),
+)

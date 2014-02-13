@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>Viewflow project samples</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet">
+        <style type="text/css">
+          body {
+              padding-top: 60px;
+              padding-bottom: 40px;
+          }
+        </style>
+    </head>
+    <body>
+        <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+            <div class="container-fluid">
+                <ul class="nav navbar-nav">
+                    <li class="{% block nav_index %}{% endblock %}"><a href="/">Home</a></li>
+                    <li class="{% block nav_helloworld %}{% endblock %}"><a href="{% url 'onetwothree:start' %}">Hello, World</a></li>
+                    <li class="{% block nav_shipment %}{% endblock %}"><a href="#">Shipment</a></li>
+                </ul>
+            </div>
+        </nav>
+
+        <div class="container">
+            {% block content %}
+            {% endblock %}
+
+        </div>
+
+        <footer class="navbar-fixed-bottom">
+            <div class="container">
+                <p>&copy; Mikhail Podgurskiy 2014</p>
+            </div>
+        </footer>
+
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
+    </body>
+</html>

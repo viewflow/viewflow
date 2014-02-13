@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from shipment.flow import ShipmentFlow
+from shipment.flows import ShipmentFlow
 
 
 urlpatterns = patterns('shipment.views',

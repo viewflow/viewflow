@@ -1,5 +1,5 @@
 from viewflow import flow, this, Flow
-from one_two_thee import views
+from onetwothree import views
 
 
 class StepFlow(Flow):
@@ -9,7 +9,7 @@ class StepFlow(Flow):
     one = flow.View(views.one) \
         .Next(views.two)
 
-    two = flow.View(views.thee) \
+    two = flow.View(views.two) \
         .Next(views.three)
 
     three = flow.View(views.three) \

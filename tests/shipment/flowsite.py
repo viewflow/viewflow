@@ -1,4 +1,4 @@
 from viewflow import flowsite
-from shipment import models, flow
+from shipment import models, flows
 
-flowsite.register(models.ShipmentProcess, flow.ShipmentFlow)
+flowsite.register(models.ShipmentProcess, flows.ShipmentFlow)
