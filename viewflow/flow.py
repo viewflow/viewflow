@@ -50,6 +50,7 @@ class _Node(object):
     def __init__(self):
         self._role = None
         self._incoming_edges = []
+        self.flow_cls = None
         self.name = None
 
     def Role(self, role):

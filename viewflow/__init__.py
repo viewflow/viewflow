@@ -54,6 +54,10 @@ class FlowMetaClass(type):
         
         new_class._meta = FlowMeta(meta, nodes)
 
+        # back reference
+        for name, node in nodes.items():
+            node.flow_cls = new_class
+
         return new_class
 
 
