@@ -5,6 +5,8 @@ from viewflow.fields import FlowReferenceField, TaskReferenceField
 
 class Process(models.Model):
     flow_cls = FlowReferenceField()
+    created = models.DateTimeField(auto_now_add=True)
+    finished = models.DateTimeField(blank=True, null=True)
 
 
 class Task(models.Model):
