@@ -1,6 +1,10 @@
 from collections import defaultdict
 
+from django.conf.urls import patterns
+from django.utils.functional import cached_property
+
 from viewflow import flow, sites
+from viewflow.urls import node_url, node_url_reverse
 from viewflow.resolve import Resolver
 
 
@@ -51,10 +55,9 @@ class FlowMetaClass(type):
 
         # set up workflow meta
         meta = getattr(new_class, 'Meta', None)
-
         new_class._meta = FlowMeta(meta, nodes)
 
-        # back reference
+        # flow back reference
         for name, node in nodes.items():
             node.flow_cls = new_class
 
@@ -65,6 +68,20 @@ class Flow(object, metaclass=FlowMetaClass):
     """
     Base class for flow definition
     """
+    @classmethod
+    def urls(self):
+        node_urls = []
+        for node in self._meta.nodes():
+            url_getter = getattr(self, 'url_{}'.format(node.name), None)
+            url = url_getter() if url_getter else node_url(node)
+            if url:
+                node_urls.append(url)
+        return patterns('', *node_urls)
+
+    @classmethod
+    def reverse(self, task):
+        reverse_impl = getattr(self, 'revers_{}'.format(task.flow_task.name), None)
+        return reverse_impl(task) if reverse_impl else node_url_reverse(self.urls, task)
 
 
 # global object represents the default flow management site

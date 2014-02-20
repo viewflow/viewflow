@@ -218,7 +218,7 @@ def diagram(flow_cls, output_file_name=None):
     }
     """
 
-    if output_file_name:        
+    if output_file_name:
         dot = subprocess.Popen(['dot', '-Tpng', '-o', output_file_name],
                                stdout=subprocess.PIPE,
                                stdin=subprocess.PIPE,
