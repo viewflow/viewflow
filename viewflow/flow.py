@@ -88,9 +88,9 @@ class Start(_Node):
     """
     Start process event
     """
-    def __init__(self, explicit=False):
+    def __init__(self, view=None):
         super(Start, self).__init__()
-        self._explicit = explicit
+        self._view = view
         self._activate_next = []
 
     def _outgoing(self):
@@ -172,6 +172,7 @@ class View(_Task):
             yield _Edge(src=self, dst=next_node, edge_class='next')
 
     def Next(self, node):
+
         self._activate_next.append(node)
         return self
 

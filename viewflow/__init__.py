@@ -90,9 +90,9 @@ class Flow(object, metaclass=FlowMetaClass):
                 node_urls.append(url)
         return patterns('', *node_urls)
 
-    def reverse(self, task):
-        reverse_impl = getattr(self, 'revers_{}'.format(task.flow_task.name), None)
-        return reverse_impl(task) if reverse_impl else node_url_reverse(self.urls, task)
+    def reverse(self, task, **kwargs):
+        reverse_impl = getattr(self, 'reverse_{}'.format(task.flow_task.name), None)
+        return reverse_impl(task, **kwargs) if reverse_impl else node_url_reverse(self.urls, task, **kwargs)
 
 
 # global object represents the default flow management site
