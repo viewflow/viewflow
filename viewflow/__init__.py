@@ -1,7 +1,6 @@
 from collections import defaultdict
 
 from django.conf.urls import patterns
-from django.utils.functional import cached_property
 
 from viewflow import flow, sites
 from viewflow.urls import node_url, node_url_reverse
@@ -32,9 +31,22 @@ class FlowMeta(object):
         return self._nodes_by_name.get(name, None)
 
 
+class FlowInstanceDescriptor(object):
+    def __init__(self):
+        self.flow_instance = None
+
+    def __get__(self, instance=None, owner=None):
+        if self.flow_instance is None:
+            self.flow_instance = owner()
+        return self.flow_instance
+
+
 class FlowMetaClass(type):
     def __new__(cls, name, bases, attrs):
         new_class = super(FlowMetaClass, cls).__new__(cls, name, bases, attrs)
+
+        # singleton instance
+        new_class.instance = FlowInstanceDescriptor()
 
         # set up flow tasks
         nodes = {name: attr for name, attr in attrs.items() if isinstance(attr, flow._Node)}
@@ -68,7 +80,7 @@ class Flow(object, metaclass=FlowMetaClass):
     """
     Base class for flow definition
     """
-    @classmethod
+    @property
     def urls(self):
         node_urls = []
         for node in self._meta.nodes():
@@ -78,7 +90,6 @@ class Flow(object, metaclass=FlowMetaClass):
                 node_urls.append(url)
         return patterns('', *node_urls)
 
-    @classmethod
     def reverse(self, task):
         reverse_impl = getattr(self, 'revers_{}'.format(task.flow_task.name), None)
         return reverse_impl(task) if reverse_impl else node_url_reverse(self.urls, task)

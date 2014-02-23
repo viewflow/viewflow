@@ -18,7 +18,7 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'viewflow.app.ViewflowConfig',
+    'viewflow',
     # Samples
     'shipment',
     'onetwothree'
