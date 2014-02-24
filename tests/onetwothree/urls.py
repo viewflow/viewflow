@@ -1,7 +1,11 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
 from onetwothree.flows.v1 import StepFlow
 
+urlpatterns = patterns('',  # NOQA
+    url(r'^flow/', include(StepFlow.instance.urls)))
 
+
+"""
 urlpatterns = patterns('onetwothree.views',  # NOQA
     url(r'onetwothree/list/$', 'list',
         {'flow_cls': StepFlow}),
@@ -16,3 +20,4 @@ urlpatterns = patterns('onetwothree.views',  # NOQA
     url(r'onetwothree/end/$', 'end',
         {'flow_task': StepFlow.end}, name='v1_stepflow__end'),
 )
+"""

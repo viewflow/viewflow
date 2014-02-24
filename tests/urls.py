@@ -11,6 +11,6 @@ urlpatterns = patterns('',  # NOQA
     url(r'^$', TemplateView.as_view(template_name='index.html')),
     url(r'^flow/', include(flowsite.urls)),
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^samples/shipment', include('shipment.urls')),
-    url(r'^samples/onetwothree', include('onetwothree.urls', namespace='onetwothree'))
+    url(r'^samples/shipment', include('shipment.urls', namespace="shipment")),
+    url(r'^samples/onetwothree/', include('onetwothree.urls', namespace="onetwothree"))
 )

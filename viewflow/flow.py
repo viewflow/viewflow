@@ -1,6 +1,7 @@
 """
 Ubiquitos language for flow construction
 """
+from viewflow import views as viewflow_views
 
 
 class This(object):
@@ -96,6 +97,10 @@ class Start(_Node):
     def _outgoing(self):
         for next_node in self._activate_next:
             yield _Edge(src=self, dst=next_node, edge_class='next')
+
+    @property
+    def view(self):
+        return self._view if self._view else viewflow_views.start
 
     def Activate(self, node):
         self._activate_next.append(node)

@@ -88,6 +88,7 @@ class Flow(object, metaclass=FlowMetaClass):
             url = url_getter() if url_getter else node_url(node)
             if url:
                 node_urls.append(url)
+
         return patterns('', *node_urls)
 
     def reverse(self, task, **kwargs):

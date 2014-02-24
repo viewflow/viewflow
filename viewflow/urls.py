@@ -13,13 +13,11 @@ def node_url(flow_node):
 
 @node_url.register(flow.Start)
 def _(flow_node):
-    if flow_node._view:
-        return url(r'^start/$', flow_node._view, {'start_task': flow_node})
+    return url(r'^start/$', 'start', {'start_task': flow_node}, name='start')
 
 
 @node_url.register(flow.View)  # NOQA
 def _(flow_node):
-    import ipdb; ipdb.set_trace()
     return url(r'^{}/(?P<act_id>\d+)/$'.format(flow_node.name), flow_node._view, {'flow_task': flow_node})
 
 
