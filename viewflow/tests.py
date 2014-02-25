@@ -1,7 +1,8 @@
 from django.db import models
 from django.test import TestCase
 
-from viewflow import flow, Flow
+from viewflow import flow
+from viewflow.base import Flow
 from viewflow.fields import FlowReferenceField, TaskReferenceField
 
 
