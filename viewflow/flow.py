@@ -1,9 +1,6 @@
 """
 Ubiquitos language for flow construction
 """
-from viewflow import views as viewflow_views
-
-
 class This(object):
     """
     Helper for building forward referencied flow task
@@ -100,7 +97,7 @@ class Start(_Node):
 
     @property
     def view(self):
-        return self._view if self._view else viewflow_views.start
+        return self._view if self._view else 'viewflow.views.start'
 
     def Activate(self, node):
         self._activate_next.append(node)
