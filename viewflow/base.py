@@ -96,8 +96,8 @@ class Flow(object, metaclass=FlowMetaClass):
             if url:
                 node_urls.append(url)
 
-        return patterns('', *node_urls)
+        return patterns('', *node_urls), 'viewflow', self._meta.app_label
 
     def reverse(self, task, **kwargs):
         reverse_impl = getattr(self, 'reverse_{}'.format(task.flow_task.name), None)
-        return reverse_impl(task, **kwargs) if reverse_impl else node_url_reverse(self.urls, task, **kwargs)
+        return reverse_impl(task, **kwargs) if reverse_impl else node_url_reverse(task.flow_task, task, **kwargs)

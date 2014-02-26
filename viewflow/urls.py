@@ -2,7 +2,10 @@
 Construction flow task urls
 """
 from singledispatch import singledispatch
+
+from django.core.urlresolvers import reverse
 from django.conf.urls import url
+
 from viewflow import flow
 
 
@@ -28,4 +31,6 @@ def node_url_reverse(flow_node, task, **kwargs):
 
 @node_url_reverse.register(flow.Start)  # NOQA
 def _(flow_node, task, **kwargs):
-    pass
+    return reverse('viewflow:start', current_app=flow_node.flow_cls._meta.app_label)
+
+#reverse('viewflow:shipment.views.fill_post_label', args=[1], current_app='shipment')

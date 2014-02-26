@@ -1,7 +1,11 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import patterns, url, include
 from shipment.flows import ShipmentFlow
 
+urlpatterns = patterns('',  # NOQA
+    url(r'^flow/', include(ShipmentFlow.instance.urls)))
 
+
+"""
 urlpatterns = patterns('shipment.views',
     url(r'shipment_type/(?P<act_id>\d+)/$', 'shipment_type', {'flow_task': ShipmentFlow.shipment_type}),  # NOQA
     url(r'package_goods/(?P<act_id>\d+)/$', 'package_goods', {'flow_task': ShipmentFlow.package_goods}),
@@ -13,3 +17,4 @@ urlpatterns = patterns('shipment.views',
     url(r'assign_carrier/(?P<act_id>\d+)/$', 'assign_carrier', {'flow_task': ShipmentFlow.assign_carrier}),
     url(r'move_package/(?P<act_id>\d+)/$', 'move_package', {'flow_task': ShipmentFlow.move_package}),
 )
+"""
