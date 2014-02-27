@@ -1,13 +1,46 @@
+import re
 from django import template
-from django.template.base import Node, TemplateSyntaxError, kwarg_re
+from django.apps import apps
+from django.template.base import Node, TemplateSyntaxError
+from django.utils.module_loading import import_by_path
+
+from viewflow.urls import node_url_reverse
 
 
+kwarg_re = re.compile(r"(\w+)=?(.+)")
 register = template.Library()
 
 
 class FlowURLNode(Node):
     def __init__(self, actionname, kwargs):
-        pass
+        self.kwargs = kwargs
+        self.actionname = actionname
+
+    def render(self, context):
+        flow_path = self.actionname.resolve(context)
+
+        # resolve flow reference
+        try:
+            app_label, flow_path = flow_path.split('/')
+            flow_cls_path, action_name = flow_path.rsplit('.', 1)
+        except ValueError:
+            raise TemplateSyntaxError("Flow action should looks like app_label/FlowCls.action")
+
+        app_config = apps.get_app_config(app_label)
+        if app_config is None:
+            raise TemplateSyntaxError("{} app not found".format(app_label))
+
+        flow_cls = import_by_path('{}.flows.{}'.format(app_config.module.__package__, flow_cls_path))
+        flow_task = getattr(flow_cls, action_name, None)
+        if not flow_task:
+            raise TemplateSyntaxError("Action {} not found".format(action_name))
+
+        # url reverse
+        reverse_impl = getattr(flow_cls, 'reverse_{}'.format(flow_task.name), None)
+        if reverse_impl:
+            return reverse_impl(task=None, **self.kwargs)
+        else:
+            return node_url_reverse(flow_task, task=None, **self.kwargs)
 
 
 @register.tag
@@ -19,8 +52,7 @@ def flowurl(parser, token):
     """
     bits = token.split_contents()
     if len(bits) < 2:
-        raise TemplateSyntaxError("'%s' takes at least one , argument"
-                                  " (path to a flow action)" % bits[0])
+        raise TemplateSyntaxError("'{}' takes at least one , argument" " (path to a flow action)".format(bits[0]))
 
     kwargs = {}
 

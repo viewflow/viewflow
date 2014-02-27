@@ -1,3 +1,4 @@
+{% load viewflow %}
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -17,8 +18,8 @@
             <div class="container-fluid">
                 <ul class="nav navbar-nav">
                     <li class="{% block nav_index %}{% endblock %}"><a href="/">Home</a></li>
-                    <li class="{% block nav_helloworld %}{% endblock %}"><a href="{% url 'onetwothree:start' %}">Hello, World</a></li>
-                    <li class="{% block nav_shipment %}{% endblock %}"><a href="#">Shipment</a></li>
+                    <li class="{% block nav_helloworld %}{% endblock %}"><a href="{% flowurl 'onetwothree/v1.StepFlow.start' %}">Hello, World</a></li>
+                    <li class="{% block nav_shipment %}{% endblock %}"><a href="{% flowurl 'shipment/ShipmentFlow.start' %}">Shipment</a></li>
                 </ul>
             </div>
         </nav>

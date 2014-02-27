@@ -162,8 +162,8 @@ class View(_Task):
     """
     def __init__(self, view, description=None):
         super(View, self).__init__()
+        self.view = view
         self._activate_next = []
-        self._view = view
         self._description = description
 
     @property
@@ -177,7 +177,6 @@ class View(_Task):
             yield _Edge(src=self, dst=next_node, edge_class='next')
 
     def Next(self, node):
-
         self._activate_next.append(node)
         return self
 

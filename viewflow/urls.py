@@ -16,12 +16,14 @@ def node_url(flow_node):
 
 @node_url.register(flow.Start)
 def _(flow_node):
-    return url(r'^start/$', 'start', {'start_task': flow_node}, name='start')
+    return url(r'^{}/$'.format(flow_node.name), flow_node.view, {'start_task': flow_node},
+               name=flow_node.name)
 
 
 @node_url.register(flow.View)  # NOQA
 def _(flow_node):
-    return url(r'^{}/(?P<act_id>\d+)/$'.format(flow_node.name), flow_node._view, {'flow_task': flow_node})
+    return url(r'^{}/(?P<act_id>\d+)/$'.format(flow_node.name), flow_node.view, {'flow_task': flow_node},
+               name=flow_node.name)
 
 
 @singledispatch
@@ -31,6 +33,10 @@ def node_url_reverse(flow_node, task, **kwargs):
 
 @node_url_reverse.register(flow.Start)  # NOQA
 def _(flow_node, task, **kwargs):
-    return reverse('viewflow:start', current_app=flow_node.flow_cls._meta.app_label)
+    return reverse('viewflow:start', current_app=flow_node.flow_cls._meta.namespace)
 
-#reverse('viewflow:shipment.views.fill_post_label', args=[1], current_app='shipment')
+
+@node_url_reverse.register(flow.View)  # NOQA
+def _(flow_node, task, **kwargs):
+    pk = task.pk if task else kwargs.get('pk')
+    reverse('viewflow:{}'.format(flow_node.name), args=[pk], current_app=flow_node.flow_cls._meta.namespace)

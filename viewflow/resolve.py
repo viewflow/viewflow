@@ -16,7 +16,7 @@ def node_callable(flow_node):
 
 @node_callable.register(flow.View)
 def _(flow_node):
-    return flow_node._view
+    return flow_node.view
 
 
 @node_callable.register(flow.Job)  # NOQA
