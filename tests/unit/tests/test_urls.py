@@ -10,7 +10,7 @@ class TestURLPatterns(TestCase):
         self.assertEqual(3, len(patterns))
 
         urls, app, namespace = patterns
-        self.assertEqual(3, len(urls))
+        self.assertEqual(4, len(urls))
         self.assertEqual('viewflow', app)
         self.assertEqual(SingleTaskFlow._meta.namespace, namespace)
 

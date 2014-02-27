@@ -1,6 +1,7 @@
 import re
 from django import template
 from django.apps import apps
+from django.core.urlresolvers import reverse
 from django.template.base import Node, TemplateSyntaxError
 from django.utils.module_loading import import_by_path
 
@@ -31,16 +32,20 @@ class FlowURLNode(Node):
             raise TemplateSyntaxError("{} app not found".format(app_label))
 
         flow_cls = import_by_path('{}.flows.{}'.format(app_config.module.__package__, flow_cls_path))
-        flow_task = getattr(flow_cls, action_name, None)
-        if not flow_task:
-            raise TemplateSyntaxError("Action {} not found".format(action_name))
 
-        # url reverse
-        reverse_impl = getattr(flow_cls, 'reverse_{}'.format(flow_task.name), None)
-        if reverse_impl:
-            return reverse_impl(task=None, **self.kwargs)
+        if action_name == 'index':
+            return reverse('viewflow:index', current_app=flow_cls._meta.namespace)
         else:
-            return node_url_reverse(flow_task, task=None, **self.kwargs)
+            flow_task = getattr(flow_cls, action_name, None)
+            if not flow_task:
+                raise TemplateSyntaxError("Action {} not found".format(action_name))
+
+            # url reverse
+            reverse_impl = getattr(flow_cls, 'reverse_{}'.format(flow_task.name), None)
+            if reverse_impl:
+                return reverse_impl(task=None, **self.kwargs)
+            else:
+                return node_url_reverse(flow_task, task=None, **self.kwargs)
 
 
 @register.tag

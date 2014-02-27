@@ -1,3 +1,7 @@
+def index(request, flow_cls):
+    pass
+
+
 def start(request, start_task):
     pass
 

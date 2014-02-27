@@ -107,7 +107,7 @@ class Start(_Node):
         return self
 
 
-class End(_Event):
+class End(_Node):
     """
     End process event
     """

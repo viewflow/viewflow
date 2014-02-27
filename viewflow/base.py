@@ -88,6 +88,12 @@ class FlowMetaClass(type):
         for name, node in nodes.items():
             node.flow_cls = new_class
 
+        # index view
+        if not getattr(new_class, 'index_view', None):
+            from viewflow.views import index
+            new_class.index_view = index
+            new_class.index_view = staticmethod(new_class.index_view)
+
         return new_class
 
 
@@ -97,7 +103,12 @@ class Flow(object, metaclass=FlowMetaClass):
     """
     @property
     def urls(self):
-        node_urls = []
+        from django.conf.urls import url
+
+        node_urls = [
+            url(r'^$', self.index_view, {'flow_cls': type(self)}, name='index')
+        ]
+
         for node in self._meta.nodes():
             url_getter = getattr(self, 'url_{}'.format(node.name), None)
             url = url_getter() if url_getter else node_url(node)
