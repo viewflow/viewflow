@@ -17,6 +17,10 @@ class Task(models.Model):
     started = models.DateTimeField(blank=True, null=True)
     finished = models.DateTimeField(blank=True, null=True)
 
+    def get_absolute_url(self):
+        if self.process and self.flow_task:
+            return self.process.flow_cls.instance.reverse(self)
+
     def save(self):
         if not self.started:
             self.started = datetime.now()
