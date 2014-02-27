@@ -111,6 +111,15 @@ class End(_Event):
     """
     End process event
     """
+    def __init__(self, view=None):
+        super(End, self).__init__()
+        self._view = view
+
+    @property
+    def view(self):
+        from viewflow.views import end
+        return self._view if self._view else end
+
     def _outgoing(self):
         return iter([])
 
