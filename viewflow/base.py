@@ -18,9 +18,17 @@ class FlowMeta(object):
     """
     Flow options
     """
-    def __init__(self, app_label, nodes):
+    def __init__(self, app_label, flow_cls, nodes):
         self.app_label = app_label
+        self.flow_cls = flow_cls
         self._nodes_by_name = nodes
+
+    @property
+    def namespace(self):
+        module = "{}.{}".format(self.flow_cls.__module__, self.flow_cls.__name__)
+        app_config = apps.get_containing_app_config(module)
+        subpath = module.lstrip(app_config.module.__package__+'.')
+        return "{}/{}".format(app_config.label, subpath)
 
     def nodes(self):
         """
@@ -74,7 +82,7 @@ class FlowMetaClass(type):
 
         if app_config is None:
             raise ImportError("Flow can't be imported before app setup")
-        new_class._meta = FlowMeta(app_config.label, nodes)
+        new_class._meta = FlowMeta(app_config.label, new_class, nodes)
 
         # flow back reference
         for name, node in nodes.items():
@@ -96,7 +104,7 @@ class Flow(object, metaclass=FlowMetaClass):
             if url:
                 node_urls.append(url)
 
-        return patterns('', *node_urls), 'viewflow', self._meta.app_label
+        return patterns('', *node_urls), 'viewflow', self._meta.namespace
 
     def reverse(self, task, **kwargs):
         reverse_impl = getattr(self, 'reverse_{}'.format(task.flow_task.name), None)
