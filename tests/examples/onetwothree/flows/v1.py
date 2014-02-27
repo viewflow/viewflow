@@ -1,6 +1,6 @@
 from viewflow import flow
 from viewflow.base import this, Flow
-from onetwothree import views
+from examples.onetwothree import views
 
 
 class StepFlow(Flow):

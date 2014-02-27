@@ -2,7 +2,7 @@ import os
 import tempfile
 from django.test import TestCase
 from viewflow.graphviz import diagram
-from shipment.flows import ShipmentFlow
+from examples.shipment.flows import ShipmentFlow
 
 
 class ShipmentFlowConformanceTests(TestCase):

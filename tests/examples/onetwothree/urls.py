@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url, include
-from onetwothree.flows.v1 import StepFlow
+from examples.onetwothree.flows.v1 import StepFlow
 
 urlpatterns = patterns('',  # NOQA
     url(r'^flow/', include(StepFlow.instance.urls)))

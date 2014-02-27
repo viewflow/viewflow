@@ -1,6 +1,6 @@
 from viewflow import flow
 from viewflow.base import this, Flow
-from shipment import views
+from examples.shipment import views
 
 
 class ShipmentFlow(Flow):

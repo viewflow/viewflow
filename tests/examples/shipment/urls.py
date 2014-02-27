@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url, include
-from shipment.flows import ShipmentFlow
+from examples.shipment.flows import ShipmentFlow
 
 urlpatterns = patterns('',  # NOQA
     url(r'^flow/', include(ShipmentFlow.instance.urls)))
