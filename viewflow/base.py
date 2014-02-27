@@ -27,7 +27,7 @@ class FlowMeta(object):
     def namespace(self):
         module = "{}.{}".format(self.flow_cls.__module__, self.flow_cls.__name__)
         app_config = apps.get_containing_app_config(module)
-        subpath = module.lstrip(app_config.module.__package__+'.')
+        subpath = module.lstrip(app_config.module.__package__+'.flows.')
         return "{}/{}".format(app_config.label, subpath)
 
     def nodes(self):
