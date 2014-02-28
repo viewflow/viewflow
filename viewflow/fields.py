@@ -22,6 +22,12 @@ class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
         return value
 
     def get_prep_value(self, value):
+        if not isinstance(value, type):
+            # HACK: Django calls callable due query parameter
+            # preparation. So here we can get Flow instance,
+            # even if we pass Flow class to query.
+            value = value.__class__
+
         module = "{}.{}".format(value.__module__, value.__name__)
         app_config = apps.get_containing_app_config(module)
         subpath = module.lstrip(app_config.module.__package__+'.')

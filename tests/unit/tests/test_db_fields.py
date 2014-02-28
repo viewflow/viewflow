@@ -23,3 +23,11 @@ class TestReferenceFields(TestCase):
         instance = FlowReferencedModel.objects.get(pk=instance.pk)
         self.assertEqual(instance.flow_cls, SingleTaskFlow)
         self.assertEqual(instance.task, SingleTaskFlow.end)
+
+    def test_get_by_cls_succeed(self):
+        first = FlowReferencedModel.objects.create(
+            flow_cls=SingleTaskFlow, task=SingleTaskFlow.end)
+
+        second = FlowReferencedModel.objects.get(flow_cls=SingleTaskFlow)
+
+        self.assertEqual(first.pk, second.pk)
