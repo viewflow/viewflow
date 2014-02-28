@@ -8,9 +8,11 @@ def index(request, flow_cls):
     process_list = Process.objects.filter(flow_cls=flow_cls) \
                                   .order_by('-created')
 
-    return render(request, ('{}/flow/index.html'.format(flow_cls._meta.app_label),
-                            'viewflow/flow/index.html'),
-                  {'process_list': get_page(request, process_list)})
+    templates = ('{}/flow/index.html'.format(flow_cls._meta.app_label),
+                 'viewflow/flow/index.html')
+
+    return render(request, templates, {'process_list': get_page(request, process_list)},
+                  current_app=flow_cls._meta.namespace)
 
 
 def start(request, start_task):
