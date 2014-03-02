@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.forms.models import modelform_factory
 from django.shortcuts import redirect
 
-from viewflow.models import Process, Activation
+from viewflow.models import Process
 from viewflow.shortcuts import get_page
 
 
@@ -18,7 +18,17 @@ def index(request, flow_cls):
 
 
 def start(request, start_task):
-    pass
+    activation = start_task.start(request.POST or None)
+
+    if request.method == 'POST' and 'start' in request.POST:
+        activation.done()
+        return activation.redirect_to_next()
+
+    templates = ('{}/flow/start.html'.format(start_task.flow_cls._meta.app_label),
+                 'viewflow/flow/start.html')
+
+    return render(request, templates,
+                  {'activation': activation})
 
 
 def end(request, end_task, activation_id):
@@ -26,17 +36,17 @@ def end(request, end_task, activation_id):
 
 
 def task(request, flow_task, activation_id):
-    activation = Activation.objects.start(activation_id, request.POST or None)
+    activation = flow_task.start(activation_id, request.POST or None)
     form_cls = modelform_factory(flow_task.flow_cls.process_model)
     form = form_cls(request.POST or None)
 
     if form.is_valid():
         form.save()
         activation.done()
-    return redirect(activation.guess_next())
+        return redirect(activation.guess_next())
 
-    templates = ('{}/flow/index.html'.format(flow_task.flow_cls._meta.app_label),
-                 'viewflow/flow/index.html')
+    templates = ('{}/flow/task.html'.format(flow_task.flow_cls._meta.app_label),
+                 'viewflow/flow/task.html')
 
     return render(request, templates,
                   {'form': form,
