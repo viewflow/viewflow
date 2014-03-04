@@ -2,8 +2,6 @@ from django.apps import apps
 from django.db import models
 from django.utils.module_loading import import_by_path
 
-from viewflow.flow import _Node
-
 
 class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
     description = """Flow class reference field,
@@ -50,13 +48,13 @@ class TaskDescriptor(object):
 
         task = instance.__dict__[self.field.name]
 
-        if not isinstance(task, _Node):
+        if isinstance(task, str):
             flow_cls = self._get_instance_value(instance, self.field.flow_cls_ref)
             task = getattr(flow_cls, task)
         return task
 
     def __set__(self, instance, value):
-        if isinstance(value, _Node):
+        if not isinstance(value, str):
             value = value.name
 
         instance.__dict__[self.field.name] = value
@@ -91,12 +89,12 @@ class TaskReferenceField(models.CharField):
         return name, path, args, kwargs
 
     def get_default(self):
-        if isinstance(self.default, _Node):
+        if not isinstance(self.default, str):
             return self.default.name
         return super(TaskReferenceField, self).get_default()
 
     def get_prep_value(self, value):
-        if isinstance(value, _Node):
+        if not isinstance(value, str):
             return value.name
         return super(TaskReferenceField, self).get_prep_value(value)
 
