@@ -28,7 +28,8 @@ class Task(models.Model):
 
 
 class ActivationManager(models.Manager):
-    pass
+    def from_data(data):
+        pass
 
 
 class Activation(Task):
@@ -37,11 +38,21 @@ class Activation(Task):
     """
     objects = ActivationManager()
 
+    def __init__(self, *args, **kwargs):
+        super(Activation, self).__init__(*args, **kwargs)
+        self._form = None
+
     def done(self):
         pass
 
-    def redirect_to_next():
-        pass
+    @property
+    def form(self):
+        from viewflow.forms import ActivationDataForm
+
+        if not self._form:
+            self._form = ActivationDataForm(initial={
+                'started': self.started or datetime.now()})
+        return self._form
 
     class Meta:
         proxy = True
