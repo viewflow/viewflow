@@ -4,6 +4,7 @@ Ubiquitos language for flow construction
 from datetime import datetime
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.forms import ActivationDataForm
+from viewflow.models import Activation
 
 
 class This(object):
@@ -110,14 +111,14 @@ class Start(_Node):
         return self
 
     def start(self, data=None):
-        from viewflow.models import Activation
-
         form = ActivationDataForm(data=data, initial={'started': datetime.now()})
 
         if data and not form.is_valid():
             raise FlowRuntimeError('Activation metadata is broken {}'.format(form.errors))
 
-        return Activation(started=form['started'].value())
+        return Activation(
+            form=form,
+            started=form['started'].value())
 
 
 class End(_Node):

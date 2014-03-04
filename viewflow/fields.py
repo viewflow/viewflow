@@ -1,5 +1,6 @@
 from django.apps import apps
 from django.db import models
+from django.db.models.fields import NOT_PROVIDED
 from django.utils.module_loading import import_by_path
 
 
@@ -89,7 +90,7 @@ class TaskReferenceField(models.CharField):
         return name, path, args, kwargs
 
     def get_default(self):
-        if not isinstance(self.default, str):
+        if self.default != NOT_PROVIDED and not isinstance(self.default, str):
             return self.default.name
         return super(TaskReferenceField, self).get_default()
 

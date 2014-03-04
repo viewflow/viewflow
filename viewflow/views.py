@@ -20,7 +20,7 @@ def start(request, start_task):
     activation = start_task.start(request.POST or None)
 
     if request.method == 'POST' and 'start' in request.POST:
-        activation.done()
+        start_task.done(activation)
         return redirect('viewflow:index', current_app=start_task.flow_cls._meta.app_label)
 
     templates = ('{}/flow/start.html'.format(start_task.flow_cls._meta.app_label),
@@ -41,7 +41,7 @@ def task(request, flow_task, activation_id):
 
     if form.is_valid():
         form.save()
-        activation.done()
+        flow_task.done(activation)
         return redirect('viewflow:index', current_app=flow_task.flow_cls._meta.app_label)
 
     templates = ('{}/flow/task.html'.format(flow_task.flow_cls._meta.app_label),
