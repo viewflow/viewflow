@@ -17,9 +17,9 @@
         <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
             <div class="container-fluid">
                 <ul class="nav navbar-nav">
-                    <li class="{% block nav_index %}{% endblock %}"><a href="/">Home</a></li>
-                    <li class="{% block nav_helloworld %}{% endblock %}"><a href="{% flowurl 'onetwothree/v1.StepFlow.index' %}">Hello, World</a></li>
-                    <li class="{% block nav_shipment %}{% endblock %}"><a href="{% flowurl 'shipment/ShipmentFlow.index' %}">Shipment</a></li>
+                    <li {% if request.path == "/" %}class="active"{% endif %}><a href="/">Home</a></li>
+                    <li {% if "/onetwothree/" in request.path %}class="active"{% endif %}><a href="{% flowurl 'onetwothree/v1.StepFlow.index' %}">Hello, World</a></li>
+                    <li {% if "/shipment" in request.path %}class="active"{% endif %}><a href="{% flowurl 'shipment/ShipmentFlow.index' %}">Shipment</a></li>
                 </ul>
             </div>
         </nav>
