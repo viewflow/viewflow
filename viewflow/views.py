@@ -1,9 +1,8 @@
 from django.shortcuts import render
 from django.forms.models import modelform_factory
-from django.shortcuts import redirect
 
 from viewflow.models import Process
-from viewflow.shortcuts import get_page
+from viewflow.shortcuts import get_page, redirect
 
 
 def index(request, flow_cls):
@@ -22,7 +21,7 @@ def start(request, start_task):
 
     if request.method == 'POST' and 'start' in request.POST:
         activation.done()
-        return activation.redirect_to_next()
+        return redirect('viewflow:index', current_app=start_task.flow_cls._meta.app_label)
 
     templates = ('{}/flow/start.html'.format(start_task.flow_cls._meta.app_label),
                  'viewflow/flow/start.html')
@@ -43,7 +42,7 @@ def task(request, flow_task, activation_id):
     if form.is_valid():
         form.save()
         activation.done()
-        return redirect(activation.guess_next())
+        return redirect('viewflow:index', current_app=flow_task.flow_cls._meta.app_label)
 
     templates = ('{}/flow/task.html'.format(flow_task.flow_cls._meta.app_label),
                  'viewflow/flow/task.html')

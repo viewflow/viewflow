@@ -1,4 +1,6 @@
+from django.core import urlresolvers
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.shortcuts import redirect as django_redirect
 
 
 def get_page(request, query, page_attr='page', per_page=25):
@@ -20,3 +22,16 @@ def get_page(request, query, page_attr='page', per_page=25):
         result = paginator.page(paginator.num_pages)
 
     return result
+
+
+def redirect(to, permanent=False, current_app=None, *args, **kwargs):
+    """
+    redirect that takes into account current_app parameter for url resolution
+    """
+    if current_app:
+        try:
+            to = urlresolvers.reverse(to, args=args, kwargs=kwargs)
+        except urlresolvers.NoReverseMatch:
+            pass
+
+    return django_redirect(to, permanent=permanent, *args, **kwargs)
