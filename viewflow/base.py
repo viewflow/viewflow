@@ -7,6 +7,7 @@ from django.apps import apps
 from django.conf.urls import patterns
 
 from viewflow import flow
+from viewflow.models import Process
 from viewflow.urls import node_url, node_url_reverse
 from viewflow.resolve import Resolver
 
@@ -101,6 +102,8 @@ class Flow(object, metaclass=FlowMetaClass):
     """
     Base class for flow definition
     """
+    process_cls = Process
+
     @property
     def urls(self):
         from django.conf.urls import url

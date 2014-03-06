@@ -2,19 +2,20 @@
 
 {% block content %}
 <a class="btn btn-default" href="{% url 'viewflow:start' %}">Start New<a>
-
 <table class="table">
     <thead>
+        <th>#</th>
+        <th class="span1">Started</th>
+        <th class="span1">Finished</th>
         <th>Active Tasks</th>
-        <th>Started</th>
-        <th>Finished</th>
     </thead>
     <tbody>
         {% for process in process_list %}
         <tr>
-            <td>{{ process.active_tasks }}</td>
+            <td>{{ process.id }}</td>
             <td>{{ process.created }}</td>
-            <td>{{ process.finished }}</td>
+            <td>{{ process.finished|default:"" }}</td>
+            <td>{{ process.active_tasks }}</td>
         </tr>
         {% empty %}
         <tr>

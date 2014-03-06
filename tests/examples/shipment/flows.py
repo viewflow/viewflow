@@ -1,9 +1,13 @@
 from viewflow import flow
 from viewflow.base import this, Flow
+
 from examples.shipment import views
+from examples.shipment.models import ShipmentProcess
 
 
 class ShipmentFlow(Flow):
+    process_cls = ShipmentProcess
+
     start = flow.Start() \
         .Activate(this.split_clerk_warehouse)
 

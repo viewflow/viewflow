@@ -1,13 +1,12 @@
 from django.shortcuts import render
 from django.forms.models import modelform_factory
 
-from viewflow.models import Process
 from viewflow.shortcuts import get_page, redirect
 
 
 def index(request, flow_cls):
-    process_list = Process.objects.filter(flow_cls=flow_cls) \
-                                  .order_by('-created')
+    process_list = flow_cls.process_cls.objects.filter(flow_cls=flow_cls) \
+                                               .order_by('-created')
 
     templates = ('{}/flow/index.html'.format(flow_cls._meta.app_label),
                  'viewflow/flow/index.html')

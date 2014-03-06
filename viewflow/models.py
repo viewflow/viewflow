@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.db import models
+from viewflow.exceptions import FlowRuntimeError
 from viewflow.fields import FlowReferenceField, TaskReferenceField
 
 
@@ -27,31 +28,18 @@ class Task(models.Model):
         super(Task, self).save()
 
 
-class ActivationManager(models.Manager):
-    def from_data(data):
-        pass
-
-
 class Activation(Task):
     """
     Proxy class for active task
     """
-    objects = ActivationManager()
-
     def __init__(self, *args, **kwargs):
+        self._form = kwargs.pop('form', None)
         super(Activation, self).__init__(*args, **kwargs)
-        self._form = None
-
-    def done(self):
-        pass
 
     @property
     def form(self):
-        from viewflow.forms import ActivationDataForm
-
         if not self._form:
-            self._form = ActivationDataForm(initial={
-                'started': self.started or datetime.now()})
+            raise FlowRuntimeError('No activation from instance set')
         return self._form
 
     class Meta:

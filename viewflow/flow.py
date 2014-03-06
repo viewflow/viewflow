@@ -4,7 +4,7 @@ Ubiquitos language for flow construction
 from datetime import datetime
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.forms import ActivationDataForm
-from viewflow.models import Activation
+from viewflow.models import Process, Activation
 
 
 class This(object):
@@ -117,8 +117,24 @@ class Start(_Node):
             raise FlowRuntimeError('Activation metadata is broken {}'.format(form.errors))
 
         return Activation(
-            form=form,
-            started=form['started'].value())
+            process=self.flow_cls.process_cls(flow_cls=self.flow_cls),
+            flow_task=self,
+            started=form['started'].value(),
+            form=form)
+
+    def done(self, activation):
+        # Create process
+        process = activation.process
+        process.save()
+
+        # Finish activation
+        activation.process = process
+        activation.finished = datetime.now()
+        activation.save()
+
+        # Activate all outgoing edges
+        for outgoing in self._outgoing():
+            outgoing.dst.activate(activation)
 
 
 class End(_Node):
@@ -177,6 +193,11 @@ class _Task(_Node):
     """
     Base class for algoritmically performed tasks
     """
+    def activate(self, prev_activation):
+        activation = Activation(
+            process=prev_activation.process,
+            flow_task=self)
+        activation.save()
 
 
 class View(_Task):
@@ -202,6 +223,12 @@ class View(_Task):
     def Next(self, node):
         self._activate_next.append(node)
         return self
+
+    def start(self, activation_id, data=None):
+        raise NotImplementedError
+
+    def done(self, activation):
+        raise NotImplementedError
 
 
 class Job(_Task):
