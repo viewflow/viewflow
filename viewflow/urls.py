@@ -45,4 +45,4 @@ def _(flow_node, task, **kwargs):
 @node_url_reverse.register(flow.View)  # NOQA
 def _(flow_node, task, **kwargs):
     pk = task.pk if task else kwargs.get('pk')
-    reverse('viewflow:{}'.format(flow_node.name), args=[pk], current_app=flow_node.flow_cls._meta.namespace)
+    return reverse('viewflow:{}'.format(flow_node.name), args=[pk], current_app=flow_node.flow_cls._meta.namespace)

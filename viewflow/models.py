@@ -9,6 +9,9 @@ class Process(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     finished = models.DateTimeField(blank=True, null=True)
 
+    def active_tasks(self):
+        return Task.objects.filter(process=self, finished__isnull=True).order_by('created')
+
 
 class Task(models.Model):
     process = models.ForeignKey(Process)
@@ -41,6 +44,10 @@ class Activation(Task):
         if not self._form:
             raise FlowRuntimeError('No activation from instance set')
         return self._form
+
+    @form.setter
+    def form(self, form):
+        self._form = form
 
     class Meta:
         proxy = True

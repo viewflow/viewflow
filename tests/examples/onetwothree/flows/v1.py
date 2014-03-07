@@ -9,13 +9,13 @@ class StepFlow(Flow):
     process_cls = StepProcess
 
     start = flow.Start() \
-        .Activate(views.one)
+        .Activate(this.one)
 
-    one = flow.View(views.one) \
-        .Next(views.two)
+    one = flow.View() \
+        .Next(this.two)
 
     two = flow.View(views.two) \
-        .Next(views.three)
+        .Next(this.three)
 
     three = flow.View(views.three) \
         .Next(this.end)

@@ -204,9 +204,9 @@ class View(_Task):
     """
     Human performed task
     """
-    def __init__(self, view, description=None):
+    def __init__(self, view=None, description=None):
         super(View, self).__init__()
-        self.view = view
+        self._view = view
         self._activate_next = []
         self._description = description
 
@@ -215,6 +215,11 @@ class View(_Task):
         if self._description:
             return self.description
         return self.name.replace('_', ' ').capitalize()
+
+    @property
+    def view(self):
+        from viewflow.views import task
+        return self._view if self._view else task
 
     def _outgoing(self):
         for next_node in self._activate_next:
@@ -225,10 +230,23 @@ class View(_Task):
         return self
 
     def start(self, activation_id, data=None):
-        raise NotImplementedError
+        form = ActivationDataForm(data=data, initial={'started': datetime.now()})
+
+        if data and not form.is_valid():
+            raise FlowRuntimeError('Activation metadata is broken {}'.format(form.errors))
+
+        activation = Activation.objects.get(pk=activation_id)
+        activation.form = form
+        return activation
 
     def done(self, activation):
-        raise NotImplementedError
+        # Finish activation
+        activation.finished = datetime.now()
+        activation.save()
+
+        # Activate all outgoing edges
+        for outgoing in self._outgoing():
+            outgoing.dst.activate(activation)
 
 
 class Job(_Task):

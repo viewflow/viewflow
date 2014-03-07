@@ -38,10 +38,10 @@ def end(request, end_task, activation_id):
 
 
 @transaction.atomic()
-def task(request, flow_task, activation_id):
-    activation = flow_task.start(activation_id, request.POST or None)
-    form_cls = modelform_factory(flow_task.flow_cls.process_model)
-    form = form_cls(request.POST or None)
+def task(request, flow_task, act_id):
+    activation = flow_task.start(act_id, request.POST or None)
+    form_cls = modelform_factory(flow_task.flow_cls.process_cls, exclude=["flow_cls", "finished"])
+    form = form_cls(request.POST or None, instance=activation.process)
 
     if form.is_valid():
         form.save()

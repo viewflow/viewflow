@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ task.flow_task.name }}</h1>
+<form method="POST">
+{% csrf_token %}
+{{ form }}
+{{ activation.form }}
+<button type="submit" name="done" class="btn btn-default">Done</button>
+</form>
+{% endblock %}

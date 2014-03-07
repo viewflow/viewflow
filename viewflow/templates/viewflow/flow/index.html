@@ -15,7 +15,12 @@
             <td>{{ process.id }}</td>
             <td>{{ process.created }}</td>
             <td>{{ process.finished|default:"" }}</td>
-            <td>{{ process.active_tasks }}</td>
+            <td>
+                {% for task in process.active_tasks %}
+                <a href="{{ task.get_absolute_url }}">{{ task.flow_task.name }}</a>
+                {% endfor %}
+            </td>
+
         </tr>
         {% empty %}
         <tr>

@@ -1,5 +1,6 @@
+from django.db import models
 from viewflow.models import Process
 
 
 class StepProcess(Process):
-    pass
+    one = models.CharField(max_length=50)
