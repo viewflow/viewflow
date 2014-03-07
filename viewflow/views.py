@@ -1,9 +1,11 @@
+from django.db import transaction
 from django.shortcuts import render
 from django.forms.models import modelform_factory
 
 from viewflow.shortcuts import get_page, redirect
 
 
+@transaction.atomic()
 def index(request, flow_cls):
     process_list = flow_cls.process_cls.objects.filter(flow_cls=flow_cls) \
                                                .order_by('-created')
@@ -15,6 +17,7 @@ def index(request, flow_cls):
                   current_app=flow_cls._meta.namespace)
 
 
+@transaction.atomic()
 def start(request, start_task):
     activation = start_task.start(request.POST or None)
 
@@ -29,10 +32,12 @@ def start(request, start_task):
                   {'activation': activation})
 
 
+@transaction.atomic()
 def end(request, end_task, activation_id):
     pass
 
 
+@transaction.atomic()
 def task(request, flow_task, activation_id):
     activation = flow_task.start(activation_id, request.POST or None)
     form_cls = modelform_factory(flow_task.flow_cls.process_model)
