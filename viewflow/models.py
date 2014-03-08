@@ -1,5 +1,6 @@
 from datetime import datetime
 from django.db import models
+
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.fields import FlowReferenceField, TaskReferenceField
 
@@ -16,6 +17,10 @@ class Process(models.Model):
 class Task(models.Model):
     process = models.ForeignKey(Process)
     flow_task = TaskReferenceField(flow_cls_ref='process__flow_cls')
+    flow_task_type = models.CharField(max_length=50)
+
+    spit_on = models.ForeignKey('self', null=True, blank=True, related_name='splited')
+    token_start = models.ForeignKey('self', null=True, blank=True, related_name='token_path')
 
     created = models.DateTimeField(auto_now_add=True)
     started = models.DateTimeField(blank=True, null=True)
@@ -26,9 +31,14 @@ class Task(models.Model):
             return self.process.flow_cls.instance.reverse(self)
 
     def save(self):
-        if not self.started:
-            self.started = datetime.now()
+        if self.flow_task:
+            self.flow_task_type = self.flow_task.task_type
         super(Task, self).save()
+
+
+class ActivationPath(models.Model):
+    source = models.ForeignKey(Task, related_name='+')
+    target = models.ForeignKey(Task, related_name='+')
 
 
 class Activation(Task):

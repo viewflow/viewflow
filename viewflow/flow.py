@@ -4,7 +4,7 @@ Ubiquitos language for flow construction
 from datetime import datetime
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.forms import ActivationDataForm
-from viewflow.models import Process, Activation
+from viewflow.models import Activation
 
 
 class This(object):
@@ -92,6 +92,8 @@ class Start(_Node):
     """
     Start process event
     """
+    task_type = 'START'
+
     def __init__(self, view=None):
         super(Start, self).__init__()
         self._view = view
@@ -132,6 +134,9 @@ class Start(_Node):
         activation.finished = datetime.now()
         activation.save()
 
+        activation.spit_on = activation
+        activation.token_start = activation
+
         # Activate all outgoing edges
         for outgoing in self._outgoing():
             outgoing.dst.activate(activation)
@@ -141,6 +146,8 @@ class End(_Node):
     """
     End process event
     """
+    task_type = 'END'
+
     def __init__(self, view=None):
         super(End, self).__init__()
         self._view = view
@@ -158,6 +165,8 @@ class Timer(_Event):
     """
     Timer activated event task
     """
+    task_type = 'TIMER'
+
     def __init__(self, minutes=None, hours=None, days=None):
         super(Timer, self).__init__()
         self._activate_next = []
@@ -175,6 +184,8 @@ class Mailbox(_Event):
     """
     Message activated task
     """
+    task_type = 'MAILBOX'
+
     def __init__(self, on_receive):
         super(Mailbox, self).__init__()
         self._activate_next = []
@@ -196,6 +207,8 @@ class _Task(_Node):
     def activate(self, prev_activation):
         activation = Activation(
             process=prev_activation.process,
+            spit_on=prev_activation,
+            token_start=prev_activation,
             flow_task=self)
         activation.save()
 
@@ -204,6 +217,8 @@ class View(_Task):
     """
     Human performed task
     """
+    task_type = 'HUMAN'
+
     def __init__(self, view=None, description=None):
         super(View, self).__init__()
         self._view = view
@@ -253,6 +268,8 @@ class Job(_Task):
     """
     Automatically running task
     """
+    task_type = 'JOB'
+
     def __init__(self, job):
         super(Job, self).__init__()
         self._activate_next = []
@@ -277,6 +294,8 @@ class If(_Gate):
     """
     Activates one of paths based on condition
     """
+    task_type = 'IF'
+
     def __init__(self, cond):
         super(If, self).__init__()
         self._condition = cond
@@ -300,6 +319,8 @@ class Switch(_Gate):
     """
     Activates first path with matched condition
     """
+    task_type = 'SWITCH'
+
     def __init__(self):
         super(Split, self).__init__()
         self._activate_next = []
@@ -322,6 +343,8 @@ class Join(_Gate):
     """
     Wait for one or all incoming links and activate next path
     """
+    task_type = 'JOIN'
+
     def __init__(self, wait_all=False):
         super(Join, self).__init__()
         self._wait_all = wait_all
@@ -340,6 +363,8 @@ class Split(_Gate):
     """
     Activate outgoing path in-parallel depends on per-path condition
     """
+    task_type = 'SPLIT'
+
     def __init__(self):
         super(Split, self).__init__()
         self._activate_next = []
@@ -362,6 +387,8 @@ class First(_Gate):
     """
     Wait for first of outgoing task to be completed and cancells all others
     """
+    task_type = 'FIRST_OF'
+
     def __init__(self):
         super(First, self).__init__()
         self._activate_list = []
