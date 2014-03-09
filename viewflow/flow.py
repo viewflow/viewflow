@@ -134,9 +134,6 @@ class Start(_Node):
         activation.finished = datetime.now()
         activation.save()
 
-        activation.spit_on = activation
-        activation.token_start = activation
-
         # Activate all outgoing edges
         for outgoing in self._outgoing():
             outgoing.dst.activate(activation)
@@ -207,10 +204,9 @@ class _Task(_Node):
     def activate(self, prev_activation):
         activation = Activation(
             process=prev_activation.process,
-            spit_on=prev_activation,
-            token_start=prev_activation,
             flow_task=self)
         activation.save()
+        activation.previous.add(prev_activation)
 
 
 class View(_Task):
@@ -322,11 +318,11 @@ class Switch(_Gate):
     task_type = 'SWITCH'
 
     def __init__(self):
-        super(Split, self).__init__()
+        super(Switch, self).__init__()
         self._activate_next = []
 
     def _outgoing(self):
-        for next_node, cond in self._activate_next.items():
+        for next_node, cond in self._activate_next:
             edge_class = 'cond_true' if cond else 'default'
             yield _Edge(src=self, dst=next_node, edge_class=edge_class)
 
@@ -394,7 +390,7 @@ class First(_Gate):
         self._activate_list = []
 
     def _outgoing(self):
-        for next_node, cond in self._activate_next.items():
+        for next_node in self._activate_next:
             yield _Edge(src=self, dst=next_node, edge_class='next')
 
     def Of(self, node):

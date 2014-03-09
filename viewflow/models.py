@@ -19,12 +19,11 @@ class Task(models.Model):
     flow_task = TaskReferenceField(flow_cls_ref='process__flow_cls')
     flow_task_type = models.CharField(max_length=50)
 
-    spit_on = models.ForeignKey('self', null=True, blank=True, related_name='splited')
-    token_start = models.ForeignKey('self', null=True, blank=True, related_name='token_path')
-
     created = models.DateTimeField(auto_now_add=True)
     started = models.DateTimeField(blank=True, null=True)
     finished = models.DateTimeField(blank=True, null=True)
+
+    previous = models.ManyToManyField('self')
 
     def get_absolute_url(self):
         if self.process and self.flow_task:
@@ -34,11 +33,6 @@ class Task(models.Model):
         if self.flow_task:
             self.flow_task_type = self.flow_task.task_type
         super(Task, self).save()
-
-
-class ActivationPath(models.Model):
-    source = models.ForeignKey(Task, related_name='+')
-    target = models.ForeignKey(Task, related_name='+')
 
 
 class Activation(Task):

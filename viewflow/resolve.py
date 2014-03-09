@@ -55,7 +55,7 @@ def _(flow_node, resolver):
 def _(flow_node, resolver):
     flow_node._activate_next = \
         [resolver.get_implementation(node) for node in flow_node._activate_next]
-    flow_node._on_receive = resolver.get_implementation(flow_node._on_receive)
+    #TODO ?? flow_node._on_receive = resolver.get_implementation(flow_node._on_receive)
 
 
 @resolve_children_links.register(flow.View)  # NOQA
@@ -97,7 +97,7 @@ def _(flow_node, resolver):
 @resolve_children_links.register(flow.First)  # NOQA
 def _(flow_node, resolver):
     flow_node._activate_next = \
-        [resolver.get_implementation(node) for node in flow_node._activate_next]
+        [resolver.get_implementation(node) for node in flow_node._activate_list]
 
 
 class Resolver(object):
