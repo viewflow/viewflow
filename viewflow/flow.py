@@ -279,6 +279,20 @@ class Job(_Task):
         self._activate_next.append(node)
         return self
 
+    def start(self, activation_id):
+        activation = Activation.objects.get(pk=activation_id)
+        activation.started = datetime.now()
+        return activation
+
+    def done(self, activation):
+        # Finish activation
+        activation.finished = datetime.now()
+        activation.save()
+
+        # Activate all outgoing edges
+        for outgoing in self._outgoing():
+            outgoing.dst.activate(activation)
+
 
 class _Gate(_Node):
     """
@@ -310,6 +324,13 @@ class If(_Gate):
         self._on_false = node
         return self
 
+    def activate(self, prev_activation):
+        activation = Activation(
+            process=prev_activation.process,
+            flow_task=self)
+        activation.save()
+        activation.previous.add(prev_activation)
+
 
 class Switch(_Gate):
     """
@@ -333,6 +354,13 @@ class Switch(_Gate):
     def Default(self, node):
         self._activate_next.append((node, None))
         return self
+
+    def activate(self, prev_activation):
+        activation = Activation(
+            process=prev_activation.process,
+            flow_task=self)
+        activation.save()
+        activation.previous.add(prev_activation)
 
 
 class Join(_Gate):
