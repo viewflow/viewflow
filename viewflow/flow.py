@@ -157,6 +157,19 @@ class End(_Node):
     def _outgoing(self):
         return iter([])
 
+    def activate(self, prev_activation):
+        activation = Activation(
+            process=prev_activation.process,
+            started=datetime.now(),
+            finished=datetime.now(),
+            flow_task=self)
+        activation.save()
+        activation.previous.add(prev_activation)
+        activation.process.finished = True
+        activation.process.save()
+
+        # TODO Cancel all active tasks
+
 
 class Timer(_Event):
     """
@@ -207,6 +220,7 @@ class _Task(_Node):
             flow_task=self)
         activation.save()
         activation.previous.add(prev_activation)
+        return activation
 
 
 class View(_Task):
@@ -279,6 +293,10 @@ class Job(_Task):
         self._activate_next.append(node)
         return self
 
+    def activate(self, prev_activation):
+        activation = super(Job, self).activate(prev_activation)
+        self._job(activation.pk)
+
     def start(self, activation_id):
         activation = Activation.objects.get(pk=activation_id)
         activation.started = datetime.now()
@@ -328,8 +346,21 @@ class If(_Gate):
         activation = Activation(
             process=prev_activation.process,
             flow_task=self)
+        activation.started = datetime.now()
         activation.save()
         activation.previous.add(prev_activation)
+
+        cond_result = self._condition(activation)
+
+        activation.finished = datetime.now()
+        activation.save()
+
+        if cond_result:
+            self._on_true.activate(activation)
+        else:
+            self._on_false.activate(activation)
+
+        return activation
 
 
 class Switch(_Gate):
@@ -359,8 +390,28 @@ class Switch(_Gate):
         activation = Activation(
             process=prev_activation.process,
             flow_task=self)
+        activation.started = datetime.now()
         activation.save()
         activation.previous.add(prev_activation)
+
+        next_task = None
+        for node, cond in self._activate_next:
+            if cond:
+                if cond():
+                    next_task = node
+                    break
+            else:
+                next_task = node
+
+        activation.finished = datetime.now()
+        activation.save()
+
+        if next_task:
+            next_task.activate(activation)
+        else:
+            raise FlowRuntimeError('Switch have no positive condition')
+
+        return activation
 
 
 class Join(_Gate):
@@ -381,6 +432,41 @@ class Join(_Gate):
     def Next(self, node):
         self._activate_next.append(node)
         return self
+
+    def activate(self, prev_activation):
+        started = datetime.now()
+
+        # lookup for active join instance
+        activations = Activation.objects.filter(
+            flow_task=self,
+            process=prev_activation.process,
+            finished__isnull=True)
+
+        if len(activations) > 1:
+            raise FlowRuntimeError('More than one join instance for process found')
+
+        activation = activations.first()
+        if activation:
+            activation.previous.add(prev_activation)
+        else:
+            activation = Activation(
+                process=prev_activation.process,
+                flow_task=self)
+            activation.started = started
+            activation.save()
+            activation.previous.add(prev_activation)
+
+        # check are we done
+        finished_links = set(task.flow_task for task in activation.previous.all())
+        all_links = set(x.src for x in self._incoming())
+        if finished_links == all_links:
+            activation.finished = datetime.now()
+            activation.save()
+
+            for outgoing in self._outgoing():
+                outgoing.dst.activate(activation)
+
+        return activation
 
 
 class Split(_Gate):
@@ -406,6 +492,33 @@ class Split(_Gate):
         self._activate_next.append((node, None))
         return self
 
+    def activate(self, prev_activation):
+        activation = Activation(
+            process=prev_activation.process,
+            flow_task=self)
+        activation.started = datetime.now()
+        activation.save()
+        activation.previous.add(prev_activation)
+
+        next_tasks = []
+        for node, cond in self._activate_next:
+            if cond:
+                if cond(activation):
+                    next_tasks.append(node)
+            else:
+                next_tasks.append(node)
+
+        activation.finished = datetime.now()
+        activation.save()
+
+        if next_tasks:
+            for next_task in next_tasks:
+                next_task.activate(activation)
+        else:
+            raise FlowRuntimeError('No active tasks after split')
+
+        return activation
+
 
 class First(_Gate):
     """
@@ -424,3 +537,6 @@ class First(_Gate):
     def Of(self, node):
         self._activate_list.append(node)
         return self
+
+    def activate(self, prev_activation):
+        pass  # TODO

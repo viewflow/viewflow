@@ -20,12 +20,23 @@ class TestFlowTaskStates(TestCase):
         AllTaskFlow.job.done(activation)
 
         # iff
+        activation = Activation.objects.get(flow_task=AllTaskFlow.iff)
+        self.assertIsNotNone(activation.finished)
+
         # switch
+        activation = Activation.objects.get(flow_task=AllTaskFlow.switch)
+        self.assertIsNotNone(activation.finished)
+
         # split
+        activation = Activation.objects.get(flow_task=AllTaskFlow.switch)
+        self.assertIsNotNone(activation.finished)
+
         # join
+        activation = Activation.objects.get(flow_task=AllTaskFlow.join)
+        self.assertIsNotNone(activation.finished)
+
         # first
         # timer
         # mailbox
         # end
 
-        
