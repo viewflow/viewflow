@@ -165,7 +165,7 @@ class End(_Node):
             flow_task=self)
         activation.save()
         activation.previous.add(prev_activation)
-        activation.process.finished = True
+        activation.process.finished = datetime.now()
         activation.process.save()
 
         # TODO Cancel all active tasks
