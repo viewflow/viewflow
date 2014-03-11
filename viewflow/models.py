@@ -55,26 +55,3 @@ class Activation(Task):
 
     class Meta:
         proxy = True
-
-
-class StartTask(Task):
-    """
-    Proxy class for initial flow task
-    """
-    @classmethod
-    def from_start_task(cls, start_task):
-        """
-        initialize new instance from flow start task
-        """
-        return cls(process=Process(flow_cls=start_task.flow_cls),
-                   flow_task=start_task)
-
-    def done(self):
-        if not self.process.pk:
-            self.process.save()
-            self.process_id = self.process.pk
-        self.finished = datetime.now()
-        self.save()
-
-    class Meta:
-        proxy = True
