@@ -2,40 +2,33 @@ from viewflow.exceptions import FlowRuntimeError
 
 
 class Activation(object):
-    def __init__(self, task):
-        self.task = task
-
-    def activate(self):
-        self.task.activate()
+    def activate(self, prev_activation):
+        raise NotImplementedError
 
     def start(self, data):
-        self.task.start()
+        raise NotImplementedError
 
     def done(self):
-        self.task.done()
+        raise NotImplementedError
 
 
 class StartActivation(Activation):
-    def __init__(self, flow_task, task_cls, data=None):
+    def __init__(self, flow_task, data=None):
         self.data = data
         self.flow_cls = flow_task.flow_cls
         self.process = self.flow_cls.process_cls(flow_cls=self.flow_cls)
-        self.task = task_cls(process=self.process, flow_task=flow_task)
+        self.task = self.flow_cls.task_cls(process=self.process, flow_task=flow_task)
         self.form = self.flow_cls.activation_form_cls(data=data, instance=self.task)
+
         if data:
             if self.form.is_valid():
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.form.errors))
             else:
                 self.task = self.form.save(commit=False)
 
-        super(StartActivation, self).__init__(self.task)
-
-    def activate(self):
-        if not self.data:
-            self.task.activate()
-
     def start(self):
         if not self.data:
+            self.task.activate()
             self.task.start()
 
     def done(self):
@@ -50,3 +43,15 @@ class StartActivation(Activation):
         # Start process
         self.task.process.start()
         self.process.save()
+
+
+class ViewActivation(Activation):
+    def __init__(self, flow_task, task, data=None):
+        self.task = task
+
+    @staticmethod
+    def activate(self, flow_task, prev_activation):
+        #activation.save()
+        #activation.previous.add(prev_activation)
+        #return activation
+        pass

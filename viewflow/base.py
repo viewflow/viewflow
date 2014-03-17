@@ -7,7 +7,7 @@ from django.apps import apps
 from django.conf.urls import patterns
 
 from viewflow import flow
-from viewflow.models import Process
+from viewflow.models import Process, Task
 from viewflow.urls import node_url, node_url_reverse
 from viewflow.resolve import Resolver
 from viewflow.forms import ActivationDataForm
@@ -104,6 +104,7 @@ class Flow(object, metaclass=FlowMetaClass):
     Base class for flow definition
     """
     process_cls = Process
+    task_cls = Task
     activation_form_cls = ActivationDataForm
 
     @property

@@ -115,8 +115,7 @@ class Start(_Node):
         return self
 
     def start(self, data=None):
-        activation = self.activation_cls(self, Task, data)
-        activation.activate()
+        activation = self.activation_cls(self, data)
         activation.start()
         return activation
 
