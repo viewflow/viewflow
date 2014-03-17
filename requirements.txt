@@ -1,2 +1,3 @@
-git+http://github.com/django/django.git#egg=django
+https://github.com/django/django/archive/1.7a2.zip
 singledispatch
+django-fsm
