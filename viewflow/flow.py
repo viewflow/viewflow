@@ -2,9 +2,10 @@
 Ubiquitos language for flow construction
 """
 from datetime import datetime
+from viewflow import activation
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.forms import ActivationDataForm
-from viewflow.models import Activation
+from viewflow.models import Task, Activation
 
 
 class This(object):
@@ -93,6 +94,7 @@ class Start(_Node):
     Start process event
     """
     task_type = 'START'
+    activation_cls = activation.StartActivation
 
     def __init__(self, view=None):
         super(Start, self).__init__()
@@ -113,26 +115,13 @@ class Start(_Node):
         return self
 
     def start(self, data=None):
-        form = ActivationDataForm(data=data, initial={'started': datetime.now()})
-
-        if data and not form.is_valid():
-            raise FlowRuntimeError('Activation metadata is broken {}'.format(form.errors))
-
-        return Activation(
-            process=self.flow_cls.process_cls(flow_cls=self.flow_cls),
-            flow_task=self,
-            started=form['started'].value(),
-            form=form)
+        activation = self.activation_cls(self, Task, data)
+        activation.activate()
+        activation.start()
+        return activation
 
     def done(self, activation):
-        # Create process
-        process = activation.process
-        process.save()
-
-        # Finish activation
-        activation.process = process
-        activation.finished = datetime.now()
-        activation.save()
+        activation.done()
 
         # Activate all outgoing edges
         for outgoing in self._outgoing():

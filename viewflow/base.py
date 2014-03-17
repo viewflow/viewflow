@@ -10,6 +10,7 @@ from viewflow import flow
 from viewflow.models import Process
 from viewflow.urls import node_url, node_url_reverse
 from viewflow.resolve import Resolver
+from viewflow.forms import ActivationDataForm
 
 
 this = flow.This()
@@ -103,6 +104,7 @@ class Flow(object, metaclass=FlowMetaClass):
     Base class for flow definition
     """
     process_cls = Process
+    activation_form_cls = ActivationDataForm
 
     @property
     def urls(self):
