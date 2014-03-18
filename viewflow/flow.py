@@ -4,7 +4,6 @@ Ubiquitos language for flow construction
 from datetime import datetime
 from viewflow import activation
 from viewflow.exceptions import FlowRuntimeError
-from viewflow.forms import ActivationDataForm
 from viewflow.models import Task, Activation
 
 
@@ -115,8 +114,8 @@ class Start(_Node):
         return self
 
     def start(self, data=None):
-        activation = self.activation_cls(self, data)
-        activation.start()
+        activation = self.activation_cls(self)
+        activation.start(data)
         return activation
 
     def done(self, activation):
@@ -203,12 +202,16 @@ class _Task(_Node):
     Base class for algoritmically performed tasks
     """
     def activate(self, prev_activation):
-        activation = Activation(
-            process=prev_activation.process,
-            flow_task=self)
-        activation.save()
-        activation.previous.add(prev_activation)
+        activation = self.activation_cls(self)
+        activation.activate(prev_activation)
         return activation
+
+    def done(self, activation):
+        activation.done()
+
+        # Activate all outgoing edges
+        for outgoing in self._outgoing():
+            outgoing.dst.activate(activation)
 
 
 class View(_Task):
@@ -216,6 +219,7 @@ class View(_Task):
     Human performed task
     """
     task_type = 'HUMAN'
+    activation_cls = activation.ViewActivation
 
     def __init__(self, view=None, description=None):
         super(View, self).__init__()
@@ -243,23 +247,10 @@ class View(_Task):
         return self
 
     def start(self, activation_id, data=None):
-        form = ActivationDataForm(data=data, initial={'started': datetime.now()})
-
-        if data and not form.is_valid():
-            raise FlowRuntimeError('Activation metadata is broken {}'.format(form.errors))
-
-        activation = Activation.objects.get(pk=activation_id)
-        activation.form = form
+        task = Task.objects.get(pk=activation_id)
+        activation = self.activation_cls(self, task=task)
+        activation.start(data)
         return activation
-
-    def done(self, activation):
-        # Finish activation
-        activation.finished = datetime.now()
-        activation.save()
-
-        # Activate all outgoing edges
-        for outgoing in self._outgoing():
-            outgoing.dst.activate(activation)
 
 
 class Job(_Task):
@@ -267,6 +258,7 @@ class Job(_Task):
     Automatically running task
     """
     task_type = 'JOB'
+    activation_cls = activation.Activation
 
     def __init__(self, job):
         super(Job, self).__init__()
@@ -281,23 +273,11 @@ class Job(_Task):
         self._activate_next.append(node)
         return self
 
-    def activate(self, prev_activation):
-        activation = super(Job, self).activate(prev_activation)
-        self._job(activation.pk)
-
     def start(self, activation_id):
-        activation = Activation.objects.get(pk=activation_id)
-        activation.started = datetime.now()
+        task = Task.objects.get(pk=activation_id)
+        activation = self.activation_cls(self, task=task)
+        activation.start()
         return activation
-
-    def done(self, activation):
-        # Finish activation
-        activation.finished = datetime.now()
-        activation.save()
-
-        # Activate all outgoing edges
-        for outgoing in self._outgoing():
-            outgoing.dst.activate(activation)
 
 
 class _Gate(_Node):
