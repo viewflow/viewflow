@@ -2,6 +2,11 @@ from viewflow.exceptions import FlowRuntimeError
 
 
 class Activation(object):
+    """
+    Base class for managing flow task activation state
+
+    By default any state changes saved to db
+    """
     def __init__(self, flow_task, task=None):
         self.task = task
         self.process = task.process if task else None
@@ -19,6 +24,7 @@ class Activation(object):
 
     def start(self, data=None):
         self.task.start()
+        self.task.save()
 
     def done(self):
         self.task.done()
@@ -26,6 +32,12 @@ class Activation(object):
 
 
 class StartActivation(Activation):
+    """
+    Create and start flow process activation
+    Track and save activation data from user form
+
+    start() call do not save data and suitable for calling on GET requests
+    """
     def __init__(self, flow_task):
         super(StartActivation, self).__init__(flow_task)
         self.form = None
@@ -62,6 +74,11 @@ class StartActivation(Activation):
 
 
 class ViewActivation(Activation):
+    """
+    Track and save activation data from user form
+
+    start() call do not save data and suitable for calling on GET requests
+    """
     def __init__(self, flow_task, task=None):
         super(ViewActivation, self).__init__(flow_task, task=task)
         self.form = None
