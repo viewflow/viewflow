@@ -1,10 +1,9 @@
 """
 Ubiquitos language for flow construction
 """
-from datetime import datetime
 from viewflow import activation
 from viewflow.exceptions import FlowRuntimeError
-from viewflow.models import Task, Activation
+from viewflow.models import Task
 
 
 class This(object):
@@ -150,7 +149,7 @@ class End(_Node):
 
 class Timer(_Event):
     """
-    Timer activated event task
+    TODO: Timer activated event task
     """
     task_type = 'TIMER'
 
@@ -169,7 +168,7 @@ class Timer(_Event):
 
 class Mailbox(_Event):
     """
-    Message activated task
+    TODO: Message activated task
     """
     task_type = 'MAILBOX'
 
@@ -466,7 +465,7 @@ class Split(_Gate):
 
 class First(_Gate):
     """
-    Wait for first of outgoing task to be completed and cancells all others
+    TODO: Wait for first of outgoing task to be completed and cancells all others
     """
     task_type = 'FIRST_OF'
 

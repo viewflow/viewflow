@@ -100,25 +100,3 @@ class Task(models.Model):
         if self.flow_task:
             self.flow_task_type = self.flow_task.task_type
         super(Task, self).save()
-
-
-class Activation(Task):
-    """
-    Proxy class for active task
-    """
-    def __init__(self, *args, **kwargs):
-        self._form = kwargs.pop('form', None)
-        super(Activation, self).__init__(*args, **kwargs)
-
-    @property
-    def form(self):
-        if not self._form:
-            raise FlowRuntimeError('No activation from instance set')
-        return self._form
-
-    @form.setter
-    def form(self, form):
-        self._form = form
-
-    class Meta:
-        proxy = True

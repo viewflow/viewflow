@@ -34,11 +34,6 @@ def start(request, start_task):
 
 
 @transaction.atomic()
-def end(request, end_task, activation_id):
-    pass
-
-
-@transaction.atomic()
 def task(request, flow_task, act_id):
     flow_cls = flow_task.flow_cls
 
