@@ -1,4 +1,5 @@
 from viewflow.exceptions import FlowRuntimeError
+from viewflow.models import Task
 
 
 class Activation(object):
@@ -48,16 +49,19 @@ class StartActivation(Activation):
     def start(self, data=None):
         self.process = self.flow_cls.process_cls(flow_cls=self.flow_cls)
         self.task = self.flow_cls.task_cls(process=self.process, flow_task=self.flow_task)
+
+        if not data:
+            self.task.activate()
+            self.task.start()
+
         self.form = self.flow_cls.activation_form_cls(data=data, instance=self.task)
 
         if data:
             if self.form.is_valid():
                 self.task = self.form.save(commit=False)
+                self.task.status = Task.STATUS.STARTED
             else:
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.form.errors))
-        else:
-            self.task.activate()
-            self.task.start()
 
     def done(self):
         # Create process
@@ -84,12 +88,24 @@ class ViewActivation(Activation):
         self.form = None
 
     def start(self, data=None):
+        if not data:
+            self.task.start()
+
         self.form = self.flow_cls.activation_form_cls(data=data, instance=self.task)
 
         if data:
             if self.form.is_valid():
                 self.task = self.form.save(commit=False)
+                self.task.status = Task.STATUS.STARTED
             else:
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.form.errors))
-        else:
-            self.task.start()
+
+
+class EndActivation(Activation):
+    """
+    Finish the flow process
+    """
+    def done(self):
+        super(EndActivation, self).done()
+        self.process.finish()
+        self.process.save()

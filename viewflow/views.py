@@ -73,7 +73,7 @@ class TaskView(UpdateView):
     def get_object(self):
         act_id = self.kwargs[self.pk_url_kwarg]
         self.activation = self.flow_task.start(act_id, self.request.POST or None)
-        self.process = self.process_cls.objects.get(pk=self.activation.process_id)
+        self.process = self.process_cls.objects.get(pk=self.activation.task.process_id)
         return self.process
 
     def get_template_names(self):

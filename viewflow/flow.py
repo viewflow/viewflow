@@ -131,29 +131,19 @@ class End(_Node):
     End process event
     """
     task_type = 'END'
+    activation_cls = activation.EndActivation
 
-    def __init__(self, view=None):
+    def __init__(self):
         super(End, self).__init__()
-        self._view = view
-
-    @property
-    def view(self):
-        from viewflow.views import end
-        return self._view if self._view else end
 
     def _outgoing(self):
         return iter([])
 
     def activate(self, prev_activation):
-        activation = Activation(
-            process=prev_activation.process,
-            started=datetime.now(),
-            finished=datetime.now(),
-            flow_task=self)
-        activation.save()
-        activation.previous.add(prev_activation)
-        activation.process.finished = datetime.now()
-        activation.process.save()
+        activation = self.activation_cls(self)
+        activation.activate(prev_activation)
+        activation.start()
+        activation.done()
 
         # TODO Cancel all active tasks
 

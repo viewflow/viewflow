@@ -16,7 +16,7 @@ class TestURLPatterns(TestCase):
         self.assertEqual(3, len(patterns))
 
         urls, app, namespace = patterns
-        self.assertEqual(4, len(urls))
+        self.assertEqual(3, len(urls))
         self.assertEqual('viewflow', app)
         self.assertEqual(SingleTaskFlow._meta.namespace, namespace)
 
@@ -26,8 +26,8 @@ class TestURLReverse(TestCase):
 
     def test_django_reverse_flow_urls_succeed(self):
         reverse('viewflow:index', current_app=SingleTaskFlow._meta.app_label)
+        reverse('viewflow:start', current_app=SingleTaskFlow._meta.app_label)
         reverse('viewflow:task', args=[1], current_app=SingleTaskFlow._meta.app_label)
-        reverse('viewflow:end', args=[1], current_app=SingleTaskFlow._meta.app_label)
 
     def test_flow_reverse_urls_succeed(self):
         SingleTaskFlow.instance.reverse(

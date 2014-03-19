@@ -20,12 +20,6 @@ def _(flow_node):
                name=flow_node.name)
 
 
-@node_url.register(flow.End)  # NOQA
-def _(flow_node):
-    return url(r'^{}/(?P<act_id>\d+)/$'.format(flow_node.name), flow_node.view, {'flow_task': flow_node},
-               name=flow_node.name)
-
-
 @node_url.register(flow.View)  # NOQA
 def _(flow_node):
     return url(r'^{}/(?P<act_id>\d+)/$'.format(flow_node.name), flow_node.view, {'flow_task': flow_node},
