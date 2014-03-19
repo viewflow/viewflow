@@ -284,6 +284,7 @@ class _Gate(_Node):
     """
     Base class for flow control gates
     """
+    activation_cls = activation.Activation
 
 
 class If(_Gate):
@@ -311,17 +312,12 @@ class If(_Gate):
         return self
 
     def activate(self, prev_activation):
-        activation = Activation(
-            process=prev_activation.process,
-            flow_task=self)
-        activation.started = datetime.now()
-        activation.save()
-        activation.previous.add(prev_activation)
+        activation = self.activation_cls(self)
+        activation.activate(prev_activation)
 
+        activation.start()
         cond_result = self._condition(activation)
-
-        activation.finished = datetime.now()
-        activation.save()
+        activation.done()
 
         if cond_result:
             self._on_true.activate(activation)
@@ -355,12 +351,10 @@ class Switch(_Gate):
         return self
 
     def activate(self, prev_activation):
-        activation = Activation(
-            process=prev_activation.process,
-            flow_task=self)
-        activation.started = datetime.now()
-        activation.save()
-        activation.previous.add(prev_activation)
+        activation = self.activation_cls(self)
+        activation.activate(prev_activation)
+
+        activation.start()
 
         next_task = None
         for node, cond in self._activate_next:
@@ -371,8 +365,7 @@ class Switch(_Gate):
             else:
                 next_task = node
 
-        activation.finished = datetime.now()
-        activation.save()
+        activation.done()
 
         if next_task:
             next_task.activate(activation)
@@ -402,34 +395,30 @@ class Join(_Gate):
         return self
 
     def activate(self, prev_activation):
-        started = datetime.now()
-
         # lookup for active join instance
-        activations = Activation.objects.filter(
+        tasks = Task.objects.filter(
             flow_task=self,
             process=prev_activation.process,
-            finished__isnull=True)
+            status=Task.STATUS.STARTED)
 
-        if len(activations) > 1:
+        if len(tasks) > 1:
             raise FlowRuntimeError('More than one join instance for process found')
 
-        activation = activations.first()
-        if activation:
-            activation.previous.add(prev_activation)
+        task = tasks.first()
+        if task:
+            activation = self.activation_cls(self, task)
+            activation.task.previous.add(prev_activation)
+            activation.task.save()
         else:
-            activation = Activation(
-                process=prev_activation.process,
-                flow_task=self)
-            activation.started = started
-            activation.save()
-            activation.previous.add(prev_activation)
+            activation = self.activation_cls(self)
+            activation.activate(prev_activation)
+            activation.start()
 
         # check are we done
-        finished_links = set(task.flow_task for task in activation.previous.all())
         all_links = set(x.src for x in self._incoming())
+        finished_links = set(task.flow_task for task in activation.task.previous.all())
         if finished_links == all_links:
-            activation.finished = datetime.now()
-            activation.save()
+            activation.done()
 
             for outgoing in self._outgoing():
                 outgoing.dst.activate(activation)
@@ -461,12 +450,10 @@ class Split(_Gate):
         return self
 
     def activate(self, prev_activation):
-        activation = Activation(
-            process=prev_activation.process,
-            flow_task=self)
-        activation.started = datetime.now()
-        activation.save()
-        activation.previous.add(prev_activation)
+        activation = self.activation_cls(self)
+        activation.activate(prev_activation)
+
+        activation.start()
 
         next_tasks = []
         for node, cond in self._activate_next:
@@ -476,8 +463,7 @@ class Split(_Gate):
             else:
                 next_tasks.append(node)
 
-        activation.finished = datetime.now()
-        activation.save()
+        activation.done()
 
         if next_tasks:
             for next_task in next_tasks:
