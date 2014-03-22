@@ -73,6 +73,7 @@ class Task(models.Model):
     finished = models.DateTimeField(blank=True, null=True)
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+    external_task_id = models.CharField(max_length=50, blank=True, null=True)
     previous = models.ManyToManyField('self')
 
     @transition(field=status, source=STATUS.NEW, target=STATUS.ACTIVATED)
@@ -84,8 +85,12 @@ class Task(models.Model):
         self.owner = user
 
     @transition(field=status, source=[STATUS.ACTIVATED, STATUS.ASSIGNED], target=STATUS.STARTED)
-    def start(self):
+    def start(self, user=None, external_task_id=None):
         self.started = datetime.now()
+        if user:
+            self.owner = user
+        if external_task_id:
+            self.external_task_id = external_task_id
 
     @transition(field=status, source=STATUS.STARTED, target=STATUS.FINISHED)
     def done(self):
