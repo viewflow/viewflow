@@ -1,6 +1,5 @@
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import get_object_or_404, render
-from viewflow.models import Activation
 
 
 def shipment_type(request, flow_task, act_id):

@@ -1,5 +1,5 @@
 from django.test import TestCase
-from viewflow.models import Activation
+from viewflow.models import Task
 from unit.flows import AllTaskFlow
 
 
@@ -10,30 +10,30 @@ class TestFlowTaskStates(TestCase):
         AllTaskFlow.start.done(activation)
 
         # view
-        activation = Activation.objects.get(flow_task=AllTaskFlow.view)
-        activation = AllTaskFlow.view.start(activation.pk)
-        AllTaskFlow.view.done(activation)
+        task = Task.objects.get(flow_task=AllTaskFlow.view)
+        task = AllTaskFlow.view.start(task.pk)
+        AllTaskFlow.view.done(task)
 
         # job
-        activation = Activation.objects.get(flow_task=AllTaskFlow.job)
-        activation = AllTaskFlow.job.start(activation.pk)
-        AllTaskFlow.job.done(activation)
+        task = Task.objects.get(flow_task=AllTaskFlow.job)
+        task = AllTaskFlow.job.start(task.pk)
+        AllTaskFlow.job.done(task)
 
         # iff
-        activation = Activation.objects.get(flow_task=AllTaskFlow.iff)
-        self.assertIsNotNone(activation.finished)
+        task = Task.objects.get(flow_task=AllTaskFlow.iff)
+        self.assertIsNotNone(task.finished)
 
         # switch
-        activation = Activation.objects.get(flow_task=AllTaskFlow.switch)
-        self.assertIsNotNone(activation.finished)
+        task = Task.objects.get(flow_task=AllTaskFlow.switch)
+        self.assertIsNotNone(task.finished)
 
         # split
-        activation = Activation.objects.get(flow_task=AllTaskFlow.switch)
-        self.assertIsNotNone(activation.finished)
+        task = Task.objects.get(flow_task=AllTaskFlow.switch)
+        self.assertIsNotNone(task.finished)
 
         # join
-        activation = Activation.objects.get(flow_task=AllTaskFlow.join)
-        self.assertIsNotNone(activation.finished)
+        task = Task.objects.get(flow_task=AllTaskFlow.join)
+        self.assertIsNotNone(task.finished)
 
         # first
         # timer

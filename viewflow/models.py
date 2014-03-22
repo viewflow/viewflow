@@ -1,9 +1,9 @@
 from datetime import datetime
 
+from django.conf import settings
 from django.db import models
 from django_fsm import FSMField, transition
 
-from viewflow.exceptions import FlowRuntimeError
 from viewflow.fields import FlowReferenceField, TaskReferenceField
 
 
@@ -49,6 +49,7 @@ class Task(models.Model):
     class STATUS:
         NEW = 'NEW'
         ACTIVATED = 'ACT'
+        ASSIGNED = 'ASN'
         STARTED = 'STR'
         FINISHED = 'FNS'
         CANCELLED = 'CNC'
@@ -56,6 +57,7 @@ class Task(models.Model):
 
     STATUS_CHOICES = ((STATUS.NEW, 'New'),
                       (STATUS.ACTIVATED, 'Activated'),
+                      (STATUS.ASSIGNED, 'Assigned'),
                       (STATUS.STARTED, 'Stated'),
                       (STATUS.FINISHED, 'Finished'),
                       (STATUS.CANCELLED, 'Cancelled'),
@@ -70,13 +72,18 @@ class Task(models.Model):
     started = models.DateTimeField(blank=True, null=True)
     finished = models.DateTimeField(blank=True, null=True)
 
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     previous = models.ManyToManyField('self')
 
     @transition(field=status, source=STATUS.NEW, target=STATUS.ACTIVATED)
     def activate(self):
         pass
 
-    @transition(field=status, source=STATUS.ACTIVATED, target=STATUS.STARTED)
+    @transition(field=status, source=STATUS.ACTIVATED, target=STATUS.ASSIGNED)
+    def assign(self, user):
+        self.owner = user
+
+    @transition(field=status, source=[STATUS.ACTIVATED, STATUS.ASSIGNED], target=STATUS.STARTED)
     def start(self):
         self.started = datetime.now()
 
