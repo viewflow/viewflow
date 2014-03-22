@@ -73,6 +73,7 @@ class Task(models.Model):
     finished = models.DateTimeField(blank=True, null=True)
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
+    owner_permission = models.CharField(max_length=50, blank=True, null=True)
     external_task_id = models.CharField(max_length=50, blank=True, null=True)
     previous = models.ManyToManyField('self')
 

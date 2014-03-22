@@ -215,6 +215,8 @@ class View(_Task):
         self._view = view
         self._activate_next = []
         self._description = description
+        self._owner = None
+        self._owner_permission = None
 
     @property
     def description(self):
@@ -234,6 +236,13 @@ class View(_Task):
     def Next(self, node):
         self._activate_next.append(node)
         return self
+
+    def Assign(self, owner=None, permission=None):
+        if owner is not None and permission is not None:
+            raise FlowRuntimeError('Only one of owner or permission could be specified')
+
+        self._owner = owner
+        self._owner_permission = permission
 
     def start(self, activation_id, data=None):
         task = Task.objects.get(pk=activation_id)
