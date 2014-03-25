@@ -1,23 +1,29 @@
+from datetime import datetime
+
 from django.test import TestCase
 from viewflow.models import Task
+
 from unit.flows import AllTaskFlow
+from unit.helpers import get_default_form_data
 
 
 class TestFlowTaskStates(TestCase):
     def test_all_activations_succeed(self):
         # start
         activation = AllTaskFlow.start.start()
+        activation = AllTaskFlow.start.start(get_default_form_data(activation.form))
         AllTaskFlow.start.done(activation)
 
         # view
         task = Task.objects.get(flow_task=AllTaskFlow.view)
-        task = AllTaskFlow.view.start(task.pk)
-        AllTaskFlow.view.done(task)
+        activation = AllTaskFlow.view.start(task.pk)
+        activation = AllTaskFlow.view.start(task.pk, get_default_form_data(activation.form))
+        AllTaskFlow.view.done(activation)
 
         # job
         task = Task.objects.get(flow_task=AllTaskFlow.job)
-        task = AllTaskFlow.job.start(task.pk)
-        AllTaskFlow.job.done(task)
+        activation = AllTaskFlow.job.start(task.pk)
+        AllTaskFlow.job.done(activation)
 
         # iff
         task = Task.objects.get(flow_task=AllTaskFlow.iff)

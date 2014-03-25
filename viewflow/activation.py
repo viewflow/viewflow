@@ -1,5 +1,4 @@
 from viewflow.exceptions import FlowRuntimeError
-from viewflow.models import Task
 
 
 class Activation(object):
@@ -37,7 +36,7 @@ class StartActivation(Activation):
     Create and start flow process activation
     Track and save activation data from user form
 
-    start() call do not save data and suitable for calling on GET requests
+    start() call suitable for get requests, if no data provided
     """
     def __init__(self, flow_task):
         super(StartActivation, self).__init__(flow_task)
@@ -51,23 +50,29 @@ class StartActivation(Activation):
         self.task = self.flow_cls.task_cls(process=self.process, flow_task=self.flow_task)
 
         if not data:
-            self.task.activate()
-            self.task.start()
+            self.task.initialize()
 
         self.form = self.flow_cls.activation_form_cls(data=data, instance=self.task)
 
         if data:
             if self.form.is_valid():
+                # Create process
+                self.process.save()
+                self.task.process = self.process
+                self.task.save()
+
+                # Activate task
+                self.task.activate()
+                self.task.save()
+
+                # Start task
                 self.task = self.form.save(commit=False)
-                self.task.status = Task.STATUS.STARTED
+                self.task.start()
+                self.task.save()
             else:
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.form.errors))
 
     def done(self):
-        # Create process
-        self.process.save()
-        self.task.process = self.process
-
         # Finish activation
         self.task.done()
         self.task.save()
@@ -81,22 +86,27 @@ class ViewActivation(Activation):
     """
     Track and save activation data from user form
 
-    start() call do not save data and suitable for calling on GET requests
+    start() call suitable for get requests, if no data provided
     """
     def __init__(self, flow_task, task=None):
         super(ViewActivation, self).__init__(flow_task, task=task)
         self.form = None
 
+    def assign(self, user):
+        self.task.assign(user)
+        self.task.save()
+
     def start(self, data=None):
         if not data:
-            self.task.start()
+            self.task.initialize()
 
         self.form = self.flow_cls.activation_form_cls(data=data, instance=self.task)
 
         if data:
             if self.form.is_valid():
                 self.task = self.form.save(commit=False)
-                self.task.status = Task.STATUS.STARTED
+                self.task.start()
+                self.task.save()
             else:
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.form.errors))
 

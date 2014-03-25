@@ -216,7 +216,8 @@ class View(_Task):
         self._activate_next = []
         self._description = description
         self._owner = None
-        self._owner_permission = None
+        self._permission = None
+        self._assign_view = None
 
     @property
     def description(self):
@@ -229,6 +230,11 @@ class View(_Task):
         from viewflow.views import task
         return self._view if self._view else task
 
+    @property
+    def assign_view(self):
+        from viewflow.views import assign
+        return self._assign_view if self._assign_view else assign
+
     def _outgoing(self):
         for next_node in self._activate_next:
             yield _Edge(src=self, dst=next_node, edge_class='next')
@@ -237,16 +243,23 @@ class View(_Task):
         self._activate_next.append(node)
         return self
 
-    def Assign(self, owner=None, permission=None):
-        if owner is not None and permission is not None:
-            raise FlowRuntimeError('Only one of owner or permission could be specified')
-
+    def Assign(self, owner=None):
         self._owner = owner
-        self._owner_permission = permission
 
-    def start(self, activation_id, data=None):
+    def Permission(self, permission, assign_view=None):
+        self._owner_permission = permission
+        self._assign_view = assign_view
+
+    def get(self, activation_id):
         task = Task.objects.get(pk=activation_id)
         activation = self.activation_cls(self, task=task)
+        return activation
+
+    def assign(self, activation, user):
+        activation.assign(user)
+
+    def start(self, activation_id, data=None):
+        activation = self.get(activation_id)
         activation.start(data)
         return activation
 

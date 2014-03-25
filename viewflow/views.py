@@ -55,6 +55,21 @@ def task(request, flow_task, act_id):
                   current_app=flow_cls._meta.namespace)
 
 
+@transaction.atomic()
+def assign(request, view_task, act_id):
+    activation = view_task.get(act_id)
+
+    if request.method == 'POST' and 'assign' in request.POST:
+        view_task.assign(activation, request.user)
+        return redirect('viewflow:{}'.format(view_task.name), current_app=view_task.flow_cls._meta.app_label)
+
+    templates = ('{}/flow/assign.html'.format(view_task.flow_cls._meta.app_label),
+                 'viewflow/flow/assign.html')
+
+    return render(request, templates,
+                  {'activation': activation})
+
+
 class TaskView(UpdateView):
     pk_url_kwarg = 'act_id'
     context_object_name = 'process'

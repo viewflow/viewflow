@@ -77,31 +77,45 @@ class Task(models.Model):
     external_task_id = models.CharField(max_length=50, blank=True, null=True)
     previous = models.ManyToManyField('self')
 
-    @transition(field=status, source=STATUS.NEW, target=STATUS.ACTIVATED)
-    def activate(self):
-        pass
+    def _in_db(self):
+        """
+        All transitions method except initialize runs only after task has stored in database
+        """
+        return self.pk
 
-    @transition(field=status, source=STATUS.ACTIVATED, target=STATUS.ASSIGNED)
+    @transition(field=status, source=[STATUS.NEW, STATUS.ACTIVATED, STATUS.ASSIGNED])
+    def initialize(self):
+        """
+        Person assigned task coulbe be initialized several times (probably on GET request)
+        """
+        self.started = datetime.now()
+
+    @transition(field=status, source=STATUS.NEW, target=STATUS.ACTIVATED, conditions=[_in_db])
+    def activate(self):
+        """
+        Task created, and available for execution
+        """
+
+    @transition(field=status, source=STATUS.ACTIVATED, target=STATUS.ASSIGNED, conditions=[_in_db])
     def assign(self, user):
         self.owner = user
 
-    @transition(field=status, source=[STATUS.ACTIVATED, STATUS.ASSIGNED], target=STATUS.STARTED)
-    def start(self, user=None, external_task_id=None):
-        self.started = datetime.now()
-        if user:
-            self.owner = user
+    @transition(field=status, source=[STATUS.ACTIVATED, STATUS.ASSIGNED], target=STATUS.STARTED, conditions=[_in_db])
+    def start(self, external_task_id=None):
+        if not self.started:
+            self.started = datetime.now()
         if external_task_id:
             self.external_task_id = external_task_id
 
-    @transition(field=status, source=STATUS.STARTED, target=STATUS.FINISHED)
+    @transition(field=status, source=STATUS.STARTED, target=STATUS.FINISHED, conditions=[_in_db])
     def done(self):
         self.finished = datetime.now()
 
-    @transition(field=status, source=[STATUS.ACTIVATED, STATUS.STARTED], target=STATUS.CANCELLED)
+    @transition(field=status, source=[STATUS.ACTIVATED, STATUS.STARTED], target=STATUS.CANCELLED, conditions=[_in_db])
     def cancel(self):
         self.finished = datetime.now()
 
-    @transition(field=status, source=[STATUS.ACTIVATED, STATUS.STARTED], target=STATUS.ERROR)
+    @transition(field=status, source=[STATUS.ACTIVATED, STATUS.STARTED], target=STATUS.ERROR, conditions=[_in_db])
     def error(self):
         pass
 
