@@ -1,6 +1,7 @@
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.shortcuts import render
 from django.forms.models import modelform_factory
+from django.shortcuts import render
 from django.views.generic.edit import UpdateView
 
 from viewflow.shortcuts import get_page, redirect
@@ -35,8 +36,10 @@ def start(request, start_task):
 
 @transaction.atomic()
 def task(request, flow_task, act_id):
-    flow_cls = flow_task.flow_cls
+    if not flow_task.has_perm(request.user):
+        raise PermissionDenied
 
+    flow_cls = flow_task.flow_cls
     activation = flow_task.start(act_id, request.POST or None)
     form_cls = modelform_factory(flow_cls.process_cls, exclude=["flow_cls", "finished"])
     form = form_cls(request.POST or None, instance=activation.process)
@@ -59,9 +62,12 @@ def task(request, flow_task, act_id):
 def assign(request, view_task, act_id):
     activation = view_task.get(act_id)
 
+    if not activation.can_be_assigned(request.user):
+        raise PermissionDenied
+
     if request.method == 'POST' and 'assign' in request.POST:
         view_task.assign(activation, request.user)
-        return redirect('viewflow:{}'.format(view_task.name), current_app=view_task.flow_cls._meta.app_label)
+        return redirect(activation.task)
 
     templates = ('{}/flow/assign.html'.format(view_task.flow_cls._meta.app_label),
                  'viewflow/flow/assign.html')
@@ -78,12 +84,17 @@ class TaskView(UpdateView):
         self.flow_task = self.kwargs['flow_task']
         self.flow_cls = self.flow_task.flow_cls
         self.process_cls = self.flow_cls.process_cls
+
         return super(TaskView, self).dispatch(request, *args, **kwargs)
 
     def get_object(self):
         act_id = self.kwargs[self.pk_url_kwarg]
         self.activation = self.flow_task.start(act_id, self.request.POST or None)
         self.process = self.process_cls.objects.get(pk=self.activation.task.process_id)
+
+        if not self.activation.has_perm(self.request.user):
+            raise PermissionDenied
+
         return self.process
 
     def get_template_names(self):

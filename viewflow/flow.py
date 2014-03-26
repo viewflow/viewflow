@@ -216,7 +216,7 @@ class View(_Task):
         self._activate_next = []
         self._description = description
         self._owner = None
-        self._permission = None
+        self._owner_permission = None
         self._assign_view = None
 
     @property
@@ -245,10 +245,12 @@ class View(_Task):
 
     def Assign(self, owner=None):
         self._owner = owner
+        return self
 
     def Permission(self, permission, assign_view=None):
         self._owner_permission = permission
         self._assign_view = assign_view
+        return self
 
     def get(self, activation_id):
         task = Task.objects.get(pk=activation_id)

@@ -2,9 +2,9 @@
 {
     "model": "contenttypes.contenttype",
     "fields": {
-        "name": "step process",
+        "name": "hello world process",
         "app_label": "onetwothree",
-        "model": "stepprocess"
+        "model": "helloworldprocess"
     }
 },
 {
@@ -12,9 +12,9 @@
     "fields": {
         "content_type": [
             "onetwothree",
-            "stepprocess"
+            "helloworldprocess"
         ],
-        "name": "Can approve StepProcess request",
+        "name": "Can approve HelloWorld request",
         "codename": "can_approve_request"
     }
 },
@@ -32,7 +32,7 @@
             [
                 "can_approve_request",
                 "onetwothree",
-                "stepprocess"
+                "helloworldprocess"
             ]
         ],
         "username": "manager"

@@ -92,6 +92,39 @@ class ViewActivation(Activation):
         super(ViewActivation, self).__init__(flow_task, task=task)
         self.form = None
 
+    def can_be_assigned(self, user):
+        if not self.flow_task._owner and not self.flow_task._owner_permission:
+            """
+            Available for everyone
+            """
+            return True
+
+        if not self.flow_task._owner_permission:
+            return False
+
+        return user.has_perm(self.flow_task._owner_permission)
+
+    def has_perm(self, user):
+        if not self.flow_task._owner and not self.flow_task._owner_permission:
+            """
+            Available for everyone
+            """
+            return True
+        return user and self.task and self.task.owner == user
+
+    def activate(self, prev_activation):
+        self.process = prev_activation.process
+        self.task = self.flow_cls.task_cls(
+            process=self.process,
+            flow_task=self.flow_task,
+            owner=self.flow_task._owner,
+            owner_permission=self.flow_task._owner_permission)
+        self.task.save()
+
+        self.task.previous.add(prev_activation.task)
+        self.task.activate()
+        self.task.save()
+
     def assign(self, user):
         self.task.assign(user)
         self.task.save()

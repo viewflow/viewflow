@@ -27,10 +27,10 @@ def _(flow_node):
     urls.append(url(r'^{}/(?P<act_id>\d+)/$'.format(flow_node.name), flow_node.view, {'flow_task': flow_node},
                     name=flow_node.name))
 
-    if flow_node._permission:
+    if flow_node._owner_permission:
         urls.append(url(r'^{}/(?P<act_id>\d+)/assign/$'.format(flow_node.name),
                         flow_node.assign_view,
-                        {'flow_task': flow_node},
+                        {'view_task': flow_node},
                         name="{}__assign".format(flow_node.name)))
     return urls
 
@@ -48,4 +48,11 @@ def _(flow_node, task, **kwargs):
 @node_url_reverse.register(flow.View)  # NOQA
 def _(flow_node, task, **kwargs):
     pk = task.pk if task else kwargs.get('pk')
+    if flow_node._owner_permission and not task.owner_id:
+        """
+        Need to be assigned
+        """
+        return reverse('viewflow:{}__assign'.format(flow_node.name),
+                       args=[pk],
+                       current_app=flow_node.flow_cls._meta.namespace)
     return reverse('viewflow:{}'.format(flow_node.name), args=[pk], current_app=flow_node.flow_cls._meta.namespace)

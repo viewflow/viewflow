@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Hello, world</h1>
+<p class="lead">Basic framework-less hello world sample</p>
+<form method="POST">
+{% csrf_token %}
+<button type="submit" name="assign" class="btn btn-default">Assign</button>
+</form>
+{% endblock %}
