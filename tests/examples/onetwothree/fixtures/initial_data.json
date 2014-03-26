@@ -1,0 +1,41 @@
+[
+{
+    "model": "contenttypes.contenttype",
+    "fields": {
+        "name": "step process",
+        "app_label": "onetwothree",
+        "model": "stepprocess"
+    }
+},
+{
+    "model": "auth.permission",
+    "fields": {
+        "content_type": [
+            "onetwothree",
+            "stepprocess"
+        ],
+        "name": "Can approve StepProcess request",
+        "codename": "can_approve_request"
+    }
+},
+{
+    "model": "auth.user",
+    "fields": {
+        "user_permissions": [],
+        "username": "employee"
+    }
+},
+{
+    "model": "auth.user",
+    "fields": {
+        "user_permissions": [
+            [
+                "can_approve_request",
+                "onetwothree",
+                "stepprocess"
+            ]
+        ],
+        "username": "manager"
+    }
+}
+]
