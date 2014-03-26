@@ -118,7 +118,9 @@ class Flow(object, metaclass=FlowMetaClass):
         for node in self._meta.nodes():
             url_getter = getattr(self, 'url_{}'.format(node.name), None)
             url = url_getter() if url_getter else node_url(node)
-            if url:
+            if isinstance(url, (list, tuple)):
+                node_urls += url
+            elif url:
                 node_urls.append(url)
 
         return patterns('', *node_urls), 'viewflow', self._meta.namespace

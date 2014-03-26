@@ -22,8 +22,17 @@ def _(flow_node):
 
 @node_url.register(flow.View)  # NOQA
 def _(flow_node):
-    return url(r'^{}/(?P<act_id>\d+)/$'.format(flow_node.name), flow_node.view, {'flow_task': flow_node},
-               name=flow_node.name)
+    urls = []
+
+    urls.append(url(r'^{}/(?P<act_id>\d+)/$'.format(flow_node.name), flow_node.view, {'flow_task': flow_node},
+                    name=flow_node.name))
+
+    if flow_node._permission:
+        urls.append(url(r'^{}/(?P<act_id>\d+)/assign/$'.format(flow_node.name),
+                        flow_node.assign_view,
+                        {'flow_task': flow_node},
+                        name="{}__assign".format(flow_node.name)))
+    return urls
 
 
 @singledispatch

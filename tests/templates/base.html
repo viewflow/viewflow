@@ -11,15 +11,29 @@
               padding-top: 60px;
               padding-bottom: 40px;
           }
+          .glyphicon{
+              min-width: 15px;
+          }
         </style>
     </head>
     <body>
         <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-            <div class="container-fluid">
-                <ul class="nav navbar-nav">
+            <div class="container">
+                <ul class="nav navbar-nav" style="width:100%">
                     <li {% if request.path == "/" %}class="active"{% endif %}><a href="/">Home</a></li>
                     <li {% if "/onetwothree/" in request.path %}class="active"{% endif %}><a href="{% flowurl 'onetwothree/v1.StepFlow.index' %}">Hello, World</a></li>
                     <li {% if "/shipment" in request.path %}class="active"{% endif %}><a href="{% flowurl 'shipment/ShipmentFlow.index' %}">Shipment</a></li>
+                    <ul class="nav navbar-nav navbar-right">
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ request.user.username|title|default:"Anonymous" }} <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="{% url 'login_as' %}"><i class="glyphicon {% if request.user.is_anonymous %}glyphicon-ok{% endif %}"></i> Anonymous</a></li>
+                                {% for user in users %}
+                                <li><a href="{% url 'login_as' %}?user_pk={{ user.pk }}"><i class="glyphicon {% if request.user == user %}glyphicon-ok{% endif %}"></i> {{ user.username|title }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                    </ul>
                 </ul>
             </div>
         </nav>
@@ -36,6 +50,7 @@
             </div>
         </footer>
 
+        <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
         <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.0/js/bootstrap.min.js"></script>
     </body>
 </html>
