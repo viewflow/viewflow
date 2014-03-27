@@ -243,11 +243,28 @@ class View(_Task):
         self._activate_next.append(node)
         return self
 
-    def Assign(self, owner=None):
-        self._owner = owner
+    def Assign(self, owner=None, **owner_kwargs):
+        """
+        Assign task to the User immediately on activation,
+        accepts user lookup kwargs or callable :: Process -> User
+
+        .Assign(username='employee')
+        .Assign(lambda p: p.created_by)
+        """
+        if owner:
+            self._owner = owner
+        else:
+            self._owner = owner_kwargs
         return self
 
     def Permission(self, permission, assign_view=None):
+        """
+        Make task available for users with specific permission,
+        aceps permissions name of callable :: Process -> permission_name
+
+        .Permission('my_app.can_approve')
+        .Permission(lambda p: 'my_app.department_manager_{}'.format(p.depratment.pk))
+        """
         self._owner_permission = permission
         self._assign_view = assign_view
         return self

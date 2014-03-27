@@ -91,6 +91,8 @@ class TaskReferenceField(models.CharField):
 
     def get_default(self):
         if self.default != NOT_PROVIDED and not isinstance(self.default, str):
+            if callable(self.default):
+                return self.default().name
             return self.default.name
         return super(TaskReferenceField, self).get_default()
 

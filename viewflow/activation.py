@@ -1,3 +1,4 @@
+from django.contrib.auth import get_user_model
 from viewflow.exceptions import FlowRuntimeError
 
 
@@ -118,6 +119,8 @@ class ViewActivation(Activation):
         owner = self.flow_task._owner
         if callable(owner):
             owner = owner(self.process)
+        elif isinstance(owner, dict):
+            owner = get_user_model()._default_manager.get(**owner)
 
         owner_permission = self.flow_task._owner_permission
         if callable(owner_permission):
@@ -126,13 +129,16 @@ class ViewActivation(Activation):
         self.task = self.flow_cls.task_cls(
             process=self.process,
             flow_task=self.flow_task,
-            owner=owner,
             owner_permission=owner_permission)
         self.task.save()
 
         self.task.previous.add(prev_activation.task)
         self.task.activate()
         self.task.save()
+
+        if owner:
+            self.task.assign(owner)
+            self.task.save()
 
     def assign(self, user):
         self.task.assign(user)

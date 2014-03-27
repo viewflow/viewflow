@@ -1,5 +1,9 @@
+from django.contrib.auth.models import User
+
 from viewflow import flow
 from viewflow.base import Flow, this
+
+from unit.models import TestProcess
 
 
 def perform_task(request, act_id):
@@ -25,4 +29,24 @@ class AllTaskFlow(Flow):
     first = flow.First().Of(this.timer)
     timer = flow.Timer().Next(this.mailbox)
     mailbox = flow.Mailbox(lambda a: None).Next(this.end)
+    end = flow.End()
+
+
+class RestrictedUserFlow(Flow):
+    start = flow.Start().Activate(this.view)
+    view = flow.View().Next(this.end).Assign(username='employee')
+    end = flow.End()
+
+
+class RestrictedCallableUserFlow(Flow):
+    start = flow.Start().Activate(this.view)
+    view = flow.View().Next(this.end).Assign(lambda p: User.objects.get(username='employee'))
+    end = flow.End()
+
+
+class RestrictedPermissionFlow(Flow):
+    process_cls = TestProcess
+
+    start = flow.Start().Activate(this.view)
+    view = flow.View().Next(this.end).Permission('unit.restricted_permission_flow__view')
     end = flow.End()
