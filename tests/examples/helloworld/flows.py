@@ -2,7 +2,7 @@ from viewflow import flow
 from viewflow.base import this, Flow
 from viewflow.views import TaskView
 
-from examples.onetwothree.models import HelloWorldProcess
+from examples.helloworld.models import HelloWorldProcess
 
 
 class HelloWorldFlow(Flow):
@@ -15,7 +15,7 @@ class HelloWorldFlow(Flow):
         .Next(this.approve)
 
     approve = flow.View(TaskView.as_view(fields=['approved'])) \
-        .Permission('onetwothree.can_approve_request') \
+        .Permission('helloworld.can_approve_request') \
         .Next(this.end)
 
     end = flow.End()

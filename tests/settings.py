@@ -23,7 +23,7 @@ INSTALLED_APPS = (
     'unit',
     # Samples
     'examples.shipment',
-    'examples.onetwothree'
+    'examples.helloworld'
 )
 
 MIDDLEWARE_CLASSES = (

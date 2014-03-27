@@ -3,7 +3,7 @@
     "model": "contenttypes.contenttype",
     "fields": {
         "name": "hello world process",
-        "app_label": "onetwothree",
+        "app_label": "helloworld",
         "model": "helloworldprocess"
     }
 },
@@ -11,7 +11,7 @@
     "model": "auth.permission",
     "fields": {
         "content_type": [
-            "onetwothree",
+            "helloworld",
             "helloworldprocess"
         ],
         "name": "Can approve HelloWorld request",
@@ -31,7 +31,7 @@
         "user_permissions": [
             [
                 "can_approve_request",
-                "onetwothree",
+                "helloworld",
                 "helloworldprocess"
             ]
         ],
