@@ -102,7 +102,7 @@ class ViewActivation(Activation):
         if not self.flow_task._owner_permission:
             return False
 
-        return user.has_perm(self.flow_task._owner_permission)
+        return self.task is not None and user.has_perm(self.task.owner_permission)
 
     def has_perm(self, user):
         if not self.flow_task._owner and not self.flow_task._owner_permission:
@@ -114,11 +114,20 @@ class ViewActivation(Activation):
 
     def activate(self, prev_activation):
         self.process = prev_activation.process
+
+        owner = self.flow_task._owner
+        if callable(owner):
+            owner = owner(self.process)
+
+        owner_permission = self.flow_task._owner_permission
+        if callable(owner_permission):
+            owner_permission = owner_permission(self.process)
+
         self.task = self.flow_cls.task_cls(
             process=self.process,
             flow_task=self.flow_task,
-            owner=self.flow_task._owner,
-            owner_permission=self.flow_task._owner_permission)
+            owner=owner,
+            owner_permission=owner_permission)
         self.task.save()
 
         self.task.previous.add(prev_activation.task)

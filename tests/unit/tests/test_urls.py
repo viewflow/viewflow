@@ -16,7 +16,7 @@ class TestURLPatterns(TestCase):
         self.assertEqual(3, len(patterns))
 
         urls, app, namespace = patterns
-        self.assertEqual(3, len(urls))
+        self.assertEqual(4, len(urls))
         self.assertEqual('viewflow', app)
         self.assertEqual(SingleTaskFlow._meta.namespace, namespace)
 
@@ -28,6 +28,7 @@ class TestURLReverse(TestCase):
         reverse('viewflow:index', current_app=SingleTaskFlow._meta.app_label)
         reverse('viewflow:start', current_app=SingleTaskFlow._meta.app_label)
         reverse('viewflow:task', args=[1], current_app=SingleTaskFlow._meta.app_label)
+        reverse('viewflow:task__assign', args=[1], current_app=SingleTaskFlow._meta.app_label)
 
     def test_flow_reverse_urls_succeed(self):
         SingleTaskFlow.instance.reverse(

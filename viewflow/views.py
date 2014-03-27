@@ -36,13 +36,13 @@ def start(request, start_task):
 
 @transaction.atomic()
 def task(request, flow_task, act_id):
-    if not flow_task.has_perm(request.user):
-        raise PermissionDenied
-
     flow_cls = flow_task.flow_cls
     activation = flow_task.start(act_id, request.POST or None)
     form_cls = modelform_factory(flow_cls.process_cls, exclude=["flow_cls", "finished"])
     form = form_cls(request.POST or None, instance=activation.process)
+
+    if not activation.has_perm(request.user):
+        raise PermissionDenied
 
     if form.is_valid():
         form.save()

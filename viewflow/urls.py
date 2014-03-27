@@ -27,7 +27,10 @@ def _(flow_node):
     urls.append(url(r'^{}/(?P<act_id>\d+)/$'.format(flow_node.name), flow_node.view, {'flow_task': flow_node},
                     name=flow_node.name))
 
-    if flow_node._owner_permission:
+    if not flow_node._owner:
+        """
+        No specific task owner, user need to be assigned
+        """
         urls.append(url(r'^{}/(?P<act_id>\d+)/assign/$'.format(flow_node.name),
                         flow_node.assign_view,
                         {'view_task': flow_node},
@@ -48,7 +51,7 @@ def _(flow_node, task, **kwargs):
 @node_url_reverse.register(flow.View)  # NOQA
 def _(flow_node, task, **kwargs):
     pk = task.pk if task else kwargs.get('pk')
-    if flow_node._owner_permission and not task.owner_id:
+    if not task.owner_id:
         """
         Need to be assigned
         """
