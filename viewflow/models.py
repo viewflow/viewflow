@@ -64,7 +64,7 @@ class Task(models.Model):
                       (STATUS.ERROR, 'Error'))
 
     process = models.ForeignKey(Process)
-    flow_task = TaskReferenceField(flow_cls_ref='process__flow_cls')
+    flow_task = TaskReferenceField()
     flow_task_type = models.CharField(max_length=50)
     status = FSMField(max_length=3, choices=STATUS_CHOICES, default=STATUS.NEW)
 

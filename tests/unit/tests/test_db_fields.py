@@ -1,6 +1,6 @@
 from django.test import TestCase
 from unit.models import FlowReferencedModel
-from unit.flows import SingleTaskFlow
+from unit.flows import SingleTaskFlow, AllTaskFlow
 
 
 class TestReferenceFields(TestCase):
@@ -31,3 +31,14 @@ class TestReferenceFields(TestCase):
         second = FlowReferencedModel.objects.get(flow_cls=SingleTaskFlow)
 
         self.assertEqual(first.pk, second.pk)
+
+    def test_get_by_flow_task_succeed(self):
+        FlowReferencedModel.objects.create(
+            flow_cls=SingleTaskFlow, task=SingleTaskFlow.start)
+        FlowReferencedModel.objects.create(
+            flow_cls=AllTaskFlow, task=AllTaskFlow.start)
+
+        instance = FlowReferencedModel.objects.get(task=SingleTaskFlow.start)
+
+        self.assertEqual(instance.flow_cls, SingleTaskFlow)
+        self.assertEqual(instance.task, SingleTaskFlow.start)

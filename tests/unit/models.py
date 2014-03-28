@@ -11,7 +11,7 @@ def default():
 
 class FlowReferencedModel(models.Model):
     flow_cls = FlowReferenceField()
-    task = TaskReferenceField(flow_cls_ref='flow_cls', default=default)
+    task = TaskReferenceField(default=default)
 
 
 class TestProcess(Process):
