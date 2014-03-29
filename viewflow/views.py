@@ -1,7 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.forms.models import modelform_factory
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.views.generic.edit import UpdateView
 
 from viewflow.shortcuts import get_page, redirect
@@ -60,10 +60,12 @@ def task(request, flow_task, act_id):
 
 @transaction.atomic()
 def assign(request, view_task, act_id):
-    activation = view_task.get(act_id)
+    task = get_object_or_404(view_task.flow_cls.task_cls, pk=act_id)
 
-    if not activation.can_be_assigned(request.user):
+    if not view_task.can_be_assigned(request.user, task):
         raise PermissionDenied
+
+    activation = view_task.get(task)
 
     if request.method == 'POST' and 'assign' in request.POST:
         view_task.assign(activation, request.user)
@@ -84,16 +86,17 @@ class TaskView(UpdateView):
         self.flow_task = self.kwargs['flow_task']
         self.flow_cls = self.flow_task.flow_cls
         self.process_cls = self.flow_cls.process_cls
-
         return super(TaskView, self).dispatch(request, *args, **kwargs)
 
     def get_object(self):
         act_id = self.kwargs[self.pk_url_kwarg]
-        self.activation = self.flow_task.start(act_id, self.request.POST or None)
-        self.process = self.process_cls.objects.get(pk=self.activation.task.process_id)
+        self.task = get_object_or_404(self.flow_cls.task_cls, pk=act_id)
+        self.process = self.process_cls.objects.get(pk=self.task.process_id)
 
-        if not self.activation.has_perm(self.request.user):
+        if not self.flow_task.has_perm(self.request.user, self.task):
             raise PermissionDenied
+
+        self.activation = self.flow_task.start(self.task, self.request.POST or None)
 
         return self.process
 

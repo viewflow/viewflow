@@ -14,13 +14,13 @@ class TestFlowTaskStates(TestCase):
 
         # view
         task = Task.objects.get(flow_task=AllTaskFlow.view)
-        activation = AllTaskFlow.view.start(task.pk)
-        activation = AllTaskFlow.view.start(task.pk, get_default_form_data(activation.form))
+        activation = AllTaskFlow.view.start(task)
+        activation = AllTaskFlow.view.start(task, get_default_form_data(activation.form))
         AllTaskFlow.view.done(activation)
 
         # job
         task = Task.objects.get(flow_task=AllTaskFlow.job)
-        activation = AllTaskFlow.job.start(task.pk)
+        activation = AllTaskFlow.job.start(task)
         AllTaskFlow.job.done(activation)
 
         # iff

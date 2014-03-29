@@ -235,6 +235,40 @@ class View(_Task):
         from viewflow.views import assign
         return self._assign_view if self._assign_view else assign
 
+    def calc_owner(self, task):
+        from django.contrib.auth import get_user_model
+
+        owner = self._owner
+        if callable(owner):
+            owner = owner(task.process)
+        elif isinstance(owner, dict):
+            owner = get_user_model() ._default_manager.get(**owner)
+        return owner
+
+    def calc_owner_permission(self, task):
+        owner_permission = self._owner_permission
+        if callable(owner_permission):
+            owner_permission = owner_permission(task.process)
+        return owner_permission
+
+    def can_be_assigned(self, user, task):
+        if task.owner_id:
+            return False
+
+        if user.is_anonymous():
+            return False
+
+        if not task.owner_permission:
+            """
+            Available for everyone
+            """
+            return True
+
+        return user.has_perm(task.owner_permission)
+
+    def has_perm(self, user, task):
+        return task.owner == user
+
     def _outgoing(self):
         for next_node in self._activate_next:
             yield _Edge(src=self, dst=next_node, edge_class='next')
@@ -269,16 +303,15 @@ class View(_Task):
         self._assign_view = assign_view
         return self
 
-    def get(self, activation_id):
-        task = Task.objects.get(pk=activation_id)
+    def get(self, task):
         activation = self.activation_cls(self, task=task)
         return activation
 
     def assign(self, activation, user):
         activation.assign(user)
 
-    def start(self, activation_id, data=None):
-        activation = self.get(activation_id)
+    def start(self, task, data=None):
+        activation = self.get(task)
         activation.start(data)
         return activation
 
@@ -303,8 +336,7 @@ class Job(_Task):
         self._activate_next.append(node)
         return self
 
-    def start(self, activation_id):
-        task = Task.objects.get(pk=activation_id)
+    def start(self, task):
         activation = self.activation_cls(self, task=task)
         activation.start()
         return activation

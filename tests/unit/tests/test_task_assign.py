@@ -23,8 +23,8 @@ class TestRestrictedUserFlow(TestCase):
         self.assertEqual(Task.STATUS.ASSIGNED, task.status)
         self.assertEqual(self.user, task.owner)
 
-        activation = RestrictedUserFlow.view.start(task.pk)
-        self.assertTrue(activation.has_perm(self.user))
+        activation = RestrictedUserFlow.view.start(task)
+        self.assertTrue(RestrictedUserFlow.view.has_perm(self.user, task))
 
 
 class TestRestrictedCallableUserFlow(TestCase):
@@ -42,8 +42,8 @@ class TestRestrictedCallableUserFlow(TestCase):
         self.assertEqual(Task.STATUS.ASSIGNED, task.status)
         self.assertEqual(self.user, task.owner)
 
-        activation = RestrictedCallableUserFlow.view.start(task.pk)
-        self.assertTrue(activation.has_perm(self.user))
+        activation = RestrictedCallableUserFlow.view.start(task)
+        self.assertTrue(RestrictedCallableUserFlow.view.has_perm(self.user, task))
 
 
 class TestRestrictedPermissionFlow(TestCase):
@@ -66,9 +66,9 @@ class TestRestrictedPermissionFlow(TestCase):
         self.assertEqual(Task.STATUS.ACTIVATED, task.status)
         self.assertEqual('unit.restricted_permission_flow__view', task.owner_permission)
 
-        activation = RestrictedPermissionFlow.view.start(task.pk)
-        self.assertTrue(activation.can_be_assigned(self.user))
+        activation = RestrictedPermissionFlow.view.start(task)
+        self.assertTrue(RestrictedPermissionFlow.view.can_be_assigned(self.user, task))
         activation.assign(self.user)
 
-        activation = RestrictedPermissionFlow.view.start(task.pk)
-        self.assertTrue(activation.has_perm(self.user))
+        activation = RestrictedPermissionFlow.view.start(task)
+        self.assertTrue(RestrictedPermissionFlow.view.has_perm(self.user, task))

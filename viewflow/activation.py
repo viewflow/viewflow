@@ -1,4 +1,3 @@
-from django.contrib.auth import get_user_model
 from viewflow.exceptions import FlowRuntimeError
 
 
@@ -93,52 +92,30 @@ class ViewActivation(Activation):
         super(ViewActivation, self).__init__(flow_task, task=task)
         self.form = None
 
-    def can_be_assigned(self, user):
-        if not self.flow_task._owner and not self.flow_task._owner_permission:
-            """
-            Available for everyone
-            """
-            return True
-
-        if not self.flow_task._owner_permission:
-            return False
-
-        return self.task is not None and user.has_perm(self.task.owner_permission)
-
-    def has_perm(self, user):
-        if not self.flow_task._owner and not self.flow_task._owner_permission:
-            """
-            Available for everyone
-            """
-            return True
-        return user and self.task and self.task.owner == user
-
     def activate(self, prev_activation):
         self.process = prev_activation.process
 
-        owner = self.flow_task._owner
-        if callable(owner):
-            owner = owner(self.process)
-        elif isinstance(owner, dict):
-            owner = get_user_model()._default_manager.get(**owner)
-
-        owner_permission = self.flow_task._owner_permission
-        if callable(owner_permission):
-            owner_permission = owner_permission(self.process)
-
+        # Create task
         self.task = self.flow_cls.task_cls(
             process=self.process,
-            flow_task=self.flow_task,
-            owner_permission=owner_permission)
+            flow_task=self.flow_task)
         self.task.save()
-
         self.task.previous.add(prev_activation.task)
+
+        # Try to assign permission
+        owner_permission = self.flow_task.calc_owner_permission(self.task)
+        if owner_permission:
+            self.task.owner_permission = owner_permission
+            self.task.save()
+
+        # Activate
         self.task.activate()
         self.task.save()
 
+        # Try to assign owner
+        owner = self.flow_task.calc_owner(self.task)
         if owner:
-            self.task.assign(owner)
-            self.task.save()
+            self.assign(owner)
 
     def assign(self, user):
         self.task.assign(user)
