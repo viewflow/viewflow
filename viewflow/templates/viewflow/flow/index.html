@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% if has_start_permission %}
 <a class="btn btn-default" href="{% url 'viewflow:start' %}">Start New<a>
+{% endif %}
 <table class="table">
     <thead>
         <th>#</th>

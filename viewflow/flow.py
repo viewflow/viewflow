@@ -112,39 +112,25 @@ class Start(_Node):
         from viewflow.views import assign
         return self._assign_view if self._assign_view else assign
 
-    def calc_owner(self):
+    def has_perm(self, user):
         from django.contrib.auth import get_user_model
 
-        owner = self._owner
-        if callable(owner):
-            owner = owner()
-        elif isinstance(owner, dict):
-            owner = get_user_model() ._default_manager.get(**owner)
-        return owner
+        if self._owner:
+            if callable(self._owner) and self._owner(user):
+                return True
+            owner = get_user_model()._default_manager.get(**self._owner)
+            return owner == user
 
-    def calc_owner_permission(self):
-        owner_permission = self._owner_permission
-        if callable(owner_permission):
-            owner_permission = owner_permission()
-        return owner_permission
+        elif self._owner_permission:
+            if callable(self._owner_permission) and self._owner_permission(user):
+                return True
+            return user.has_perm(self._owner_permission)
 
-    def can_be_assigned(self, user, task):
-        if task.owner_id:
-            return False
-
-        if user.is_anonymous():
-            return False
-
-        if not task.owner_permission:
+        else:
             """
-            Available for everyone
+            No restriction
             """
             return True
-
-        return user.has_perm(task.owner_permission)
-
-    def has_perm(self, user, task):
-        return task.owner == user
 
     def _outgoing(self):
         for next_node in self._activate_next:
@@ -154,24 +140,27 @@ class Start(_Node):
         self._activate_next.append(node)
         return self
 
-    def Assign(self, **owner_kwargs):
+    def Available(self, owner=None, **owner_kwargs):
         """
-        Assign process start available for the User accepts user lookup kwargs
-        or callable without arguments
+        Make process start action available for the User
+        accepts user lookup kwargs or callable predicate :: User -> bool
 
-        .Assign(username='employee')
-        .Assign(lambda: User.objects.get(username='admin'))
+        .Available(username='employee')
+        .Available(lambda user: user.is_super_user)
         """
-        self._owner = owner_kwargs
+        if owner:
+            self._owner = owner
+        else:
+            self._owner = owner_kwargs
         return self
 
     def Permission(self, permission, assign_view=None):
         """
-        Assign process start available for the User for users with specific permission
-        or callable
+        Make process start available for users with specific permission
+        acceps permissions name or callable predicate :: User -> bool
 
         .Permission('my_app.can_approve')
-        .Permission(lambda: settings.PROCESS_PERMISSION_NAME)
+        .Permission(lambda user: user.department_id is not None)
         """
         self._owner_permission = permission
         self._assign_view = assign_view
@@ -292,8 +281,8 @@ class View(_Task):
 
     @property
     def view(self):
-        from viewflow.views import task
-        return self._view if self._view else task
+        from viewflow.views import TaskView
+        return self._view if self._view else TaskView.as_view()
 
     @property
     def assign_view(self):

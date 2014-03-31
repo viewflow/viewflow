@@ -1,6 +1,5 @@
 from django.core.exceptions import PermissionDenied
 from django.db import transaction
-from django.forms.models import modelform_factory
 from django.shortcuts import get_object_or_404, render
 from django.views.generic.edit import UpdateView
 
@@ -15,12 +14,16 @@ def index(request, flow_cls):
     templates = ('{}/flow/index.html'.format(flow_cls._meta.app_label),
                  'viewflow/flow/index.html')
 
-    return render(request, templates, {'process_list': get_page(request, process_list)},
+    return render(request, templates, {'process_list': get_page(request, process_list),
+                                       'has_start_permission': flow_cls.start.has_perm(request.user)},
                   current_app=flow_cls._meta.namespace)
 
 
 @transaction.atomic()
 def start(request, start_task):
+    if not start_task.has_perm(request.user):
+        raise PermissionDenied
+
     activation = start_task.start(request.POST or None)
 
     if request.method == 'POST' and 'start' in request.POST:
@@ -32,30 +35,6 @@ def start(request, start_task):
 
     return render(request, templates,
                   {'activation': activation})
-
-
-@transaction.atomic()
-def task(request, flow_task, act_id):
-    flow_cls = flow_task.flow_cls
-    activation = flow_task.start(act_id, request.POST or None)
-    form_cls = modelform_factory(flow_cls.process_cls, exclude=["flow_cls", "finished"])
-    form = form_cls(request.POST or None, instance=activation.process)
-
-    if not activation.has_perm(request.user):
-        raise PermissionDenied
-
-    if form.is_valid():
-        form.save()
-        flow_task.done(activation)
-        return redirect('viewflow:index', current_app=flow_cls._meta.app_label)
-
-    templates = ('{}/flow/task.html'.format(flow_cls._meta.app_label),
-                 'viewflow/flow/task.html')
-
-    return render(request, templates,
-                  {'form': form,
-                   'activation': activation},
-                  current_app=flow_cls._meta.namespace)
 
 
 @transaction.atomic()

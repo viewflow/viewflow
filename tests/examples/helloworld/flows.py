@@ -9,7 +9,8 @@ class HelloWorldFlow(Flow):
     process_cls = HelloWorldProcess
 
     start = flow.Start() \
-        .Activate(this.hello_request)
+        .Activate(this.hello_request) \
+        .Available(username='employee')
 
     hello_request = flow.View(TaskView.as_view(fields=['text'])) \
         .Next(this.approve)
