@@ -1,12 +1,14 @@
 from viewflow import flow
 from viewflow.base import this, Flow
 from viewflow.views import TaskView
+from viewflow.lock import select_for_update_lock
 
 from examples.helloworld.models import HelloWorldProcess
 
 
 class HelloWorldFlow(Flow):
     process_cls = HelloWorldProcess
+    lock_impl = select_for_update_lock
 
     start = flow.Start() \
         .Activate(this.hello_request) \

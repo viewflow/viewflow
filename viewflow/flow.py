@@ -1,6 +1,8 @@
 """
 Ubiquitos language for flow construction
 """
+from functools import wraps
+
 from viewflow import activation
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.models import Task
@@ -255,6 +257,28 @@ class _Task(_Node):
         # Activate all outgoing edges
         for outgoing in self._outgoing():
             outgoing.dst.activate(activation)
+
+
+def flow_lock(**lock_args):
+    """
+    Decorator that locks the flow
+    """
+    def flow_lock_decorator(func):
+        @wraps(func)
+        def view(request, *args, **kwargs):
+            """
+            Suppose we are in atomic block
+            """
+            flow_task = kwargs['flow_task'] if 'flow_task' in kwargs else args[1]
+            act_id = kwargs['act_id'] if 'act_id' in kwargs else args[2]
+
+            lock = flow_task.flow_cls.lock_impl(**lock_args)
+            with lock(flow_task, act_id):
+                return func(request, *args, **kwargs)
+
+        return view
+
+    return flow_lock_decorator
 
 
 class View(_Task):

@@ -3,6 +3,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, render
 from django.views.generic.edit import UpdateView
 
+from viewflow.flow import flow_lock
 from viewflow.shortcuts import get_page, redirect
 
 
@@ -61,6 +62,8 @@ class TaskView(UpdateView):
     pk_url_kwarg = 'act_id'
     context_object_name = 'process'
 
+    @transaction.atomic()
+    @flow_lock()
     def dispatch(self, request, *args, **kwargs):
         self.flow_task = self.kwargs['flow_task']
         self.flow_cls = self.flow_task.flow_cls

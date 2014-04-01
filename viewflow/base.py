@@ -6,7 +6,7 @@ from collections import defaultdict
 from django.apps import apps
 from django.conf.urls import patterns
 
-from viewflow import flow
+from viewflow import flow, lock
 from viewflow.models import Process, Task
 from viewflow.urls import node_url, node_url_reverse
 from viewflow.resolve import Resolver
@@ -106,6 +106,7 @@ class Flow(object, metaclass=FlowMetaClass):
     process_cls = Process
     task_cls = Task
     activation_form_cls = ActivationDataForm
+    lock_impl = lock.no_lock
 
     @property
     def urls(self):
