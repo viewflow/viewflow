@@ -39,19 +39,20 @@ def start(request, start_task):
 
 
 @transaction.atomic()
-def assign(request, view_task, act_id):
-    task = get_object_or_404(view_task.flow_cls.task_cls, pk=act_id)
+@flow_lock()
+def assign(request, flow_task, act_id):
+    task = get_object_or_404(flow_task.flow_cls.task_cls, pk=act_id)
 
-    if not view_task.can_be_assigned(request.user, task):
+    if not flow_task.can_be_assigned(request.user, task):
         raise PermissionDenied
 
-    activation = view_task.get(task)
+    activation = flow_task.get(task)
 
     if request.method == 'POST' and 'assign' in request.POST:
-        view_task.assign(activation, request.user)
+        flow_task.assign(activation, request.user)
         return redirect(activation.task)
 
-    templates = ('{}/flow/assign.html'.format(view_task.flow_cls._meta.app_label),
+    templates = ('{}/flow/assign.html'.format(flow_task.flow_cls._meta.app_label),
                  'viewflow/flow/assign.html')
 
     return render(request, templates,

@@ -33,7 +33,7 @@ def _(flow_node):
         """
         urls.append(url(r'^{}/(?P<act_id>\d+)/assign/$'.format(flow_node.name),
                         flow_node.assign_view,
-                        {'view_task': flow_node},
+                        {'flow_task': flow_node},
                         name="{}__assign".format(flow_node.name)))
     return urls
 
