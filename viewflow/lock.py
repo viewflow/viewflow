@@ -27,7 +27,8 @@ def select_for_update_lock(using=None, nowait=True, attempts=5):
             try:
                 flow_task.flow_cls.process_cls._default_manager \
                     .filter(id__in=process_ids) \
-                    .select_for_update(nowait=nowait)
+                    .select_for_update(nowait=nowait) \
+                    .exists()
                 break
             except DatabaseError:
                 if i != attempts-1:

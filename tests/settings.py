@@ -66,3 +66,8 @@ TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
     'examples.website.users',
 )
+
+try:
+    from local_settings import *  # NOQA
+except ImportError:
+    pass
