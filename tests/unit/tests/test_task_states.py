@@ -21,7 +21,7 @@ class TestFlowTaskStates(TestCase):
         # job
         task = Task.objects.get(flow_task=AllTaskFlow.job)
         activation = AllTaskFlow.job.start(task)
-        AllTaskFlow.job.done(activation)
+        AllTaskFlow.job.done(task)
 
         # iff
         task = Task.objects.get(flow_task=AllTaskFlow.iff)

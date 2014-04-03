@@ -67,6 +67,11 @@ TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + (
     'examples.website.users',
 )
 
+# Celery
+BROKER_URL = 'django://'
+INSTALLED_APPS += ('kombu.transport.django', )
+
+
 try:
     from local_settings import *  # NOQA
 except ImportError:

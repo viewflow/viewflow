@@ -2,9 +2,12 @@
 Ubiquitos language for flow construction
 """
 from functools import wraps
+from celery import shared_task
+from django.db import transaction
 
 from viewflow import activation
 from viewflow.exceptions import FlowRuntimeError
+from viewflow.fields import import_task_by_ref
 from viewflow.models import Task
 
 
@@ -394,6 +397,37 @@ class View(_Task):
         return activation
 
 
+def flow_job(lock_args=None, **task_kwargs):
+    """
+    Decorator for flow eanbled celery tasks
+    """
+    def flow_job_decorator(func):
+        @wraps(func)
+        def flow_job(flow_task_strref, act_id):
+            flow_task = import_task_by_ref(flow_task_strref)
+
+            # start
+            lock = flow_task.flow_cls.lock_impl(**lock_args)
+            with transaction.atomic():
+                with lock(flow_task, act_id):
+                    task = flow_task.flow_cls.task_cls.objects.get(pk=act_id)
+                    flow_task.start(task)
+
+            # execute
+            result = func(flow_task, task)
+
+            # done
+            lock = flow_task.flow_cls.lock_impl(**lock_args)
+            with transaction.atomic():
+                with lock(flow_task, act_id):
+                    task = flow_task.flow_cls.task_cls.objects.get(pk=act_id)
+                    flow_task.done(task)
+
+            return result
+        return shared_task(**task_kwargs)(flow_job)
+    return flow_job_decorator
+
+
 class Job(_Task):
     """
     Automatically running task
@@ -417,6 +451,15 @@ class Job(_Task):
     def start(self, task):
         activation = self.activation_cls(self, task=task)
         activation.start()
+        return activation
+
+    def done(self, task):
+        activation = self.activation_cls(self, task=task)
+        activation.done()
+
+        # Activate all outgoing edges
+        for outgoing in self._outgoing():
+            outgoing.dst.activate(activation)
         return activation
 
 

@@ -1,3 +1,4 @@
 https://github.com/django/django/archive/1.7b1.zip
-singledispatch
-django-fsm
+singledispatch==3.4.0.3
+django-fsm==2.0.1
+celery==3.1.10

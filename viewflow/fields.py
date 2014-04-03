@@ -1,7 +1,17 @@
 from django.apps import apps
 from django.db import models
-from django.db.models.fields import NOT_PROVIDED
 from django.utils.module_loading import import_by_path
+
+
+def import_task_by_ref(task_strref):
+    """
+    Return flow task by reference like `app_label/path.to.Flowcls.task_name`
+    """
+    app_label, flow_path = task_strref.split('/')
+    flow_path, task_name = flow_path.rsplit('.', 1)
+    app_config = apps.get_app_config(app_label)
+    flow_cls = import_by_path('{}.{}'.format(app_config.module.__package__, flow_path))
+    return getattr(flow_cls, task_name)
 
 
 class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
@@ -44,11 +54,7 @@ class TaskReferenceField(models.CharField, metaclass=models.SubfieldBase):
 
     def to_python(self, value):
         if isinstance(value, str) and value:
-            app_label, flow_path = value.split('/')
-            flow_path, task_name = flow_path.rsplit('.', 1)
-            app_config = apps.get_app_config(app_label)
-            flow_cls = import_by_path('{}.{}'.format(app_config.module.__package__, flow_path))
-            return getattr(flow_cls, task_name)
+            return import_task_by_ref(value)
         return value
 
     def get_prep_value(self, value):
