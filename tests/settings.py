@@ -68,9 +68,12 @@ TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + (
 )
 
 # Celery
-BROKER_URL = 'django://'
-INSTALLED_APPS += ('kombu.transport.django', )
+import djcelery
+djcelery.setup_loader()
 
+BROKER_URL = 'django://'
+INSTALLED_APPS += ('kombu.transport.django', 'djcelery')
+CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
 try:
     from local_settings import *  # NOQA

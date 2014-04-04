@@ -14,6 +14,14 @@ def import_task_by_ref(task_strref):
     return getattr(flow_cls, task_name)
 
 
+def get_task_ref(flow_task):
+    module = flow_task.flow_cls.__module__
+    app_config = apps.get_containing_app_config(module)
+    subpath = module.lstrip(app_config.module.__package__+'.')
+
+    return "{}/{}.{}.{}".format(app_config.label, subpath, flow_task.flow_cls.__name__, flow_task.name)
+
+
 class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
     description = """Flow class reference field,
     stores flow as app_label/flows.FlowName> to
@@ -59,11 +67,7 @@ class TaskReferenceField(models.CharField, metaclass=models.SubfieldBase):
 
     def get_prep_value(self, value):
         if not isinstance(value, str):
-            module = value.flow_cls.__module__
-            app_config = apps.get_containing_app_config(module)
-            subpath = module.lstrip(app_config.module.__package__+'.')
-
-            return "{}/{}.{}.{}".format(app_config.label, subpath, value.flow_cls.__name__, value.name)
+            return get_task_ref(value)
         return super(TaskReferenceField, self).get_prep_value(value)
 
     def value_to_string(self, obj):

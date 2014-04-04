@@ -7,7 +7,7 @@ from django.db import transaction
 
 from viewflow import activation
 from viewflow.exceptions import FlowRuntimeError
-from viewflow.fields import import_task_by_ref
+from viewflow.fields import import_task_by_ref, get_task_ref
 from viewflow.models import Task
 
 
@@ -401,6 +401,9 @@ def flow_job(lock_args=None, **task_kwargs):
     """
     Decorator for flow eanbled celery tasks
     """
+    if lock_args is None:
+        lock_args = {}
+
     def flow_job_decorator(func):
         @wraps(func)
         def flow_job(flow_task_strref, act_id):
@@ -433,7 +436,7 @@ class Job(_Task):
     Automatically running task
     """
     task_type = 'JOB'
-    activation_cls = activation.Activation
+    activation_cls = activation.JobActivation
 
     def __init__(self, job):
         super(Job, self).__init__()
@@ -447,6 +450,20 @@ class Job(_Task):
     def Next(self, node):
         self._activate_next.append(node)
         return self
+
+    def activate(self, prev_activation):
+        activation = self.activation_cls(self)
+        activation.activate(prev_activation)
+
+        async_result = self._job.apply_async(args=[get_task_ref(self), activation.task.pk], countdown=2)
+        if async_result.state == 'SUCCESS':
+            # We are running in EAGER mode, typically task could not be executed at this time
+            # b/c process instance lock prevents it
+            activation.task = self.flow_cls.task_cls._default_manager.get(pk=activation.task.pk)
+        else:
+            activation.assign(async_result.id)
+
+        return activation
 
     def start(self, task):
         activation = self.activation_cls(self, task=task)

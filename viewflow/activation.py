@@ -118,7 +118,7 @@ class ViewActivation(Activation):
             self.assign(owner)
 
     def assign(self, user):
-        self.task.assign(user)
+        self.task.assign(user=user)
         self.task.save()
 
     def start(self, data=None):
@@ -134,6 +134,12 @@ class ViewActivation(Activation):
                 self.task.save()
             else:
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.form.errors))
+
+
+class JobActivation(Activation):
+    def assign(self, external_task_id):
+        self.task.assign(external_task_id=external_task_id)
+        self.task.save()
 
 
 class EndActivation(Activation):

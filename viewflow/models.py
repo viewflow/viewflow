@@ -97,8 +97,9 @@ class Task(models.Model):
         """
 
     @transition(field=status, source=STATUS.ACTIVATED, target=STATUS.ASSIGNED, conditions=[_in_db])
-    def assign(self, user):
+    def assign(self, user=None, external_task_id=None):
         self.owner = user
+        self.external_task_id = external_task_id
 
     @transition(field=status, source=[STATUS.ACTIVATED, STATUS.ASSIGNED], target=STATUS.STARTED, conditions=[_in_db])
     def start(self, external_task_id=None):

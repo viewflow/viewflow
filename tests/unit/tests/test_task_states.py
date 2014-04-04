@@ -1,11 +1,15 @@
-from django.test import TestCase
+from django.test import TransactionTestCase
+from django.test.utils import override_settings
 from viewflow.models import Task
 
 from unit.flows import AllTaskFlow
 from unit.helpers import get_default_form_data
 
 
-class TestFlowTaskStates(TestCase):
+@override_settings(CELERY_ALWAYS_EAGER=True)
+class TestFlowTaskStates(TransactionTestCase):
+    available_apps = ['viewflow', 'unit']
+
     def test_all_activations_succeed(self):
         # start
         activation = AllTaskFlow.start.start()
@@ -20,8 +24,7 @@ class TestFlowTaskStates(TestCase):
 
         # job
         task = Task.objects.get(flow_task=AllTaskFlow.job)
-        activation = AllTaskFlow.job.start(task)
-        AllTaskFlow.job.done(task)
+        self.assertIsNotNone(task.finished)  # Celery executed eager
 
         # iff
         task = Task.objects.get(flow_task=AllTaskFlow.iff)
