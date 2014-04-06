@@ -41,6 +41,7 @@ class FlowURLNode(Node):
                 raise TemplateSyntaxError("Action {} not found".format(action_name))
 
             # url reverse
+            # TODO drop missing task support?
             reverse_impl = getattr(flow_cls, 'reverse_{}'.format(flow_task.name), None)
             if reverse_impl:
                 return reverse_impl(task=None, **self.kwargs)

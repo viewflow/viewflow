@@ -40,7 +40,7 @@ def start(request, start_task):
 
 @transaction.atomic()
 @flow_lock()
-def assign(request, flow_task, act_id):
+def assign(request, flow_task, process_id, act_id):
     task = get_object_or_404(flow_task.flow_cls.task_cls, pk=act_id)
 
     if not flow_task.can_be_assigned(request.user, task):

@@ -24,14 +24,16 @@ def _(flow_node):
 def _(flow_node):
     urls = []
 
-    urls.append(url(r'^{}/(?P<act_id>\d+)/$'.format(flow_node.name), flow_node.view, {'flow_task': flow_node},
+    urls.append(url(r'^(?P<process_id>\d+)/{}/(?P<act_id>\d+)/$'.format(flow_node.name),
+                    flow_node.view,
+                    {'flow_task': flow_node},
                     name=flow_node.name))
 
     if not flow_node._owner:
         """
         No specific task owner, user need to be assigned
         """
-        urls.append(url(r'^{}/(?P<act_id>\d+)/assign/$'.format(flow_node.name),
+        urls.append(url(r'^(?P<process_id>\d+)/{}/(?P<act_id>\d+)/assign/$'.format(flow_node.name),
                         flow_node.assign_view,
                         {'flow_task': flow_node},
                         name="{}__assign".format(flow_node.name)))
@@ -50,12 +52,17 @@ def _(flow_node, task, **kwargs):
 
 @node_url_reverse.register(flow.View)  # NOQA
 def _(flow_node, task, **kwargs):
-    pk = task.pk if task else kwargs.get('pk')
+    if not task:
+        task = flow_node.flow_cls.task_cls._default_manager.get(pk=kwargs['pk'])
+
     if not task.owner_id:
         """
         Need to be assigned
         """
         return reverse('viewflow:{}__assign'.format(flow_node.name),
-                       args=[pk],
+                       args=[task.process_id, task.pk],
                        current_app=flow_node.flow_cls._meta.namespace)
-    return reverse('viewflow:{}'.format(flow_node.name), args=[pk], current_app=flow_node.flow_cls._meta.namespace)
+
+    return reverse('viewflow:{}'.format(flow_node.name),
+                   args=[task.process_id, task.pk],
+                   current_app=flow_node.flow_cls._meta.namespace)
