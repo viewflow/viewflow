@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User
 
-from viewflow import flow
+from viewflow import flow, lock
 from viewflow.base import Flow, this
 
 from unit.models import TestProcess
@@ -20,6 +20,8 @@ class SingleTaskFlow(Flow):
 
 
 class AllTaskFlow(Flow):
+    lock_impl = lock.cache_lock
+
     start = flow.Start().Activate(this.view)
     view = flow.View().Next(this.job)
     job = flow.Job(dummy_job).Next(this.iff)
