@@ -262,26 +262,23 @@ class _Task(_Node):
             outgoing.dst.activate(activation)
 
 
-def flow_lock(**lock_args):
+def flow_view(**lock_args):
     """
-    Decorator that locks the flow
+    Decorator that locks and runs the flow view in transaction
     """
-    def flow_lock_decorator(func):
+    def flow_view_decorator(func):
         @wraps(func)
         def view(request, *args, **kwargs):
-            """
-            Suppose we are in atomic block
-            """
             flow_task = kwargs['flow_task'] if 'flow_task' in kwargs else args[1]
-            act_id = kwargs['act_id'] if 'act_id' in kwargs else args[2]
+            process_pk = kwargs['process_pk'] if 'process_pk' in kwargs else args[2]
 
             lock = flow_task.flow_cls.lock_impl(**lock_args)
-            with lock(flow_task, act_id):
+            with lock(flow_task, process_pk):
                 return func(request, *args, **kwargs)
 
         return view
 
-    return flow_lock_decorator
+    return flow_view_decorator
 
 
 class View(_Task):
@@ -411,20 +408,18 @@ def flow_job(lock_args=None, **task_kwargs):
 
             # start
             lock = flow_task.flow_cls.lock_impl(**lock_args)
-            with transaction.atomic():
-                with lock(flow_task, act_id):
-                    task = flow_task.flow_cls.task_cls.objects.get(pk=act_id)
-                    flow_task.start(task)
+            with lock(flow_task, act_id):
+                task = flow_task.flow_cls.task_cls.objects.get(pk=act_id)
+                flow_task.start(task)
 
             # execute
             result = func(flow_task, task)
 
             # done
             lock = flow_task.flow_cls.lock_impl(**lock_args)
-            with transaction.atomic():
-                with lock(flow_task, act_id):
-                    task = flow_task.flow_cls.task_cls.objects.get(pk=act_id)
-                    flow_task.done(task)
+            with lock(flow_task, act_id):
+                task = flow_task.flow_cls.task_cls.objects.get(pk=act_id)
+                flow_task.done(task)
 
             return result
         return shared_task(**task_kwargs)(flow_job)

@@ -4,7 +4,7 @@ class FlowRuntimeError(Exception):
     """
 
 
-class FlowLockFailedException(Exception):
+class FlowLockFailed(Exception):
     """
     Flow lock failed
     """

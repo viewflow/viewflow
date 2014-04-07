@@ -6,7 +6,8 @@ from unit.flows import AllTaskFlow
 from unit.helpers import get_default_form_data
 
 
-@override_settings(CELERY_ALWAYS_EAGER=True)
+@override_settings(CELERY_ALWAYS_EAGER=True,
+                   CELERY_EAGER_PROPAGATES_EXCEPTIONS=True)
 class TestFlowTaskStates(TransactionTestCase):
     available_apps = ['viewflow', 'unit']
 

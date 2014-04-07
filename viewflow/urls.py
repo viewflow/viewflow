@@ -24,7 +24,7 @@ def _(flow_node):
 def _(flow_node):
     urls = []
 
-    urls.append(url(r'^(?P<process_id>\d+)/{}/(?P<act_id>\d+)/$'.format(flow_node.name),
+    urls.append(url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/$'.format(flow_node.name),
                     flow_node.view,
                     {'flow_task': flow_node},
                     name=flow_node.name))
@@ -33,7 +33,7 @@ def _(flow_node):
         """
         No specific task owner, user need to be assigned
         """
-        urls.append(url(r'^(?P<process_id>\d+)/{}/(?P<act_id>\d+)/assign/$'.format(flow_node.name),
+        urls.append(url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/assign/$'.format(flow_node.name),
                         flow_node.assign_view,
                         {'flow_task': flow_node},
                         name="{}__assign".format(flow_node.name)))

@@ -3,7 +3,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, render
 from django.views.generic.edit import UpdateView
 
-from viewflow.flow import flow_lock
+from viewflow.flow import flow_view
 from viewflow.shortcuts import get_page, redirect
 
 
@@ -38,10 +38,9 @@ def start(request, start_task):
                   {'activation': activation})
 
 
-@transaction.atomic()
-@flow_lock()
-def assign(request, flow_task, process_id, act_id):
-    task = get_object_or_404(flow_task.flow_cls.task_cls, pk=act_id)
+@flow_view()
+def assign(request, flow_task, process_pk, task_pk):
+    task = get_object_or_404(flow_task.flow_cls.task_cls, pk=task_pk)
 
     if not flow_task.can_be_assigned(request.user, task):
         raise PermissionDenied
@@ -60,11 +59,10 @@ def assign(request, flow_task, process_id, act_id):
 
 
 class TaskView(UpdateView):
-    pk_url_kwarg = 'act_id'
+    pk_url_kwarg = 'task_pk'
     context_object_name = 'process'
 
-    @transaction.atomic()
-    @flow_lock()
+    @flow_view()
     def dispatch(self, request, *args, **kwargs):
         self.flow_task = self.kwargs['flow_task']
         self.flow_cls = self.flow_task.flow_cls
@@ -72,8 +70,9 @@ class TaskView(UpdateView):
         return super(TaskView, self).dispatch(request, *args, **kwargs)
 
     def get_object(self):
-        act_id = self.kwargs[self.pk_url_kwarg]
-        self.task = get_object_or_404(self.flow_cls.task_cls, pk=act_id)
+        self.task = get_object_or_404(self.flow_cls.task_cls, pk=self.kwargs['task_pk'])
+
+        assert self.kwargs['process_pk'] == self.task.process_id
         self.process = self.process_cls.objects.get(pk=self.task.process_id)
 
         if not self.flow_task.has_perm(self.request.user, self.task):
