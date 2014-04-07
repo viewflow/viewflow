@@ -3,6 +3,7 @@ Ubiquitos language for flow construction
 """
 from functools import wraps
 from celery import shared_task
+from celery.utils import uuid
 from django.db import transaction
 
 from viewflow import activation
@@ -403,22 +404,30 @@ def flow_job(lock_args=None, **task_kwargs):
 
     def flow_job_decorator(func):
         @wraps(func)
-        def flow_job(flow_task_strref, act_id):
+        def flow_job(flow_task_strref, process_pk, task_pk):
             flow_task = import_task_by_ref(flow_task_strref)
 
             # start
             lock = flow_task.flow_cls.lock_impl(**lock_args)
-            with lock(flow_task, act_id):
-                task = flow_task.flow_cls.task_cls.objects.get(pk=act_id)
-                flow_task.start(task)
+            with lock(flow_task, process_pk):
+                try:
+                    task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
+                except flow_task.flow_cls.task_cls.DoesNotExists:
+                    """
+                    There was rollback on job task created transaction,
+                    we don't need to do the job
+                    """
+                    return
+                else:
+                    flow_task.start(task)
 
             # execute
             result = func(flow_task, task)
 
             # done
             lock = flow_task.flow_cls.lock_impl(**lock_args)
-            with lock(flow_task, act_id):
-                task = flow_task.flow_cls.task_cls.objects.get(pk=act_id)
+            with lock(flow_task, process_pk):
+                task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
                 flow_task.done(task)
 
             return result
@@ -450,13 +459,13 @@ class Job(_Task):
         activation = self.activation_cls(self)
         activation.activate(prev_activation)
 
-        async_result = self._job.apply_async(args=[get_task_ref(self), activation.task.pk], countdown=2)
-        if async_result.state == 'SUCCESS':
-            # We are running in EAGER mode, typically task could not be executed at this time
-            # b/c process instance lock prevents it
-            activation.task = self.flow_cls.task_cls._default_manager.get(pk=activation.task.pk)
-        else:
-            activation.assign(async_result.id)
+        # It is safe to run task just now b/c we are holding the process instance lock,
+        # and task will wait until our transaction completes
+        external_task_id = uuid()
+        activation.assign(external_task_id)
+        self._job.apply_async(args=[get_task_ref(self), activation.task.process_id, activation.task.pk],
+                              task_id=external_task_id,
+                              countdown=1)
 
         return activation
 

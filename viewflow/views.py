@@ -72,7 +72,7 @@ class TaskView(UpdateView):
     def get_object(self):
         self.task = get_object_or_404(self.flow_cls.task_cls, pk=self.kwargs['task_pk'])
 
-        assert self.kwargs['process_pk'] == self.task.process_id
+        assert self.kwargs['process_pk'] == str(self.task.process_id)
         self.process = self.process_cls.objects.get(pk=self.task.process_id)
 
         if not self.flow_task.has_perm(self.request.user, self.task):
