@@ -124,7 +124,7 @@ class Task(models.Model):
         if self.process and self.flow_task:
             return self.process.flow_cls.instance.reverse(self)
 
-    def save(self):
+    def save(self, *args, **kwargs):
         if self.flow_task:
             self.flow_task_type = self.flow_task.task_type
-        super(Task, self).save()
+        super(Task, self).save(*args, **kwargs)
