@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from viewflow.models import Process
 
 
@@ -27,6 +28,7 @@ class Shipment(models.Model):
 
 class ShipmentProcess(Process):
     shipment = models.ForeignKey(Shipment, blank=True, null=True)
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
 
     def is_normal_post():
         raise NotImplementedError
@@ -34,6 +36,10 @@ class ShipmentProcess(Process):
     def need_extra_insurance():
         raise NotImplementedError
 
-
-
-
+    class Meta:
+        permissions = [
+            ('can_start_request', 'Can start shipment request'),
+            ('can_take_extra_insurance', 'Can take extra insurance'),
+            ('can_package_goods', 'Can package goods'),
+            ('can_move_package', 'Can move package')
+        ]

@@ -1,0 +1,134 @@
+[
+{
+    "model": "contenttypes.contenttype",
+    "fields": {
+        "name": "shipment process",
+        "app_label": "shipment",
+        "model": "shipmentprocess"
+    }
+},
+{
+    "fields": {
+        "content_type": [
+            "shipment",
+            "shipmentprocess"
+        ],
+        "name": "Can start shipment request",
+        "codename": "can_start_request"
+    },
+    "model": "auth.permission"
+},
+{
+    "fields": {
+        "content_type": [
+            "shipment",
+            "shipmentprocess"
+        ],
+        "name": "Can take extra insurance",
+        "codename": "can_take_extra_insurance"
+    },
+    "model": "auth.permission"
+},
+{
+    "fields": {
+        "content_type": [
+            "shipment",
+            "shipmentprocess"
+        ],
+        "name": "Can package goods",
+        "codename": "can_package_goods"
+    },
+    "model": "auth.permission"
+},
+{
+    "fields": {
+        "content_type": [
+            "shipment",
+            "shipmentprocess"
+        ],
+        "name": "Can move package",
+        "codename": "can_move_package"
+    },
+    "model": "auth.permission"
+},
+{
+    "fields": {
+        "name": "shipment/clerk",
+        "permissions": [
+            [
+                "can_start_request",
+                "shipment",
+                "shipmentprocess"
+            ]
+        ]
+    },
+    "model": "auth.group"
+},
+{
+    "fields": {
+        "name": "shipment/manager",
+        "permissions": [
+            [
+                "can_take_extra_insurance",
+                "shipment",
+                "shipmentprocess"
+            ]
+        ]
+    },
+    "model": "auth.group"
+},
+{
+    "fields": {
+        "name": "shipment/worker",
+        "permissions": [
+            [
+                "can_approve_request",
+                "helloworld",
+                "helloworldprocess"
+            ],
+            [
+                "can_move_package",
+                "shipment",
+                "shipmentprocess"
+            ]
+        ]
+    },
+    "model": "auth.group"
+},
+{
+    "model": "auth.user",
+    "fields": {
+        "user_permissions": [],
+        "username": "shipment/clerk",
+        "groups": [
+            [
+                "shipment/clerk"
+            ]
+        ]
+    }
+},
+{
+    "model": "auth.user",
+    "fields": {
+        "user_permissions": [],
+        "username": "shipment/manager",
+        "groups": [
+            [
+                "shipment/manager"
+            ]
+        ]
+    }
+},
+{
+    "model": "auth.user",
+    "fields": {
+        "user_permissions": [],
+        "username": "shipment/worker",
+        "groups": [
+            [
+                "shipment/worker"
+            ]
+        ]
+    }
+}
+]

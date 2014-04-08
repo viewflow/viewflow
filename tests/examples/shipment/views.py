@@ -1,69 +1,23 @@
+from django.db import transaction
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import get_object_or_404, render
+from django.core.urlresolvers import reverse
+from django.shortcuts import redirect, render
 
 
-def shipment_type(request, flow_task, act_id):
-    """
-    Decide if normal post or special shipment
-    """
-    activation = get_object_or_404(Activation, pk=act_id)
-
-    if not flow_task.has_perm(request, activation):
+@transaction.atomic()
+def start(request, start_task):
+    if not start_task.has_perm(request.user):
         raise PermissionDenied
 
-    if request.method == 'POST':
-        activation.done(save=True)
-        return activation.redirect_to_next()
+    activation = start_task.start(request.POST or None)
 
-    return render(request, 'shipment/shipment_type.html', {
-        'activation': activation
-    })
+    if request.method == 'POST' and 'start' in request.POST:
+        start_task.done(activation)
 
+        activation.task.process.created_by = request.user
+        activation.task.process.save()
 
-def package_goods(request, flow_task, act_id):
-    """
-    Package goods
-    """
-    raise NotImplementedError
+        return redirect(reverse('viewflow:index', current_app=start_task.flow_cls._meta.namespace))
 
-
-def check_insurance(request, flow_task, act_id):
-    """
-    Check if extra insurance is necessary
-    """
-    raise NotImplementedError
-
-
-def request_quotes(request, flow_task, act_id):
-    """
-    Check if extra insurance is necessary
-    """
-    raise NotImplementedError
-
-
-def take_extra_insurance(request, flow_task, act_id):
-    """
-    Take out extra insurance
-    """
-    raise NotImplementedError
-
-
-def fill_post_label(request, flow_task, act_id):
-    """
-    Fill in a Post label
-    """
-    raise NotImplementedError
-
-
-def assign_carrier(request, flow_task, act_id):
-    """
-    Assign a carrier & prepare paperwork
-    """
-    raise NotImplementedError
-
-
-def move_package(request, flow_task, act_id):
-    """
-    Assign a carrier & prepare paperwork
-    """
-    raise NotImplementedError
+    return render(request, 'shipment/flow/start.html',
+                  {'activation': activation})

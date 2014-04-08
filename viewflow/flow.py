@@ -4,7 +4,6 @@ Ubiquitos language for flow construction
 from functools import wraps
 from celery import shared_task
 from celery.utils import uuid
-from django.db import transaction
 
 from viewflow import activation
 from viewflow.exceptions import FlowRuntimeError
