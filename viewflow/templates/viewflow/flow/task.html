@@ -5,7 +5,7 @@
 <form method="POST">
 {% csrf_token %}
 {{ form }}
-{{ activation.form }}
+{{ activation.management_form }}
 <button type="submit" name="done" class="btn btn-default">Done</button>
 </form>
 {% endblock %}

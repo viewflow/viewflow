@@ -18,10 +18,11 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_fsm',
     'viewflow',
     # Tests
-    'unit',
-    'integration',
+    # 'unit',
+    # 'integration',
     # Samples
     'examples.shipment',
     'examples.helloworld'

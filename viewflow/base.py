@@ -63,7 +63,7 @@ class FlowMetaClass(type):
         new_class.instance = FlowInstanceDescriptor()
 
         # set up flow tasks
-        nodes = {name: attr for name, attr in attrs.items() if isinstance(attr, flow._Node)}
+        nodes = {name: attr for name, attr in attrs.items() if isinstance(attr, flow.Node)}
 
         for name, node in nodes.items():
             node.name = name
@@ -105,7 +105,7 @@ class Flow(object, metaclass=FlowMetaClass):
     """
     process_cls = Process
     task_cls = Task
-    activation_form_cls = ActivationDataForm
+    management_form_cls = ActivationDataForm
     lock_impl = lock.no_lock
 
     @property

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django_fsm import FSMField, transition
 
+from viewflow.exceptions import FlowRuntimeError
 from viewflow.fields import FlowReferenceField, TaskReferenceField
 
 
@@ -48,16 +49,16 @@ class Process(models.Model):
 class Task(models.Model):
     class STATUS:
         NEW = 'NEW'
-        ACTIVATED = 'ACT'
         ASSIGNED = 'ASN'
+        PREPARED = 'PRP'
         STARTED = 'STR'
         FINISHED = 'FNS'
         CANCELLED = 'CNC'
         ERROR = 'ERR'
 
     STATUS_CHOICES = ((STATUS.NEW, 'New'),
-                      (STATUS.ACTIVATED, 'Activated'),
                       (STATUS.ASSIGNED, 'Assigned'),
+                      (STATUS.PREPARED, 'Prepared for execution'),
                       (STATUS.STARTED, 'Stated'),
                       (STATUS.FINISHED, 'Finished'),
                       (STATUS.CANCELLED, 'Cancelled'),
@@ -71,52 +72,45 @@ class Task(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     started = models.DateTimeField(blank=True, null=True)
     finished = models.DateTimeField(blank=True, null=True)
+    previous = models.ManyToManyField('self')
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
-    owner_permission = models.CharField(max_length=50, blank=True, null=True)
     external_task_id = models.CharField(max_length=50, blank=True, null=True)
-    previous = models.ManyToManyField('self')
+
+    owner_permission = models.CharField(max_length=50, blank=True, null=True)
 
     def _in_db(self):
         """
-        All transitions method except initialize runs only after task has stored in database
+        Ensure that we have primary key and that's we are safe to create referencied models
         """
         return self.pk
 
-    @transition(field=status, source=[STATUS.NEW, STATUS.ACTIVATED, STATUS.ASSIGNED])
-    def initialize(self):
-        """
-        Person assigned task coulbe be initialized several times (probably on GET request)
-        """
-        self.started = datetime.now()
-
-    @transition(field=status, source=STATUS.NEW, target=STATUS.ACTIVATED, conditions=[_in_db])
-    def activate(self):
-        """
-        Task created, and available for execution
-        """
-
-    @transition(field=status, source=STATUS.ACTIVATED, target=STATUS.ASSIGNED, conditions=[_in_db])
+    @transition(field=status, source=STATUS.NEW, target=STATUS.ASSIGNED, conditions=[_in_db])
     def assign(self, user=None, external_task_id=None):
         self.owner = user
         self.external_task_id = external_task_id
 
-    @transition(field=status, source=[STATUS.ACTIVATED, STATUS.ASSIGNED], target=STATUS.STARTED, conditions=[_in_db])
-    def start(self, external_task_id=None):
-        if not self.started:
-            self.started = datetime.now()
-        if external_task_id:
-            self.external_task_id = external_task_id
+    @transition(field=status, source=[STATUS.NEW, STATUS.ASSIGNED], target=STATUS.PREPARED)
+    def prepare(self):
+        """
+        Task going to be started. Task could be initialized several times (probably on GET request)
+        Initialized tasks could not be saved
+        """
+        self.started = datetime.now()
 
-    @transition(field=status, source=STATUS.STARTED, target=STATUS.FINISHED, conditions=[_in_db])
+    @transition(field=status, source=STATUS.PREPARED, target=STATUS.STARTED, conditions=[_in_db])
+    def start(self):
+        pass
+
+    @transition(field=status, source=[STATUS.PREPARED, STATUS.STARTED], target=STATUS.FINISHED)
     def done(self):
         self.finished = datetime.now()
 
-    @transition(field=status, source=[STATUS.ACTIVATED, STATUS.STARTED], target=STATUS.CANCELLED, conditions=[_in_db])
+    @transition(field=status, source=[STATUS.ASSIGNED, STATUS.STARTED], target=STATUS.CANCELLED, conditions=[_in_db])
     def cancel(self):
         self.finished = datetime.now()
 
-    @transition(field=status, source=[STATUS.ACTIVATED, STATUS.STARTED], target=STATUS.ERROR, conditions=[_in_db])
+    @transition(field=status, source=[STATUS.ASSIGNED, STATUS.STARTED], target=STATUS.ERROR, conditions=[_in_db])
     def error(self):
         pass
 
@@ -125,6 +119,10 @@ class Task(models.Model):
             return self.process.flow_cls.instance.reverse(self)
 
     def save(self, *args, **kwargs):
+        if self.status == Task.STATUS.PREPARED:
+            raise FlowRuntimeError("Can't save task with intermediate status - PREPARED")
+
         if self.flow_task:
             self.flow_task_type = self.flow_task.task_type
+
         super(Task, self).save(*args, **kwargs)

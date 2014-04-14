@@ -5,7 +5,8 @@
 <p class="lead">Basic framework-less hello world sample</p>
 <form method="POST">
 {% csrf_token %}
+{{ form }}
+{{ activation.management_form }}
 <button type="submit" name="start" class="btn btn-default">Start</button>
-{{ activation.form }}
 </form>
 {% endblock %}

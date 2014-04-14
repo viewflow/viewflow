@@ -1,152 +1,167 @@
-from viewflow.exceptions import FlowRuntimeError
+from django.utils.decorators import classonlymethod
 
 
 class Activation(object):
     """
-    Base class for managing flow task activation state
+    Activation responsible for managing state and persistance of task instance
 
-    By default any state changes saved to db
+    There is no common interface for activation, but every subactivation type
+    defines each own
     """
-    def __init__(self, flow_task, task=None):
-        self.task = task
-        self.process = task.process if task else None
-        self.flow_task = flow_task
-        self.flow_cls = self.flow_task.flow_cls
-
-    def activate(self, prev_activation):
-        self.process = prev_activation.process
-        self.task = self.flow_cls.task_cls(process=self.process, flow_task=self.flow_task)
-        self.task.save()
-
-        self.task.previous.add(prev_activation.task)
-        self.task.activate()
-        self.task.save()
-
-    def start(self, data=None):
-        self.task.start()
-        self.task.save()
-
-    def done(self):
-        self.task.done()
-        self.task.save()
+    def __init__(self, **kwargs):
+        """
+        Activation should be available for instante without any constructor parameters.
+        """
+        super(Activation, self).__init__(**kwargs)
 
 
 class StartActivation(Activation):
     """
-    Create and start flow process activation
-    Track and save activation data from user form
-
-    start() call suitable for get requests, if no data provided
+    Base activation that starts new process instance
     """
-    def __init__(self, flow_task):
-        super(StartActivation, self).__init__(flow_task)
-        self.form = None
+    def __init__(self, **kwargs):
+        self.flow_cls, self.flow_task = None, None
+        self.process, self.task = None, None
+        super(StartActivation, self).__init__(**kwargs)
 
-    def activate(self, prev_activation):
-        raise NotImplementedError
+    def initialize(self, flow_task):
+        """
+        Initialize new activation instance
+        """
+        self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
 
-    def start(self, data=None):
         self.process = self.flow_cls.process_cls(flow_cls=self.flow_cls)
         self.task = self.flow_cls.task_cls(process=self.process, flow_task=self.flow_task)
 
-        if not data:
-            self.task.initialize()
+    def prepare(self):
+        self.task.prepare()
 
-        self.form = self.flow_cls.activation_form_cls(data=data, instance=self.task)
+    def save_process(self):
+        """
+        Save process when done,
+        """
+        self.process.save()
+        return self.process
 
-        if data:
-            if self.form.is_valid():
-                # Create process
-                self.process.save()
-                self.task.process = self.process
-                self.task.save()
+    def done(self, process=None):
+        """
+        Creates and starts new process instance
+        """
+        if process:
+            self.process = process
+        self.process = self.save_process()
 
-                # Activate task
-                self.task.activate()
-                self.task.save()
-
-                # Start task
-                self.task = self.form.save(commit=False)
-                self.task.start()
-                self.task.save()
-            else:
-                raise FlowRuntimeError('Activation metadata is broken {}'.format(self.form.errors))
-
-    def done(self):
-        # Finish activation
+        self.task.process = process
         self.task.done()
         self.task.save()
 
-        # Start process
-        self.task.process.start()
+        self.process.start()
         self.process.save()
+
+        self.flow_task.activate_next(self)
 
 
 class ViewActivation(Activation):
     """
-    Track and save activation data from user form
-
-    start() call suitable for get requests, if no data provided
+    Base activation that starts new process instance
     """
-    def __init__(self, flow_task, task=None):
-        super(ViewActivation, self).__init__(flow_task, task=task)
-        self.form = None
+    def __init__(self, **kwargs):
+        self.flow_cls, self.flow_task = None, None
+        self.process, self.task = None, None
+        super(ViewActivation, self).__init__(**kwargs)
 
-    def activate(self, prev_activation):
-        self.process = prev_activation.process
+    def initialize(self, flow_task, task):
+        """
+        Initialize new activation instance
+        """
+        self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
 
-        # Create task
-        self.task = self.flow_cls.task_cls(
-            process=self.process,
-            flow_task=self.flow_task)
-        self.task.save()
-        self.task.previous.add(prev_activation.task)
-
-        # Try to assign permission
-        owner_permission = self.flow_task.calc_owner_permission(self.task)
-        if owner_permission:
-            self.task.owner_permission = owner_permission
-            self.task.save()
-
-        # Activate
-        self.task.activate()
-        self.task.save()
-
-        # Try to assign owner
-        owner = self.flow_task.calc_owner(self.task)
-        if owner:
-            self.assign(owner)
+        self.process = self.flow_cls.process_cls._default_manager.get(flow_cls=self.flow_cls, pk=task.process_id)
+        self.task = task
 
     def assign(self, user):
         self.task.assign(user=user)
         self.task.save()
 
-    def start(self, data=None):
-        if not data:
-            self.task.initialize()
+    def prepare(self):
+        self.task.prepare()
 
-        self.form = self.flow_cls.activation_form_cls(data=data, instance=self.task)
+    def get_task(self):
+        return self.task
 
-        if data:
-            if self.form.is_valid():
-                self.task = self.form.save(commit=False)
-                self.task.start()
-                self.task.save()
-            else:
-                raise FlowRuntimeError('Activation metadata is broken {}'.format(self.form.errors))
-
-
-class JobActivation(Activation):
-    def assign(self, external_task_id):
-        self.task.assign(external_task_id=external_task_id)
+    def done(self):
+        self.task = self.get_task()
+        self.task.done()
         self.task.save()
+
+        self.flow_task.activate_next(self)
+
+    @classmethod
+    def activate(cls, flow_task, prev_activation):
+        flow_cls, flow_task = flow_task.flow_cls, flow_task
+        process = prev_activation.process
+
+        task = flow_cls.task_cls(
+            process=process,
+            flow_task=flow_task)
+
+        # Try to assign permission
+        owner_permission = flow_task.calc_owner_permission(task)
+        if owner_permission:
+            task.owner_permission = owner_permission
+
+        task.save()
+        task.previous.add(prev_activation.task)
+
+        activation = cls()
+        activation.initialize(flow_task, task)
+
+        # Try to assign owner
+        owner = flow_task.calc_owner(task)
+        if owner:
+            activation.assign(owner)
+
+        return activation
 
 
 class EndActivation(Activation):
-    """
-    Finish the flow process
-    """
+    def initialize(self, flow_task, task):
+        """
+        Initialize new activation instance
+        """
+        self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
+
+        self.process = self.flow_cls.process_cls._default_manager.get(flow_cls=self.flow_cls, pk=task.process_id)
+        self.task = task
+
+    def prepare(self):
+        self.task.prepare()
+
     def done(self):
-        super(EndActivation, self).done()
+        self.task.done()
+        self.task.save()
+
         self.process.finish()
         self.process.save()
+
+        for task in self.process.active_tasks():
+            task.flow_task.deactivate(task)
+
+    @classmethod
+    def activate(cls, flow_task, prev_activation):
+        flow_cls, flow_task = flow_task.flow_cls, flow_task
+        process = prev_activation.process
+
+        task = flow_cls.task_cls(
+            process=process,
+            flow_task=flow_task)
+
+        task.save()
+        task.previous.add(prev_activation.task)
+
+        activation = cls()
+        activation.initialize(flow_task, task)
+        activation.prepare()
+        activation.done()
+
+        return activation
