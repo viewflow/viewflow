@@ -1,6 +1,8 @@
 """
 Task performed by user in django view
 """
+from inspect import isfunction
+
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.views.generic.edit import UpdateView
@@ -130,12 +132,27 @@ class TaskView(TaskViewActivation, UpdateView):
         return super(TaskView, self).dispatch(request, *args, **kwargs)
 
 
-class BaseView(Task):
+class View(Task):
     task_type = 'HUMAN'
     activation_cls = TaskViewActivation
 
-    def __init__(self, **kwargs):
-        super(BaseView, self).__init__(**kwargs)
+    def __init__(self, view_or_cls, activation_cls=None, **kwargs):
+        """
+        Accepts view callable or CBV View class with view kwargs,
+        if CBV view implements ViewActivation, it used as activation_cls
+        """
+        self._view, self._view_cls, self._view_args = None, None, None
+
+        if isfunction(view_or_cls):
+            self._view = view_or_cls
+        else:
+            self._view_cls = view_or_cls
+            self._view_args = kwargs
+            if issubclass(view_or_cls, ViewActivation):
+                activation_cls = view_or_cls
+
+        super(View, self).__init__(activation_cls=activation_cls)
+
         self._activate_next = []
         self._owner = None
         self._owner_permission = None
@@ -183,6 +200,12 @@ class BaseView(Task):
         return self
 
     @property
+    def view(self):
+        if not self._view:
+            self._view = self._view_cls.as_view(**self._view_args)
+        return self._view
+
+    @property
     def assign_view(self):
         from viewflow.views import assign
         return self._assign_view if self._assign_view else assign
@@ -220,33 +243,3 @@ class BaseView(Task):
 
     def has_perm(self, user, task):
         return task.owner == user
-
-
-class View(BaseView):
-    """
-    Function based view or CBV without ViewActivation interface implementation
-    """
-    def __init__(self, view, activation_cls=None):
-        super(View, self).__init__(activation_cls=activation_cls)
-        self._view = view
-
-    @property
-    def view(self):
-        return self._view
-
-
-class ActiveView(BaseView):
-    """
-    CBV impements VuewActivation interface
-    """
-    def __init__(self, view_cls, **view_args):
-        super(ActiveView, self).__init__(activation_cls=view_cls)
-        self._view_cls = view_cls
-        self._view_args = view_args
-        self._view = None
-
-    @property
-    def view(self):
-        if not self._view:
-            self._view = self._view_cls.as_view(**self._view_args)
-        return self._view

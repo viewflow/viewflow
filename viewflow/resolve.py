@@ -3,7 +3,6 @@ Resolver of task inter-links
 """
 from singledispatch import singledispatch
 from viewflow import flow
-from viewflow.flow.view import BaseView
 
 
 @singledispatch
@@ -15,7 +14,7 @@ def node_callable(flow_node):
     return None
 
 
-@node_callable.register(BaseView)
+@node_callable.register(flow.View)
 def _(flow_node):
     return flow_node.view
 
@@ -59,7 +58,7 @@ def _(flow_node, resolver):
     #TODO ?? flow_node._on_receive = resolver.get_implementation(flow_node._on_receive)
 
 
-@resolve_children_links.register(BaseView)  # NOQA
+@resolve_children_links.register(flow.View)  # NOQA
 def _(flow_node, resolver):
     flow_node._activate_next = \
         [resolver.get_implementation(node) for node in flow_node._activate_next]

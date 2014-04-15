@@ -7,7 +7,6 @@ from django.core.urlresolvers import reverse
 from django.conf.urls import url
 
 from viewflow import flow
-from viewflow.flow.view import BaseView
 
 
 @singledispatch
@@ -21,7 +20,7 @@ def _(flow_node):
                name=flow_node.name)
 
 
-@node_url.register(BaseView)  # NOQA
+@node_url.register(flow.View)  # NOQA
 def _(flow_node):
     urls = []
 
@@ -51,7 +50,7 @@ def _(flow_node, task, **kwargs):
     return reverse('viewflow:start', current_app=flow_node.flow_cls._meta.namespace)
 
 
-@node_url_reverse.register(BaseView)  # NOQA
+@node_url_reverse.register(flow.View)  # NOQA
 def _(flow_node, task, **kwargs):
     if not task:
         task = flow_node.flow_cls.task_cls._default_manager.get(pk=kwargs['pk'])

@@ -15,10 +15,10 @@ class HelloWorldFlow(Flow):
         .Activate(this.hello_request) \
         .Available(username='helloworld/employee')
 
-    hello_request = flow.ActiveView(TaskView, fields=['text']) \
+    hello_request = flow.View(TaskView, fields=['text']) \
         .Next(this.approve)
 
-    approve = flow.ActiveView(TaskView, fields=['approved']) \
+    approve = flow.View(TaskView, fields=['approved']) \
         .Permission('helloworld.can_approve_request') \
         .Next(this.end)
 

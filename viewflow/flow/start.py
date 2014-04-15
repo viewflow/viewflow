@@ -2,6 +2,7 @@
 Start flow task, instantiate new flow process
 """
 import warnings
+from inspect import isfunction
 
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
@@ -126,9 +127,23 @@ class Start(Event):
     task_type = 'START'
     activation_cls = StartViewActivation
 
-    def __init__(self, view=None, activation_cls=None):
+    def __init__(self, view_or_cls=None, activation_cls=None, **kwargs):
+        """
+        Accepts view callable or CBV View class with view kwargs,
+        if CBV view implements StartActivation, it used as activation_cls
+        """
+        self._view, self._view_cls, self._view_args = None, None, None
+        
+        if isfunction(view_or_cls):
+            self._view = view_or_cls
+        elif view_or_cls is not None:
+            self._view_cls = view_or_cls
+            self._view_args = kwargs
+            if issubclass(view_or_cls, StartActivation):
+                activation_cls = view_or_cls
+
         super(Start, self).__init__(activation_cls=activation_cls)
-        self._view = view
+
         self._activate_next = []
         self._owner = None
         self._owner_permission = None
@@ -176,8 +191,14 @@ class Start(Event):
 
     @property
     def view(self):
-        from viewflow.views import start
-        return self._view if self._view else start
+        if not self._view:
+            if not self._view_cls:
+                from viewflow.views import start
+                return start
+            else:
+                self._view = self._view_cls(self._view_args)
+                return self._view
+        return self._view
 
     def has_perm(self, user):
         from django.contrib.auth import get_user_model
