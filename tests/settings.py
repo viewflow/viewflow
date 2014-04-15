@@ -21,8 +21,8 @@ INSTALLED_APPS = (
     'django_fsm',
     'viewflow',
     # Tests
-    # 'unit',
-    # 'integration',
+    'unit',
+    'integration',
     # Samples
     'examples.shipment',
     'examples.helloworld'

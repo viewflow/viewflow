@@ -133,7 +133,7 @@ class Start(Event):
         if CBV view implements StartActivation, it used as activation_cls
         """
         self._view, self._view_cls, self._view_args = None, None, None
-        
+
         if isfunction(view_or_cls):
             self._view = view_or_cls
         elif view_or_cls is not None:
