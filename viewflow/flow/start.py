@@ -108,7 +108,7 @@ class StartView(StartViewActivation, UpdateView):
 
     def form_valid(self, form):
         response = super(StartView, self).form_valid(form)
-        self.done(process=self.object)
+        self.done(process=self.object, user=self.request.user)
         return response
 
     @flow_start_view()

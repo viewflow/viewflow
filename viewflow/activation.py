@@ -45,7 +45,7 @@ class StartActivation(Activation):
         self.process.save()
         return self.process
 
-    def done(self, process=None):
+    def done(self, process=None, user=None):
         """
         Creates and starts new process instance
         """
@@ -54,6 +54,8 @@ class StartActivation(Activation):
         self.process = self.save_process()
 
         self.task.process = process
+        if user:
+            self.task.owner = user
         self.task.done()
         self.task.save()
 
