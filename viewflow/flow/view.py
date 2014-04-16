@@ -1,6 +1,7 @@
 """
 Task performed by user in django view
 """
+import functools
 from inspect import isfunction
 
 from django.core.exceptions import PermissionDenied
@@ -30,6 +31,7 @@ def flow_view(**lock_args):
         def __init__(self, func, activation=None):
             self.func = func
             self.activation = activation
+            functools.update_wrapper(self, func)
 
         def __call__(self, request, flow_task, process_pk, task_pk, **kwargs):
             lock = flow_task.flow_cls.lock_impl(**lock_args)

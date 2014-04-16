@@ -4,7 +4,7 @@ from viewflow.views import TaskView
 from viewflow.lock import select_for_update_lock
 
 from examples.helloworld.models import HelloWorldProcess
-# from examples.helloworld.tasks import send_hello_world_request
+from examples.helloworld.tasks import send_hello_world_request
 
 
 class HelloWorldFlow(Flow):
@@ -20,9 +20,9 @@ class HelloWorldFlow(Flow):
 
     approve = flow.View(TaskView, fields=['approved']) \
         .Permission('helloworld.can_approve_request') \
-        .Next(this.end)
+        .Next(this.send)
 
-    #send = flow.Job(send_hello_world_request) \
-    #    .Next(this.end)
+    send = flow.Job(send_hello_world_request) \
+        .Next(this.end)
 
     end = flow.End()

@@ -1,13 +1,11 @@
 import os
 
+from celery import shared_task
 from viewflow.flow import flow_job
-from examples.helloworld.models import HelloWorldProcess
 
-"""
+
+@shared_task(bind=True)
 @flow_job()
-def send_hello_world_request(flow_task, task):
-    process = HelloWorldProcess.objects.get(task=task)
-
+def send_hello_world_request(self, activation):
     with open(os.devnull, "w") as world:
-        world.write(process.text)
-"""
+        world.write(activation.process.text)
