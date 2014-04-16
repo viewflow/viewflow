@@ -82,9 +82,9 @@
         "name": "shipment/worker",
         "permissions": [
             [
-                "can_approve_request",
-                "helloworld",
-                "helloworldprocess"
+                "can_package_goods",
+                "shipment",
+                "shipmentprocess"
             ],
             [
                 "can_move_package",
