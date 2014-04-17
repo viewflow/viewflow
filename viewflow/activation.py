@@ -167,6 +167,47 @@ class JobActivation(TaskActivation):
         return activation
 
 
+class GateActivation(Activation):
+    def prepare(self):
+        self.task.prepare()
+
+    def start(self):
+        self.task.start()
+        self.task.save()
+
+    def execute(self):
+        """
+        Execute gate conditions, prepare data required to determine
+        next tasks for activation
+        """
+        raise NotImplementedError
+
+    def done(self):
+        self.task = self.get_task()
+        self.task.done()
+        self.task.save()
+
+        self.flow_task.activate_next(self)
+
+    @classmethod
+    def activate(cls, flow_task, prev_activation):
+        flow_cls, flow_task = flow_task.flow_cls, flow_task
+        process = prev_activation.process
+
+        task = flow_cls.task_cls(
+            process=process,
+            flow_task=flow_task)
+
+        task.save()
+        task.previous.add(prev_activation.task)
+
+        activation = cls()
+        activation.initialize(flow_task, task)
+        activation.prepare()
+        activation.execute()
+        activation.done()
+
+
 class EndActivation(Activation):
     def initialize(self, flow_task, task):
         """

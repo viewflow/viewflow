@@ -1,5 +1,15 @@
+from viewflow.activation import Activation, GateActivation
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.flow.base import Gateway, Edge
+
+
+class IfActivation(GateActivation):
+    def __init__(self, **kwargs):
+        self.condition_result = None
+        super(IfActivation, self).__init__(**kwargs)
+
+    def execute(self):
+        self.condition_result = self.flow_task.condition(self)
 
 
 class If(Gateway):
@@ -7,6 +17,7 @@ class If(Gateway):
     Activates one of paths based on condition
     """
     task_type = 'IF'
+    activation_cls = IfActivation
 
     def __init__(self, cond):
         super(If, self).__init__()
@@ -26,20 +37,33 @@ class If(Gateway):
         self._on_false = node
         return self
 
-    def activate(self, prev_activation):
-        activation = self.activation_cls(self)
-        activation.activate(prev_activation)
+    @property
+    def condition(self):
+        return self._condition
 
-        activation.start()
-        cond_result = self._condition(activation)
-        activation.done()
-
-        if cond_result:
-            self._on_true.activate(activation)
+    def activate_next(self, self_activation, **kwargs):
+        if self._activate_next.condition_result:
+            self._on_true.activate(self_activation)
         else:
-            self._on_false.activate(activation)
+            self._on_false.activate(self_activation)
 
-        return activation
+
+class SwitchActivation(GateActivation):
+    def __init__(self, **kwargs):
+        self.next_task = None
+        super(SwitchActivation, self).__init__(**kwargs)
+
+    def execute(self):
+        for node, cond in self.activate_next:
+            if cond:
+                if cond():
+                    self.next_task = node
+                    break
+            else:
+                self.next_task = node
+
+        if not self.next_task:
+            raise FlowRuntimeError('No next task available for {}'.format(self.flow_task.name))
 
 
 class Switch(Gateway):
@@ -47,6 +71,7 @@ class Switch(Gateway):
     Activates first path with matched condition
     """
     task_type = 'SWITCH'
+    activation_cls = SwitchActivation
 
     def __init__(self):
         super(Switch, self).__init__()
@@ -65,27 +90,66 @@ class Switch(Gateway):
         self._activate_next.append((node, None))
         return self
 
-    def activate(self, prev_activation):
-        activation = self.activation_cls(self)
-        activation.activate(prev_activation)
+    def activate_next(self, self_activation, **kwargs):
+        self_activation.next_task.activate(self_activation)
 
-        activation.start()
 
-        next_task = None
-        for node, cond in self._activate_next:
-            if cond:
-                if cond():
-                    next_task = node
-                    break
-            else:
-                next_task = node
+class JoinActivation(Activation):
+    def __init__(self, **kwargs):
+        self.next_task = None
+        super(JoinActivation, self).__init__(**kwargs)
 
-        activation.done()
+    def prepare(self):
+        self.task.prepare()
 
-        if next_task:
-            next_task.activate(activation)
+    def start(self):
+        self.task.start()
+        self.task.save()
+
+    def done(self):
+        self.task = self.get_task()
+        self.task.done()
+        self.task.save()
+
+        self.flow_task.activate_next(self)
+
+    def is_done(self):
+        all_links = set(x.src for x in self.flow_task._incoming())
+        finished_links = set(task.flow_task for task in self.task.previous.all())
+        return finished_links == all_links
+
+    @classmethod
+    def activate(cls, flow_task, prev_activation):
+        flow_cls, flow_task = flow_task.flow_cls, flow_task
+        process = prev_activation.process
+
+        # lookup for active join instance
+        tasks = flow_cls.task_cls._default_manager.filter(
+            flow_task=flow_task,
+            process=process,
+            status=flow_cls.task_cls.STATUS.STARTED)
+
+        if len(tasks) > 1:
+            raise FlowRuntimeError('More than one join instance for process found')
+
+        activation = cls()
+
+        task = tasks.first()
+        if not task:
+            task = flow_cls.task_cls(
+                process=process,
+                flow_task=flow_task)
+
+            task.save()
+            task.previous.add(prev_activation.task)
+            activation.initialize(flow_task, task)
+            activation.prepare()
+            activation.start()
         else:
-            raise FlowRuntimeError('Switch have no positive condition')
+            activation.initialize(flow_task, task)
+
+        if activation.is_done():
+            activation.done()
 
         return activation
 
@@ -95,6 +159,7 @@ class Join(Gateway):
     Wait for one or all incoming links and activate next path
     """
     task_type = 'JOIN'
+    activation_cls = JoinActivation
 
     def __init__(self, wait_all=False):
         super(Join, self).__init__()
@@ -109,39 +174,29 @@ class Join(Gateway):
         self._activate_next.append(node)
         return self
 
-    def activate(self, prev_activation):
+    def activate_next(self, self_activation, **kwargs):
         """
-        TODO
-        # lookup for active join instance
-        tasks = Task.objects.filter(
-            flow_task=self,
-            process=prev_activation.process,
-            status=Task.STATUS.STARTED)
-
-        if len(tasks) > 1:
-            raise FlowRuntimeError('More than one join instance for process found')
-
-        task = tasks.first()
-        if task:
-            activation = self.activation_cls(self, task)
-            activation.task.previous.add(prev_activation)
-            activation.task.save()
-        else:
-            activation = self.activation_cls(self)
-            activation.activate(prev_activation)
-            activation.start()
-
-        # check are we done
-        all_links = set(x.src for x in self._incoming())
-        finished_links = set(task.flow_task for task in activation.task.previous.all())
-        if finished_links == all_links:
-            activation.done()
-
-            for outgoing in self._outgoing():
-                outgoing.dst.activate(activation)
-
-        return activation
+        Activate all outgoing edges
         """
+        for outgoing in self._outgoing():
+            outgoing.dst.activate(prev_activation=self_activation)
+
+
+class SplitActivation(GateActivation):
+    def __init__(self, **kwargs):
+        self.next_tasks = []
+        super(SplitActivation, self).__init__(**kwargs)
+
+    def execute(self):
+        for node, cond in self._activate_next:
+            if cond:
+                if cond(self):
+                    self.next_tasks.append(node)
+            else:
+                self.next_tasks.append(node)
+
+        if not self.next_tasks:
+            raise FlowRuntimeError('No next task available for {}'.format(self.flow_task.name))
 
 
 class Split(Gateway):
@@ -167,29 +222,9 @@ class Split(Gateway):
         self._activate_next.append((node, None))
         return self
 
-    def activate(self, prev_activation):
-        activation = self.activation_cls(self)
-        activation.activate(prev_activation)
-
-        activation.start()
-
-        next_tasks = []
-        for node, cond in self._activate_next:
-            if cond:
-                if cond(activation):
-                    next_tasks.append(node)
-            else:
-                next_tasks.append(node)
-
-        activation.done()
-
-        if next_tasks:
-            for next_task in next_tasks:
-                next_task.activate(activation)
-        else:
-            raise FlowRuntimeError('No active tasks after split')
-
-        return activation
+    def activate_next(self, self_activation, **kwargs):
+        for next_task in self_activation.next_tasks:
+            next_task.activate(self_activation)
 
 
 class First(Gateway):
