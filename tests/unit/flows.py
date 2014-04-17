@@ -1,13 +1,11 @@
-from django.contrib.auth.models import User
-
 from viewflow import flow, lock
 from viewflow.base import Flow, this
 
-from unit.models import TestProcess
 from unit.tasks import dummy_job
 
 
-def perform_task(request, act_id):
+@flow.flow_view()
+def perform_task(request, activation):
     raise NotImplementedError
 
 
@@ -23,7 +21,7 @@ class AllTaskFlow(Flow):
     lock_impl = lock.cache_lock
 
     start = flow.Start().Activate(this.view)
-    view = flow.View().Next(this.job)
+    view = flow.View(perform_task).Next(this.job)
     job = flow.Job(dummy_job).Next(this.iff)
     iff = flow.If(lambda act: True).OnTrue(this.switch).OnFalse(this.switch)
     switch = flow.Switch().Default(this.split)
@@ -32,24 +30,4 @@ class AllTaskFlow(Flow):
     first = flow.First().Of(this.timer)
     timer = flow.Timer().Next(this.mailbox)
     mailbox = flow.Mailbox(lambda act: None).Next(this.end)
-    end = flow.End()
-
-
-class RestrictedUserFlow(Flow):
-    start = flow.Start().Activate(this.view)
-    view = flow.View().Next(this.end).Assign(username='employee')
-    end = flow.End()
-
-
-class RestrictedCallableUserFlow(Flow):
-    start = flow.Start().Activate(this.view)
-    view = flow.View().Next(this.end).Assign(lambda p: User.objects.get(username='employee'))
-    end = flow.End()
-
-
-class RestrictedPermissionFlow(Flow):
-    process_cls = TestProcess
-
-    start = flow.Start().Activate(this.view)
-    view = flow.View().Next(this.end).Permission('unit.restricted_permission_flow__view')
     end = flow.End()

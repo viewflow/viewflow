@@ -53,7 +53,7 @@ class StartActivation(Activation):
             self.process = process
         self.process = self.save_process()
 
-        self.task.process = process
+        self.task.process = self.process
         if user:
             self.task.owner = user
         self.task.done()

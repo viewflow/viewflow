@@ -5,4 +5,4 @@ from viewflow.flow.job import Job, flow_job                       # NOQA
 from viewflow.flow.mailbox import Mailbox                         # NOQA
 from viewflow.flow.start import Start, flow_start_view            # NOQA
 from viewflow.flow.timer import Timer                             # NOQA
-from viewflow.flow.view import View                               # NOQA
+from viewflow.flow.view import View, flow_view                    # NOQA

@@ -2,7 +2,6 @@
 Task performed by user in django view
 """
 import functools
-from inspect import isfunction
 
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
@@ -145,13 +144,14 @@ class View(Task):
         """
         self._view, self._view_cls, self._view_args = None, None, None
 
-        if isfunction(view_or_cls):
-            self._view = view_or_cls
-        else:
+        if isinstance(view_or_cls, type):
             self._view_cls = view_or_cls
             self._view_args = kwargs
+
             if issubclass(view_or_cls, ViewActivation):
                 activation_cls = view_or_cls
+        else:
+            self._view = view_or_cls
 
         super(View, self).__init__(activation_cls=activation_cls)
 
