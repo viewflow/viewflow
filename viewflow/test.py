@@ -15,7 +15,10 @@ with FlowTest(RestrictedUserFlow) as flow_test:
 
 """
 from singledispatch import singledispatch
+from django_webtest import WebTestMixin
+
 from viewflow import flow
+from viewflow.urls import node_url_reverse
 
 
 @singledispatch
@@ -26,13 +29,20 @@ def flow_do(flow_node, *args, **kwargs):
     raise NotImplementedError
 
 
+@flow_do.register(flow.Start)  # NOQA
+def _(flow_node, app, **post_kwargs):
+    task_url = node_url_reverse(flow_node)
+    form = app.get(task_url)
+    form.submit().follow()
+
+
 @flow_do.register(flow.View)  # NOQA
-def _(flow_node, client, **post_kwargs):
+def _(flow_node, app, **post_kwargs):
     pass
 
 
 @flow_do.register(flow.Job)  # NOQA
-def _(flow_node, client, **post_kwargs):
+def _(flow_node, **post_kwargs):
     pass
 
 
@@ -49,17 +59,7 @@ def _(flow_node):
     pass
 
 
-class FlowTestTask(object):
-    """
-    """
-    def User(self, user=None, **user_lookup):
-        pass
-
-    def Do(self):
-        pass
-
-
-class FlowTest(object):
+class FlowTest(WebTestMixin):
     """
     """
     def __init__(self, flow_cls):
@@ -71,10 +71,19 @@ class FlowTest(object):
             if manager:
                 self.patch_managers.append(manager)
 
+    def User(self, user=None, **user_lookup):
+        pass
+
+    def Do(self):
+        pass
+
     def __enter__(self):
+        self._patch_settings()
+        self.renew_app()
         for patch_manager in self.patch_managers:
             patch_manager.__enter__()
 
     def __exit__(self, type, value, traceback):
+        self._unpatch_settings()
         for patch_manager in self.patch_managers:
             patch_manager.__exit__()
