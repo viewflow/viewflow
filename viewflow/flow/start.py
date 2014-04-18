@@ -1,8 +1,7 @@
 """
 Start flow task, instantiate new flow process
 """
-import warnings
-from inspect import isfunction
+import functools
 
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
@@ -16,20 +15,23 @@ from viewflow.flow.base import Event, Edge
 def flow_start_view():
     """
     Decorator for start views, creates and initializes start activation
-    Expects view with signature :: (request, activation, **kwargs)
-    Returns                     :: (request, flow_task, **kwargs)
+
+    Expects view with signature
+             :: (request, activation, **kwargs)
+      or CDB view that implemnts ViewActivation, in this case, dispatch
+      with would be called with
+             :: (request, **kwargs)
+
+    Returns
+             :: (request, flow_task, **kwargs)
     """
     class StartViewDecorator(object):
         def __init__(self, func, activation=None):
             self.func = func
             self.activation = activation
+            functools.update_wrapper(self, func)
 
         def __call__(self, request, flow_task, **kwargs):
-            if self.activation and flow_task.activation_cls:
-                warnings.warn('View already implemens StartActivation interface. '
-                              'Flow task `{}` activation_cls ignored'.format(flow_task.name),
-                              RuntimeWarning)
-
             if self.activation:
                 self.activation.initialize(flow_task)
                 return self.func(request, **kwargs)
@@ -134,13 +136,14 @@ class Start(Event):
         """
         self._view, self._view_cls, self._view_args = None, None, None
 
-        if isfunction(view_or_cls):
-            self._view = view_or_cls
-        elif view_or_cls is not None:
+        if isinstance(view_or_cls, type):
             self._view_cls = view_or_cls
             self._view_args = kwargs
+
             if issubclass(view_or_cls, StartActivation):
                 activation_cls = view_or_cls
+        else:
+            self._view = view_or_cls
 
         super(Start, self).__init__(activation_cls=activation_cls)
 
