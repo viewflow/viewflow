@@ -72,34 +72,6 @@ def _(flow_node):
     return ''
 
 
-@graphviz_node.register(flow.Timer)  # NOQA
-def _(flow_node):
-    return '%s [shape="circle",width="0.3",height="0.3",label="⌚",fontsize=14,margin=0];' \
-        % _nodename(flow_node)
-
-
-@graphviz_outedges.register(flow.Timer)  # NOQA
-def _(flow_node):
-    edges = []
-    for target in flow_node._activate_next:
-        edges.append("%s -> %s;" % (_nodename(flow_node), _nodename(target)))
-    return '\n'.join(edges)
-
-
-@graphviz_node.register(flow.Mailbox)  # NOQA
-def _(flow_node):
-    return '%s [shape="circle",width="0.3",height="0.3",label="✉",fontsize=14,margin=0];' \
-        % _nodename(flow_node)
-
-
-@graphviz_outedges.register(flow.Mailbox)  # NOQA
-def _(flow_node):
-    edges = []
-    for target in flow_node._activate_next:
-        edges.append("%s -> %s;" % (_nodename(flow_node), _nodename(target)))
-    return '\n'.join(edges)
-
-
 @graphviz_node.register(flow.View)  # NOQA
 def _(flow_node):
     return '%s [label="%s"];' \

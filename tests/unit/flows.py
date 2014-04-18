@@ -27,7 +27,5 @@ class AllTaskFlow(Flow):
     switch = flow.Switch().Default(this.split)
     split = flow.Split().Always(this.join)
     join = flow.Join().Next(this.first)
-    first = flow.First().Of(this.timer)
-    timer = flow.Timer().Next(this.mailbox)
-    mailbox = flow.Mailbox(lambda act: None).Next(this.end)
+    first = flow.First().Of(this.end)
     end = flow.End()

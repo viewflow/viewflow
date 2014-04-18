@@ -137,11 +137,12 @@ class View(Task):
     task_type = 'HUMAN'
     activation_cls = TaskViewActivation
 
-    def __init__(self, view_or_cls, activation_cls=None, **kwargs):
+    def __init__(self, view_or_cls, description=None, activation_cls=None, **kwargs):
         """
         Accepts view callable or CBV View class with view kwargs,
         if CBV view implements ViewActivation, it used as activation_cls
         """
+        self.description = description or ""
         self._view, self._view_cls, self._view_args = None, None, None
 
         if isinstance(view_or_cls, type):

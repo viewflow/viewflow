@@ -45,19 +45,6 @@ def _(flow_node, resolver):
     """
 
 
-@resolve_children_links.register(flow.Timer)  # NOQA
-def _(flow_node, resolver):
-    flow_node._activate_next = \
-        [resolver.get_implementation(node) for node in flow_node._activate_next]
-
-
-@resolve_children_links.register(flow.Mailbox)  # NOQA
-def _(flow_node, resolver):
-    flow_node._activate_next = \
-        [resolver.get_implementation(node) for node in flow_node._activate_next]
-    #TODO ?? flow_node._on_receive = resolver.get_implementation(flow_node._on_receive)
-
-
 @resolve_children_links.register(flow.View)  # NOQA
 def _(flow_node, resolver):
     flow_node._activate_next = \
