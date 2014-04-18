@@ -23,7 +23,7 @@ INSTALLED_APPS = (
     # Tests
     'unit',
     'integration',
-    # Samples
+    # Examples
     'examples.shipment',
     'examples.helloworld'
 )
