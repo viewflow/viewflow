@@ -54,7 +54,7 @@ class SwitchActivation(GateActivation):
         super(SwitchActivation, self).__init__(**kwargs)
 
     def execute(self):
-        for node, cond in self.activate_next:
+        for node, cond in self.flow_task.branches:
             if cond:
                 if cond():
                     self.next_task = node
@@ -82,6 +82,10 @@ class Switch(Gateway):
             edge_class = 'cond_true' if cond else 'default'
             yield Edge(src=self, dst=next_node, edge_class=edge_class)
 
+    @property
+    def branches(self):
+        return self._activate_next
+
     def Case(self, node, cond=None):
         self._activate_next.append((node, cond))
         return self
@@ -95,6 +99,12 @@ class Switch(Gateway):
 
 
 class JoinActivation(Activation):
+    def initialize(self, flow_task, task):
+        self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
+
+        self.process = self.flow_cls.process_cls._default_manager.get(flow_cls=self.flow_cls, pk=task.process_id)
+        self.task = task
+
     def __init__(self, **kwargs):
         self.next_task = None
         super(JoinActivation, self).__init__(**kwargs)
@@ -107,7 +117,6 @@ class JoinActivation(Activation):
         self.task.save()
 
     def done(self):
-        self.task = self.get_task()
         self.task.done()
         self.task.save()
 
@@ -188,7 +197,7 @@ class SplitActivation(GateActivation):
         super(SplitActivation, self).__init__(**kwargs)
 
     def execute(self):
-        for node, cond in self._activate_next:
+        for node, cond in self.flow_task.branches:
             if cond:
                 if cond(self):
                     self.next_tasks.append(node)
@@ -213,6 +222,10 @@ class Split(Gateway):
         for next_node, cond in self._activate_next:
             edge_class = 'cond_true' if cond else 'default'
             yield Edge(src=self, dst=next_node, edge_class=edge_class)
+
+    @property
+    def branches(self):
+        return self._activate_next
 
     def Next(self, node, cond=None):
         self._activate_next.append((node, cond))

@@ -168,6 +168,12 @@ class JobActivation(TaskActivation):
 
 
 class GateActivation(Activation):
+    def initialize(self, flow_task, task):
+        self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
+
+        self.process = self.flow_cls.process_cls._default_manager.get(flow_cls=self.flow_cls, pk=task.process_id)
+        self.task = task
+
     def prepare(self):
         self.task.prepare()
 
@@ -183,7 +189,6 @@ class GateActivation(Activation):
         raise NotImplementedError
 
     def done(self):
-        self.task = self.get_task()
         self.task.done()
         self.task.save()
 
@@ -206,6 +211,8 @@ class GateActivation(Activation):
         activation.prepare()
         activation.execute()
         activation.done()
+
+        return activation
 
 
 class EndActivation(Activation):
