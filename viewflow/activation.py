@@ -1,4 +1,5 @@
 from celery.utils import uuid
+from viewflow import signals
 from viewflow.fields import get_task_ref
 
 
@@ -37,6 +38,7 @@ class StartActivation(Activation):
 
     def prepare(self):
         self.task.prepare()
+        signals.task_prepared.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     def save_process(self):
         """
@@ -62,6 +64,9 @@ class StartActivation(Activation):
         self.process.start()
         self.process.save()
 
+        signals.flow_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+
         self.flow_task.activate_next(self)
 
 
@@ -80,6 +85,7 @@ class TaskActivation(Activation):
 
     def prepare(self):
         self.task.prepare()
+        signals.task_prepared.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     def get_task(self):
         return self.task
@@ -88,6 +94,7 @@ class TaskActivation(Activation):
         self.task = self.get_task()
         self.task.done()
         self.task.save()
+        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
         self.flow_task.activate_next(self)
 
@@ -139,6 +146,7 @@ class JobActivation(TaskActivation):
     def start(self):
         self.task.start()
         self.task.save()
+        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     def done(self, result):
         super(JobActivation, self).done()
@@ -176,10 +184,12 @@ class GateActivation(Activation):
 
     def prepare(self):
         self.task.prepare()
+        signals.task_prepared.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     def start(self):
         self.task.start()
         self.task.save()
+        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     def execute(self):
         """
@@ -191,6 +201,7 @@ class GateActivation(Activation):
     def done(self):
         self.task.done()
         self.task.save()
+        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
         self.flow_task.activate_next(self)
 
@@ -227,6 +238,7 @@ class EndActivation(Activation):
 
     def prepare(self):
         self.task.prepare()
+        signals.task_prepared.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     def done(self):
         self.task.done()
@@ -237,6 +249,9 @@ class EndActivation(Activation):
 
         for task in self.process.active_tasks():
             task.flow_task.deactivate(task)
+
+        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.flow_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     @classmethod
     def activate(cls, flow_task, prev_activation):

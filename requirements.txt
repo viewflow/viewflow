@@ -2,4 +2,5 @@ https://github.com/django/django/archive/1.7b1.zip
 singledispatch==3.4.0.3
 django-fsm==2.0.1
 celery==3.1.11
+webtest==2.0.15
 django-webtest==1.7.7
