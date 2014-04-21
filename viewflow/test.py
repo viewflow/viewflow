@@ -2,27 +2,28 @@
 Flow scenario based testing
 
 with FlowTest(RestrictedUserFlow) as flow_test:
-    flow_test.User('xxx').Do(Flow.start, {
-         xxx=1,
-         yyy=2}) \
+
+    flow_test.Task(Flow.start).User('xxx').Execute({xxx=1, yyy=2}) \
         .Assert(lambda t: t.owner='xxx') \
         .Assert(p: p.owner='yyy')
 
     with patch('web.service'):
-        flow_test.Do(Flow.job)
+        flow_test.Task(Flow.job),Execute()
 
-    flow_test.User('aaa').Do(Flow.confirm, {'confirm': 1})
+    flow_test.User('aaa').Task(Flow.confirm).Execute({'confirm': 1})
 
 """
+import inspect
 from singledispatch import singledispatch
 from django_webtest import WebTestMixin
 
 from viewflow import flow
+from viewflow.signals import task_finished
 from viewflow.urls import node_url_reverse
 
 
 @singledispatch
-def flow_do(flow_node, *args, **kwargs):
+def flow_do(flow_node, app, **post_kwargs):
     """
     Executes flow task
     """
@@ -42,7 +43,7 @@ def _(flow_node, app, **post_kwargs):
 
 
 @flow_do.register(flow.Job)  # NOQA
-def _(flow_node, **post_kwargs):
+def _(flow_node, app, **post_kwargs):
     pass
 
 
@@ -59,9 +60,61 @@ def _(flow_node):
     pass
 
 
+class FlowTaskTest(object):
+    def __init__(self, flow_cls, flow_task):
+        self.flow_cls, self.flow_task = flow_cls, flow_task
+        self.process, self.task = None, None
+
+        self.user, self.user_lookup = None, {}
+        self.url_args = {}
+
+    def task_finished(self, sender, **kwargs):
+        if self.task is None:
+            """
+            First finished task is ours
+            """
+            assert self.flow_task == kwargs['task'].flow_task
+
+            self.task = kwargs['task']
+            self.process = kwargs['process']
+
+    def Url(self, **kwargs):
+        self.url_args = kwargs
+        return self
+
+    def User(self, user=None, **user_lookup):
+        self.user = user
+        self.user_lookup = user_lookup
+
+        return self
+
+    def Execute(self, data):
+        task_finished.connect(self.task_finished)
+        flow_do(self.flow_task, **data)
+        task_finished.disconnect(self.task_finished)
+        assert self.task, 'Flow task {} not finished'.format(self.flow_task.name)
+
+        return self
+
+    def Assert(self, assertion):
+        fail_message = "Flow task {} post condition fails".format(self.flow_task.name)
+
+        if callable(assertion):
+            args = inspect.getargspec(assertion).args
+
+            if args == ['p']:
+                assert assertion(self.process), fail_message
+            elif args == ['t']:
+                assert assertion(self.task), fail_message
+            else:
+                raise ValueError('Invalid assertion args spec {}'.format(args))
+        else:
+            assert assertion, fail_message
+
+        return self
+
+
 class FlowTest(WebTestMixin):
-    """
-    """
     def __init__(self, flow_cls):
         self.flow_cls = flow_cls
 
@@ -71,11 +124,8 @@ class FlowTest(WebTestMixin):
             if manager:
                 self.patch_managers.append(manager)
 
-    def User(self, user=None, **user_lookup):
-        pass
-
-    def Do(self):
-        pass
+    def Task(self, flow_task):
+        return FlowTaskTest(self.flow_cls, flow_task)
 
     def __enter__(self):
         self._patch_settings()
