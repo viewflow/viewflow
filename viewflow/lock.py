@@ -23,7 +23,7 @@ def no_lock():
 def select_for_update_lock(nowait=True, attempts=5):
     @contextmanager
     def lock(flow_task, process_pk):
-        assert transaction.get_autocommit()
+        assert transaction.get_autocommit() or transaction.commit.__module__ == 'django.test.testcases'
 
         with transaction.atomic():
             for i in range(attempts):

@@ -18,12 +18,13 @@ from singledispatch import singledispatch
 from django_webtest import WebTestMixin
 
 from viewflow import flow
+from viewflow.models import Task
 from viewflow.signals import task_finished
 from viewflow.urls import node_url_reverse
 
 
 @singledispatch
-def flow_do(flow_node, app, **post_kwargs):
+def flow_do(flow_node, test_task, **post_kwargs):
     """
     Executes flow task
     """
@@ -31,19 +32,34 @@ def flow_do(flow_node, app, **post_kwargs):
 
 
 @flow_do.register(flow.Start)  # NOQA
-def _(flow_node, app, **post_kwargs):
-    task_url = node_url_reverse(flow_node)
-    form = app.get(task_url)
-    form.submit().follow()
+def _(flow_node, test_task, **post_kwargs):
+    url_args = test_task.url_args.copy()
+    url_args.setdefault('task', None)
+    task_url = node_url_reverse(flow_node, **url_args)
+
+    form = test_task.app.get(task_url, user=test_task.user).form
+    form.submit('start', **post_kwargs).follow()
 
 
 @flow_do.register(flow.View)  # NOQA
-def _(flow_node, app, **post_kwargs):
-    pass
+def _(flow_node, test_task, **post_kwargs):
+    task = test_task.flow_cls.task_cls._default_manager.get(
+        flow_task=test_task.flow_task,
+        status=Task.STATUS.NEW)
+
+    url_args = test_task.url_args.copy()
+    url_args.setdefault('task', task)
+    task_url = node_url_reverse(flow_node, **url_args)
+
+    form = test_task.app.get(task_url, user=test_task.user).form
+    for key, value in post_kwargs.items():
+        form[key] = value
+
+    form.submit().follow()
 
 
 @flow_do.register(flow.Job)  # NOQA
-def _(flow_node, app, **post_kwargs):
+def _(flow_node, test_task, **post_kwargs):
     pass
 
 
@@ -61,11 +77,12 @@ def _(flow_node):
 
 
 class FlowTaskTest(object):
-    def __init__(self, flow_cls, flow_task):
+    def __init__(self, app, flow_cls, flow_task):
+        self.app = app
         self.flow_cls, self.flow_task = flow_cls, flow_task
         self.process, self.task = None, None
 
-        self.user, self.user_lookup = None, {}
+        self.user = None
         self.url_args = {}
 
     def task_finished(self, sender, **kwargs):
@@ -82,15 +99,17 @@ class FlowTaskTest(object):
         self.url_args = kwargs
         return self
 
-    def User(self, user=None, **user_lookup):
+    def User(self, user):
         self.user = user
-        self.user_lookup = user_lookup
 
         return self
 
-    def Execute(self, data):
+    def Execute(self, data=None):
+        if not data:
+            data = {}
+
         task_finished.connect(self.task_finished)
-        flow_do(self.flow_task, **data)
+        flow_do(self.flow_task, self, **data)
         task_finished.disconnect(self.task_finished)
         assert self.task, 'Flow task {} not finished'.format(self.flow_task.name)
 
@@ -119,19 +138,20 @@ class FlowTest(WebTestMixin):
         self.flow_cls = flow_cls
 
         self.patch_managers = []
-        for node in flow_cls.nodes():
+        for node in flow_cls._meta.nodes():
             manager = flow_patch_manager(node)
             if manager:
                 self.patch_managers.append(manager)
 
     def Task(self, flow_task):
-        return FlowTaskTest(self.flow_cls, flow_task)
+        return FlowTaskTest(self.app, self.flow_cls, flow_task)
 
     def __enter__(self):
         self._patch_settings()
         self.renew_app()
         for patch_manager in self.patch_managers:
             patch_manager.__enter__()
+        return self
 
     def __exit__(self, type, value, traceback):
         self._unpatch_settings()
