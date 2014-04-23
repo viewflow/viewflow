@@ -11,7 +11,7 @@ class ShipmentFlow(Flow):
     process_cls = ShipmentProcess
     lock_impl = select_for_update_lock
 
-    start = flow.Start(views.start) \
+    start = flow.Start(views.StartView) \
         .Activate(this.split_clerk_warehouse) \
         .Permission('shipment.can_start_request')
 

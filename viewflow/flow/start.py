@@ -5,6 +5,7 @@ import functools
 
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
+from django.db import transaction
 from django.views.generic.edit import UpdateView
 
 from viewflow.activation import StartActivation
@@ -34,11 +35,13 @@ def flow_start_view():
         def __call__(self, request, flow_task, **kwargs):
             if self.activation:
                 self.activation.initialize(flow_task)
-                return self.func(request, **kwargs)
+                with transaction.atomic():
+                    return self.func(request, **kwargs)
             else:
                 activation = flow_task.activation_cls()
                 activation.initialize(flow_task)
-                return self.func(request, activation, **kwargs)
+                with transaction.atomic():
+                    return self.func(request, activation, **kwargs)
 
         def __get__(self, instance, instancetype):
             """
@@ -199,7 +202,7 @@ class Start(Event):
                 from viewflow.views import start
                 return start
             else:
-                self._view = self._view_cls(self._view_args)
+                self._view = self._view_cls.as_view(**self._view_args)
                 return self._view
         return self._view
 

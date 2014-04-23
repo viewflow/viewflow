@@ -213,6 +213,7 @@ class Split(Gateway):
     Activate outgoing path in-parallel depends on per-path condition
     """
     task_type = 'SPLIT'
+    activation_cls = SplitActivation
 
     def __init__(self):
         super(Split, self).__init__()
