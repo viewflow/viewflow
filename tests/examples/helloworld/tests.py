@@ -17,7 +17,7 @@ class OneTwoThreeConformanceTests(TestCase):
                 .Assert(lambda p: p.text == 'Test Request')
 
             # The `manager` approve the request
-            flow.Task(HelloWorldFlow.approve).User(username='helloworld/manager') \
+            flow.Task(HelloWorldFlow.approve).User('helloworld/manager') \
                 .Execute({'approved': True}) \
                 .Assert(lambda p: p.finished is None)
 

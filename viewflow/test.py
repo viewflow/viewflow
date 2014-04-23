@@ -15,6 +15,9 @@ with FlowTest(RestrictedUserFlow) as flow_test:
 """
 import inspect
 from singledispatch import singledispatch
+from unittest import mock
+
+from django.utils.functional import cached_property
 from django_webtest import WebTestMixin
 
 from viewflow import flow
@@ -33,6 +36,9 @@ def flow_do(flow_node, test_task, **post_kwargs):
 
 @flow_do.register(flow.Start)  # NOQA
 def _(flow_node, test_task, **post_kwargs):
+    """
+    Start flow process
+    """
     url_args = test_task.url_args.copy()
     url_args.setdefault('task', None)
     task_url = node_url_reverse(flow_node, **url_args)
@@ -43,6 +49,9 @@ def _(flow_node, test_task, **post_kwargs):
 
 @flow_do.register(flow.View)  # NOQA
 def _(flow_node, test_task, **post_kwargs):
+    """
+    Assign if required and executes view task
+    """
     task = test_task.flow_cls.task_cls._default_manager.get(
         flow_task=test_task.flow_task,
         status=Task.STATUS.NEW)
@@ -52,6 +61,9 @@ def _(flow_node, test_task, **post_kwargs):
     task_url = node_url_reverse(flow_node, **url_args)
 
     form = test_task.app.get(task_url, user=test_task.user).form
+    if not task.owner:
+        form = form.submit('assign').follow().form
+
     for key, value in post_kwargs.items():
         form[key] = value
 
@@ -60,7 +72,11 @@ def _(flow_node, test_task, **post_kwargs):
 
 @flow_do.register(flow.Job)  # NOQA
 def _(flow_node, test_task, **post_kwargs):
-    pass
+    """
+    Eager run of delayed job call
+    """
+    args, kwargs = flow_node._job.apply_async.call_args
+    flow_node._job.apply(*args, **kwargs).get()
 
 
 @singledispatch
@@ -73,27 +89,41 @@ def flow_patch_manager(flow_node):
 
 @flow_patch_manager.register(flow.Job)  # NOQA
 def _(flow_node):
-    pass
+    return mock.patch.object(flow_node._job, 'apply_async')
 
 
 class FlowTaskTest(object):
     def __init__(self, app, flow_cls, flow_task):
         self.app = app
         self.flow_cls, self.flow_task = flow_cls, flow_task
-        self.process, self.task = None, None
 
         self.user = None
         self.url_args = {}
 
+        self._task = None
+
     def task_finished(self, sender, **kwargs):
-        if self.task is None:
+        if self._task is None:
             """
             First finished task is ours
             """
             assert self.flow_task == kwargs['task'].flow_task
 
-            self.task = kwargs['task']
-            self.process = kwargs['process']
+            self._task = kwargs['task']
+
+    @cached_property
+    def process(self):
+        """
+        Reread process instanse from db, once after test call ends
+        """
+        return self.flow_cls.process_cls._default_manager.get(pk=self._task.process_id)
+
+    @cached_property
+    def task(self):
+        """
+        Reread task instanse from db, once after test call ends
+        """
+        return self.flow_cls.task_cls._default_manager.get(pk=self._task.pk)
 
     def Url(self, **kwargs):
         self.url_args = kwargs
@@ -111,7 +141,7 @@ class FlowTaskTest(object):
         task_finished.connect(self.task_finished)
         flow_do(self.flow_task, self, **data)
         task_finished.disconnect(self.task_finished)
-        assert self.task, 'Flow task {} not finished'.format(self.flow_task.name)
+        assert self._task, 'Flow task {} not finished'.format(self.flow_task.name)
 
         return self
 
