@@ -42,7 +42,7 @@ class If(Gateway):
         return self._condition
 
     def activate_next(self, self_activation, **kwargs):
-        if self._activate_next.condition_result:
+        if self_activation.condition_result:
             self._on_true.activate(self_activation)
         else:
             self._on_false.activate(self_activation)
@@ -123,6 +123,9 @@ class JoinActivation(Activation):
         self.flow_task.activate_next(self)
 
     def is_done(self):
+        if not self.flow_task._wait_all:
+            return True
+
         all_links = set(x.src for x in self.flow_task._incoming())
         finished_links = set(task.flow_task for task in self.task.previous.all())
         return finished_links == all_links
@@ -170,7 +173,7 @@ class Join(Gateway):
     task_type = 'JOIN'
     activation_cls = JoinActivation
 
-    def __init__(self, wait_all=False):
+    def __init__(self, wait_all=True):
         super(Join, self).__init__()
         self._wait_all = wait_all
         self._activate_next = []

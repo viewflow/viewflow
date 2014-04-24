@@ -97,6 +97,37 @@ class TaskViewActivation(ViewActivation):
             self.task = self.management_form.save(commit=False)
 
 
+class TaskViewMixin(object):
+    """
+    Mixin for task views, not implementing activation
+    """
+    def get_context_data(self, **kwargs):
+        context = super(TaskViewMixin, self).get_context_data(**kwargs)
+        context['activation'] = self.activation
+        return context
+
+    def get_success_url(self):
+        return reverse('viewflow:index', current_app=self.activation.flow_cls._meta.namespace)
+
+    def get_template_names(self):
+        return ('{}/flow/task.html'.format(self.activation.flow_cls._meta.app_label),
+                'viewflow/flow/task.html')
+
+    def form_valid(self, form):
+        response = super(TaskViewMixin, self).form_valid(form)
+        self.activation.done()
+        return response
+
+    @flow_view()
+    def dispatch(self, request, activation, **kwargs):
+        self.activation = activation
+        if not self.activation.flow_task.has_perm(request.user, self.activation.task):
+            raise PermissionDenied
+
+        self.activation.prepare(request.POST or None)
+        return super(TaskViewMixin, self).dispatch(request, **kwargs)
+
+
 class TaskView(TaskViewActivation, UpdateView):
     fields = []
 

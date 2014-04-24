@@ -130,5 +130,29 @@
             ]
         ]
     }
+},
+{
+    "pk": 1,
+    "fields": {
+        "name": "Default",
+        "phone": "+555-123-456"
+    },
+    "model": "shipment.carrier"
+},
+{
+    "model": "shipment.carrier",
+    "fields": {
+        "name": "China Post",
+        "phone": "+555-765-432"
+    },
+    "pk": 2
+},
+{
+    "model": "shipment.carrier",
+    "fields": {
+        "name": "USPS",
+        "phone": "+555-918-273"
+    },
+    "pk": 3
 }
 ]

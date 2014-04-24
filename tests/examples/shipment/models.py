@@ -4,8 +4,16 @@ from viewflow.models import Process
 
 
 class Carrier(models.Model):
+    DEFAULT = 'Default'
+
     name = models.CharField(max_length=50)
     phone = models.CharField(max_length=15)
+
+    def is_default(self):
+        return self.name == Carrier.DEFAULT
+
+    def __str__(self):
+        return self.name
 
 
 class Insurance(models.Model):
@@ -15,10 +23,10 @@ class Insurance(models.Model):
 
 class Shipment(models.Model):
     goods_tag = models.CharField(max_length=50)
-    carrier = models.ForeignKey(Carrier, blank=True, null=True)
+    carrier = models.ForeignKey(Carrier, null=True)
 
     need_insurance = models.BooleanField(default=False)
-    insurance = models.ForeignKey('Insurance', blank=True, null=True)
+    insurance = models.ForeignKey('Insurance', null=True)
 
     carrier_quote = models.IntegerField(blank=True, default=0)
     post_label = models.TextField(blank=True, null=True)
@@ -30,10 +38,13 @@ class ShipmentProcess(Process):
     shipment = models.ForeignKey(Shipment, blank=True, null=True)
     created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
 
-    def is_normal_post():
-        raise NotImplementedError
+    def is_normal_post(self):
+        try:
+            return self.shipment.carrier.is_default()
+        except (Shipment.DoesNotExist, Carrier.DoesNotExist):
+            return None
 
-    def need_extra_insurance():
+    def need_extra_insurance(self):
         raise NotImplementedError
 
     class Meta:

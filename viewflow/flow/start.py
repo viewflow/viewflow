@@ -89,6 +89,37 @@ class StartViewActivation(StartActivation):
             self.task = self.management_form.save(commit=False)
 
 
+class StartViewMixin(object):
+    """
+    Mixin for start views, not implementing activation
+    """
+    def get_context_data(self, **kwargs):
+        context = super(StartViewMixin, self).get_context_data(**kwargs)
+        context['activation'] = self.activation
+        return context
+
+    def get_success_url(self):
+        return reverse('viewflow:index', current_app=self.activation.flow_cls._meta.namespace)
+
+    def get_template_names(self):
+        return ('{}/flow/start.html'.format(self.activation.flow_cls._meta.app_label),
+                'viewflow/flow/start.html')
+
+    def form_valid(self, form):
+        response = super(StartViewMixin, self).form_valid(form)
+        self.activation.done()
+        return response
+
+    @flow_start_view()
+    def dispatch(self, request, activation, **kwargs):
+        self.activation = activation
+        if not self.activation.flow_task.has_perm(request.user):
+            raise PermissionDenied
+
+        self.activation.prepare(request.POST or None)
+        return super(StartViewMixin, self).dispatch(request, **kwargs)
+
+
 class StartView(StartViewActivation, UpdateView):
     fields = []
 

@@ -20,24 +20,24 @@ class ShipmentFlow(Flow):
         .Next(this.shipment_type) \
         .Next(this.package_goods)
 
-    shipment_type = flow.View(TaskView.as_view()) \
+    shipment_type = flow.View(views.ShipmentView, fields=["carrier"]) \
         .Next(this.delivery_mode) \
         .Assign(lambda p: p.created_by)
 
-    delivery_mode = flow.If(cond=lambda a: a.process.shipmentprocess.is_normal_post()) \
+    delivery_mode = flow.If(cond=lambda a: a.process.is_normal_post()) \
         .OnTrue(this.check_insurance) \
         .OnFalse(this.request_quotes)
 
-    request_quotes = flow.View(TaskView.as_view()) \
+    request_quotes = flow.View(views.ShipmentView, fields=["carrier_quote"]) \
         .Next(this.join_delivery_mode) \
-        .Assign(lambda a: a.process.shipmentprocess.created_by)
+        .Assign(lambda p: p.created_by)
 
     check_insurance = flow.View(TaskView.as_view()) \
         .Next('split_on_insurance') \
-        .Assign(lambda a: a.process.shipmentprocess.created_by)
+        .Assign(lambda p: p.created_by)
 
     split_on_insurance = flow.Split() \
-        .Next(this.take_extra_insurance, cond=lambda a: a.process.shipmentprocess.need_extra_insurance()) \
+        .Next(this.take_extra_insurance, cond=lambda a: a.process.need_extra_insurance()) \
         .Always(this.fill_post_label)
 
     fill_post_label = flow.View(TaskView.as_view()) \
@@ -47,7 +47,7 @@ class ShipmentFlow(Flow):
     join_on_insurance = flow.Join() \
         .Next(this.join_delivery_mode)
 
-    join_delivery_mode = flow.Join() \
+    join_delivery_mode = flow.Join(wait_all=False) \
         .Next(this.join_clerk_warehouse)
 
     # Logistic manager
