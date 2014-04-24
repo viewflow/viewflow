@@ -1,6 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.views.generic import CreateView
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from viewflow.flow import flow_start_view
 from examples.shipment.models import Shipment
 
@@ -11,6 +11,29 @@ from examples.shipment.models import Shipment
 #    def save_process(self):
 #        self.process.created_by = self.request.us
 #        return super(StartView, self).save_process()
+
+
+@flow_start_view()
+def start_view(request, activation):
+    form_cls = None
+
+    if not activation.flow_task.has_perm(request.user):
+        raise PermissionDenied
+
+    activation.prepare(request.POST or None)
+    form = form_cls(request.POST or None)
+
+    if form.is_valie():
+        shipment = form.save()
+        activation.process.created_by = request.user
+        activation.process.shipment = shipment
+        activation.done()
+        return redirect('viewflow:index')
+
+    return render(request, 'shipment/flow/start.html', {
+        'form': form,
+        'activation': activation
+    })
 
 
 class StartView(CreateView):
