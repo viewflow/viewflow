@@ -15,7 +15,7 @@ class Insurance(models.Model):
 
 class Shipment(models.Model):
     goods_tag = models.CharField(max_length=50)
-    carrier = models.ForeignKey(Carrier, blank=True, default='')
+    carrier = models.ForeignKey(Carrier, blank=True, null=True)
 
     need_insurance = models.BooleanField(default=False)
     insurance = models.ForeignKey('Insurance', blank=True, null=True)
