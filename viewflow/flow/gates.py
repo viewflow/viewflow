@@ -43,9 +43,9 @@ class If(Gateway):
 
     def activate_next(self, self_activation, **kwargs):
         if self_activation.condition_result:
-            self._on_true.activate(self_activation)
+            self._on_true.activate(self_activation, self_activation.task.token)
         else:
-            self._on_false.activate(self_activation)
+            self._on_false.activate(self_activation, self_activation.task.token)
 
 
 class SwitchActivation(GateActivation):
@@ -95,7 +95,7 @@ class Switch(Gateway):
         return self
 
     def activate_next(self, self_activation, **kwargs):
-        self_activation.next_task.activate(self_activation)
+        self_activation.next_task.activate(self_activation, self_activation.task.token)
 
 
 class JoinActivation(Activation):
@@ -131,7 +131,7 @@ class JoinActivation(Activation):
         return finished_links == all_links
 
     @classmethod
-    def activate(cls, flow_task, prev_activation):
+    def activate(cls, flow_task, prev_activation, token):
         flow_cls, flow_task = flow_task.flow_cls, flow_task
         process = prev_activation.process
 
@@ -150,7 +150,8 @@ class JoinActivation(Activation):
         if not task:
             task = flow_cls.task_cls(
                 process=process,
-                flow_task=flow_task)
+                flow_task=flow_task,
+                token=token)
 
             task.save()
             task.previous.add(prev_activation.task)
@@ -191,7 +192,8 @@ class Join(Gateway):
         Activate all outgoing edges
         """
         for outgoing in self._outgoing():
-            outgoing.dst.activate(prev_activation=self_activation)
+            outgoing.dst.activate(prev_activation=self_activation,
+                                  token=self_activation.task.token)
 
 
 class SplitActivation(GateActivation):
@@ -241,7 +243,7 @@ class Split(Gateway):
 
     def activate_next(self, self_activation, **kwargs):
         for next_task in self_activation.next_tasks:
-            next_task.activate(self_activation)
+            next_task.activate(self_activation, self_activation.task.token)
 
 
 class First(Gateway):

@@ -19,7 +19,7 @@ class Activation(object):
         super(Activation, self).__init__(**kwargs)
 
     @classmethod
-    def activate(cls, flow_task, prev_activation):
+    def activate(cls, flow_task, prev_activation, token):
         raise NotImplementedError
 
 
@@ -105,13 +105,14 @@ class ViewActivation(TaskActivation):
         self.task.save()
 
     @classmethod
-    def activate(cls, flow_task, prev_activation):
+    def activate(cls, flow_task, prev_activation, token):
         flow_cls, flow_task = flow_task.flow_cls, flow_task
         process = prev_activation.process
 
         task = flow_cls.task_cls(
             process=process,
-            flow_task=flow_task)
+            flow_task=flow_task,
+            token=token)
 
         # Try to assign permission
         owner_permission = flow_task.calc_owner_permission(task)
@@ -152,13 +153,14 @@ class JobActivation(TaskActivation):
         super(JobActivation, self).done()
 
     @classmethod
-    def activate(cls, flow_task, prev_activation):
+    def activate(cls, flow_task, prev_activation, token):
         flow_cls, flow_task = flow_task.flow_cls, flow_task
         process = prev_activation.process
 
         task = flow_cls.task_cls(
             process=process,
-            flow_task=flow_task)
+            flow_task=flow_task,
+            token=token)
 
         task.save()
         task.previous.add(prev_activation.task)
@@ -206,13 +208,14 @@ class GateActivation(Activation):
         self.flow_task.activate_next(self)
 
     @classmethod
-    def activate(cls, flow_task, prev_activation):
+    def activate(cls, flow_task, prev_activation, token):
         flow_cls, flow_task = flow_task.flow_cls, flow_task
         process = prev_activation.process
 
         task = flow_cls.task_cls(
             process=process,
-            flow_task=flow_task)
+            flow_task=flow_task,
+            token=token)
 
         task.save()
         task.previous.add(prev_activation.task)
@@ -254,13 +257,14 @@ class EndActivation(Activation):
         signals.flow_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     @classmethod
-    def activate(cls, flow_task, prev_activation):
+    def activate(cls, flow_task, prev_activation, token):
         flow_cls, flow_task = flow_task.flow_cls, flow_task
         process = prev_activation.process
 
         task = flow_cls.task_cls(
             process=process,
-            flow_task=flow_task)
+            flow_task=flow_task,
+            token=token)
 
         task.save()
         task.previous.add(prev_activation.task)

@@ -26,7 +26,7 @@ class TestViewActivation(TestCase):
         flow_task_mock = mock.Mock(spec=flow.View(lambda *args, **kwargs: None))
         prev_activation_mock = mock.Mock(spec=activation.StartActivation())
 
-        act = activation.ViewActivation.activate(flow_task_mock, prev_activation_mock)
+        act = activation.ViewActivation.activate(flow_task_mock, prev_activation_mock, 'start')
 
         act.task.save.assert_has_calls(())
 
@@ -50,7 +50,7 @@ class TestJobActivation(TestCase):
         prev_activation_mock = mock.Mock(spec=activation.StartActivation())
 
         with mock.patch('viewflow.activation.get_task_ref'):
-            act = activation.JobActivation.activate(flow_task_mock, prev_activation_mock)
+            act = activation.JobActivation.activate(flow_task_mock, prev_activation_mock, 'start')
             act.task.save.assert_has_calls(())
             self.assertEquals(1, flow_task_mock.job.apply_async.call_count)
 
@@ -78,7 +78,7 @@ class TestEndActivation(TestCase):
         flow_task_mock.flow_cls.process_cls._default_manager.get = mock.Mock(return_value=process_mock)
         prev_activation_mock = mock.Mock(spec=activation.StartActivation())
 
-        act = activation.EndActivation.activate(flow_task_mock, prev_activation_mock)
+        act = activation.EndActivation.activate(flow_task_mock, prev_activation_mock, 'start')
 
         act.task.save.assert_has_calls(())
         act.process.finish.assert_has_calls(())
@@ -90,7 +90,7 @@ class TestIfActivation(TestCase):
         flow_task_mock = mock.Mock(spec=flow.If(lambda act: True))
         prev_activation_mock = mock.Mock(spec=activation.StartActivation())
 
-        act = gates.IfActivation.activate(flow_task_mock, prev_activation_mock)
+        act = gates.IfActivation.activate(flow_task_mock, prev_activation_mock, 'start')
         act.task.save.assert_has_calls(())
 
 
@@ -100,7 +100,7 @@ class TestSwitchActivation(TestCase):
         type(flow_task_mock).branches = mock.PropertyMock(return_value=[(True, mock.Mock())])
         prev_activation_mock = mock.Mock(spec=activation.StartActivation())
 
-        act = gates.SwitchActivation.activate(flow_task_mock, prev_activation_mock)
+        act = gates.SwitchActivation.activate(flow_task_mock, prev_activation_mock, 'start')
         act.task.save.assert_has_calls(())
 
 
@@ -116,7 +116,7 @@ class TestJoinActivation(TestCase):
 
         prev_activation_mock = mock.Mock(spec=activation.StartActivation())
 
-        act = gates.JoinActivation.activate(flow_task_mock, prev_activation_mock)
+        act = gates.JoinActivation.activate(flow_task_mock, prev_activation_mock, 'start')
         act.task.save.assert_has_calls(())
         flow_task_mock.activate_next.assert_any_call(act)
 
@@ -127,5 +127,5 @@ class TestSplitActivation(TestCase):
         type(flow_task_mock).branches = mock.PropertyMock(return_value=[(True, mock.Mock())])
         prev_activation_mock = mock.Mock(spec=activation.StartActivation())
 
-        act = gates.SplitActivation.activate(flow_task_mock, prev_activation_mock)
+        act = gates.SplitActivation.activate(flow_task_mock, prev_activation_mock, 'start')
         act.task.save.assert_has_calls(())

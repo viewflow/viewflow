@@ -194,7 +194,8 @@ class Start(Event):
         Activate all outgoing edges
         """
         for outgoing in self._outgoing():
-            outgoing.dst.activate(prev_activation=self_activation)
+            outgoing.dst.activate(prev_activation=self_activation,
+                                  token=self_activation.task.token)
 
     def Activate(self, node):
         self._activate_next.append(node)

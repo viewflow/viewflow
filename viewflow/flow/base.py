@@ -75,11 +75,11 @@ class Node(object):
             return self.name.title().replace('_', ' ')
         return super(Node, self).__str__()
 
-    def activate(self, prev_activation):
+    def activate(self, prev_activation, token):
         """
         Creates task activation
         """
-        return self.activation_cls.activate(self, prev_activation)
+        return self.activation_cls.activate(self, prev_activation, prev_activation.task.token)
 
     def activate_next(self, self_activation, **kwargs):
         """
