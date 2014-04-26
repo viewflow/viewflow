@@ -24,6 +24,7 @@ class ShipmentView(TaskViewMixin, UpdateView):
 
 class InsuranceView(TaskViewMixin, CreateView):
     model = Insurance
+    fields = ['company_name', 'cost']
 
     def get_object(self):
         if self.activation.process.shipment.insurance_id:

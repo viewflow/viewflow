@@ -44,7 +44,11 @@ def _(flow_node, test_task, **post_kwargs):
     task_url = node_url_reverse(flow_node, **url_args)
 
     form = test_task.app.get(task_url, user=test_task.user).form
-    form.submit('start', **post_kwargs).follow()
+
+    for key, value in post_kwargs.items():
+        form[key] = value
+
+    form.submit('start').follow()
 
 
 @flow_do.register(flow.View)  # NOQA
@@ -54,7 +58,7 @@ def _(flow_node, test_task, **post_kwargs):
     """
     task = test_task.flow_cls.task_cls._default_manager.get(
         flow_task=test_task.flow_task,
-        status=Task.STATUS.NEW)
+        status__in=[Task.STATUS.NEW, Task.STATUS.ASSIGNED])
 
     url_args = test_task.url_args.copy()
     url_args.setdefault('task', task)

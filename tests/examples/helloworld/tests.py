@@ -3,7 +3,7 @@ from viewflow.test import FlowTest
 from examples.helloworld.flows import HelloWorldFlow
 
 
-class OneTwoThreeConformanceTests(TestCase):
+class HelloWorldFlowTests(TestCase):
     def test_normal_flow_succeed(self):
         with FlowTest(HelloWorldFlow) as flow:
             # The `employee` starts process
