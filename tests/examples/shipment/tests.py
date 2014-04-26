@@ -24,7 +24,7 @@ class ShipmentFlowTests(TestCase):
         self.default_carrier = Carrier.objects.get(name=Carrier.DEFAULT)
         self.special_carrier = Carrier.objects.exclude(name=Carrier.DEFAULT)[0]
 
-    def _test_normal_post_succeed(self):
+    def test_normal_post_succeed(self):
         with FlowTest(ShipmentFlow) as flow:
             # Clerk start process
             flow.Task(ShipmentFlow.start).User('shipment/clerk') \
