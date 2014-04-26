@@ -3,12 +3,12 @@ from django.db import transaction
 from django.shortcuts import render
 
 from viewflow.flow.start import StartView
-from viewflow.flow.view import TaskView, flow_view
+from viewflow.flow.view import ProcessView, flow_view
 from viewflow.shortcuts import get_page, redirect
 
 
 start = StartView.as_view()
-task = TaskView.as_view()
+task = ProcessView.as_view()
 
 
 @transaction.atomic()

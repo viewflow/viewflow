@@ -128,7 +128,10 @@ class TaskViewMixin(object):
         return super(TaskViewMixin, self).dispatch(request, **kwargs)
 
 
-class TaskView(TaskViewActivation, UpdateView):
+class ProcessView(TaskViewActivation, UpdateView):
+    """
+    Shortcut view for task that updates subset of Process model fields
+    """
     fields = []
 
     @property
@@ -136,7 +139,7 @@ class TaskView(TaskViewActivation, UpdateView):
         return self.flow_cls.process_cls
 
     def get_context_data(self, **kwargs):
-        context = super(TaskView, self).get_context_data(**kwargs)
+        context = super(ProcessView, self).get_context_data(**kwargs)
         context['activation'] = self
         return context
 
@@ -151,7 +154,7 @@ class TaskView(TaskViewActivation, UpdateView):
         return reverse('viewflow:index', current_app=self.flow_cls._meta.app_label)
 
     def form_valid(self, form):
-        response = super(TaskView, self).form_valid(form)
+        response = super(ProcessView, self).form_valid(form)
         self.done()
         return response
 
@@ -161,7 +164,7 @@ class TaskView(TaskViewActivation, UpdateView):
             raise PermissionDenied
 
         self.prepare(request.POST or None)
-        return super(TaskView, self).dispatch(request, *args, **kwargs)
+        return super(ProcessView, self).dispatch(request, *args, **kwargs)
 
 
 class View(Task):

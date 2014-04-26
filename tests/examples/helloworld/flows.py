@@ -1,6 +1,6 @@
 from viewflow import flow
 from viewflow.base import this, Flow
-from viewflow.views import TaskView
+from viewflow.views import ProcessView
 from viewflow.lock import select_for_update_lock
 
 from examples.helloworld.models import HelloWorldProcess
@@ -15,10 +15,10 @@ class HelloWorldFlow(Flow):
         .Activate(this.hello_request) \
         .Available(username='helloworld/employee')
 
-    hello_request = flow.View(TaskView, fields=['text']) \
+    hello_request = flow.View(ProcessView, fields=['text']) \
         .Next(this.approve)
 
-    approve = flow.View(TaskView, fields=['approved']) \
+    approve = flow.View(ProcessView, fields=['approved']) \
         .Permission('helloworld.can_approve_request') \
         .Next(this.send)
 
