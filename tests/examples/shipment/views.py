@@ -26,12 +26,6 @@ class InsuranceView(TaskViewMixin, CreateView):
     model = Insurance
     fields = ['company_name', 'cost']
 
-    def get_object(self):
-        if self.activation.process.shipment.insurance_id:
-            return self.activation.process.shipment.insurance
-        else:
-            return Insurance()
-
     def form_valid(self, form):
         self.object = form.save()
 
