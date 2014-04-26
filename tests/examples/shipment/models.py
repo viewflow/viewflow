@@ -45,7 +45,10 @@ class ShipmentProcess(Process):
             return None
 
     def need_extra_insurance(self):
-        raise NotImplementedError
+        try:
+            return self.shipment.need_insurance
+        except Shipment.DoesNotExist:
+            return None
 
     class Meta:
         permissions = [

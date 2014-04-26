@@ -32,7 +32,7 @@ class ShipmentFlow(Flow):
         .Next(this.join_clerk_warehouse) \
         .Assign(lambda p: p.created_by)
 
-    check_insurance = flow.View(TaskView.as_view()) \
+    check_insurance = flow.View(views.ShipmentView, fields=["need_insurance"]) \
         .Next('split_on_insurance') \
         .Assign(lambda p: p.created_by)
 
@@ -40,15 +40,15 @@ class ShipmentFlow(Flow):
         .Next(this.take_extra_insurance, cond=lambda a: a.process.need_extra_insurance()) \
         .Always(this.fill_post_label)
 
-    fill_post_label = flow.View(TaskView.as_view()) \
+    fill_post_label = flow.View(views.ShipmentView, fields=["post_label"]) \
         .Next(this.join_on_insurance) \
-        .Assign(lambda a: a.process.shipmentprocess.created_by)
+        .Assign(lambda p: p.created_by)
 
     join_on_insurance = flow.Join() \
         .Next(this.join_clerk_warehouse)
 
     # Logistic manager
-    take_extra_insurance = flow.View(TaskView.as_view()) \
+    take_extra_insurance = flow.View(views.InsuranceView) \
         .Next(this.join_on_insurance) \
         .Permission('shipment.can_take_extra_insurance')
 
