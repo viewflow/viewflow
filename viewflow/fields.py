@@ -1,6 +1,7 @@
 from django.apps import apps
 from django.db import models
 from django.utils.module_loading import import_by_path
+from viewflow.token import Token
 
 
 def import_task_by_ref(task_strref):
@@ -73,3 +74,23 @@ class TaskReferenceField(models.CharField, metaclass=models.SubfieldBase):
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
         return self.get_prep_value(value)
+
+
+class TokenField(models.CharField, metaclass=models.SubfieldBase):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('max_length', 150)
+        if 'default' in kwargs:
+            default = kwargs['default']
+            if isinstance(default, str):
+                kwargs['default'] = Token(default)
+        super(TokenField, self).__init__(*args, **kwargs)
+
+    def to_python(self, value):
+        if isinstance(value, str) and value:
+            return Token(value)
+        return value
+
+    def get_prep_value(self, value):
+        if not isinstance(value, str):
+            return value.token
+        return super(TokenField, self).get_prep_value(value)

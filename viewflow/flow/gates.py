@@ -1,6 +1,8 @@
 from viewflow.activation import Activation, GateActivation
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.flow.base import Gateway, Edge
+from viewflow.models import Task
+from viewflow.token import Token
 
 
 class IfActivation(GateActivation):
@@ -126,9 +128,18 @@ class JoinActivation(Activation):
         if not self.flow_task._wait_all:
             return True
 
-        all_links = set(x.src for x in self.flow_task._incoming())
-        finished_links = set(task.flow_task for task in self.task.previous.all())
-        return finished_links == all_links
+        join_prefixes = set(prev.token.get_common_split_prefix() for prev in self.task.previous.all())
+
+        if len(join_prefixes) > 1:
+            raise FlowRuntimeError('Multiple tokens {} cames to join {}'.format(join_prefixes, self.flow_task.name))
+
+        join_token_prefix = next(iter(join_prefixes))
+
+        active = self.flow_cls.task_cls._default_manager \
+            .filter(process=self.process, token__startswith=join_token_prefix) \
+            .exclude(status=Task.STATUS.FINISHED)
+
+        return not active.exists()
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
@@ -148,6 +159,9 @@ class JoinActivation(Activation):
 
         task = tasks.first()
         if not task:
+            if token.is_split_token():
+                token = token.get_base_split_token()
+
             task = flow_cls.task_cls(
                 process=process,
                 flow_task=flow_task,
@@ -216,6 +230,8 @@ class SplitActivation(GateActivation):
 class Split(Gateway):
     """
     Activate outgoing path in-parallel depends on per-path condition
+
+    FIX: More clear token seman
     """
     task_type = 'SPLIT'
     activation_cls = SplitActivation
@@ -242,8 +258,10 @@ class Split(Gateway):
         return self
 
     def activate_next(self, self_activation, **kwargs):
-        for next_task in self_activation.next_tasks:
-            next_task.activate(self_activation, self_activation.task.token)
+        token_source = Token.split_token_source(self_activation.task.token, self_activation.task.pk)
+
+        for n, next_task in enumerate(self_activation.next_tasks, 1):
+            next_task.activate(self_activation, next(token_source))
 
 
 class First(Gateway):

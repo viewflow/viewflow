@@ -79,7 +79,7 @@ class Node(object):
         """
         Creates task activation
         """
-        return self.activation_cls.activate(self, prev_activation, prev_activation.task.token)
+        return self.activation_cls.activate(self, prev_activation, token)
 
     def activate_next(self, self_activation, **kwargs):
         """

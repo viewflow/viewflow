@@ -1,6 +1,7 @@
 from django.test import TestCase
-from unit.models import FlowReferencedModel
+from unit.models import FlowReferencedModel, TokenModel
 from unit.flows import SingleTaskFlow, AllTaskFlow
+from viewflow.token import Token
 
 
 class TestReferenceFields(TestCase):
@@ -42,3 +43,21 @@ class TestReferenceFields(TestCase):
 
         self.assertEqual(instance.flow_cls, SingleTaskFlow)
         self.assertEqual(instance.task, SingleTaskFlow.start)
+
+
+class TestTokenField(TestCase):
+    def test_crud_succeed(self):
+        instance = TokenModel()
+        instance.token = Token('start/1_2')
+        instance.save()
+
+    def test_default_succeed(self):
+        instance = TokenModel()
+        self.assertTrue(isinstance(instance.token, Token))
+        instance.save()
+
+    def test_startswith_lookup_succeed(self):
+        TokenModel.objects.create(token='start/1_2')
+
+        instance = TokenModel.objects.get(token__startswith='start/1_')
+        self.assertEqual('start/1_2', instance.token)

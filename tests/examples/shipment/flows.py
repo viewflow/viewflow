@@ -29,7 +29,7 @@ class ShipmentFlow(Flow):
         .OnFalse(this.request_quotes)
 
     request_quotes = flow.View(views.ShipmentView, fields=["carrier_quote"]) \
-        .Next(this.join_delivery_mode) \
+        .Next(this.join_clerk_warehouse) \
         .Assign(lambda p: p.created_by)
 
     check_insurance = flow.View(TaskView.as_view()) \
@@ -45,9 +45,6 @@ class ShipmentFlow(Flow):
         .Assign(lambda a: a.process.shipmentprocess.created_by)
 
     join_on_insurance = flow.Join() \
-        .Next(this.join_delivery_mode)
-
-    join_delivery_mode = flow.Join(wait_all=False) \
         .Next(this.join_clerk_warehouse)
 
     # Logistic manager

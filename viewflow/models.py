@@ -5,7 +5,7 @@ from django.db import models
 from django_fsm import FSMField, transition
 
 from viewflow.exceptions import FlowRuntimeError
-from viewflow.fields import FlowReferenceField, TaskReferenceField
+from viewflow.fields import FlowReferenceField, TaskReferenceField, TokenField
 
 
 class Process(models.Model):
@@ -73,7 +73,7 @@ class Task(models.Model):
     started = models.DateTimeField(blank=True, null=True)
     finished = models.DateTimeField(blank=True, null=True)
     previous = models.ManyToManyField('self')
-    token = models.CharField(max_length=150, default='start')
+    token = TokenField(default='start')
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
     external_task_id = models.CharField(max_length=50, blank=True, null=True)
