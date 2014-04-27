@@ -5,11 +5,9 @@ from viewflow.fields import get_task_ref
 
 class Activation(object):
     """
-    Activation responsible for managing state and persistance of task instance
-
-    There is no common interface for activation, but every subactivation type
-    defines each own
+    Activation responsible for managing livecycle and persistance of flow task instance
     """
+
     def __init__(self, **kwargs):
         """
         Activation should be available for instante without any constructor parameters.
@@ -18,15 +16,27 @@ class Activation(object):
         self.process, self.task = None, None
         super(Activation, self).__init__(**kwargs)
 
+    def activate_next(self):
+        """
+        Activates next connected flow tasks
+        """
+        raise NotImplementedError
+
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
+        """
+        Instanciate and persist new flow task
+        """
         raise NotImplementedError
 
 
 class StartActivation(Activation):
     """
-    Base activation that starts new process instance
+    Base activation that creates new process instance
+
+    Start activations could not be activated by other tasks
     """
+
     def initialize(self, flow_task):
         """
         Initialize new activation instance
@@ -37,15 +47,13 @@ class StartActivation(Activation):
         self.task = self.flow_cls.task_cls(process=self.process, flow_task=self.flow_task)
 
     def prepare(self):
+        """
+        Initialize start task for execution
+
+        No db changes performed. It is safe to call it on GET requests
+        """
         self.task.prepare()
         signals.task_prepared.send(sender=self.flow_cls, process=self.process, task=self.task)
-
-    def save_process(self):
-        """
-        Save process when done,
-        """
-        self.process.save()
-        return self.process
 
     def done(self, process=None, user=None):
         """
@@ -53,7 +61,7 @@ class StartActivation(Activation):
         """
         if process:
             self.process = process
-        self.process = self.save_process()
+        self.process.save()
 
         self.task.process = self.process
         if user:
@@ -67,13 +75,21 @@ class StartActivation(Activation):
         signals.flow_started.send(sender=self.flow_cls, process=self.process, task=self.task)
         signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-        self.flow_task.activate_next(self)
+        self.activate_next()
+
+    def activate_next(self):
+        """
+        Activate all outgoing edges
+        """
+        for outgoing in self.flow_task._outgoing():
+            outgoing.dst.activate(prev_activation=self, token=self.task.token)
 
 
 class TaskActivation(Activation):
     """
-    Base activation that starts new process instance
+    Base class for flow tasks thatdo some work
     """
+
     def initialize(self, flow_task, task):
         """
         Initialize new activation instance
@@ -84,28 +100,52 @@ class TaskActivation(Activation):
         self.task = task
 
     def prepare(self):
+        """
+        Initialize task for execution
+
+        No db changes performed. It is safe to call it on GET requests
+        """
         self.task.prepare()
         signals.task_prepared.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-    def get_task(self):
-        return self.task
-
     def done(self):
-        self.task = self.get_task()
+        """
+        Finishes the task and activate next
+        """
         self.task.done()
         self.task.save()
         signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-        self.flow_task.activate_next(self)
+        self.activate_next()
+
+    def activate_next(self):
+        """
+        Activate all outgoing edges
+        """
+        for outgoing in self.flow_task._outgoing():
+            outgoing.dst.activate(prev_activation=self, token=self.task.token)
 
 
 class ViewActivation(TaskActivation):
+    """
+    Activation for task performed by human in django views
+    """
+
     def assign(self, user):
+        """
+        Assigns user to task
+        """
         self.task.assign(user=user)
         self.task.save()
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
+        """
+        Instnatiate new task, calculate and store required user permissions.
+
+        If task could be assigned to user, assigns it
+        """
+
         flow_cls, flow_task = flow_task.flow_cls, flow_task
         process = prev_activation.process
 
@@ -134,26 +174,48 @@ class ViewActivation(TaskActivation):
 
 
 class JobActivation(TaskActivation):
+    """
+    Activation for long-running background celery tasks
+    """
+
     def assign(self, external_task_id):
+        """
+        Saves schedulled celery task_id
+        """
         self.task.assign(external_task_id=external_task_id)
         self.task.save()
 
     def schedule(self, task_id):
+        """
+        Async task schedule
+        """
         self.flow_task.job.apply_async(
             args=[get_task_ref(self.flow_task), self.task.process_id, self.task.pk],
             task_id=task_id,
             countdown=1)
 
     def start(self):
+        """
+        Persist that job is started
+        """
         self.task.start()
         self.task.save()
         signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     def done(self, result):
+        """
+        Celery task finished with `result`, finishes the flow task
+        """
         super(JobActivation, self).done()
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
+        """
+        Activate and schedule for background job execution
+
+        It is safe to schedule job just now b/c the process instance is locked,
+        and job will wait until this transaction completes
+        """
         flow_cls, flow_task = flow_task.flow_cls, flow_task
         process = prev_activation.process
 
@@ -168,8 +230,6 @@ class JobActivation(TaskActivation):
         activation = cls()
         activation.initialize(flow_task, task)
 
-        # It is safe to run task just now b/c we are holding the process instance lock,
-        # and task will wait until our transaction completes
         external_task_id = uuid()
         activation.assign(external_task_id)
         activation.schedule(external_task_id)
@@ -178,6 +238,9 @@ class JobActivation(TaskActivation):
 
 
 class GateActivation(Activation):
+    """
+    Activation for task gates
+    """
     def initialize(self, flow_task, task):
         self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
 
@@ -205,10 +268,13 @@ class GateActivation(Activation):
         self.task.save()
         signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-        self.flow_task.activate_next(self)
+        self.activate_next()
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
+        """
+        Activate gate, immediatle executes it, and activate next tasks
+        """
         flow_cls, flow_task = flow_task.flow_cls, flow_task
         process = prev_activation.process
 
@@ -230,6 +296,9 @@ class GateActivation(Activation):
 
 
 class EndActivation(Activation):
+    """
+    Activation that finishes the proceess, and cancells all other active tasks
+    """
     def initialize(self, flow_task, task):
         """
         Initialize new activation instance
@@ -258,6 +327,9 @@ class EndActivation(Activation):
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
+        """
+        Mark process as done, and cancel all other active tasks
+        """
         flow_cls, flow_task = flow_task.flow_cls, flow_task
         process = prev_activation.process
 

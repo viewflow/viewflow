@@ -81,12 +81,6 @@ class Node(object):
         """
         return self.activation_cls.activate(self, prev_activation, token)
 
-    def activate_next(self, self_activation, **kwargs):
-        """
-        Activates next connected flow tasks
-        """
-        raise NotImplementedError
-
 
 class Event(Node):
     """

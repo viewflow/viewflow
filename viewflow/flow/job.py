@@ -82,14 +82,6 @@ class Job(Task):
         for next_node in self._activate_next:
             yield Edge(src=self, dst=next_node, edge_class='next')
 
-    def activate_next(self, self_activation, **kwargs):
-        """
-        Activate all outgoing edges
-        """
-        for outgoing in self._outgoing():
-            outgoing.dst.activate(prev_activation=self_activation,
-                                  token=self_activation.task.token)
-
     def Next(self, node):
         self._activate_next.append(node)
         return self

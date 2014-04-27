@@ -11,7 +11,13 @@ class IfActivation(GateActivation):
         super(IfActivation, self).__init__(**kwargs)
 
     def execute(self):
-        self.condition_result = self.flow_task.condition(self)
+        self.condition_result = self.flow_task.condition(self.process)
+
+    def activate_next(self):
+        if self.condition_result:
+            self.flow_task._on_true.activate(prev_activation=self, token=self.task.token)
+        else:
+            self.flow_task._on_false.activate(prev_activation=self, token=self.task.token)
 
 
 class If(Gateway):
@@ -43,12 +49,6 @@ class If(Gateway):
     def condition(self):
         return self._condition
 
-    def activate_next(self, self_activation, **kwargs):
-        if self_activation.condition_result:
-            self._on_true.activate(self_activation, self_activation.task.token)
-        else:
-            self._on_false.activate(self_activation, self_activation.task.token)
-
 
 class SwitchActivation(GateActivation):
     def __init__(self, **kwargs):
@@ -58,7 +58,7 @@ class SwitchActivation(GateActivation):
     def execute(self):
         for node, cond in self.flow_task.branches:
             if cond:
-                if cond():
+                if cond(self.process):
                     self.next_task = node
                     break
             else:
@@ -66,6 +66,9 @@ class SwitchActivation(GateActivation):
 
         if not self.next_task:
             raise FlowRuntimeError('No next task available for {}'.format(self.flow_task.name))
+
+    def activate_next(self):
+        self.next_task.activate(prev_activation=self, token=self.task.token)
 
 
 class Switch(Gateway):
@@ -96,9 +99,6 @@ class Switch(Gateway):
         self._activate_next.append((node, None))
         return self
 
-    def activate_next(self, self_activation, **kwargs):
-        self_activation.next_task.activate(self_activation, self_activation.task.token)
-
 
 class JoinActivation(Activation):
     def initialize(self, flow_task, task):
@@ -122,7 +122,7 @@ class JoinActivation(Activation):
         self.task.done()
         self.task.save()
 
-        self.flow_task.activate_next(self)
+        self.activate_next()
 
     def is_done(self):
         if not self.flow_task._wait_all:
@@ -140,6 +140,13 @@ class JoinActivation(Activation):
             .exclude(status=Task.STATUS.FINISHED)
 
         return not active.exists()
+
+    def activate_next(self):
+        """
+        Activate all outgoing edges
+        """
+        for outgoing in self.flow_task._outgoing():
+            outgoing.dst.activate(prev_activation=self, token=self.task.token)
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
@@ -201,14 +208,6 @@ class Join(Gateway):
         self._activate_next.append(node)
         return self
 
-    def activate_next(self, self_activation, **kwargs):
-        """
-        Activate all outgoing edges
-        """
-        for outgoing in self._outgoing():
-            outgoing.dst.activate(prev_activation=self_activation,
-                                  token=self_activation.task.token)
-
 
 class SplitActivation(GateActivation):
     def __init__(self, **kwargs):
@@ -218,13 +217,19 @@ class SplitActivation(GateActivation):
     def execute(self):
         for node, cond in self.flow_task.branches:
             if cond:
-                if cond(self):
+                if cond(self.process):
                     self.next_tasks.append(node)
             else:
                 self.next_tasks.append(node)
 
         if not self.next_tasks:
             raise FlowRuntimeError('No next task available for {}'.format(self.flow_task.name))
+
+    def activate_next(self):
+        token_source = Token.split_token_source(self.task.token, self.task.pk)
+
+        for n, next_task in enumerate(self.next_tasks, 1):
+            next_task.activate(prev_activation=self, token=next(token_source))
 
 
 class Split(Gateway):
@@ -256,12 +261,6 @@ class Split(Gateway):
     def Always(self, node):
         self._activate_next.append((node, None))
         return self
-
-    def activate_next(self, self_activation, **kwargs):
-        token_source = Token.split_token_source(self_activation.task.token, self_activation.task.pk)
-
-        for n, next_task in enumerate(self_activation.next_tasks, 1):
-            next_task.activate(self_activation, next(token_source))
 
 
 class First(Gateway):

@@ -24,7 +24,7 @@ class ShipmentFlow(Flow):
         .Next(this.delivery_mode) \
         .Assign(lambda p: p.created_by)
 
-    delivery_mode = flow.If(cond=lambda a: a.process.is_normal_post()) \
+    delivery_mode = flow.If(cond=lambda p: p.is_normal_post()) \
         .OnTrue(this.check_insurance) \
         .OnFalse(this.request_quotes)
 
@@ -37,7 +37,7 @@ class ShipmentFlow(Flow):
         .Assign(lambda p: p.created_by)
 
     split_on_insurance = flow.Split() \
-        .Next(this.take_extra_insurance, cond=lambda a: a.process.need_extra_insurance()) \
+        .Next(this.take_extra_insurance, cond=lambda p: p.need_extra_insurance()) \
         .Always(this.fill_post_label)
 
     fill_post_label = flow.View(views.ShipmentView, fields=["post_label"]) \
