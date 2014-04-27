@@ -7,6 +7,10 @@ Ad-hoc business process automation framework for Django
 django-viewflow provides simple, django friendly way to organize views, background jobs, user permission checking,
 in one clearly defined task flow.
 
+django-viewflow does not introduce any restriction on views, urls or celery tasks, and should plays well
+in any other django project.
+
+
 Quick start
 ===========
 Let's define basic Hello Process where one could start hello world request, and another approve it,
