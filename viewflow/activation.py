@@ -7,7 +7,6 @@ class Activation(object):
     """
     Activation responsible for managing livecycle and persistance of flow task instance
     """
-
     def __init__(self, **kwargs):
         """
         Activation should be available for instante without any constructor parameters.

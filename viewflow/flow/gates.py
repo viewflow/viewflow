@@ -235,8 +235,6 @@ class SplitActivation(GateActivation):
 class Split(Gateway):
     """
     Activate outgoing path in-parallel depends on per-path condition
-
-    FIX: More clear token seman
     """
     task_type = 'SPLIT'
     activation_cls = SplitActivation
