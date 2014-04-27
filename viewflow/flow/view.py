@@ -110,8 +110,13 @@ class TaskViewMixin(object):
         return reverse('viewflow:index', current_app=self.activation.flow_cls._meta.namespace)
 
     def get_template_names(self):
-        return ('{}/flow/task.html'.format(self.activation.flow_cls._meta.app_label),
-                'viewflow/flow/task.html')
+        flow_task = self.activation.flow_task
+        flow_cls = self.activation.flow_task.flow_cls
+
+        return (
+            '{}/flow/{}.html'.format(flow_cls._meta.app_label, flow_task.name),
+            '{}/flow/task.html'.format(flow_cls._meta.app_label),
+            'viewflow/flow/task.html')
 
     def form_valid(self, form):
         response = super(TaskViewMixin, self).form_valid(form)
@@ -147,8 +152,10 @@ class ProcessView(TaskViewActivation, UpdateView):
         return self.process
 
     def get_template_names(self):
-        return ('{}/flow/task.html'.format(self.flow_cls._meta.app_label),
-                'viewflow/flow/task.html')
+        return (
+            '{}/flow/{}.html'.format(self.flow_cls._meta.app_label, self.flow_task.name),
+            '{}/flow/task.html'.format(self.flow_cls._meta.app_label),
+            'viewflow/flow/task.html')
 
     def get_success_url(self):
         return reverse('viewflow:index', current_app=self.flow_cls._meta.app_label)

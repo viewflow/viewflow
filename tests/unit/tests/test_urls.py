@@ -31,8 +31,8 @@ class TestURLReverse(TestCase):
     def test_django_reverse_flow_urls_succeed(self):
         reverse('viewflow:index', current_app=SingleTaskFlow._meta.app_label)
         reverse('viewflow:start', current_app=SingleTaskFlow._meta.app_label)
-        reverse('viewflow:task', args=[1, 1], current_app=SingleTaskFlow._meta.app_label)
-        reverse('viewflow:task__assign', args=[1, 1], current_app=SingleTaskFlow._meta.app_label)
+        reverse('viewflow:task', args=[1, 1], current_app=SingleTaskFlow._meta.namespace)
+        reverse('viewflow:task__assign', args=[1, 1], current_app=SingleTaskFlow._meta.namespace)
 
     def test_flow_reverse_urls_succeed(self):
         process = Process.objects.create(flow_cls=SingleTaskFlow)
@@ -64,3 +64,9 @@ class TestFlowUrlTag(TestCase):
             "{% load viewflow %}{% flowurl 'unit/SingleTaskFlow' 'viewflow:task' process_pk=1 task_pk=2 %}")
 
         self.assertEqual(template.render(Context({})), '/single_flow/1/task/2/')
+
+    def test_task_assign_resolve_succeed(self):
+        template = Template(
+            "{% load viewflow %}{% flowurl 'unit/SingleTaskFlow' 'viewflow:task__assign' process_pk=1 task_pk=2 %}")
+
+        self.assertEqual(template.render(Context({})), '/single_flow/1/task/2/assign/')
