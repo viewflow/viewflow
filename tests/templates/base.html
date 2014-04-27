@@ -21,8 +21,8 @@
             <div class="container">
                 <ul class="nav navbar-nav" style="width:100%">
                     <li {% if request.path == "/" %}class="active"{% endif %}><a href="/">Home</a></li>
-                    <li {% if "/helloworld/" in request.path %}class="active"{% endif %}><a href="{% flowurl 'helloworld/HelloWorldFlow.index' %}">Hello, World</a></li>
-                    <li {% if "/shipment" in request.path %}class="active"{% endif %}><a href="{% flowurl 'shipment/ShipmentFlow.index' %}">Shipment</a></li>
+                    <li {% if "/helloworld/" in request.path %}class="active"{% endif %}><a href="{% flowurl 'helloworld/HelloWorldFlow' 'viewflow:index' %}">Hello, World</a></li>
+                    <li {% if "/shipment" in request.path %}class="active"{% endif %}><a href="{% flowurl 'shipment/ShipmentFlow' 'viewflow:index' %}">Shipment</a></li>
                     <ul class="nav navbar-nav navbar-right">
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ request.user.username|title|default:"Anonymous" }} <b class="caret"></b></a>

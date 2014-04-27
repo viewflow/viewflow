@@ -1,11 +1,15 @@
 from django.conf.urls import patterns, include, url
 from django.core.urlresolvers import reverse
+from django.template import Template, Context
 from django.test import TestCase
+
 from viewflow.models import Process, Task
-from unit.flows import SingleTaskFlow
+from unit.flows import SingleTaskFlow, AllTaskFlow
+
 
 urlpatterns = patterns('',  # NOQA
-    url(r'^flow/', include(SingleTaskFlow.instance.urls)))
+    url(r'^single_flow/', include(SingleTaskFlow.instance.urls)),
+    url(r'^alltask_flow/', include(AllTaskFlow.instance.urls)))
 
 
 class TestURLPatterns(TestCase):
@@ -47,4 +51,16 @@ class TestURLReverse(TestCase):
         task = Task.objects.create(process=process, flow_task=SingleTaskFlow.task)
         task.get_absolute_url()
 
-# TODO Test flowurl tag
+
+class TestFlowUrlTag(TestCase):
+    urls = 'unit.tests.test_urls'
+
+    def test_index_resolve_succeed(self):
+        template = Template("{% load viewflow %}{% flowurl 'unit/SingleTaskFlow' 'viewflow:index' %}")
+        self.assertEqual(template.render(Context({})), '/single_flow/')
+
+    def test_task_resolve_succeed(self):
+        template = Template(
+            "{% load viewflow %}{% flowurl 'unit/SingleTaskFlow' 'viewflow:task' process_pk=1 task_pk=2 %}")
+
+        self.assertEqual(template.render(Context({})), '/single_flow/1/task/2/')
