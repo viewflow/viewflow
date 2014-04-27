@@ -158,7 +158,7 @@ class ProcessView(TaskViewActivation, UpdateView):
             'viewflow/flow/task.html')
 
     def get_success_url(self):
-        return reverse('viewflow:index', current_app=self.flow_cls._meta.app_label)
+        return reverse('viewflow:index', current_app=self.flow_cls._meta.namespace)
 
     def form_valid(self, form):
         response = super(ProcessView, self).form_valid(form)
