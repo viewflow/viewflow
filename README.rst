@@ -14,8 +14,10 @@ django-viewflow requires Python 3.3 or grater and django 1.7::
 
     pip install django-viewflow
 
-And add it into INSTALLED_APPS settings::
-    
+And add it into INSTALLED_APPS settings
+
+.. code-block:: python
+
     INSTALLED_APPS = (
          ...
          viewflow,
@@ -27,7 +29,9 @@ Quick start
 Let's define basic Hello Process where one could start hello world request, another approve it,
 and when request approved, it should be send in background.
 
-Start with process model definition::
+Start with process model definition
+
+.. code-block:: python
 
     from django.db import models
     from viewflow.models import Process
@@ -42,7 +46,9 @@ Start with process model definition::
                 ('can_approve_request', 'Can approve hello world request')
             ]
 
-Define the actual task that would perform Hello on World, in task.py::
+Define the actual task that would perform Hello on World, in task.py
+
+.. code-block:: python
 
     import os
 
@@ -56,7 +62,9 @@ Define the actual task that would perform Hello on World, in task.py::
             world.write(activation.process.text)
 
 
-To make this code works flow definition is simple, put it in `flows.py` inside your django application::
+To make this code works flow definition is simple, put it in `flows.py` inside your django application
+
+.. code-block:: python
 
     from viewflow import flow
     from viewflow.base import this, Flow
@@ -80,7 +88,9 @@ To make this code works flow definition is simple, put it in `flows.py` inside y
 
         end = flow.End()
 
-`Flow` class contains all url required for task processing::
+`Flow` class contains all url required for task processing
+
+.. code-block:: python
 
     from django.conf.urls import patterns, url, include
     from .flows import HelloWorldFlow
