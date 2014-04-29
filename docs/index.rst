@@ -7,6 +7,7 @@ Ad-hoc business process automation framework for Django
 django-viewflow provides simple, django friendly way to organize views, background jobs, user permission checking,
 in one clearly defined task flow.
 
+
 Installation
 ============
 
@@ -22,8 +23,9 @@ And add it into INSTALLED_APPS settings::
     )
 
 
-Quick start
+Quick Start
 ===========
+
 Let's define basic Hello Process where one could start hello world request, another approve it,
 and when request approved, it should be send in background.
 
@@ -56,7 +58,9 @@ Define the actual task that would perform Hello on World, in task.py::
             world.write(activation.process.text)
 
 
-To make this code works flow definition is simple, put it in `flows.py` inside your django application::
+To make this code works flow definition is simple, put it in `flows.py` inside your django application
+
+.. code-block:: python
 
     from viewflow import flow
     from viewflow.base import this, Flow
@@ -96,17 +100,21 @@ Next, you can see how to define custom views `TODO` meet with and other concepts
 More examples available in `tests\\examples` directory
 
 
-License
-======
-|The GNU General Public License v3.0|
 
-.. |The GNU General Public License v3.0| https://www.gnu.org/copyleft/gpl.html
+Contents:
+=========
 
-Change log
-==========
+.. toctree::
+   :maxdepth: 2
 
-0.1.0
------
+   core_concepts
+   flow_tasks
+   examples
 
-* Initial public prototype
-* Basic set of tasks support (View, Job, If/Switch, Split/Join)
+
+Indices and tables
+==================
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`

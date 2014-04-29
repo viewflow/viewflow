@@ -91,7 +91,7 @@ class StartViewActivation(StartActivation):
 
 class StartViewMixin(object):
     """
-    Mixin for start views, not implementing activation
+    Mixin for start views, that not implements activation interface
     """
     def get_context_data(self, **kwargs):
         context = super(StartViewMixin, self).get_context_data(**kwargs)
@@ -121,6 +121,9 @@ class StartViewMixin(object):
 
 
 class StartView(StartViewActivation, UpdateView):
+    """
+    Generic start view
+    """
     fields = []
 
     @property
@@ -159,6 +162,11 @@ class StartView(StartViewActivation, UpdateView):
 class Start(Event):
     """
     Start process event
+
+    Example:
+        start = flow.Start(StartView, fields=["some_process_field"]) \
+            .Available(lambda user: user.is_super_user) \
+            .Activate(this.first_start)
     """
     task_type = 'START'
     activation_cls = StartViewActivation

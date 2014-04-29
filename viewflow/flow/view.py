@@ -99,7 +99,7 @@ class TaskViewActivation(ViewActivation):
 
 class TaskViewMixin(object):
     """
-    Mixin for task views, not implementing activation
+    Mixin for task views, that not implements activation interface
     """
     def get_context_data(self, **kwargs):
         context = super(TaskViewMixin, self).get_context_data(**kwargs)
@@ -175,6 +175,14 @@ class ProcessView(TaskViewActivation, UpdateView):
 
 
 class View(Task):
+    """
+    View task
+
+    Example:
+        task = flow.View(some_view) \
+            .Permission('my_app.can_do_task') \
+            .Next(this.next_task)
+    """
     task_type = 'HUMAN'
     activation_cls = TaskViewActivation
 
@@ -216,7 +224,7 @@ class View(Task):
         accepts user lookup kwargs or callable :: Process -> User
 
         .Assign(username='employee')
-        .Assign(lambda task: task.process.created_by)
+        .Assign(lambda process: process.created_by)
         """
         if owner:
             self._owner = owner
@@ -230,7 +238,7 @@ class View(Task):
         aceps permissions name of callable :: Process -> permission_name
 
         .Permission('my_app.can_approve')
-        .Permission(lambda task: 'my_app.department_manager_{}'.format(task.process.depratment.pk))
+        .Permission(lambda process: 'my_app.department_manager_{}'.format(process.depratment.pk))
         """
         self._owner_permission = permission
         self._assign_view = assign_view

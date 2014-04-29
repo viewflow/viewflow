@@ -8,6 +8,21 @@ from viewflow.flow.base import Task, Edge
 
 
 def flow_job(**lock_args):
+    """
+    Decorator that prepares celery task for execution
+
+    Makes celry job function with following signature:
+             :: (flow_task-strref, process_pk, task_pk, **kwargs)
+
+    Expects actual celery job function have following signature
+             :: (activation, **kwargs)
+    If celery task class implements activation interface, job function
+    called without activation instance
+             :: (activation, **kwargs)
+
+    Process instannce are locked only before and after function execution.
+    Plese avoid any process state modification during the celery job
+    """
     class flow_task_decorator(object):
         def __init__(self, func, activation=None):
             self.func = func
@@ -69,6 +84,10 @@ def flow_job(**lock_args):
 class Job(Task):
     """
     Task that runs in background
+
+    Example:
+        job = flow.Job(task.job) \
+            .Next(this.end)
     """
     task_type = 'JOB'
     activation_cls = JobActivation

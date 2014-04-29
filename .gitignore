@@ -2,4 +2,5 @@
 .tox
 django_viewflow.egg-info
 db.sqlite3
+docs/_build/**
 tests/local_settings.py

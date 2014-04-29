@@ -23,6 +23,11 @@ class IfActivation(GateActivation):
 class If(Gateway):
     """
     Activates one of paths based on condition
+
+    Example
+       check_decision = flow.If(lambda p: p.approved) \
+           .OnTrue(this.approved)
+           .OnFalse(this.end)
     """
     task_type = 'IF'
     activation_cls = IfActivation
@@ -191,6 +196,12 @@ class JoinActivation(Activation):
 class Join(Gateway):
     """
     Wait for one or all incoming links and activate next path
+
+    Join should be connected to one split task only
+
+    Example:
+        join_on_warehouse = self.Join() \
+            .Next(this.next_task)
     """
     task_type = 'JOIN'
     activation_cls = JoinActivation
@@ -235,6 +246,11 @@ class SplitActivation(GateActivation):
 class Split(Gateway):
     """
     Activate outgoing path in-parallel depends on per-path condition
+
+    Example:
+        split_on_decision = flow.Split() \
+            .Next(check_post, cond=lambda p: p,is_check_post_required)
+            .Next(this.perform_task_always)
     """
     task_type = 'SPLIT'
     activation_cls = SplitActivation

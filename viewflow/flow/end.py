@@ -18,4 +18,3 @@ class End(Event):
 
     def _outgoing(self):
         return iter([])
-
