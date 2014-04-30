@@ -110,11 +110,3 @@ Contents:
    core_concepts
    flow_tasks
    examples
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

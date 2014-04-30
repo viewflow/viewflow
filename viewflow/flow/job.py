@@ -85,8 +85,9 @@ class Job(Task):
     """
     Task that runs in background
 
-    Example:
-        job = flow.Job(task.job) \
+    Example::
+
+        job = flow.Job(task.job) \\
             .Next(this.end)
     """
     task_type = 'JOB'

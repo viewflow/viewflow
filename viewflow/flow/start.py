@@ -163,9 +163,10 @@ class Start(Event):
     """
     Start process event
 
-    Example:
-        start = flow.Start(StartView, fields=["some_process_field"]) \
-            .Available(lambda user: user.is_super_user) \
+    Example::
+
+        start = flow.Start(StartView, fields=["some_process_field"]) \\
+            .Available(lambda user: user.is_super_user) \\
             .Activate(this.first_start)
     """
     task_type = 'START'

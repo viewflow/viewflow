@@ -178,9 +178,10 @@ class View(Task):
     """
     View task
 
-    Example:
-        task = flow.View(some_view) \
-            .Permission('my_app.can_do_task') \
+    Example::
+
+        task = flow.View(some_view) \\
+            .Permission('my_app.can_do_task') \\
             .Next(this.next_task)
     """
     task_type = 'HUMAN'

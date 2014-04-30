@@ -45,7 +45,10 @@ class Edge(object):
 
 class Node(object):
     """
-    Base class for flow objects
+    Base class for flow task
+
+    :keyword task_type: Human readable task type
+    :keyword activation_cls: Activation implementation specific for this node
     """
     task_type = None
     activation_cls = None

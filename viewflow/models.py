@@ -9,6 +9,9 @@ from viewflow.fields import FlowReferenceField, TaskReferenceField, TokenField
 
 
 class Process(models.Model):
+    """
+    Base class for Process data object
+    """
     class STATUS:
         NEW = 'NEW'
         STARTED = 'STR'
@@ -47,6 +50,9 @@ class Process(models.Model):
 
 
 class Task(models.Model):
+    """
+    Base class for Task state objects
+    """
     class STATUS:
         NEW = 'NEW'
         ASSIGNED = 'ASN'
@@ -88,6 +94,10 @@ class Task(models.Model):
 
     @transition(field=status, source=STATUS.NEW, target=STATUS.ASSIGNED, conditions=[_in_db])
     def assign(self, user=None, external_task_id=None):
+        """
+        Tasks that perform some activity should be assotiated with
+        task owner user or background task id
+        """
         self.owner = user
         self.external_task_id = external_task_id
 
@@ -101,10 +111,17 @@ class Task(models.Model):
 
     @transition(field=status, source=STATUS.PREPARED, target=STATUS.STARTED, conditions=[_in_db])
     def start(self):
+        """
+        Task that non involves user view interaction could be marked as started.
+        User view task only preprared but not started, b/c we do not do hit db on GET requests
+        """
         pass
 
     @transition(field=status, source=[STATUS.PREPARED, STATUS.STARTED], target=STATUS.FINISHED)
     def done(self):
+        """
+        Mark task as done
+        """
         self.finished = datetime.now()
 
     @transition(field=status, source=[STATUS.ASSIGNED, STATUS.STARTED], target=STATUS.CANCELLED, conditions=[_in_db])

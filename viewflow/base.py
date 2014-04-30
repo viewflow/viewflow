@@ -102,6 +102,12 @@ class FlowMetaClass(type):
 class Flow(object, metaclass=FlowMetaClass):
     """
     Base class for flow definition
+
+    :keyword process_cls: Defines model class for Process
+    :keyword task_cls: Defines model class for Task
+    :keyword management_form_cls: Defines form class for task state tracking over GET requests
+    :keyword lock_impl: Locking implementation for flow
+
     """
     process_cls = Process
     task_cls = Task
@@ -110,6 +116,9 @@ class Flow(object, metaclass=FlowMetaClass):
 
     @property
     def urls(self):
+        """
+        Provides ready to include urlpatterns required for this flow
+        """
         from django.conf.urls import url
 
         node_urls = [

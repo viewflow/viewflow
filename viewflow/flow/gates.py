@@ -24,9 +24,10 @@ class If(Gateway):
     """
     Activates one of paths based on condition
 
-    Example
-       check_decision = flow.If(lambda p: p.approved) \
-           .OnTrue(this.approved)
+    Example::
+
+       check_decision = flow.If(lambda p: p.approved) \\
+           .OnTrue(this.approved) \\
            .OnFalse(this.end)
     """
     task_type = 'IF'
@@ -199,8 +200,9 @@ class Join(Gateway):
 
     Join should be connected to one split task only
 
-    Example:
-        join_on_warehouse = self.Join() \
+    Example::
+
+        join_on_warehouse = self.Join() \\
             .Next(this.next_task)
     """
     task_type = 'JOIN'
@@ -247,9 +249,10 @@ class Split(Gateway):
     """
     Activate outgoing path in-parallel depends on per-path condition
 
-    Example:
-        split_on_decision = flow.Split() \
-            .Next(check_post, cond=lambda p: p,is_check_post_required)
+    Example::
+
+        split_on_decision = flow.Split() \\
+            .Next(check_post, cond=lambda p: p,is_check_post_required) \\
             .Next(this.perform_task_always)
     """
     task_type = 'SPLIT'
