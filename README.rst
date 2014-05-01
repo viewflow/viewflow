@@ -4,7 +4,7 @@ django-viewflow
 
 Ad-hoc business process automation framework for Django.
 
-The process logic in django-viewflow is not spread out to a number of views but is concentrated in one clearly defined `flow`. 
+The process logic in django-viewflow is concentrated in one clearly defined `flow`. 
 You can organize your views, background jobs, user permission checking in a simple, intuitive django-friendly way.
 
 .. image:: tests/examples/shipment/doc/ShipmentProcess.png
