@@ -10,7 +10,7 @@ You can organize your views, background jobs, user permission checking in a simp
 .. image:: tests/examples/shipment/doc/ShipmentProcess.png
    :width: 400px
 
-django-viewflow allows to implement such process, just in about hundred lines of code, and you would still have pure django views for that
+django-viewflow allows to implement such process, just in about hundred lines of code, and you would still have pure django views for that.
 
 Full documentation is available at http://kmmbvnr.github.io/django-viewflow/
 
@@ -111,7 +111,7 @@ That's all you need to setup this flow.
 Next, you can see how to define custom views, and meet other concepts of django-viewflow at
 http://kmmbvnr.github.io/django-viewflow/
 
-More examples are available in the `tests\\examples` directory.
+More examples are available in the `tests/examples` directory.
 
 
 License
