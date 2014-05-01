@@ -19,7 +19,7 @@ def flow_view(**lock_args):
 
     Expects view with signature
              :: (request, activation, **kwargs)
-      or CDB view that implemnts ViewActivation, in this case, dispatch
+      or CBV view that implemnts ViewActivation, in this case, dispatch
       with would be called with
              :: (request, **kwargs)
 
@@ -183,6 +183,33 @@ class View(Task):
         task = flow.View(some_view) \\
             .Permission('my_app.can_do_task') \\
             .Next(this.next_task)
+
+    In case of function based view::
+
+        task = flow.Task(task)
+
+        @flow_start_view()
+        def task(request, activation):
+             if not activation.flow_task.has_perm(request.user):
+                 raise PermissionDenied
+
+             activation.prepare(request.POST or None)
+             form = SomeForm(request.POST or None)
+
+             if form.is_valid():
+                  form.save()
+                  activation.done()
+                  return redirect('/')
+             return render(request, {'activation': activation, 'form': form})
+
+    Ensure to include `{{ activation.management_form }}` insude template, to proper
+    track when task was started and other task perfomance statictics::
+
+             <form method="POST">
+                  {{ form }}
+                  {{ activation.management_form }}
+                  <button type="submit"/>
+             </form>
     """
     task_type = 'HUMAN'
     activation_cls = TaskViewActivation

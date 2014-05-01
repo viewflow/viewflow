@@ -25,9 +25,9 @@ Flow class should have at least one of :class:`viewflow.flow.Start` task and at 
 
 .. autoclass:: viewflow.flow.Node
    :members: activate
-       
+
 See :doc:`Flow Tasks <flow_tasks>` documentation for list of available tasks
-             
+
 Activation
 ==========
 
@@ -50,8 +50,18 @@ extending :class:`viewflow.models.Task`
 
 
 Views
-=====             
+=====
+.. autofunction:: viewflow.flow.start.flow_start_view
+.. autoclass:: viewflow.flow.start.StartViewMixin
+    :members: get_context_data, get_object, get_template_names, get_success_url, form_valid, dispatch
+.. autoclass:: viewflow.flow.start.StartView
+    :members: get_context_data, get_object, get_template_names, get_success_url, form_valid, dispatch
 
+.. autofunction:: viewflow.flow.view.flow_view
+.. autoclass:: viewflow.flow.view.TaskViewMixin
+    :members: get_context_data, get_object, get_template_names, get_success_url, form_valid, dispatch
+.. autoclass:: viewflow.flow.view.ProcessView
+    :members: get_context_data, get_object, get_template_names, get_success_url, form_valid, dispatch
 
 Urls
 ====
@@ -60,4 +70,3 @@ include it in urlpatters ::
 
   urlpatterns = patterns('',
         url(r'^myflow/', include(MyFlow.instance.urls)))
-

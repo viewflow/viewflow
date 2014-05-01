@@ -19,7 +19,7 @@ def flow_start_view():
 
     Expects view with signature
              :: (request, activation, **kwargs)
-      or CDB view that implemnts ViewActivation, in this case, dispatch
+      or CBV view that implemnts ViewActivation, in this case, dispatch
       with would be called with
              :: (request, **kwargs)
 
@@ -94,14 +94,24 @@ class StartViewMixin(object):
     Mixin for start views, that not implements activation interface
     """
     def get_context_data(self, **kwargs):
+        """
+        Adds `activation` to context data
+        """
         context = super(StartViewMixin, self).get_context_data(**kwargs)
         context['activation'] = self.activation
         return context
 
     def get_success_url(self):
+        """
+        Redirects to flow index page
+        """
         return reverse('viewflow:index', current_app=self.activation.flow_cls._meta.namespace)
 
     def get_template_names(self):
+        """
+        Get template names, first `app_name/flow/start.html` would be checked,
+        and if missed, standard `viewflow/flow/start.html` would be used
+        """
         return ('{}/flow/start.html'.format(self.activation.flow_cls._meta.app_label),
                 'viewflow/flow/start.html')
 
@@ -112,6 +122,9 @@ class StartViewMixin(object):
 
     @flow_start_view()
     def dispatch(self, request, activation, **kwargs):
+        """
+        Check user permissions, and prepare flow to execution
+        """
         self.activation = activation
         if not self.activation.flow_task.has_perm(request.user):
             raise PermissionDenied
@@ -122,27 +135,44 @@ class StartViewMixin(object):
 
 class StartView(StartViewActivation, UpdateView):
     """
-    Generic start view
+    Generic start view, allows to modify subset of process fields,
+    implements :class:`viewflow.activation.StartActivation` interface
     """
     fields = []
 
     @property
     def model(self):
+        """
+        Returns process class
+        """
         return self.flow_cls.process_cls
 
     def get_context_data(self, **kwargs):
+        """
+        Adds `activation` to context data
+        """
         context = super(StartView, self).get_context_data(**kwargs)
         context['activation'] = self
         return context
 
     def get_object(self):
+        """
+        Returns process instance
+        """
         return self.process
 
     def get_template_names(self):
+        """
+        Get template names, first `app_name/flow/start.html` would be checked,
+        and if missed, standard `viewflow/flow/start.html` would be used
+        """
         return ('{}/flow/start.html'.format(self.flow_cls._meta.app_label),
                 'viewflow/flow/start.html')
 
     def get_success_url(self):
+        """
+        Redirects to flow index page
+        """
         return reverse('viewflow:index', current_app=self.flow_cls._meta.app_label)
 
     def form_valid(self, form):
@@ -152,6 +182,9 @@ class StartView(StartViewActivation, UpdateView):
 
     @flow_start_view()
     def dispatch(self, request, *args, **kwargs):
+        """
+        Check user permissions, and prepare flow to execution
+        """
         if not self.flow_task.has_perm(request.user):
             raise PermissionDenied
 
@@ -168,6 +201,33 @@ class Start(Event):
         start = flow.Start(StartView, fields=["some_process_field"]) \\
             .Available(lambda user: user.is_super_user) \\
             .Activate(this.first_start)
+
+    In case of function based view::
+
+        start = flow.Start(start_process)
+
+        @flow_start_view()
+        def start_process(request, activation):
+             if not activation.flow_task.has_perm(request.user):
+                 raise PermissionDenied
+
+             activation.prepare(request.POST or None)
+             form = SomeForm(request.POST or None)
+
+             if form.is_valid():
+                  form.save()
+                  activation.done()
+                  return redirect('/')
+             return render(request, {'activation': activation, 'form': form})
+
+    Ensure to include `{{ activation.management_form }}` insude template, to proper
+    track when task was started and other task perfomance statictics::
+
+             <form method="POST">
+                  {{ form }}
+                  {{ activation.management_form }}
+                  <button type="submit"/>
+             </form>
     """
     task_type = 'START'
     activation_cls = StartViewActivation
