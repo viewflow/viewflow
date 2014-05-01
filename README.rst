@@ -12,7 +12,8 @@ in one clearly defined task flow.
 
 django-viewflow allows to implement such process, just in about hundred lines of code, and still have pure django views for that
 
-     
+Full documentation available at http://kmmbvnr.github.io/django-viewflow/
+
 Installation
 ============
 
@@ -107,13 +108,14 @@ To make this code works flow definition is simple, put it in `flows.py` inside y
 
 That's all you need to setup this flow.
 
-Next, you can see how to define custom views `TODO` meet with and other concepts `TODO` of django-viewflow
+Next, you can see how to define custom views, and meet with other concepts of django-viewflow
+http://kmmbvnr.github.io/django-viewflow/
 
 More examples available in `tests\\examples` directory
 
 
 License
-======
+=======
 `The GNU General Public License v3.0 <https://www.gnu.org/copyleft/gpl.html>`_
 
 Change log
