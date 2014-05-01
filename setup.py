@@ -14,7 +14,7 @@ setup(
     keywords=['workflow', 'django'],
     url='http://github.com/kmmbvnr/django-viewflow',
     classifiers=[
-        'Development Status :: Development Status :: 1 - Planning',
+        'Development Status :: 3 - Alpha',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
@@ -25,6 +25,4 @@ setup(
     requires=['Django (>=1.7b1)', 'celery (>=3.1)'],
     packages=['viewflow', 'viewflow.flow', 'viewflow.templatetags'],
     package_data={'viewflow': ['templates/viewflow/*.html', 'templates/viewflow/flow/*.html']},
-    zip_safe=False,
-    include_package_data=True
 )
