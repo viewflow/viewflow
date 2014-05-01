@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from setuptools import setup
+from distutils.core import setup
 
 
 setup(
@@ -22,8 +22,9 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    install_requires=['Django>=1.7b1', 'celery>=3.1'],
-    packages=['viewflow'],
+    requires=['Django (>=1.7b1)', 'celery (>=3.1)'],
+    packages=['viewflow', 'viewflow.flow', 'viewflow.templatetags'],
+    package_data={'viewflow': ['templates/viewflow/*.html', 'templates/viewflow/flow/*.html']},
     zip_safe=False,
     include_package_data=True
 )

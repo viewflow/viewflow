@@ -1,6 +1,8 @@
 *.pyc
 .tox
+dist
 django_viewflow.egg-info
+MANIFEST
 db.sqlite3
 docs/_build/**
 tests/local_settings.py
