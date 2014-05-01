@@ -2,7 +2,8 @@
 django-viewflow
 ===============
 
-Ad-hoc business process automation framework for Django
+Ad-hoc business process automation framework for Django.
+
 
 django-viewflow provides simple, django friendly way to organize views, background jobs, user permission checking,
 in one clearly defined task flow.
@@ -10,14 +11,14 @@ in one clearly defined task flow.
 .. image:: tests/examples/shipment/doc/ShipmentProcess.png
    :width: 400px
 
-django-viewflow allows to implement such process, just in about hundred lines of code, and still have pure django views for that
+django-viewflow allows to implement such process, just in about hundred lines of code, and you would still have pure django views for that
 
-Full documentation available at http://kmmbvnr.github.io/django-viewflow/
+Full documentation is available at http://kmmbvnr.github.io/django-viewflow/
 
 Installation
 ============
 
-django-viewflow requires Python 3.3 or grater and django 1.7::
+django-viewflow requires Python 3.3 or greater and django 1.7::
 
     pip install django-viewflow
 
@@ -33,10 +34,10 @@ And add it into INSTALLED_APPS settings
 
 Quick start
 ===========
-Let's define basic Hello Process where one could start hello world request, another approve it,
-and when request approved, it should be send in background.
+Let's define basic Hello Process where one could start hello world request, another person approves it,
+and as soon as the request is approved it should be send into background.
 
-Start with process model definition
+Start with process database model definition
 
 .. code-block:: python
 
@@ -53,7 +54,7 @@ Start with process model definition
                 ('can_approve_request', 'Can approve hello world request')
             ]
 
-Define the actual task that would perform Hello on World, in task.py
+Define the actual task that says Hello to the World in `task.py`
 
 .. code-block:: python
 
@@ -69,7 +70,7 @@ Define the actual task that would perform Hello on World, in task.py
             world.write(activation.process.text)
 
 
-To make this code works flow definition is simple, put it in `flows.py` inside your django application
+To make the above code work just put the following flow definition in `flows.py` module from your django application.
 
 .. code-block:: python
 
@@ -95,7 +96,7 @@ To make this code works flow definition is simple, put it in `flows.py` inside y
 
         end = flow.End()
 
-`Flow` class contains all url required for task processing
+`Flow` class contains all urls required for the task processing.
 
 .. code-block:: python
 
@@ -108,10 +109,10 @@ To make this code works flow definition is simple, put it in `flows.py` inside y
 
 That's all you need to setup this flow.
 
-Next, you can see how to define custom views, and meet with other concepts of django-viewflow
+Next, you can see how to define custom views, and meet other concepts of django-viewflow at
 http://kmmbvnr.github.io/django-viewflow/
 
-More examples available in `tests\\examples` directory
+More examples are available in the `tests\\examples` directory.
 
 
 License
