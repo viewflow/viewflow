@@ -3,8 +3,8 @@ from viewflow.base import this, Flow
 from viewflow.views import StartView, ProcessView
 from viewflow.lock import select_for_update_lock
 
-from examples.helloworld.models import HelloWorldProcess
-from examples.helloworld.tasks import send_hello_world_request
+from .models import HelloWorldProcess
+from .tasks import send_hello_world_request
 
 
 class HelloWorldFlow(Flow):

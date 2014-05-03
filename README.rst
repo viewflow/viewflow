@@ -4,7 +4,7 @@ django-viewflow
 
 Ad-hoc business process automation framework for Django.
 
-The process logic defined with django-viewflow is concentrated in one clearly defined `flow`. 
+The process logic defined with django-viewflow is concentrated in one clearly defined `flow`.
 You can organize your views, background jobs, user permission checking in a simple, intuitive django-friendly way.
 
 .. image:: tests/examples/shipment/doc/ShipmentProcess.png
@@ -76,8 +76,11 @@ To make the above code work just put the following flow definition in `flows.py`
     from viewflow import flow
     from viewflow.base import this, Flow
     from viewflow.views import ProcessView
+    from .models import HelloWorldProcess
 
     class HelloWorldFlow(Flow):
+        process_cls = HelloWorldProcess
+
         start = flow.Start(StartView, fields=["text"]) \
            .Permission('helloworld.can_start_request') \
            .Activate(this.hello_world)
