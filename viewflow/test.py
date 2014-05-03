@@ -143,8 +143,10 @@ class FlowTaskTest(object):
             data = {}
 
         task_finished.connect(self.task_finished)
-        flow_do(self.flow_task, self, **data)
-        task_finished.disconnect(self.task_finished)
+        try:
+            flow_do(self.flow_task, self, **data)
+        finally:
+            task_finished.disconnect(self.task_finished)
         assert self._task, 'Flow task {} not finished'.format(self.flow_task.name)
 
         return self
