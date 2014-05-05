@@ -2,7 +2,7 @@
 Background job executed by celery
 """
 import functools
-from viewflow.activation import JobActivation
+from viewflow.activation import JobActivation, Context
 from viewflow.fields import import_task_by_ref
 from viewflow.flow.base import Task, Edge
 
@@ -52,11 +52,18 @@ def flow_job(**lock_args):
                     activation.start()
 
             # execute
-            if self.activation:
-                result = self.func(**kwargs)
-            else:
-                result = self.func(activation, **kwargs)
-
+            try:
+                if self.activation:
+                    result = self.func(**kwargs)
+                else:
+                    result = self.func(activation, **kwargs)
+            except Exception as exc:
+                # mark as error
+                with lock(flow_task, process_pk):
+                    task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
+                    activation = self.activation if self.activation else flow_task.activation_cls()
+                    activation.error(exc)
+                    
             # mark as done
             with lock(flow_task, process_pk):
                 task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)

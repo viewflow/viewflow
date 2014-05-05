@@ -1,18 +1,69 @@
+import threading
+from django.db import transaction
 from celery.utils import uuid
+
 from viewflow import signals
 from viewflow.fields import get_task_ref
+
+
+_context_stack = threading.local()
+
+
+class Context(object):
+    """
+    Activation context, dynamically scoped
+
+    :keyword propagate_exception: If True on activation fails exception would be propagated to previous activalion,
+    if False, current task activation would be marked as failed
+
+    Usage ::
+
+        with Context(propagate_exception=False):
+             print(context.propagate_exception)
+    """
+    def __init__(self, **kwargs):
+        self.current_context_data = kwargs
+
+    def __getattr__(self, name):
+        if not hasattr(_context_stack, 'data'):
+            raise AttributeError
+
+        for scope in reversed(_context_stack.data):
+            if name in scope:
+                return scope[name]
+        raise AttributeError
+
+    def __enter__(self):
+        if not hasattr(_context_stack, 'data'):
+            _context_stack.data = []
+        _context_stack.data.append(self.current_context_data)
+
+    def __exit__(self, t, v, tb):
+        _context_stack.data.pop()
+
+    @staticmethod
+    def create(**kwargs):
+        if not hasattr(_context_stack, 'data'):
+            _context_stack.data = []
+        _context_stack.data.append(kwargs)
+        return Context()
+
+
+context = Context.create(propagate_exception=True)
 
 
 class Activation(object):
     """
     Activation responsible for managing livecycle and persistance of flow task instance
     """
+
     def __init__(self, **kwargs):
         """
         Activation should be available for instante without any constructor parameters.
         """
         self.flow_cls, self.flow_task = None, None
         self.process, self.task = None, None
+
         super(Activation, self).__init__(**kwargs)
 
     def activate_next(self):
@@ -176,6 +227,7 @@ class JobActivation(TaskActivation):
     """
     Activation for long-running background celery tasks
     """
+    fail_on_children_error = False
 
     def assign(self, external_task_id):
         """
@@ -201,11 +253,24 @@ class JobActivation(TaskActivation):
         self.task.save()
         signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
+    def error(self, exc):
+        self.task.error()
+        self.task.save()
+        signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task, exeception=exc)
+
     def done(self, result):
         """
         Celery task finished with `result`, finishes the flow task
         """
-        super(JobActivation, self).done()
+        with Context(propagate_exception=False):
+            super(JobActivation, self).done()
+
+    def activate_next(self):
+        """
+        If Job successfully completed, nonext task acivation failure can't drop this
+        """
+        with Context(propagate_exception=False):
+            super(JobActivation, self).activate_next()
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
@@ -262,6 +327,11 @@ class GateActivation(Activation):
         """
         raise NotImplementedError
 
+    def error(self, exc):
+        self.task.error()
+        self.task.save()
+        signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task, exeception=exc)
+
     def done(self):
         self.task.done()
         self.task.save()
@@ -288,8 +358,23 @@ class GateActivation(Activation):
         activation = cls()
         activation.initialize(flow_task, task)
         activation.prepare()
-        activation.execute()
-        activation.done()
+
+        if context.propagate_exception:
+            """
+            Any execution execption would be propagated back,
+            assume that rolback will happens and no task activation would be stored
+            """
+            activation.execute()
+            activation.done()
+        else:
+            """
+            On error, save the task and not propagate exception on top
+            """
+            try:
+                with transaction.atomic(savepoint=True):
+                    activation.execute()
+            except:
+                activation.error()
 
         return activation
 
