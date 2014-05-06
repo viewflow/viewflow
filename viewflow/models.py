@@ -88,15 +88,15 @@ class Task(models.Model):
 
     def _in_db(self):
         """
-        Ensure that we have primary key and that's we are safe to create referencied models
+        Ensure that we have primary key and that we are safe to create referenced models.
         """
         return self.pk
 
     @transition(field=status, source=STATUS.NEW, target=STATUS.ASSIGNED, conditions=[_in_db])
     def assign(self, user=None, external_task_id=None):
         """
-        Tasks that perform some activity should be assotiated with
-        task owner user or background task id
+        Tasks that perform some activity should be associated with
+        the task owner user or background task id.
         """
         self.owner = user
         self.external_task_id = external_task_id
@@ -104,23 +104,23 @@ class Task(models.Model):
     @transition(field=status, source=[STATUS.NEW, STATUS.ASSIGNED], target=STATUS.PREPARED)
     def prepare(self):
         """
-        Task going to be started. Task could be initialized several times (probably on GET request)
-        Initialized tasks could not be saved
+        Task is going to be started. Task can be initialized several times (probably on GET request).
+        Initialized tasks could not be saved.
         """
         self.started = datetime.now()
 
     @transition(field=status, source=STATUS.PREPARED, target=STATUS.STARTED, conditions=[_in_db])
     def start(self):
         """
-        Task that non involves user view interaction could be marked as started.
-        User view task only preprared but not started, b/c we do not do hit db on GET requests
+        Task that does not involve user view interaction could be marked as started.
+        User view task is only prepared but not started, b/c we do not hit db on GET requests.
         """
         pass
 
     @transition(field=status, source=[STATUS.PREPARED, STATUS.STARTED], target=STATUS.FINISHED)
     def done(self):
         """
-        Mark task as done
+        Mark task as done.
         """
         self.finished = datetime.now()
 

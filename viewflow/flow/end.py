@@ -1,5 +1,5 @@
 """
-Finishes the process and cancells all other active tasks
+Finishes the process and cancels all other active tasks
 """
 
 from viewflow.flow.base import Event

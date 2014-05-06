@@ -35,7 +35,7 @@ def assign(request, activation):
     """
     Default assign view for flow task
 
-    Get confirmation from user, asssigns task and redirects to task pages
+    Get confirmation from user, assigns task and redirects to task pages
     """
     if not activation.flow_task.can_be_assigned(request.user, activation.task):
         raise PermissionDenied

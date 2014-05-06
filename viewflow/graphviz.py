@@ -16,7 +16,7 @@ def _nodename(flow_node):
 
 def _nodelabel(flow_node):
     """
-    Add line breaks between words in  node desctiption
+    Add line breaks between words in  node description
     leaves 3 letters word on the same line
     """
     result = []

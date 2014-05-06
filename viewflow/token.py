@@ -13,7 +13,7 @@ class Token(object):
       and 'start/3_4/7_4' on one more split
 
     - each join removes corresponding split token addition, so 'start/3_4/7_4'
-      becames 'start/3_4'
+      becomes 'start/3_4'
     """
     def __init__(self, token):
         self.token = token
@@ -23,7 +23,7 @@ class Token(object):
 
     def get_base_split_token(self):
         """
-        Returns token befere split happens
+        Returns token before split happens
         """
         return Token(self.token.rsplit('/', 1)[0])
 

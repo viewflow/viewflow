@@ -17,9 +17,9 @@ def flow_start_view():
     """
     Decorator for start views, creates and initializes start activation
 
-    Expects view with signature
+    Expects view with the signature
              :: (request, activation, **kwargs)
-      or CBV view that implemnts ViewActivation, in this case, dispatch
+      or CBV view that implements ViewActivation, in this case, dispatch
       with would be called with
              :: (request, **kwargs)
 
@@ -45,8 +45,8 @@ def flow_start_view():
 
         def __get__(self, instance, instancetype):
             """
-            If we decoration method on CBV that have StartActivation interface,
-            no custom activation required
+            If we decorate method on CBV that implements StartActivation interface,
+            no custom activation is required.
             """
             if instance is None:
                 return self
@@ -91,7 +91,7 @@ class StartViewActivation(StartActivation):
 
 class StartViewMixin(object):
     """
-    Mixin for start views, that not implements activation interface
+    Mixin for start views, that do not implement activation interface
     """
     def get_context_data(self, **kwargs):
         """
@@ -110,7 +110,7 @@ class StartViewMixin(object):
     def get_template_names(self):
         """
         Get template names, first `app_name/flow/start.html` would be checked,
-        and if missed, standard `viewflow/flow/start.html` would be used
+        and if it is missing, standard `viewflow/flow/start.html` will be used
         """
         return ('{}/flow/start.html'.format(self.activation.flow_cls._meta.app_label),
                 'viewflow/flow/start.html')
@@ -164,7 +164,7 @@ class StartView(StartViewActivation, UpdateView):
     def get_template_names(self):
         """
         Get template names, first `app_name/flow/start.html` would be checked,
-        and if missed, standard `viewflow/flow/start.html` would be used
+        and if it is missing, standard `viewflow/flow/start.html` will be used
         """
         return ('{}/flow/start.html'.format(self.flow_cls._meta.app_label),
                 'viewflow/flow/start.html')
