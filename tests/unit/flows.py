@@ -10,6 +10,8 @@ def perform_task(request, activation):
 
 
 class SingleTaskFlow(Flow):
+    lock_impl = lock.cache_lock
+
     start = flow.Start() \
         .Activate('task')
     task = flow.View(perform_task)\
@@ -28,4 +30,28 @@ class AllTaskFlow(Flow):
     split = flow.Split().Always(this.join)
     join = flow.Join().Next(this.first)
     first = flow.First().Of(this.end)
+    end = flow.End()
+
+
+class FailedJobFlow(Flow):
+    """
+    Test that failed job gate stored task in error state
+    """
+    lock_impl = lock.cache_lock
+
+    start = flow.Start().Activate(this.job)
+    job = flow.Job(dummy_job).Next(this.iff)
+    iff = flow.If(lambda p: 2/(1-1)).OnTrue(this.end).OnFalse(this.end)
+    end = flow.End()
+
+
+class FailedGateFlow(Flow):
+    """
+    Test that failed If gate not reflects on finished job
+    """
+    lock_impl = lock.cache_lock
+
+    start = flow.Start().Activate(this.job)
+    job = flow.Job(dummy_job).Next(this.iff)
+    iff = flow.If(lambda p: 2/0).OnTrue(this.end).OnFalse(this.end)
     end = flow.End()

@@ -11,7 +11,7 @@ _context_stack = threading.local()
 
 class Context(object):
     """
-    Activation context, dynamically scoped
+    Thread-local activation context, dynamically scoped
 
     :keyword propagate_exception: If True on activation fails exception would be propagated to previous activalion,
     if False, current task activation would be marked as failed
@@ -19,7 +19,8 @@ class Context(object):
     Usage ::
 
         with Context(propagate_exception=False):
-             print(context.propagate_exception)
+             print(context.propagate_exception)  # prints 'False'
+        print(context.propagate_exception)  # prints default 'True'
     """
     def __init__(self, **kwargs):
         self.current_context_data = kwargs
@@ -373,8 +374,8 @@ class GateActivation(Activation):
             try:
                 with transaction.atomic(savepoint=True):
                     activation.execute()
-            except:
-                activation.error()
+            except Exception as exc:
+                activation.error(exc)
 
         return activation
 
