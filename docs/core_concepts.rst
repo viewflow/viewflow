@@ -16,8 +16,8 @@ Each flow should be subclass of :class:`viewflow.base.Flow`.
 Each flow could contains several flow tasks. Flow task represents declaration
 of what should be performed on this step, and what next steps should be activated.
 
-Flow have no specific declaration of task transitions, and all logic of task activation
-belongs to tsk itself. This makes Flow code close to well-known BPMN notation, and
+Flow does not have specific declaration of task transitions, and all logic of task activation
+belongs to the task itself. This makes Flow code close to well-known BPMN notation, and
 helps to convert it to BPMN and vise versa.
 
 Flow class should have at least one of :class:`viewflow.flow.Start` task and at least one of
@@ -26,7 +26,7 @@ Flow class should have at least one of :class:`viewflow.flow.Start` task and at 
 .. autoclass:: viewflow.flow.Node
    :members: activate
 
-See :doc:`Flow Tasks <flow_tasks>` documentation for list of available tasks
+See :doc:`Flow Tasks <flow_tasks>` documentation for list of all available tasks.
 
 Activation
 ==========
@@ -36,8 +36,8 @@ Activation
 
 Models
 ======
-django-viewflow provides base model for tracking process state. In most cases you should
-subclass :class:`viewflow.models.Process` to add additinal data fields.
+django-viewflow provides base model for tracking the process state. In most cases you should
+subclass :class:`viewflow.models.Process` to add additional data fields.
 
 In case if you need to track some execution info or add logging, you can do it by
 extending :class:`viewflow.models.Task`
@@ -65,8 +65,8 @@ Views
 
 Urls
 ====
-:class:`viewflow.base.Flow` collects all urls required by View tasks, just
-include it in urlpatters ::
+:class:`viewflow.base.Flow` collects all urls required by View tasks, you just
+have to include it in urlpatters ::
 
   urlpatterns = patterns('',
         url(r'^myflow/', include(MyFlow.instance.urls)))
