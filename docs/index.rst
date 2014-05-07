@@ -117,13 +117,12 @@ License
 `The GNU General Public License v3.0 <https://www.gnu.org/copyleft/gpl.html>`_
 
 
-Contents:
+Contents
 =========
 
 .. toctree::
-   :maxdepth: 2
-
    core_concepts
    flow_tasks
    locking
    examples
+   :maxdepth: 2

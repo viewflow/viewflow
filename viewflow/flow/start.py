@@ -17,14 +17,11 @@ def flow_start_view():
     """
     Decorator for start views, creates and initializes start activation
 
-    Expects view with the signature
-             :: (request, activation, **kwargs)
-      or CBV view that implements ViewActivation, in this case, dispatch
-      with would be called with
-             :: (request, **kwargs)
+    Expects view with the signature `(request, activation, **kwargs)`
+    or CBV view that implements ViewActivation, in this case, dispatch
+    with would be called with `(request, **kwargs)`
 
-    Returns
-             :: (request, flow_task, **kwargs)
+    Returns `(request, flow_task, **kwargs)`
     """
     class StartViewDecorator(object):
         def __init__(self, func, activation=None):

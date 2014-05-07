@@ -53,13 +53,13 @@ Views
 =====
 .. autofunction:: viewflow.flow.start.flow_start_view
 .. autoclass:: viewflow.flow.start.StartViewMixin
-    :members: get_context_data, get_object, get_template_names, get_success_url, form_valid, dispatch
+    :members: get_context_data, get_template_names, get_success_url, form_valid, dispatch
 .. autoclass:: viewflow.flow.start.StartView
     :members: get_context_data, get_object, get_template_names, get_success_url, form_valid, dispatch
 
 .. autofunction:: viewflow.flow.view.flow_view
 .. autoclass:: viewflow.flow.view.TaskViewMixin
-    :members: get_context_data, get_object, get_template_names, get_success_url, form_valid, dispatch
+    :members: get_context_data, get_template_names, get_success_url, form_valid, dispatch
 .. autoclass:: viewflow.flow.view.ProcessView
     :members: get_context_data, get_object, get_template_names, get_success_url, form_valid, dispatch
 
