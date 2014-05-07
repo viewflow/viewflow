@@ -1,5 +1,5 @@
 """
-Prevents unconsistent db updates for flow
+Prevents unconsistent db updates for flow.
 """
 import time
 import random
@@ -13,6 +13,9 @@ from viewflow.exceptions import FlowLockFailed
 
 
 def no_lock():
+    """
+    By default Flow have no lockig
+    """
     @contextmanager
     def lock(flow_task, process_pk):
         warnings.warn('No locking on flow', RuntimeWarning)
@@ -21,6 +24,12 @@ def no_lock():
 
 
 def select_for_update_lock(nowait=True, attempts=5):
+    """
+    Uses `select ... for update` on process instance row for locking,
+    bound to database transaction.
+
+    Recomended for use with PostgreSQL
+    """
     @contextmanager
     def lock(flow_task, process_pk):
         assert transaction.get_autocommit() or transaction.commit.__module__ == 'django.test.testcases'
@@ -47,7 +56,8 @@ def select_for_update_lock(nowait=True, attempts=5):
 
 def cache_lock(attempts=5, expires=120):
     """
-    Use it if primary cache backend have transactional add functionality
+    Use it if primary cache backend have transactional `add` functionality,
+    like memcached
     """
     @contextmanager
     def lock(flow_task, process_pk):

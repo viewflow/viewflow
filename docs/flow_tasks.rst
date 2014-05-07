@@ -12,9 +12,13 @@ View
 ====
 .. autoclass:: viewflow.flow.View
 
+.. autofunction:: viewflow.flow.flow_view
+
 Job
 ===
 .. autoclass:: viewflow.flow.Job
+
+.. autofunction:: viewflow.flow.flow_job
 
 
 If

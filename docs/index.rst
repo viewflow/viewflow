@@ -67,11 +67,15 @@ To make the above code work just put the following flow definition in `flows.py`
 
 .. code-block:: python
 
-    from viewflow import flow
+    from viewflow import flow, lock
     from viewflow.base import this, Flow
     from viewflow.views import ProcessView
+    from .models import HelloWorldProcess
 
     class HelloWorldFlow(Flow):
+        process_cls = HelloWorldProcess
+        lock_impl = lock.select_for_update_lock
+
         start = flow.Start(StartView, fields=["text"]) \
            .Permission('helloworld.can_start_request') \
            .Activate(this.hello_world)
@@ -121,4 +125,5 @@ Contents:
 
    core_concepts
    flow_tasks
+   locking
    examples

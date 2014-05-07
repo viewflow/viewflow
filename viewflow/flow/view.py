@@ -17,14 +17,11 @@ def flow_view(**lock_args):
     """
     Decorator that locks and runs the flow view in transaction.
 
-    Expects view with the signature
-             :: (request, activation, **kwargs)
-      or CBV view that implements ViewActivation, in this case, dispatch
-      with would be called with
-             :: (request, **kwargs)
+    Expects view with the signature `(request, activation, **kwargs)`
+    or CBV view that implements ViewActivation, in this case, dispatch
+    with would be called with `(request, **kwargs)`
 
-    Returns
-             :: (request, flow_task, process_pk, task_pk, **kwargs)
+    Returns `(request, flow_task, process_pk, task_pk, **kwargs)`
     """
     class flow_view_decorator(object):
         def __init__(self, func, activation=None):
