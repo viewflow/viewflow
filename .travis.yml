@@ -2,9 +2,6 @@ language: python
 python:
   - 3.3
 install:
-  - pip install -q -r requirements.txt --use-mirrors
-  - pip install -q django-celery --use-mirrors
-  - pip install -q coveralls --use-mirrors
-script: coverage run tests/manage.py
-after_success:
-  - coveralls --verbose
+  - pip install tox
+script: 
+  - tox -e travis
