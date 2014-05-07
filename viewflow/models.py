@@ -48,6 +48,11 @@ class Process(models.Model):
     def active_tasks(self):
         return Task.objects.filter(process=self, finished__isnull=True).order_by('created')
 
+    def __str__(self):
+        if self.flow_cls:
+            return "<{}/{}> - {}".format(self.flow_cls._meta.namespace, self.pk, self.get_status_display())
+        return "<Process {}> - {}".format(self.pk, self.get_status_display())
+
 
 class Task(models.Model):
     """

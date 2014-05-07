@@ -54,5 +54,14 @@
         ],
         "username": "helloworld/manager"
     }
+},
+{
+    "model": "auth.user",
+    "fields": {
+        "username": "admin",
+        "password": "pbkdf2_sha256$12000$CYAovBmkVawu$Et39d4GYYDlglcLTXLVvyQqe3QZhOUm8yW4Fuaoza4g=",
+        "is_superuser": true,
+        "is_staff": true
+    }
 }
 ]

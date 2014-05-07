@@ -22,17 +22,24 @@ class Context(object):
              print(context.propagate_exception)  # prints 'False'
         print(context.propagate_exception)  # prints default 'True'
     """
-    def __init__(self, **kwargs):
+    def __init__(self, default=None, **kwargs):
+        self.default = default
         self.current_context_data = kwargs
 
     def __getattr__(self, name):
-        if not hasattr(_context_stack, 'data'):
-            raise AttributeError
+        stack = []
 
-        for scope in reversed(_context_stack.data):
+        if hasattr(_context_stack, 'data'):
+            stack = _context_stack.data
+
+        for scope in reversed(stack):
             if name in scope:
                 return scope[name]
-        raise AttributeError
+
+        if name in self.default:
+            return self.default[name]
+
+        raise AttributeError(name)
 
     def __enter__(self):
         if not hasattr(_context_stack, 'data'):
@@ -44,10 +51,7 @@ class Context(object):
 
     @staticmethod
     def create(**kwargs):
-        if not hasattr(_context_stack, 'data'):
-            _context_stack.data = []
-        _context_stack.data.append(kwargs)
-        return Context()
+        return Context(default=kwargs)
 
 
 context = Context.create(propagate_exception=True)
