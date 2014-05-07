@@ -47,7 +47,7 @@ def select_for_update_lock(nowait=True, attempts=5):
 
 def cache_lock(attempts=5, expires=120):
     """
-    Use it if primary cache backend have transactional add functionallity
+    Use it if primary cache backend have transactional add functionality
     """
     @contextmanager
     def lock(flow_task, process_pk):

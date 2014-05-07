@@ -15,11 +15,11 @@ from viewflow.flow.base import Task, Edge
 
 def flow_view(**lock_args):
     """
-    Decorator that locks and runs the flow view in transaction
+    Decorator that locks and runs the flow view in transaction.
 
-    Expects view with signature
+    Expects view with the signature
              :: (request, activation, **kwargs)
-      or CBV view that implemnts ViewActivation, in this case, dispatch
+      or CBV view that implements ViewActivation, in this case, dispatch
       with would be called with
              :: (request, **kwargs)
 
@@ -45,7 +45,7 @@ def flow_view(**lock_args):
                     return self.func(request, **kwargs)
                 else:
                     """
-                    Function based view or CBV without ViewActvation interface implemented
+                    Function based view or CBV without ViewActvation interface implementation
                     """
                     activation = flow_task.activation_cls()
                     activation.initialize(flow_task, task)
@@ -53,8 +53,8 @@ def flow_view(**lock_args):
 
         def __get__(self, instance, instancetype):
             """
-            If we decoration method on CBV that have StartActivation interface,
-            no custom activation required
+            If we decorate method on CBV that implements StartActivation interface,
+            no custom activation is required.
             """
             if instance is None:
                 return self
@@ -99,7 +99,7 @@ class TaskViewActivation(ViewActivation):
 
 class TaskViewMixin(object):
     """
-    Mixin for task views, that not implements activation interface
+    Mixin for task views, that do not implement activation interface
     """
     def get_context_data(self, **kwargs):
         context = super(TaskViewMixin, self).get_context_data(**kwargs)

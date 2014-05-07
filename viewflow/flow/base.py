@@ -1,11 +1,11 @@
 """
-Base definitions for flow task delcaration
+Base definitions for flow task declaration
 """
 
 
 class This(object):
     """
-    Helper for building forward referencied flow task
+    Helper for building forward referenced flow task
     """
     def __getattr__(self, name):
         return name

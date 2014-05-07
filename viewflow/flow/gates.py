@@ -282,7 +282,7 @@ class Split(Gateway):
 
 class First(Gateway):
     """
-    TODO: Wait for first of outgoing task to be completed and cancells all others
+    TODO: Wait for first of outgoing task to be completed and cancels all others
     """
     task_type = 'FIRST_OF'
 
