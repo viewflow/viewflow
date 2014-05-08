@@ -14,7 +14,7 @@ from viewflow.exceptions import FlowLockFailed
 
 def no_lock():
     """
-    By default Flow have no lockig
+    By default Flow has no locking.
     """
     @contextmanager
     def lock(flow_task, process_pk):
@@ -28,7 +28,7 @@ def select_for_update_lock(nowait=True, attempts=5):
     Uses `select ... for update` on process instance row for locking,
     bound to database transaction.
 
-    Recomended for use with PostgreSQL
+    Recommended for use with PostgreSQL.
     """
     @contextmanager
     def lock(flow_task, process_pk):
@@ -56,8 +56,8 @@ def select_for_update_lock(nowait=True, attempts=5):
 
 def cache_lock(attempts=5, expires=120):
     """
-    Use it if primary cache backend have transactional `add` functionality,
-    like memcached
+    Use it if primary cache backend has transactional `add` functionality,
+    like `memcached`.
     """
     @contextmanager
     def lock(flow_task, process_pk):
