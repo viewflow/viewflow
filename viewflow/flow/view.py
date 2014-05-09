@@ -199,8 +199,8 @@ class View(Task):
                   return redirect('/')
              return render(request, {'activation': activation, 'form': form})
 
-    Ensure to include `{{ activation.management_form }}` insude template, to proper
-    track when task was started and other task perfomance statictics::
+    Ensure to include `{{ activation.management_form }}` inside template, to proper
+    track when task was started and other task performance statistics::
 
              <form method="POST">
                   {{ form }}

@@ -196,7 +196,7 @@ class JoinActivation(Activation):
 
 class Join(Gateway):
     """
-    Wait for one or all incoming links and activate next path
+    Waits for one or all incoming links and activates next path.
 
     Join should be connected to one split task only
 
@@ -247,7 +247,7 @@ class SplitActivation(GateActivation):
 
 class Split(Gateway):
     """
-    Activate outgoing path in-parallel depends on per-path condition
+    Activates outgoing path in-parallel depends on per-path condition.
 
     Example::
 

@@ -11,14 +11,14 @@ def flow_job(**lock_args):
     """
     Decorator that prepares celery task for execution
 
-    Makes celery job function with following signature
+    Makes celery job function with the following signature
     `(flow_task-strref, process_pk, task_pk, **kwargs)`
 
-    Expects actual celery job function have following signature `(activation, **kwargs)`
-    If celery task class implements activation interface, job function
+    Expects actual celery job function which has the following signature `(activation, **kwargs)`
+    If celery task class implements activation interface, job function is
     called without activation instance `(**kwargs)`
 
-    Process instance is locked only before and after function execution.
+    Process instance is locked only before and after the function execution.
     Please avoid any process state modification during the celery job.
     """
     class flow_task_decorator(object):

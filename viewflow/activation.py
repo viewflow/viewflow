@@ -272,7 +272,7 @@ class JobActivation(TaskActivation):
 
     def activate_next(self):
         """
-        If Job successfully completed, nonext task acivation failure can't drop this
+        If Job is successfully completed, next task activation failure can't drop this
         """
         with Context(propagate_exception=False):
             super(JobActivation, self).activate_next()
@@ -366,8 +366,8 @@ class GateActivation(Activation):
 
         if context.propagate_exception:
             """
-            Any execution execption would be propagated back,
-            assume that rolback will happens and no task activation would be stored
+            Any execution exception would be propagated back,
+            assume that rollback will happens and no task activation would be stored
             """
             activation.execute()
             activation.done()

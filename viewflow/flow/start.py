@@ -19,7 +19,7 @@ def flow_start_view():
 
     Expects view with the signature `(request, activation, **kwargs)`
     or CBV view that implements ViewActivation, in this case, dispatch
-    with would be called with `(request, **kwargs)`
+    would be called with `(request, **kwargs)`
 
     Returns `(request, flow_task, **kwargs)`
     """
@@ -217,8 +217,8 @@ class Start(Event):
                   return redirect('/')
              return render(request, {'activation': activation, 'form': form})
 
-    Ensure to include `{{ activation.management_form }}` insude template, to proper
-    track when task was started and other task perfomance statictics::
+    Ensure to include `{{ activation.management_form }}` inside template, to proper
+    track when task was started and other task performance statistics::
 
              <form method="POST">
                   {{ form }}
@@ -275,8 +275,8 @@ class Start(Event):
 
     def Permission(self, permission, assign_view=None):
         """
-        Make process start available for users with specific permission
-        acceps permissions name or callable predicate :: User -> bool
+        Make process start available for users with specific permission.
+        Accepts permissions name or callable predicate :: User -> bool
 
         .Permission('my_app.can_approve')
         .Permission(lambda user: user.department_id is not None)

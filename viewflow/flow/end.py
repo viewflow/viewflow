@@ -8,7 +8,7 @@ from viewflow.activation import EndActivation
 
 class End(Event):
     """
-    End process event
+    Ends process event.
     """
     task_type = 'END'
     activation_cls = EndActivation
