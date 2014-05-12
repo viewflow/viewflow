@@ -53,6 +53,9 @@ class Process(models.Model):
             return "<{}/{}> - {}".format(self.flow_cls._meta.namespace, self.pk, self.get_status_display())
         return "<Process {}> - {}".format(self.pk, self.get_status_display())
 
+    class Meta:
+        verbose_name_plural = 'Process list'
+
 
 class Task(models.Model):
     """
@@ -149,3 +152,12 @@ class Task(models.Model):
             self.flow_task_type = self.flow_task.task_type
 
         super(Task, self).save(*args, **kwargs)
+
+    def __str__(self):
+        if self.flow_task:
+            return "<{}.{}/{}> - {}".format(
+                self.flow_task.flow_cls._meta.namespace,
+                self.flow_task,
+                self.pk,
+                self.get_status_display())
+        return "<Task {}> - {}".format(self.pk, self.get_status_display())

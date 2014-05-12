@@ -4,11 +4,12 @@ from viewflow.views import ProcessView
 from viewflow.lock import select_for_update_lock
 
 from examples.shipment import views
-from examples.shipment.models import ShipmentProcess
+from examples.shipment.models import ShipmentProcess, ShipmentTask
 
 
 class ShipmentFlow(Flow):
     process_cls = ShipmentProcess
+    task_cls = ShipmentTask
     lock_impl = select_for_update_lock
 
     start = flow.Start(views.StartView) \

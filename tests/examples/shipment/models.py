@@ -1,6 +1,6 @@
 from django.db import models
 from django.conf import settings
-from viewflow.models import Process
+from viewflow.models import Process, Task
 
 
 class Carrier(models.Model):
@@ -19,6 +19,9 @@ class Carrier(models.Model):
 class Insurance(models.Model):
     company_name = models.CharField(max_length=50)
     cost = models.IntegerField()
+
+    def __str__(self):
+        return '{} ${}'.format(self.company_name, self.cost)
 
 
 class Shipment(models.Model):
@@ -40,7 +43,10 @@ class ShipmentProcess(Process):
 
     def is_normal_post(self):
         try:
-            return self.shipment.carrier.is_default()
+            if self.shipment.carrier:
+                return self.shipment.carrier.is_default()
+            else:
+                return None
         except (Shipment.DoesNotExist, Carrier.DoesNotExist):
             return None
 
@@ -51,9 +57,15 @@ class ShipmentProcess(Process):
             return None
 
     class Meta:
+        verbose_name_plural = 'Shipment process list'
         permissions = [
             ('can_start_request', 'Can start shipment request'),
             ('can_take_extra_insurance', 'Can take extra insurance'),
             ('can_package_goods', 'Can package goods'),
             ('can_move_package', 'Can move package')
         ]
+
+
+class ShipmentTask(Task):
+    class Meta:
+        proxy = True
