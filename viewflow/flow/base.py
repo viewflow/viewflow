@@ -78,6 +78,13 @@ class Node(object):
             return self.name.title().replace('_', ' ')
         return super(Node, self).__str__()
 
+    def ready(self):
+        """
+        Called when flow class setup finished
+
+        Subclasses could perform additional initialisation here
+        """
+
     def activate(self, prev_activation, token):
         """
         Creates task activation

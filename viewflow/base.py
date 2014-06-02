@@ -96,6 +96,10 @@ class FlowMetaClass(type):
             new_class.index_view = index
             new_class.index_view = staticmethod(new_class.index_view)
 
+        # done flow setup
+        for name, node in nodes.items():
+            node.ready()
+
         return new_class
 
 

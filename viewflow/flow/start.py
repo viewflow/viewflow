@@ -273,16 +273,20 @@ class Start(Event):
             self._owner = owner_kwargs
         return self
 
-    def Permission(self, permission, assign_view=None):
+    def Permission(self, permission, assign_view=None, auto_create=False, help_text=None):
         """
         Make process start available for users with specific permission.
         Accepts permissions name or callable predicate :: User -> bool
 
-        .Permission('my_app.can_approve')
+        .Permission('processmodel.can_approve')
         .Permission(lambda user: user.department_id is not None)
         """
         self._owner_permission = permission
         self._assign_view = assign_view
+
+        if auto_create:
+            pass
+
         return self
 
     @property
