@@ -19,6 +19,9 @@ class TaskInline(admin.TabularInline):
 
 @admin.register(Process)
 class ProcessAdmin(admin.ModelAdmin):
+    """
+    List all of viewflow process
+    """
     actions = None
     date_hierarchy = 'created'
     list_display = ['pk', 'created', 'flow_cls', 'get_status_display', 'participants']
@@ -35,6 +38,9 @@ class ProcessAdmin(admin.ModelAdmin):
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
+    """
+    List all of viewflow tasks
+    """
     actions = None
     date_hierarchy = 'created'
     list_display = ['pk', 'created', 'process', 'get_status_display',

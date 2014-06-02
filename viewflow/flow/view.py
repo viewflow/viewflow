@@ -242,10 +242,10 @@ class View(PermissionMixin, Task):
     def Assign(self, owner=None, **owner_kwargs):
         """
         Assign task to the User immediately on activation,
-        accepts user lookup kwargs or callable :: Process -> User
+        accepts user lookup kwargs or callable :: Process -> User::
 
-        .Assign(username='employee')
-        .Assign(lambda process: process.created_by)
+            .Assign(username='employee')
+            .Assign(lambda process: process.created_by)
         """
         if owner:
             self._owner = owner

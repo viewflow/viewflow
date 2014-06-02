@@ -259,10 +259,10 @@ class Start(PermissionMixin, Event):
     def Available(self, owner=None, **owner_kwargs):
         """
         Make process start action available for the User
-        accepts user lookup kwargs or callable predicate :: User -> bool
+        accepts user lookup kwargs or callable predicate :: User -> bool::
 
-        .Available(username='employee')
-        .Available(lambda user: user.is_super_user)
+            .Available(username='employee')
+            .Available(lambda user: user.is_super_user)
         """
         if owner:
             self._owner = owner

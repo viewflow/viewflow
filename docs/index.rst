@@ -16,6 +16,7 @@ Contents
    core_concepts
    flow_tasks
    locking
+   administration
    examples
    :maxdepth: 2
 

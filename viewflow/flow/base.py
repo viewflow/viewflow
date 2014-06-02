@@ -150,10 +150,19 @@ class PermissionMixin(object):
     def Permission(self, permission=None, assign_view=None, auto_create=False, help_text=None):
         """
         Make process start available for users with specific permission.
-        Accepts permissions name or callable predicate :: User -> bool
+        For existing permission accepts permissions name or callable predicate :: User -> bool::
 
-        .Permission('processmodel.can_approve')
-        .Permission(lambda user: user.department_id is not None)
+            .Permission('processmodel.can_approve')
+            .Permission(lambda user: user.department_id is not None)
+
+        Task specific permission could be auto created during migration::
+
+            # Creates `processcls_app.can_do_task_processcls` permission
+            do_task = View().Permission(auto_create=True)
+
+            # You can specify permission codename and description right here
+            # The following creates `processcls_app.can_execure_task` permission
+            do_task = View().Permission('can_execute_task', help_text='Custom text', auto_create=True)
         """
         if permission is None and not auto_create:
             raise ValueError('Please specify existion permission name or mark as auto_create=True')

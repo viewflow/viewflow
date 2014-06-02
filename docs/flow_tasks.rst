@@ -6,6 +6,7 @@ Flow tasks
 Start
 =====
 .. autoclass:: viewflow.flow.Start
+   :members: Permission, Available
 
 
 View
@@ -13,6 +14,7 @@ View
 View task represents user task performed by interaction with django view.
 
 .. autoclass:: viewflow.flow.View
+   :members: Permission, Assign
 
 .. autofunction:: viewflow.flow.flow_view
 
