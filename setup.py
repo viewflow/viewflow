@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-from distutils.core import setup
+from setuptools import setup
 
 
 setup(
     name='django-viewflow',
-    version='0.1.0',
+    version='0.2.0',
     author='Mikhail Podgurskiy',
     author_email='kmmbvnr@gmail.com',
-    description='Task based reusable workflow library for django',
-    license='GPLv3',
+    description='Activity based reusable workflow library for django',
+    license='AGPLv3',
     platforms=['Any'],
     keywords=['workflow', 'django'],
     url='http://github.com/kmmbvnr/django-viewflow',
@@ -22,7 +22,12 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    requires=['Django (>=1.7b1)', 'celery (>=3.1)'],
-    packages=['viewflow', 'viewflow.flow', 'viewflow.templatetags'],
+    install_requires=['Django>=1.6',
+                      'celery>=3.1',
+                      'singledispatch>=3.4',
+                      'django-fsm>=2.0',
+                      'webtest>=2.0',
+                      'django-webtest>=1.7'],
+    packages=['viewflow', 'viewflow.flow', 'viewflow.management', 'viewflow.templatetags'],
     package_data={'viewflow': ['templates/viewflow/*.html', 'templates/viewflow/flow/*.html']},
 )
