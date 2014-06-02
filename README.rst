@@ -129,13 +129,13 @@ More examples are available in the `tests/examples` directory.
 
 License
 =======
-`The GNU General Public License v3.0 <https://www.gnu.org/copyleft/gpl.html>`_
+`The GNU Affero General Public License v3.0 <https://www.gnu.org/copyleft/gpl.html>`_
 
 Change log
 ==========
 
-0.2.0
------
+0.2.0 2014-06-02
+----------------
 
 * Back reference for task owner for next tasks assignment
 * Auto create for task permissions support

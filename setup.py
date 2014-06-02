@@ -9,9 +9,10 @@ setup(
     author='Mikhail Podgurskiy',
     author_email='kmmbvnr@gmail.com',
     description='Activity based reusable workflow library for django',
+    long_description=open('README.rst').read(),
     license='AGPLv3',
     platforms=['Any'],
-    keywords=['workflow', 'django'],
+    keywords=['workflow', 'django', 'bpm'],
     url='http://github.com/kmmbvnr/django-viewflow',
     classifiers=[
         'Development Status :: 3 - Alpha',
