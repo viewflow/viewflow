@@ -1,27 +1,7 @@
 ===============
-django-viewflow
+Introduction
 ===============
 
-Ad-hoc business process automation framework for Django.
-
-.. image:: https://travis-ci.org/kmmbvnr/django-viewflow.svg
-   :target: https://travis-ci.org/kmmbvnr/django-viewflow
-
-.. image:: https://requires.io/github/kmmbvnr/django-viewflow/requirements.png?branch=master
-   :target: https://requires.io/github/kmmbvnr/django-viewflow/requirements/?branch=master
-
-.. image:: https://coveralls.io/repos/kmmbvnr/django-viewflow/badge.png?branch=master
-   :target: https://coveralls.io/r/kmmbvnr/django-viewflow?branch=master
-
-The process logic defined with django-viewflow is concentrated in one clearly defined `flow`.
-You can organize your views, background jobs, user permission checking in a simple, intuitive django-friendly way.
-
-.. image:: tests/examples/shipment/doc/ShipmentProcess.png
-   :width: 400px
-
-django-viewflow allows to implement such process, just in about hundred lines of code, and you would still have pure django views for that.
-
-Full documentation is available at http://kmmbvnr.github.io/django-viewflow/
 
 Installation
 ============
@@ -125,26 +105,3 @@ Next, you can see how to define custom views, and meet other concepts of django-
 http://kmmbvnr.github.io/django-viewflow/
 
 More examples are available in the `tests/examples` directory.
-
-
-License
-=======
-`The GNU General Public License v3.0 <https://www.gnu.org/copyleft/gpl.html>`_
-
-Change log
-==========
-
-0.2.0
------
-
-* Back reference for task owner for next tasks assignment
-* Auto create for task permissions support
-* Basic django admin interace
-* Exception handling during flow task activation and for broken celery jobs
-
-
-0.1.0  2014-05-01
------------------
-
-* Initial public prototype
-* Basic set of tasks support (View, Job, If/Switch, Split/Join)

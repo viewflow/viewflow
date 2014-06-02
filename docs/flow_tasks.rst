@@ -10,15 +10,27 @@ Start
 
 View
 ====
+View task represents user task performed by interaction with django view.
+
 .. autoclass:: viewflow.flow.View
 
 .. autofunction:: viewflow.flow.flow_view
 
+Views decorated with `flow_view` decorator executed in transaction. If an error happens in view or
+during nexttask activation, database rollback will be performed and no changes will be stored.
+
 Job
 ===
+Job task represents user task performed in background by celery
+
 .. autoclass:: viewflow.flow.Job
 
 .. autofunction:: viewflow.flow.flow_job
+
+If any error will happens during job execution task would be moved to `error` state, and available
+for administrator desision in admin interface. If error will happens on next task ativation, for
+example, error raised on `If` conditions, job task will be commited and marked as done, but the
+failed for activation task would be created in `error` state.
 
 
 If
