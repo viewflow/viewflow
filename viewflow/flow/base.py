@@ -3,12 +3,36 @@ Base definitions for flow task declaration
 """
 
 
+class ThisObject(object):
+    """
+    Helper for forward referencies on flow tasks
+    """
+    def __init__(self, name):
+        self.name = name
+
+    @property
+    def owner(self):
+        """
+        Returns same process finished task owner
+        """
+        def get_task_owner(process):
+            flow_cls = process.flow_cls
+
+            task_node = flow_cls._meta.node(self.name)
+            task = flow_cls.task_cls.objects.get(
+                process=process,
+                flow_task=task_node,
+                status=flow_cls.task_cls.STATUS.FINISHED)
+            return task.owner
+        return get_task_owner
+
+
 class This(object):
     """
     Helper for building forward referenced flow task
     """
     def __getattr__(self, name):
-        return name
+        return ThisObject(name)
 
 
 class Edge(object):

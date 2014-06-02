@@ -63,6 +63,6 @@ class ShipmentFlow(Flow):
 
     move_package = flow.View(ProcessView.as_view()) \
         .Next(this.end) \
-        .Permission('shipment.can_move_package')
+        .Assign(this.package_goods.owner)
 
     end = flow.End()
