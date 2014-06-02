@@ -10,7 +10,7 @@ from django.views.generic.edit import UpdateView
 
 from viewflow.activation import StartActivation
 from viewflow.exceptions import FlowRuntimeError
-from viewflow.flow.base import Event, Edge
+from viewflow.flow.base import Event, Edge, PermissionMixin
 
 
 def flow_start_view():
@@ -189,7 +189,7 @@ class StartView(StartViewActivation, UpdateView):
         return super(StartView, self).dispatch(request, *args, **kwargs)
 
 
-class Start(Event):
+class Start(PermissionMixin, Event):
     """
     Start process event
 
@@ -234,6 +234,7 @@ class Start(Event):
         Accepts view callable or CBV View class with view kwargs,
         if CBV view implements StartActivation, it used as activation_cls
         """
+        self._activate_next = []
         self._view, self._view_cls, self._view_args = None, None, None
 
         if isinstance(view_or_cls, type):
@@ -246,10 +247,6 @@ class Start(Event):
             self._view = view_or_cls
 
         super(Start, self).__init__(activation_cls=activation_cls)
-
-        self._activate_next = []
-        self._owner = None
-        self._owner_permission = None
 
     def _outgoing(self):
         for next_node in self._activate_next:
@@ -271,22 +268,6 @@ class Start(Event):
             self._owner = owner
         else:
             self._owner = owner_kwargs
-        return self
-
-    def Permission(self, permission, assign_view=None, auto_create=False, help_text=None):
-        """
-        Make process start available for users with specific permission.
-        Accepts permissions name or callable predicate :: User -> bool
-
-        .Permission('processmodel.can_approve')
-        .Permission(lambda user: user.department_id is not None)
-        """
-        self._owner_permission = permission
-        self._assign_view = assign_view
-
-        if auto_create:
-            pass
-
         return self
 
     @property

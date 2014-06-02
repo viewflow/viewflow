@@ -1,7 +1,8 @@
 from viewflow import flow, lock
 from viewflow.base import Flow, this
 
-from unit.tasks import dummy_job
+from .tasks import dummy_job
+from .models import TestProcess
 
 
 @flow.flow_view()
@@ -54,4 +55,14 @@ class FailedGateFlow(Flow):
     start = flow.Start().Activate(this.job)
     job = flow.Job(dummy_job).Next(this.iff)
     iff = flow.If(lambda p: 2/0).OnTrue(this.end).OnFalse(this.end)
+    end = flow.End()
+
+
+class AutoPermissionsFlow(Flow):
+    process_cls = TestProcess
+
+    start = flow.Start() \
+        .Permission(auto_create=True) \
+        .Activate(this.end)
+
     end = flow.End()

@@ -10,7 +10,7 @@ from django.shortcuts import get_object_or_404
 
 from viewflow.activation import ViewActivation
 from viewflow.exceptions import FlowRuntimeError
-from viewflow.flow.base import Task, Edge
+from viewflow.flow.base import Task, Edge, PermissionMixin
 
 
 def flow_view(**lock_args):
@@ -171,7 +171,7 @@ class ProcessView(TaskViewActivation, UpdateView):
         return super(ProcessView, self).dispatch(request, *args, **kwargs)
 
 
-class View(Task):
+class View(PermissionMixin, Task):
     """
     View task
 
@@ -217,6 +217,7 @@ class View(Task):
         if CBV view implements ViewActivation, it used as activation_cls
         """
         self.description = description or ""
+        self._activate_next = []
         self._view, self._view_cls, self._view_args = None, None, None
 
         if isinstance(view_or_cls, type):
@@ -229,11 +230,6 @@ class View(Task):
             self._view = view_or_cls
 
         super(View, self).__init__(activation_cls=activation_cls)
-
-        self._activate_next = []
-        self._owner = None
-        self._owner_permission = None
-        self._assign_view = None
 
     def _outgoing(self):
         for next_node in self._activate_next:
@@ -255,18 +251,6 @@ class View(Task):
             self._owner = owner
         else:
             self._owner = owner_kwargs
-        return self
-
-    def Permission(self, permission, assign_view=None):
-        """
-        Make task available for users with specific permission,
-        aceps permissions name of callable :: Process -> permission_name
-
-        .Permission('my_app.can_approve')
-        .Permission(lambda process: 'my_app.department_manager_{}'.format(process.depratment.pk))
-        """
-        self._owner_permission = permission
-        self._assign_view = assign_view
         return self
 
     @property
