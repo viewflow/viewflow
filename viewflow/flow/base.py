@@ -143,34 +143,16 @@ class PermissionMixin(object):
         self._owner_permission = None
         self._owner_permission_auto_create = False
         self._owner_permission_help_text = None
-        self._assign_view = None
 
         super(PermissionMixin, self).__init__(**kwargs)
 
-    def Permission(self, permission=None, assign_view=None, auto_create=False, help_text=None):
-        """
-        Make process start available for users with specific permission.
-        For existing permission accepts permissions name or callable predicate :: User -> bool::
-
-            .Permission('processmodel.can_approve')
-            .Permission(lambda user: user.department_id is not None)
-
-        Task specific permission could be auto created during migration::
-
-            # Creates `processcls_app.can_do_task_processcls` permission
-            do_task = View().Permission(auto_create=True)
-
-            # You can specify permission codename and description right here
-            # The following creates `processcls_app.can_execure_task` permission
-            do_task = View().Permission('can_execute_task', help_text='Custom text', auto_create=True)
-        """
+    def Permission(self, permission=None, auto_create=False, help_text=None):
         if permission is None and not auto_create:
             raise ValueError('Please specify existion permission name or mark as auto_create=True')
 
         self._owner_permission = permission
         self._owner_permission_auto_create = auto_create
         self._owner_permission_help_text = help_text
-        self._assign_view = assign_view
 
         return self
 
@@ -180,8 +162,11 @@ class PermissionMixin(object):
                 raise ValueError('Non qualified permission name expected')
 
             if not self._owner_permission:
-                self._owner_permission = 'can_{}_{}'.format(self.name, self.flow_cls.process_cls._meta.model_name)
-            if not self._owner_permission_help_text:
+                self._owner_permission = 'can_{}_{}'.format(
+                    self.name, self.flow_cls.process_cls._meta.model_name)
+                self._owner_permission_help_text = 'Can {}'.format(
+                    self.name.replace('_', ' '))
+            elif not self._owner_permission_help_text:
                 self._owner_permission_help_text = self._owner_permission.replace('_', ' ').capitalize()
 
             for codename, _ in self.flow_cls.process_cls._meta.permissions:
@@ -192,3 +177,5 @@ class PermissionMixin(object):
                     (self._owner_permission, self._owner_permission_help_text))
 
             self._owner_permission = '{}.{}'.format(self.flow_cls.process_cls._meta.app_label, self._owner_permission)
+
+        super(PermissionMixin, self).ready()

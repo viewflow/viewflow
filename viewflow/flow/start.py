@@ -256,6 +256,28 @@ class Start(PermissionMixin, Event):
         self._activate_next.append(node)
         return self
 
+    def Permission(self, permission=None, auto_create=False, help_text=None):
+        """
+        Make process start available for users with specific permission.
+        For existing permission accepts permissions name or callable predicate :: User -> bool::
+
+            .Permission('processmodel.can_approve')
+            .Permission(lambda user: user.department_id is not None)
+
+        Task specific permission could be auto created during migration::
+
+            # Creates `processcls_app.can_do_task_processcls` permission
+            do_task = Start().Permission(auto_create=True)
+
+            # You can specify permission codename and description right here
+            # The following creates `processcls_app.can_execure_task` permission
+            do_task = Start().Permission('can_execute_task', help_text='Custom text', auto_create=True)
+        """
+        return super(Start, self).Permission(
+            permission=permission,
+            auto_create=auto_create,
+            help_text=help_text)
+
     def Available(self, owner=None, **owner_kwargs):
         """
         Make process start action available for the User
