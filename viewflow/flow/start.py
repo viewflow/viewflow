@@ -100,7 +100,7 @@ class StartViewMixin(object):
         return context
 
     def get_success_url(self):
-        return shortcuts.get_next_task_url(self.activation.flow_cls, self.request.user)
+        return shortcuts.get_next_task_url(self.activation.process, self.request.user)
 
     def get_template_names(self):
         """
@@ -174,7 +174,7 @@ class StartView(StartViewActivation, UpdateView):
         """
         Redirects to flow index page
         """
-        return shortcuts.get_next_task_url(self.flow_cls, self.request.user)
+        return shortcuts.get_next_task_url(self.process, self.request.user)
 
     def activation_done(self, form):
         """
