@@ -100,7 +100,7 @@ class Task(models.Model):
         """
         return self.pk
 
-    @transition(field=status, source=STATUS.NEW, target=STATUS.ASSIGNED, conditions=[_in_db])
+    @transition(field=status, source=STATUS.NEW, target=STATUS.ASSIGNED)
     def assign(self, user=None, external_task_id=None):
         """
         Tasks that perform some activity should be associated with

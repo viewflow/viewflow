@@ -75,6 +75,9 @@ class StartViewActivation(StartActivation):
         else:
             return self.flow_cls.management_form_cls
 
+    def assign(self, user):
+        self.task.assign(user=user)
+
     def prepare(self, data=None):
         super(StartViewActivation, self).prepare()
 
@@ -130,6 +133,7 @@ class StartViewMixin(object):
         if not self.activation.flow_task.has_perm(request.user):
             raise PermissionDenied
 
+        self.activation.assign(user=request.user)
         self.activation.prepare(request.POST or None)
         return super(StartViewMixin, self).dispatch(request, **kwargs)
 
@@ -195,6 +199,7 @@ class StartView(StartViewActivation, UpdateView):
         if not self.flow_task.has_perm(request.user):
             raise PermissionDenied
 
+        self.assign(user=request.user)
         self.prepare(request.POST or None)
         return super(StartView, self).dispatch(request, *args, **kwargs)
 

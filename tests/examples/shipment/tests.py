@@ -3,6 +3,7 @@ import tempfile
 
 from django.test import TestCase
 from viewflow.graphviz import diagram
+from viewflow.models import Task
 from viewflow.test import FlowTest
 
 from examples.shipment.flows import ShipmentFlow
@@ -20,6 +21,9 @@ class ShipmentFlowDiagrammTests(TestCase):
 
 
 class ShipmentFlowTests(TestCase):
+    def task(self, process, flow_task):
+        return Task.objects.get(process=process, flow_task=flow_task)
+
     def setUp(self):
         self.default_carrier = Carrier.objects.get(name=Carrier.DEFAULT)
         self.special_carrier = Carrier.objects.exclude(name=Carrier.DEFAULT)[0]
@@ -29,7 +33,8 @@ class ShipmentFlowTests(TestCase):
             # Clerk start process
             flow.Task(ShipmentFlow.start).User('shipment/clerk') \
                 .Execute({'goods_tag': 'TST123'}) \
-                .Assert(lambda p: p.created is not None)
+                .Assert(lambda p: p.created is not None) \
+                .Assert(lambda p: self.task(p, ShipmentFlow.start).owner.username == 'shipment/clerk')
 
             # Clerk decides that is special shipment post
             flow.Task(ShipmentFlow.shipment_type).User('shipment/clerk') \
