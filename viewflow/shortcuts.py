@@ -1,4 +1,21 @@
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.core.urlresolvers import reverse
+
+
+def get_next_task_url(flow_cls, user, default='viewflow:index'):
+    """
+    Checks is there any active task that user owns, if so
+    redirects to it, else, return viewflow:index
+    """
+    user_tasks = flow_cls.task_cls._default_manager \
+        .filter(owner=user, status=flow_cls.task_cls.STATUS.ASSIGNED)
+
+    if user_tasks.exists():
+        return user_tasks.first().get_absolute_url()
+    elif '/' in default:
+        return default
+    else:
+        return reverse(default, current_app=flow_cls._meta.namespace)
 
 
 def get_page(request, query, page_attr='page', per_page=25):

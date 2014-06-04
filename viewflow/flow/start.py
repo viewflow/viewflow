@@ -4,13 +4,14 @@ Start flow task, instantiate new flow process
 import functools
 
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.db import transaction
 from django.views.generic.edit import UpdateView
 
 from viewflow.activation import StartActivation
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.flow.base import Event, Edge, PermissionMixin
+from viewflow import shortcuts
 
 
 def flow_start_view():
@@ -99,10 +100,7 @@ class StartViewMixin(object):
         return context
 
     def get_success_url(self):
-        """
-        Redirects to flow index page
-        """
-        return reverse('viewflow:index', current_app=self.activation.flow_cls._meta.namespace)
+        return shortcuts.get_next_task_url(self.activation.flow_cls, self.request.user)
 
     def get_template_names(self):
         """
@@ -112,10 +110,16 @@ class StartViewMixin(object):
         return ('{}/flow/start.html'.format(self.activation.flow_cls._meta.app_label),
                 'viewflow/flow/start.html')
 
-    def form_valid(self, form):
-        response = super(StartViewMixin, self).form_valid(form)
+    def activation_done(self, form):
+        """
+        Finish activation. Subclasses could override this
+        """
+        self.object = form.save()
         self.activation.done()
-        return response
+
+    def form_valid(self, form):
+        self.activation_done(form)
+        return HttpResponseRedirect(self.get_success_url())
 
     @flow_start_view()
     def dispatch(self, request, activation, **kwargs):
@@ -170,12 +174,18 @@ class StartView(StartViewActivation, UpdateView):
         """
         Redirects to flow index page
         """
-        return reverse('viewflow:index', current_app=self.flow_cls._meta.app_label)
+        return shortcuts.get_next_task_url(self.flow_cls, self.request.user)
+
+    def activation_done(self, form):
+        """
+        Finish activation. Subclasses could override this
+        """
+        self.object = form.save()
+        self.done()
 
     def form_valid(self, form):
-        response = super(StartView, self).form_valid(form)
-        self.done(process=self.object, user=self.request.user)
-        return response
+        self.activation_done(form)
+        return HttpResponseRedirect(self.get_success_url())
 
     @flow_start_view()
     def dispatch(self, request, *args, **kwargs):

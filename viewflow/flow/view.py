@@ -4,13 +4,14 @@ Task performed by user in django view
 import functools
 
 from django.core.exceptions import PermissionDenied
-from django.core.urlresolvers import reverse
-from django.views.generic.edit import UpdateView
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
+from django.views.generic.edit import UpdateView
 
 from viewflow.activation import ViewActivation
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.flow.base import Task, Edge, PermissionMixin
+from viewflow import shortcuts
 
 
 def flow_view(**lock_args):
@@ -104,7 +105,7 @@ class TaskViewMixin(object):
         return context
 
     def get_success_url(self):
-        return reverse('viewflow:index', current_app=self.activation.flow_cls._meta.namespace)
+        return shortcuts.get_next_task_url(self.activation.flow_cls, self.request.user)
 
     def get_template_names(self):
         flow_task = self.activation.flow_task
@@ -115,10 +116,16 @@ class TaskViewMixin(object):
             '{}/flow/task.html'.format(flow_cls._meta.app_label),
             'viewflow/flow/task.html')
 
-    def form_valid(self, form):
-        response = super(TaskViewMixin, self).form_valid(form)
+    def activation_done(self, form):
+        """
+        Finish activation. Subclasses could override this
+        """
+        self.object = form.save()
         self.activation.done()
-        return response
+
+    def form_valid(self, form):
+        self.activation_done(form)
+        return HttpResponseRedirect(self.get_success_url())
 
     @flow_view()
     def dispatch(self, request, activation, **kwargs):
@@ -155,12 +162,18 @@ class ProcessView(TaskViewActivation, UpdateView):
             'viewflow/flow/task.html')
 
     def get_success_url(self):
-        return reverse('viewflow:index', current_app=self.flow_cls._meta.namespace)
+        return shortcuts.get_next_task_url(self.flow_cls, self.request.user)
+
+    def activation_done(self, form):
+        """
+        Finish activation. Subclasses could override this
+        """
+        self.object = form.save()
+        self.done()
 
     def form_valid(self, form):
-        response = super(ProcessView, self).form_valid(form)
-        self.done()
-        return response
+        self.activation_done(form)
+        return HttpResponseRedirect(self.get_success_url())
 
     @flow_view()
     def dispatch(self, request, *args, **kwargs):
