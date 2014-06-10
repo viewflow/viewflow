@@ -113,17 +113,6 @@ class StartViewMixin(object):
         return ('{}/flow/start.html'.format(self.activation.flow_cls._meta.app_label),
                 'viewflow/flow/start.html')
 
-    def activation_done(self, form):
-        """
-        Finish activation. Subclasses could override this
-        """
-        self.object = form.save()
-        self.activation.done()
-
-    def form_valid(self, form):
-        self.activation_done(form)
-        return HttpResponseRedirect(self.get_success_url())
-
     @flow_start_view()
     def dispatch(self, request, activation, **kwargs):
         """
@@ -136,6 +125,56 @@ class StartViewMixin(object):
         self.activation.assign(user=request.user)
         self.activation.prepare(request.POST or None)
         return super(StartViewMixin, self).dispatch(request, **kwargs)
+
+
+class StartFormViewMixin(StartViewMixin):
+    """
+    Mixing for form based views
+    """
+    def activation_done(self, form):
+        """
+        Finish activation. Subclasses could override this
+        """
+        self.object = form.save()
+        self.activation.done()
+
+    def form_valid(self, form):
+        self.activation_done(form)
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class StartFormsetViewMixin(StartViewMixin):
+    """
+    Mixin for formset based views
+    """
+    def activation_done(self, formset):
+        """
+        Finish activation. Subclasses could override this
+        """
+        self.object_list = formset.save()
+        self.activation.done()
+
+    def formset_valid(self, formset):
+        self.activation_done(formset)
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class StartInlinesViewMixin(StartViewMixin):
+    """
+    Mixin for forms with inlines view
+    """
+    def activation_done(self, form, inlines):
+        """
+        Finish activation. Subclasses could override this
+        """
+        self.object = form.save()
+        for formset in inlines:
+            formset.save()
+        self.activation.done()
+
+    def forms_valid(self, form, inlines):
+        self.activation_done(form, inlines)
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class StartView(StartViewActivation, UpdateView):

@@ -116,6 +116,20 @@ class TaskViewMixin(object):
             '{}/flow/task.html'.format(flow_cls._meta.app_label),
             'viewflow/flow/task.html')
 
+    @flow_view()
+    def dispatch(self, request, activation, **kwargs):
+        self.activation = activation
+        if not self.activation.flow_task.has_perm(request.user, self.activation.task):
+            raise PermissionDenied
+
+        self.activation.prepare(request.POST or None)
+        return super(TaskViewMixin, self).dispatch(request, **kwargs)
+
+
+class TaskFormViewMixin(TaskViewMixin):
+    """
+    Mixing for form based views
+    """
     def activation_done(self, form):
         """
         Finish activation. Subclasses could override this
@@ -127,14 +141,39 @@ class TaskViewMixin(object):
         self.activation_done(form)
         return HttpResponseRedirect(self.get_success_url())
 
-    @flow_view()
-    def dispatch(self, request, activation, **kwargs):
-        self.activation = activation
-        if not self.activation.flow_task.has_perm(request.user, self.activation.task):
-            raise PermissionDenied
 
-        self.activation.prepare(request.POST or None)
-        return super(TaskViewMixin, self).dispatch(request, **kwargs)
+class TaskFormsetViewMixin(TaskViewMixin):
+    """
+    Mixin for formset based views
+    """
+    def activation_done(self, formset):
+        """
+        Finish activation. Subclasses could override this
+        """
+        self.object_list = formset.save()
+        self.activation.done()
+
+    def formset_valid(self, formset):
+        self.activation_done(formset)
+        return HttpResponseRedirect(self.get_success_url())
+
+
+class TaskInlinesViewMixin(TaskViewMixin):
+    """
+    Mixin for forms with inlines view
+    """
+    def activation_done(self, form, inlines):
+        """
+        Finish activation. Subclasses could override this
+        """
+        self.object = form.save()
+        for formset in inlines:
+            formset.save()
+        self.activation.done()
+
+    def forms_valid(self, form, inlines):
+        self.activation_done(form, inlines)
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class ProcessView(TaskViewActivation, UpdateView):

@@ -1,10 +1,10 @@
 from django.views.generic import CreateView, UpdateView
-from viewflow.flow.start import StartViewMixin
-from viewflow.flow.view import TaskViewMixin
+from viewflow.flow.start import StartFormViewMixin
+from viewflow.flow.view import TaskFormViewMixin
 from examples.shipment.models import Shipment, Insurance
 
 
-class StartView(StartViewMixin, CreateView):
+class StartView(StartFormViewMixin, CreateView):
     model = Shipment
     fields = ['goods_tag']
 
@@ -15,12 +15,12 @@ class StartView(StartViewMixin, CreateView):
         self.activation.done()
 
 
-class ShipmentView(TaskViewMixin, UpdateView):
+class ShipmentView(TaskFormViewMixin, UpdateView):
     def get_object(self):
         return self.activation.process.shipment
 
 
-class InsuranceView(TaskViewMixin, CreateView):
+class InsuranceView(TaskFormViewMixin, CreateView):
     model = Insurance
     fields = ['company_name', 'cost']
 
