@@ -1,12 +1,20 @@
-{% extends 'base.html' %}
+{% extends 'viewflow/base_site.html' %}
+{% load bootstrap3 %}
 
 {% block content %}
-<h1>Hello, world</h1>
-<p class="lead">Basic framework-less hello world sample</p>
-<form method="POST">
-{% csrf_token %}
-{{ form }}
-{{ activation.management_form }}
-<button type="submit" name="start" class="btn btn-default">Start</button>
+<form role="form" method="POST">
+    {% csrf_token %}
+    <div class="box box-primary">
+        <div class="box-header">
+            <h3 class="box-title">Start {{ activation.process.flow_cls }}</h3>
+        </div>
+        <div class="box-body">
+            {% bootstrap_form form %}
+            {{ activation.management_form }}
+        </div>
+        <div class="box box-footer">
+            <button type="submit" name="start" class="btn btn-primary">Start</button>
+        </div>
+    </div>
 </form>
 {% endblock %}

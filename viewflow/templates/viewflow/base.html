@@ -2,7 +2,7 @@
 <html>
     <head>
         <meta charset="UTF-8">
-        <title>Viewflow | Sales | Approval process</title>
+        <title>{% block title %}Viewflow{% endblock %}</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
         {% block css %}
         <link href="{% static 'viewflow/css/bootstrap.css' %}" rel="stylesheet" type="text/css" />
@@ -11,7 +11,7 @@
     </head>
     <body class="skin-blue">
         <header class="header">
-            <a href="index.html" class="logo">Viewflow</a>
+            <a href="index.html" class="logo">{% block branding %}Viewflow{% endblock %}</a>
             <nav class="navbar navbar-static-top" role="navigation">
                 <div class="navbar-right">
                     <ul class="nav navbar-nav">
@@ -21,157 +21,46 @@
             </nav>
         </header>
 
+        {% block leftside %}
         <aside class="left-side">
-            <section class="sidebar"> 
-                <ul class="sidebar-menu">                    
-                    <li>
-                        <a href="#"><span>Home</span></a>
-                    </li>
-                    <li class="treeview">
-                        <a href="#">Sales</a>
-                         <ul class="treeview-menu">
-                             <li class="active">
-                                 <a href="#"><span>Shipment</span></a>
-                             </li>
-                             <li>
-                                 <a href="#"><span>Approval process</span></a>
-                             </li>
-                         </ul>
-                    </li>
-                </ul>
-                </div>
+            <section class="sidebar">
+                {% block sidebar %}
+                {% endblock sidebar %}
             </section>
         </aside>
+        {% endblock leftside %}
 
+        {% block rightside %}
         <aside class="right-side">
-            
+
             <section class="content">
                 <div class="row">
-                <div class="col-xs-12">
-                    <ol class="breadcrumb">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">Sales</a></li>
-                        <li class="active">Approval process</li>
-                    </ol>
-                </div>
+                    <div class="col-xs-12">
+                        {% block breadcrumbs %}
+                        <ol class="breadcrumb">
+                            <li><a href="#">Home</a></li>
+                        </ol>
+                        {% endblock %}
+                    </div>
                 </div>
 
                 <div class="col-xs-12">
                     <div class="box box-solid">
                         <div class="box-body">
-                            <div class="row">
-                                <div class="col-md-2 col-sm-3">
-                                    <div class="box-header">
-                                        <h3 class="box-title">Approval process</h3>
-                                    </div>
-                                    <a class="btn btn-block btn-primary" data-toggle="modal" data-target="#compose-modal">Start new</a>
-
-                                    <div style="margin-top: 15px;">
-                                        <ul class="nav nav-pills nav-stacked">
-                                            <li class="header">Tasks</li>
-                                            <li class="active"><a href="#">Assigned (14)</a></li>
-                                            <li><a href="#">Unassigned</a></li>
-                                            <li class="header">Queues</li>
-                                            <li><a href="#"><i class="fa fa-star"></i> Starred</a></li>
-                                            <li><a href="#"><i class="fa fa-folder"></i> Junk</a></li>
-                                                </ul>
-                                            </div>
-                                        </div><!-- /.col (LEFT) -->
-                                        <div class="col-md-9 col-sm-8">
-                                            <div class="row pad">
-                                                <div class="col-sm-6">
-                                                    <label style="margin-right: 10px;">
-                                                    </label>
-                                                </div>
-                                            </div><!-- /.row -->
-
-                                            <div class="table-responsive">
-                                                <!-- THE MESSAGES -->
-                                                <table class="table table-mailbox">
-                                                    <tbody><tr class="unread">
-                                                        <td class="small-col"><i class="fa fa-star"></i></td>
-                                                        <td class="name"><a href="#">John Doe</a></td>
-                                                        <td class="subject"><a href="#">Urgent! Please read</a></td>
-                                                        <td class="time">12:30 PM</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="small-col"><i class="fa fa-star-o"></i></td>
-                                                        <td class="name"><a href="#">John Doe</a></td>
-                                                        <td class="subject"><a href="#">Urgent! Please read</a></td>
-                                                        <td class="time">12:30 PM</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="small-col"><i class="fa fa-star-o"></i></td>
-                                                        <td class="name"><a href="#">John Doe</a></td>
-                                                        <td class="subject"><a href="#">Urgent! Please read</a></td>
-                                                        <td class="time">12:30 PM</td>
-                                                    </tr>
-                                                    <tr class="unread">
-                                                        <td class="small-col"><i class="fa fa-star-o"></i></td>
-                                                        <td class="name"><a href="#">John Doe</a></td>
-                                                        <td class="subject"><a href="#">Urgent! Please read</a></td>
-                                                        <td class="time">12:30 PM</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="small-col"><i class="fa fa-star"></i></td>
-                                                        <td class="name"><a href="#">John Doe</a></td>
-                                                        <td class="subject"><a href="#">Urgent! Please read</a></td>
-                                                        <td class="time">12:30 PM</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="small-col"><i class="fa fa-star"></i></td>
-                                                        <td class="name"><a href="#">John Doe</a></td>
-                                                        <td class="subject"><a href="#">Urgent! Please read</a></td>
-                                                        <td class="time">12:30 PM</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="small-col"><i class="fa fa-star-o"></i></td>
-                                                        <td class="name"><a href="#">John Doe</a></td>
-                                                        <td class="subject"><a href="#">Urgent! Please read</a></td>
-                                                        <td class="time">12:30 PM</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="small-col"><i class="fa fa-star"></i></td>
-                                                        <td class="name"><a href="#">John Doe</a></td>
-                                                        <td class="subject"><a href="#">Urgent! Please read</a></td>
-                                                        <td class="time">12:30 PM</td>
-                                                    </tr>
-                                                    <tr class="unread">
-                                                        <td class="small-col"><i class="fa fa-star-o"></i></td>
-                                                        <td class="name"><a href="#">John Doe</a></td>
-                                                        <td class="subject"><a href="#">Urgent! Please read</a></td>
-                                                        <td class="time">12:30 PM</td>
-                                                    </tr>
-                                                    <tr class="unread">
-                                                        <td class="small-col"><i class="fa fa-star-o"></i></td>
-                                                        <td class="name"><a href="#">John Doe</a></td>
-                                                        <td class="subject"><a href="#">Urgent! Please read</a></td>
-                                                        <td class="time">12:30 PM</td>
-                                                    </tr>
-                                                    <tr>
-                                                        <td class="small-col"><i class="fa fa-star-o"></i></td>
-                                                        <td class="name"><a href="#">John Doe</a></td>
-                                                        <td class="subject"><a href="#">Urgent! Please read</a></td>
-                                                        <td class="time">12:30 PM</td>
-                                                    </tr>
-                                                </tbody></table>
-                                            </div><!-- /.table-responsive -->
-                                        </div><!-- /.col (RIGHT) -->
-                                    </div><!-- /.row -->
-                                </div><!-- /.box-body -->
-                            </div><!-- /.box -->
-                        </div><!-- /.col (MAIN) -->
+                            {% block content %}
+                            {% endblock content %}
+                        </div>
                     </div>
-                    <!-- MAILBOX END -->
-
-                </section><!-- /.content -->
-            </aside>
-
+                </div>
+            </section>
+        </aside>
+        {% endblock rightside %}
     </body>
 
     {% block js %}
     <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-    <script src="{% static 'viewflow/js/AdminLte.js' %}" type="text/javascript"></script>
     <script src="{% static 'viewflow/js/bootstrap.js' %}" type="text/javascript"></script>
+    <script src="{% static 'viewflow/js/iCheck/icheck.js' %}" type="text/javascript"></script>
+    <script src="{% static 'viewflow/js/AdminLte.js' %}" type="text/javascript"></script>
     {% endblock %}
 </html>

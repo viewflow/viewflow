@@ -1,10 +1,5 @@
-{% extends "admin/base.html" %}
-{% load i18n %}
+{% extends "viewflow/base.html" %}
 
-{% block title %}{{ title }} | {% trans 'Django site flows' %}{% endblock %}
+{% block title %}Viewflow | {{ activation.app_label|title }} | {{ activation.flow_cls }}{% endblock %}
+{% block branding %}Viewflow{% endblock %}
 
-{% block branding %}
-<h1 id="site-name">{% trans 'Flow management' %}</h1>
-{% endblock %}
-
-{% block nav-global %}{% endblock %}
