@@ -48,7 +48,6 @@ class ViewFormNode(Node):
     def render(self, context):
         template = self.template.resolve(context)
         if not callable(getattr(template, 'render', None)):
-            # If not, we'll try get_template
             template = get_template(template)
 
         context['_viewparts'] = defaultdict(dict)  # part_name -> part_id -> part_nodes
