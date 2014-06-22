@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.template.loader import get_template
 from django.template.base import Node, TemplateSyntaxError
 from django.utils.module_loading import import_by_path
+from viewflow.viewform import render_widget
 
 
 kwarg_re = re.compile(r"(\w+)=?(.+)")
@@ -81,6 +82,15 @@ class ViewPartNode(Node):
         return self.nodelist.render(context)
 
 
+class ViewFieldNode(Node):
+    def __init__(self, field):
+        self.field = field
+
+    def render(self, context):
+        field = self.field.resolve(context)
+        return render_widget(field.widget, field.name)
+
+
 @register.tag
 def flowurl(parser, token):
     """
@@ -139,10 +149,23 @@ def viewpart(parser, token):
     bits = token.split_contents()
     if len(bits) < 3:
         raise TemplateSyntaxError("'{}' takes at least one argument <part_name> <part_id>".format(bits[0]))
-
+ 
     part_name = parser.compile_filter(bits[1]).token
-    part_id = parser.compile_filter(bits[2])
+    part_id = parser.compile_filter(bits[2])  # TODO optional
     nodelist = parser.parse(('endviewpart',))
     parser.delete_first_token()
 
     return ViewPartNode(part_name, part_id, nodelist)
+
+
+@register.tag
+def viewfield(parser, token):
+    """
+    Render form field
+    """
+    bits = token.split_contents()
+    if len(bits) < 2:
+        raise TemplateSyntaxError("'{}' takes at least one argument <field>".format(bits[0]))
+ 
+    field = parser.compile_filter(bits[1])
+    return ViewFieldNode(field)

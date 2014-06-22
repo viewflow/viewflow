@@ -1,0 +1,16 @@
+{% load viewflow %}
+<form method="POST">
+{% for field in form %}
+    {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+    {% endfor %}
+    {% for field in form.visible_fields %}
+         {% viewpart field field.name %}
+             {% viewfield field %}
+         {% endviewpart %}
+    {% endfor %}
+{% endfor %}
+{% viewpart buttons %}
+<input type="submit" value="{{ submit_label|default'Submit' }}" />
+{% endviewpart %}
+</form>
