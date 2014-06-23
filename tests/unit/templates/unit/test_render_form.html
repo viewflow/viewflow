@@ -1,0 +1,10 @@
+{% load viewflow %}
+{% viewpart field 'username' %}
+AAA
+{% endviewpart %}
+
+{% for field in form.visible_fields %}
+     {% viewpart field field.name %}
+          {{ field.name }}
+     {% endviewpart %}
+{% endfor %}
