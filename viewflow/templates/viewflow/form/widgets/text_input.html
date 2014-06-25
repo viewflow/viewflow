@@ -1,10 +1,11 @@
-<div class="form-group">
-    {% include  'viewflow/form/field_errors.html' %}
+{% load viewflow %}
+<div class="{% viewpart field_group_class field.html_name %}form-group{% endviewpart %}">
     <label for="{{ field.id_for_label }}" class="control-label"> {{ field.label }} </label>
-    <input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" {% if field.value %}value="{{ field.value }}"{% endif %}>
+    <input type="{{ input.input_type }}" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" {% if field.value %}value="{{ field.value }}"{% endif %}>
+    {% viewpart field_icon field.html_name %}{% endviewpart %}
+    {% include  'viewflow/form/field_errors.html' %}
     {% if field.help_text %}
-    <p class="help-text">{{ field.help_text }}</p>
+    <span class="help-block">{{ field.help_text }}</span>
     {% endif %}
     {{ hidden_initial }}
 </div>
-<br/>

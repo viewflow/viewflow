@@ -54,7 +54,7 @@ class ViewFormNode(Node):
         context['_viewparts'] = defaultdict(dict)  # part_name -> part_id -> part_nodes
         for part in self.nodelist.get_nodes_by_type(ViewPartNode):
             value = part.render(context)
-            part_id = part.part_id.resolve(context)
+            part_id = part.resolve_part_id(context)
             context['_viewparts'][part.part_name][part_id] = value
 
         return template.render(context)
@@ -66,15 +66,20 @@ class ViewPartNode(Node):
         self.part_id = part_id
         self.nodelist = nodelist
 
+    def resolve_part_id(self, context):
+        if self.part_id is not None:
+            return self.part_id.resolve(context)
+        return '_default_'
+
     def render(self, context):
-        part_id = self.part_id.resolve(context)
+        part_id = self.resolve_part_id(context)
 
         if part_id in context['_viewparts'][self.part_name]:
             return context['_viewparts'][self.part_name][part_id]
 
         for part in self.nodelist.get_nodes_by_type(ViewPartNode):
             value = part.render(context)
-            part_id = part.part_id.resolve(context)
+            part_id = part.resolve_part_id(context)
 
             if part_id not in context['_viewparts'][part.part_name]:
                 context['_viewparts'][part.part_name][part_id] = value
@@ -88,7 +93,7 @@ class ViewFieldNode(Node):
 
     def render(self, context):
         bound_field = self.field.resolve(context)
-        return render_widget(bound_field.field.widget, bound_field)
+        return render_widget(bound_field.field.widget, context, bound_field)
 
 
 @register.tag
@@ -147,11 +152,14 @@ def viewpart(parser, token):
     Redefinable part of viewform template
     """
     bits = token.split_contents()
-    if len(bits) < 3:
-        raise TemplateSyntaxError("'{}' takes at least one argument <part_name> <part_id>".format(bits[0]))
- 
+    if len(bits) < 2:
+        raise TemplateSyntaxError("'{}' takes at least one argument <part_name> [part_id]".format(bits[0]))
+
     part_name = parser.compile_filter(bits[1]).token
-    part_id = parser.compile_filter(bits[2])  # TODO optional
+    part_id = None
+    if len(bits) >= 3:
+        part_id = parser.compile_filter(bits[2])
+
     nodelist = parser.parse(('endviewpart',))
     parser.delete_first_token()
 

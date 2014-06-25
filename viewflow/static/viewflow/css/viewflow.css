@@ -1,0 +1,12 @@
+/*
+Few bootstrap redifinitions
+*/
+
+.form-control {
+    border-radius: 0px !important;
+}
+
+.alert-formerror {
+    padding: 5px;
+    border-radius: 0px !important;
+}

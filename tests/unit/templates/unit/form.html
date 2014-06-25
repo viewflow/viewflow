@@ -1,4 +1,4 @@
-{% load viewflow %}
+{% load static %}{% load viewflow %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -8,6 +8,7 @@
     <title>Form Sample Template</title>
 
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{% static 'viewflow/css/viewflow.css' %}">
   </head>
   <body>
       <div class="container">
@@ -17,6 +18,8 @@
 
           <form method="POST">
               {% viewform 'unit/form_layout.html' %}
+                  {% viewpart field_group_class 'text_input' %}form-group has-error has-feedback{% endviewpart %}
+                  {% viewpart field_icon 'text_input' %}<span class="glyphicon glyphicon-remove form-control-feedback"></span>{% endviewpart %}
               {% endviewform %}
           </form>
 
