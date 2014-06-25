@@ -1,0 +1,66 @@
+{% load static %}<!doctype html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Viewflow{% endblock %}</title>
+        <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
+        {% block css %}
+        <link href="{% static 'viewflow/css/bootstrap.css' %}" rel="stylesheet" type="text/css" />
+        <link href="{% static 'viewflow/css/AdminLTE.css' %}" rel="stylesheet" type="text/css" />
+        {% endblock %}
+    </head>
+    <body class="skin-blue">
+        <header class="header">
+            <a href="index.html" class="logo">{% block branding %}Viewflow{% endblock %}</a>
+            <nav class="navbar navbar-static-top" role="navigation">
+                <div class="navbar-right">
+                    <ul class="nav navbar-nav">
+                        <li><a href="#">Log Out</a></li>
+                    </ul>
+                </div>
+            </nav>
+        </header>
+
+        {% block leftside %}
+        <aside class="left-side">
+            <section class="sidebar">
+                {% block sidebar %}
+                {% endblock sidebar %}
+            </section>
+        </aside>
+        {% endblock leftside %}
+
+        {% block rightside %}
+        <aside class="right-side">
+
+            <section class="content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        {% block breadcrumbs %}
+                        <ol class="breadcrumb">
+                            <li><a href="#">Home</a></li>
+                        </ol>
+                        {% endblock %}
+                    </div>
+                </div>
+
+                <div class="col-xs-12">
+                    <div class="box box-solid">
+                        <div class="box-body">
+                            {% block content %}
+                            {% endblock content %}
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </aside>
+        {% endblock rightside %}
+    </body>
+
+    {% block js %}
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
+    <script src="{% static 'viewflow/js/bootstrap.js' %}" type="text/javascript"></script>
+    <script src="{% static 'viewflow/js/iCheck/icheck.js' %}" type="text/javascript"></script>
+    <script src="{% static 'viewflow/js/AdminLte.js' %}" type="text/javascript"></script>
+    {% endblock %}
+</html>
