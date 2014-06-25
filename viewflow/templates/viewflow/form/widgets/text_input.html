@@ -1,8 +1,10 @@
-{% include  'viewflow/form/field_errors.html' %}
-<label class="control-label">
-    {{ field.label }}
-    <input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" value="{{ field.value }}" >
+<div class="form-group">
+    {% include  'viewflow/form/field_errors.html' %}
+    <label for="{{ field.id_for_label }}" class="control-label"> {{ field.label }} </label>
+    <input type="text" class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" {% if field.value %}value="{{ field.value }}"{% endif %}>
     {% if field.help_text %}
     <p class="help-text">{{ field.help_text }}</p>
     {% endif %}
-</label>
+    {{ hidden_initial }}
+</div>
+<br/>

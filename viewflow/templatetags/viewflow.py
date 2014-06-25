@@ -87,8 +87,8 @@ class ViewFieldNode(Node):
         self.field = field
 
     def render(self, context):
-        field = self.field.resolve(context)
-        return render_widget(field.widget, field.name)
+        bound_field = self.field.resolve(context)
+        return render_widget(bound_field.field.widget, bound_field)
 
 
 @register.tag
@@ -166,6 +166,6 @@ def viewfield(parser, token):
     bits = token.split_contents()
     if len(bits) < 2:
         raise TemplateSyntaxError("'{}' takes at least one argument <field>".format(bits[0]))
- 
+
     field = parser.compile_filter(bits[1])
     return ViewFieldNode(field)

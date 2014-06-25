@@ -1,0 +1,7 @@
+{% load viewflow %}
+
+{% for field in form.visible_fields %}
+     {% viewpart field field.html_name %}
+          {% viewfield field %}
+     {% endviewpart %}
+{% endfor %}
