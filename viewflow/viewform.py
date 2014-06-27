@@ -54,7 +54,7 @@ def _(widget, context, bound_field, attrs=None):
     return render_widget_template(
         context,
         bound_field,
-        template_name='viewflow/form/widgets/text_input.html',
+        template_name='viewflow/form/widgets/textarea.html',
         attrs=attrs)
 
 
@@ -63,7 +63,25 @@ def _(widget, context, bound_field, attrs=None):
     return render_widget_template(
         context,
         bound_field,
-        template_name='viewflow/form/widgets/text_input.html',
+        template_name='viewflow/form/widgets/checkbox.html',
+        attrs=attrs)
+
+
+@render_widget.register(widgets.DateInput)  # NOQA
+def _(widget, context, bound_field, attrs=None):
+    return render_widget_template(
+        context,
+        bound_field,
+        template_name='viewflow/form/widgets/date_input.html',
+        attrs=attrs)
+
+
+@render_widget.register(widgets.DateTimeInput)  # NOQA
+def _(widget, context, bound_field, attrs=None):
+    return render_widget_template(
+        context,
+        bound_field,
+        template_name='viewflow/form/widgets/datetime_input.html',
         attrs=attrs)
 
 
@@ -72,7 +90,7 @@ def _(widget, context, bound_field, attrs=None):
     return render_widget_template(
         context,
         bound_field,
-        template_name='viewflow/form/widgets/text_input.html',
+        template_name='viewflow/form/widgets/select.html',
         attrs=attrs)
 
 
@@ -81,7 +99,7 @@ def _(widget, context, bound_field, attrs=None):
     return render_widget_template(
         context,
         bound_field,
-        template_name='viewflow/form/widgets/text_input.html',
+        template_name='viewflow/form/widgets/radio_select.html',
         attrs=attrs)
 
 

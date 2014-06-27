@@ -1,0 +1,16 @@
+{% load viewflow %}
+<div class="
+    {% viewpart field_group_class field.html_name %}
+        checkbox
+        {% if field.field.required%}required{% endif %}
+        {% if field.errors %}has-error{% endif %}
+        {% viewpart field_group_class_add field.html_name %}{% endviewpart %}
+    {% endviewpart %}">
+    <label for="{{ field.id_for_label }}">
+        <input type="checkbox"
+               name="{{ field.name }}"
+               id="id_{{ field.name }}"
+               {% if field.value %}value="{{ field.value }}"{% endif %}> {{ field.label }}
+    </label>
+    {{ hidden_initial }}
+</div>

@@ -2,11 +2,17 @@
 Few bootstrap redifinitions
 */
 
-.form-control {
-    border-radius: 0px !important;
+.form-group.required .control-label:after {
+    content: "*";
+    color: red;
 }
 
-.alert-formerror {
+.form-group.form-control {
+    border-radius: 0px;
+}
+
+.form-group .alert-formerror {
     padding: 5px;
-    border-radius: 0px !important;
+    border-radius: 0px;
+    margin-left: 0px;
 }

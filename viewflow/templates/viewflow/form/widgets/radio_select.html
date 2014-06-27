@@ -1,0 +1,18 @@
+{% load viewflow %}
+<div class="
+    {% viewpart field_group_class field.html_name %}
+        form-group
+        {% if field.field.required%}required{% endif %}
+        {% if field.errors %}has-error{% endif %}
+        {% viewpart field_group_class_add field.html_name %}{% endviewpart %}
+    {% endviewpart %}">
+    <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
+    {% for value, choice in field.field.choices %}
+    <div class="radio">
+        <label for="id_choicesradio_field_{{ forloop.counter0 }}">
+            <input id="id_choicesradio_field_{{ forloop.counter0 }}" name="{{ field.name }}" type="radio" value="{{ value }}" {% if value == field.value %}checked{% endif %}/> {{ choice }}
+        </label>
+    </div>
+    {% endfor %}
+    {% include  'viewflow/form/field_errors.html' %}
+</div>

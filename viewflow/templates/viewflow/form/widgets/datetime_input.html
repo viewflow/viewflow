@@ -1,4 +1,5 @@
 {% load viewflow %}
+{% load viewflow_helpers %}
 <div class="
     {% viewpart field_group_class field.html_name %}
         form-group
@@ -7,10 +8,11 @@
         {% viewpart field_group_class_add field.html_name %}{% endviewpart %}
     {% endviewpart %}">
     <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
-    <select class="form-control" name="{{ field.name }}" id="id_{{ field.name }}">
-        {% for value, choice in field.field.choices %}
-        <option value="{{ value }}" {% if value == field.value %}selected="selected"{% endif %}>{{ choice }}</option>
-        {% endfor %}
-    </select>
+    <div class="input-group">
+        <div class="input-group-addon">
+            <i class="fa fa-calendar"></i>
+        </div>
+        <input type="text" class="form-control" data-inputmask="'alias': 'datetime'" name="{{ field.name }}" id="id_{{ field.name }}" {% if field.value %}value="{{ field.value }}"{% endif %} data-mask>
+    </div>
     {% include  'viewflow/form/field_errors.html' %}
 </div>
