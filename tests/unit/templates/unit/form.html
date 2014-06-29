@@ -18,23 +18,34 @@
           <div class="page-header">
               <h1>Form example</h1>
           </div>
-
-          <form method="POST" enctype="multipart/form-data">
-              {% viewform 'unit/form_layout.html' %}
-                  {% viewpart field_group_class_add 'text_input' %}has-feedback{% endviewpart %}
-                  {% viewpart field_icon 'text_input' %}<span class="glyphicon glyphicon glyphicon-pencil form-control-feedback"></span>{% endviewpart %}
-              {% endviewform %}
-          </form>
-
-          <div class="page-header">
-              <h1>Standard django</h1>
+          <div class="nav-tabs-custom">
+              <ul class="nav nav-tabs" role="tablist">
+                  <li class="active">
+                      <a href="#viewflow_tab" data-toggle="tab">Viewflow</a>
+                  </li>
+                  <li>
+                      <a href="#standard_tab" data-toggle="tab">Standard django</a>
+                  </li>
+              </ul>
+              <div class="tab-content">
+                  <div class="tab-pane active" id="viewflow_tab">
+                      <form method="POST" enctype="multipart/form-data">
+                          {% viewform 'unit/form_layout.html' %}
+                              {# Add pencil icon on text_input field #}
+                              {% viewpart field_group_class_add 'text_input' %}has-feedback{% endviewpart %}
+                              {% viewpart field_icon 'text_input' %}<span class="glyphicon glyphicon glyphicon-pencil form-control-feedback"></span>{% endviewpart %}
+                          {% endviewform %}
+                      </form>
+                  </div>
+                  <div class="tab-pane" id="standard_tab">
+                      <form method="POST" enctype="multipart/form-data">
+                          <table>
+                              {{ form.as_table }}
+                          </table>
+                      </form>
+                  </div>
+              </div>
           </div>
-
-          <form method="POST">
-              <table>
-                  {{ form.as_table }}
-              </table>
-          </form>
       </div>
 
       <!-- jQuery 2.0.2 -->
