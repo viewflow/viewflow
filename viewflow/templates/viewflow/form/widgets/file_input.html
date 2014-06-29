@@ -1,0 +1,17 @@
+{% load viewflow %}
+{% load viewflow_helpers %}
+<div class="
+    {% viewpart field_group_class field.html_name %}
+        form-group
+        {% if field.field.required%}required{% endif %}
+        {% if field.errors %}has-error{% endif %}
+        {% viewpart field_group_class_add field.html_name %}{% endviewpart %}
+    {% endviewpart %}">
+    <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
+    {{ field }}
+    {% if field.help_text %}
+    <span class="help-block">{{ field.help_text }}</span>
+    {% endif %}
+    {{ hidden_initial }}
+    {% include  'viewflow/form/field_errors.html' %}
+</div>

@@ -103,10 +103,19 @@ def _(widget, context, bound_field, attrs=None):
         attrs=attrs)
 
 
+@render_widget.register(widgets.FileInput)  # NOQA
+def _(widget, context, bound_field, attrs=None):
+    return render_widget_template(
+        context,
+        bound_field,
+        template_name='viewflow/form/widgets/file_input.html',
+        attrs=attrs)
+
+
 @render_widget.register(widgets.SelectMultiple)  # NOQA
 def _(widget, context, bound_field, attrs=None):
     return render_widget_template(
         context,
         bound_field,
-        template_name='viewflow/form/widgets/text_input.html',
+        template_name='viewflow/form/widgets/select_multiple.html',
         attrs=attrs)

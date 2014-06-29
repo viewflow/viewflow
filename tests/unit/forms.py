@@ -14,7 +14,7 @@ class AllElementsForm(forms.Form):
     datetime_field = forms.DateTimeField(input_formats=['%Y-%m-%d %H:%M:%S'])
     decimal_field = forms.DecimalField(max_value=100, min_value=10, max_digits=5, decimal_places=2)
     email_field = forms.EmailField(min_length=5, max_length=50)
-    file_field = forms.FileField(max_length=250)
+    file_field = forms.FileField(max_length=250, help_text='Attach any file here')
     filepath_field = forms.FilePathField(path=os.path.join(settings.BASE_DIR, 'tests/templates'), recursive=True)
     float_field = forms.FloatField(min_value=10, max_value=100)
     image_field = forms.ImageField()
