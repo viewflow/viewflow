@@ -6,11 +6,14 @@
         {% if field.errors %}has-error{% endif %}
         {% viewpart field_group_class_add field.html_name %}{% endviewpart %}
     {% endviewpart %}">
-    <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }} aaa</label>
+    <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
     <select class="form-control chosen" name="{{ field.name }}" id="id_{{ field.name }}" multiple>
         {% for value, choice in field.field.choices %}
         <option value="{{ value }}" {% if value == field.value %}selected="selected"{% endif %}>{{ choice }}</option>
         {% endfor %}
     </select>
+    {% if field.help_text %}
+    <span class="help-block">{{ field.help_text }}</span>
+    {% endif %}
     {% include  'viewflow/form/field_errors.html' %}
 </div>
