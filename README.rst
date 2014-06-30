@@ -143,6 +143,7 @@ Changelog
 * django-extra-views friendly views mixins
 * Fix start task owner assigenment
 * Task done redirect now points to next flow assigned task if exists
+* Flow Start.Activate renamed to .Next in order to be same as flow.View interface
 
 
 0.2.0 2014-06-02
