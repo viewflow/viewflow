@@ -16,6 +16,7 @@ mkdir -p viewflow/static/viewflow/fonts
 cp -v submodules/theme/css/font-awesome.css viewflow/static/viewflow/css
 cp -v submodules/theme/fonts/FontAwesome.otf viewflow/static/viewflow/fonts
 cp -v submodules/theme/fonts/fontawesome-* viewflow/static/viewflow/fonts
+cp -v submodules/theme/fonts/glyphicons-halflings-regular.* viewflow/static/viewflow/fonts
 
 # admin lte
 cp -v submodules/theme/css/AdminLTE.css viewflow/static/viewflow/css

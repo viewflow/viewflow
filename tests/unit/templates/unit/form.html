@@ -1,80 +1,35 @@
-{% load static %}{% load viewflow %}
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Form Sample Template</title>
-
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-    <link href="{% static 'viewflow/css/font-awesome.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'viewflow/css/chosen/chosen.css' %}" rel="stylesheet" type="text/css" />
-    <link href="{% static 'viewflow/css/AdminLTE.css' %}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="{% static 'viewflow/css/viewflow.css' %}">
-  </head>
-  <body>
-      <div class="container">
-          <div class="page-header">
-              <h1>Form example</h1>
-          </div>
-          <div class="nav-tabs-custom">
-              <ul class="nav nav-tabs" role="tablist">
-                  <li class="active">
-                      <a href="#viewflow_tab" data-toggle="tab">Viewflow</a>
-                  </li>
-                  <li>
-                      <a href="#standard_tab" data-toggle="tab">Standard django</a>
-                  </li>
-              </ul>
-              <div class="tab-content">
-                  <div class="tab-pane active" id="viewflow_tab">
-                      <form method="POST" enctype="multipart/form-data">
-                          {% viewform 'unit/form_layout.html' %}
-                              {# Add pencil icon on text_input field #}
-                              {% viewpart field_group_class_add 'text_input' %}has-feedback{% endviewpart %}
-                              {% viewpart field_icon 'text_input' %}<span class="glyphicon glyphicon glyphicon-pencil form-control-feedback"></span>{% endviewpart %}
-                          {% endviewform %}
-                      </form>
-                  </div>
-                  <div class="tab-pane" id="standard_tab">
-                      <form method="POST" enctype="multipart/form-data">
-                          <table>
-                              {{ form.as_table }}
-                          </table>
-                      </form>
-                  </div>
-              </div>
-          </div>
-      </div>
-
-      <!-- jQuery 2.0.2 -->
-      <script src="http://ajax.googleapis.com/ajax/libs/jquery/2.0.2/jquery.min.js"></script>
-      
-      <!-- Bootstrap -->
-      <script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
-
-      <!-- InputMask -->
-      <script src="{% static 'viewflow/js/input-mask/jquery.inputmask.js' %}" type="text/javascript"></script>
-      <script src="{% static 'viewflow/js/input-mask/jquery.inputmask.date.extensions.js' %}" type="text/javascript"></script>
-      <script src="{% static 'viewflow/js/input-mask/jquery.inputmask.extensions.js' %}" type="text/javascript"></script>
-
-      <!--ICheck -->
-      <script src="{% static 'viewflow/js/iCheck/icheck.js' %}" type="text/javascript"></script>
-
-      <!-- Choosen -->
-      <script src="{% static 'viewflow/js/chosen/chosen.jquery.js' %}" type="text/javascript"></script>
-
-
-      <!-- Theme AdminLte -->
-      <script src="{% static 'viewflow/js/AdminLte.js' %}" type="text/javascript"></script>
-
-      <script type="text/javascript">
-            $(function() {
-                $("[data-mask]").inputmask();
-                $(".chosen").chosen();
-            });
-      </script>
-  </body>
-</html>
-
+{% extends 'viewflow/base_site.html' %}
+{% load viewflow %}
+{% block content %}
+<div class="page-header">
+    <h1>Form example</h1>
+</div>
+<div class="nav-tabs-custom">
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="active">
+            <a href="#viewflow_tab" data-toggle="tab">Viewflow</a>
+        </li>
+        <li>
+            <a href="#standard_tab" data-toggle="tab">Standard django</a>
+        </li>
+    </ul>
+    <div class="tab-content">
+        <div class="tab-pane active" id="viewflow_tab">
+            <form method="POST" enctype="multipart/form-data">
+                {% viewform 'viewflow/form/layout.html' %}
+                     {# Add pencil icon on text_input field #}
+                     {% viewpart field_group_class_add 'text_input' %}has-feedback{% endviewpart %}
+                     {% viewpart field_icon 'text_input' %}<span class="glyphicon glyphicon glyphicon-pencil form-control-feedback"></span>{% endviewpart %}
+                {% endviewform %}
+            </form>
+        </div>
+        <div class="tab-pane" id="standard_tab">
+            <form method="POST" enctype="multipart/form-data">
+                <table>
+                    {{ form.as_table }}
+                </table>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
