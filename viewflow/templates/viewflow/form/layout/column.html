@@ -1,0 +1,5 @@
+{% for element in parent_contrainer %}    
+    <div>
+         {% include element.template_name with parent_contrainer=element %}
+    </div>
+{% endfor %}

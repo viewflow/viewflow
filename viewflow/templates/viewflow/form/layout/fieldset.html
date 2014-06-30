@@ -1,0 +1,9 @@
+<fieldset>
+{% if parent_contrainer.label %}
+<legend>{{ parent_contrainer.label }}</legend>
+{% endif %}
+
+{% for element in parent_contrainer %}    
+    {% include element.template_name with parent_contrainer=element %}
+{% endfor %}
+</fieldset>

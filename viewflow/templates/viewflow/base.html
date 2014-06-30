@@ -5,7 +5,7 @@
         <title>{% block title %}Viewflow{% endblock %}</title>
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
         {% block css %}
-        <link href="{% static 'viewflow/css/bootstrap.css' %}" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
         <link href="{% static 'viewflow/css/font-awesome.css' %}" rel="stylesheet" type="text/css" />
         <link href="{% static 'viewflow/css/chosen/chosen.css' %}" rel="stylesheet" type="text/css" />
         <link href="{% static 'viewflow/css/AdminLTE.css' %}" rel="stylesheet" type="text/css" />
@@ -86,7 +86,7 @@
       <script type="text/javascript">
             $(function() {
                 $("[data-mask]").inputmask();
-                $(".chosen").chosen();
+                $(".chosen").chosen({ width: '100%' });
                 {% block js_ready %}{% endblock %}
             });
       </script>

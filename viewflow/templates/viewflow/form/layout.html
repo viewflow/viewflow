@@ -1,15 +1,19 @@
 {% load viewflow %}
-<form method="POST">
-{% for field in form %}
+<form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
     {% for hidden in form.hidden_fields %}
         {{ hidden }}
     {% endfor %}
-    {% for field in form.visible_fields %}
-         {% viewpart field field.name %}
-             {% viewfield field %}
-         {% endviewpart %}
-    {% endfor %}
-{% endfor %}
+
+    {% if view.layout %}
+        {% include view.layout.template_name with parent_contrainer=view.layout %}
+    {% else %}
+        {% for field in form.visible_fields %}
+            {% viewpart field field.name %}
+                {% viewfield field %}
+            {% endviewpart %}
+        {% endfor %}
+    {% endif %}
 {% viewpart buttons %}
 <input type="submit" value="{{ submit_label|default:'Submit' }}" />
 {% endviewpart %}

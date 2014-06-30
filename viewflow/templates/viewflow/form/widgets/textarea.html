@@ -7,7 +7,7 @@
         {% viewpart field_group_class_add field.html_name %}{% endviewpart %}
     {% endviewpart %}">
     <label for="{{ field.id_for_label }}" class="control-label">{{ field.label }}</label>
-    <textarea class="form-control" name="{{ field.name }}" id="id_{{ field.name }}">{% if field.value %}value="{{ field.value }}"{% endif %}</textarea>
+    <textarea class="form-control" name="{{ field.name }}" id="id_{{ field.name }}" rows="8">{% if field.value %}value="{{ field.value }}"{% endif %}</textarea>
     {% include  'viewflow/form/field_errors.html' %}
     {% if field.help_text %}
     <span class="help-block">{{ field.help_text }}</span>

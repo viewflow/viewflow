@@ -1,0 +1,7 @@
+<div class="row">
+{% for element, span in parent_contrainer %}    
+    <div class="col-md-{{ span }} columns">
+        {% include element.template_name with parent_contrainer=element %}
+    </div>
+{% endfor %}
+</div>

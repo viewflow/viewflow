@@ -88,11 +88,16 @@ class ViewPartNode(Node):
 
 
 class ViewFieldNode(Node):
-    def __init__(self, field):
+    def __init__(self, field, form):
         self.field = field
+        self.form = form
 
     def render(self, context):
         bound_field = self.field.resolve(context)
+        if self.form:
+            form = self.form.resolve(context)
+            bound_field = form[bound_field]
+
         return render_widget(bound_field.field.widget, context, bound_field)
 
 
@@ -176,4 +181,9 @@ def viewfield(parser, token):
         raise TemplateSyntaxError("'{}' takes at least one argument <field>".format(bits[0]))
 
     field = parser.compile_filter(bits[1])
-    return ViewFieldNode(field)
+    form = None
+
+    if len(bits) == 4 and bits[2] == 'from':
+        form = parser.compile_filter(bits[3])
+
+    return ViewFieldNode(field, form)
