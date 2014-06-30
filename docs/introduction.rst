@@ -73,7 +73,7 @@ To make the above code work just put the following flow definition in `flows.py`
 
         start = flow.Start(StartView, fields=["text"]) \
            .Permission('helloworld.can_start_request') \
-           .Activate(this.hello_world)
+           .Next(this.hello_world)
 
         approve = flow.View(ProcessView, fields=["approve"]) \
             .Permission('helloworld.can_approve_request')
