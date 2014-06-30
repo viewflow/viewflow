@@ -131,8 +131,19 @@ License
 =======
 `The GNU Affero General Public License v3.0 <https://www.gnu.org/copyleft/gpl.html>`_
 
-Change log
-==========
+Changelog
+=========
+
+0.3.0 GIT Version
+-----------------
+
+* Added auto create task permission shortcuts
+* Started bootstrap based viewflow base site interface
+* Bootstrap based custom form redefinable form rendering
+* django-extra-views friendly views mixins
+* Fix start task owner assigenment
+* Task done redirect now points to next flow assigned task if exists
+
 
 0.2.0 2014-06-02
 ----------------

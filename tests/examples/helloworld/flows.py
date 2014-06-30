@@ -13,7 +13,7 @@ class HelloWorldFlow(Flow):
 
     start = flow.Start(StartView, fields=['text']) \
         .Permission('helloworld.can_start_process') \
-        .Activate(this.approve)
+        .Next(this.approve)
 
     approve = flow.View(ProcessView, fields=['approved']) \
         .Permission('helloworld.can_approve_request') \

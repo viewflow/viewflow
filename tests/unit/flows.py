@@ -14,7 +14,7 @@ class SingleTaskFlow(Flow):
     lock_impl = lock.cache_lock
 
     start = flow.Start() \
-        .Activate('task')
+        .Next('task')
     task = flow.View(perform_task)\
         .Next('end')
     end = flow.End()
@@ -23,7 +23,7 @@ class SingleTaskFlow(Flow):
 class AllTaskFlow(Flow):
     lock_impl = lock.cache_lock
 
-    start = flow.Start().Activate(this.view)
+    start = flow.Start().Next(this.view)
     view = flow.View(perform_task).Next(this.job)
     job = flow.Job(dummy_job).Next(this.iff)
     iff = flow.If(lambda act: True).OnTrue(this.switch).OnFalse(this.switch)
@@ -40,7 +40,7 @@ class FailedJobFlow(Flow):
     """
     lock_impl = lock.cache_lock
 
-    start = flow.Start().Activate(this.job)
+    start = flow.Start().Next(this.job)
     job = flow.Job(dummy_job).Next(this.iff)
     iff = flow.If(lambda p: 2/(1-1)).OnTrue(this.end).OnFalse(this.end)
     end = flow.End()
@@ -52,7 +52,7 @@ class FailedGateFlow(Flow):
     """
     lock_impl = lock.cache_lock
 
-    start = flow.Start().Activate(this.job)
+    start = flow.Start().Next(this.job)
     job = flow.Job(dummy_job).Next(this.iff)
     iff = flow.If(lambda p: 2/0).OnTrue(this.end).OnFalse(this.end)
     end = flow.End()
@@ -63,6 +63,6 @@ class AutoPermissionsFlow(Flow):
 
     start = flow.Start() \
         .Permission(auto_create=True) \
-        .Activate(this.end)
+        .Next(this.end)
 
     end = flow.End()

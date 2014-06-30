@@ -306,7 +306,7 @@ class Start(PermissionMixin, Event):
         for next_node in self._activate_next:
             yield Edge(src=self, dst=next_node, edge_class='next')
 
-    def Activate(self, node):
+    def Next(self, node):
         self._activate_next.append(node)
         return self
 

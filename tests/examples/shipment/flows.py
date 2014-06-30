@@ -13,8 +13,8 @@ class ShipmentFlow(Flow):
     lock_impl = select_for_update_lock
 
     start = flow.Start(views.StartView) \
-        .Activate(this.split_clerk_warehouse) \
-        .Permission('shipment.can_start_request')
+        .Permission('shipment.can_start_request') \
+        .Next(this.split_clerk_warehouse)
 
     # clerk
     split_clerk_warehouse = flow.Split() \
