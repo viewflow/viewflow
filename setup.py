@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='django-viewflow',
-    version='0.2.0',
+    version='0.3.0',
     author='Mikhail Podgurskiy',
     author_email='kmmbvnr@gmail.com',
     description='Activity based reusable workflow library for django',
@@ -28,7 +28,8 @@ setup(
                       'singledispatch>=3.4',
                       'django-fsm>=2.0',
                       'webtest>=2.0',
-                      'django-webtest>=1.7'],
+                      'django-webtest>=1.7',
+                      'django-bootstrap3>=4.7.0'],
     packages=['viewflow', 'viewflow.flow', 'viewflow.management', 'viewflow.templatetags'],
     package_data={'viewflow': ['templates/viewflow/*.html', 'templates/viewflow/flow/*.html']},
 )

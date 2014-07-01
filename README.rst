@@ -134,10 +134,11 @@ License
 Changelog
 =========
 
-0.3.0 GIT Version
+0.3.0 2014-07-01
 -----------------
 
 * Added auto create task permission shortcuts
+* Allow to provide process and task description in docstrings
 * Started bootstrap based viewflow base site interface
 * Bootstrap based custom form redefinable form rendering
 * django-extra-views friendly views mixins
