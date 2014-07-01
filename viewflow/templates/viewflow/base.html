@@ -17,9 +17,8 @@
             <a href="index.html" class="logo">{% block branding %}Viewflow{% endblock %}</a>
             <nav class="navbar navbar-static-top" role="navigation">
                 <div class="navbar-right">
-                    <ul class="nav navbar-nav">
-                        <li><a href="#">Log Out</a></li>
-                    </ul>
+                    {% block navright %}
+                    {% endblock %}
                 </div>
             </nav>
         </header>
@@ -41,7 +40,7 @@
                     <div class="col-xs-12">
                         {% block breadcrumbs %}
                         <ol class="breadcrumb">
-                            <li><a href="#">Home</a></li>
+                            <li><a href="/">Home</a></li>
                         </ol>
                         {% endblock %}
                     </div>

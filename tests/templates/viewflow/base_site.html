@@ -1,0 +1,37 @@
+{% extends 'viewflow/base.html' %}
+{% load viewflow %}
+
+{% block css %}
+{{ block.super }}
+<style type="text/css">
+  .glyphicon{
+      min-width: 15px;
+  }
+</style>
+{% endblock %}
+
+{% block navright %}
+<ul class="nav navbar-nav">
+    <li class="dropdown">
+        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ request.user.username|title|default:"Anonymous" }} <b class="caret"></b></a>
+        <ul class="dropdown-menu">
+            <li><a href="{% url 'login_as' %}"><i class="glyphicon {% if request.user.is_anonymous %}glyphicon-ok{% endif %}"></i> Anonymous</a></li>
+            {% for user in users %}
+            <li><a href="{% url 'login_as' %}?user_pk={{ user.pk }}"><i class="glyphicon {% if request.user == user %}glyphicon-ok{% endif %}"></i> {{ user.username|title }}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
+</ul>
+{% endblock %}
+
+{% block sidebar %}
+<section class="sidebar">
+<ul class="sidebar-menu">
+    <li {% if request.path == "/" %}class="active"{% endif %}><a href="/">Home</a></li>
+    <li {% if "/helloworld/" in request.path %}class="active"{% endif %}><a href="{% flowurl 'helloworld/HelloWorldFlow' 'viewflow:index' %}">Hello, World</a></li>
+    <li {% if "/shipment" in request.path %}class="active"{% endif %}><a href="{% flowurl 'shipment/ShipmentFlow' 'viewflow:index' %}">Shipment</a></li>
+</ul>
+</section>
+{% endblock %}
+
+{% block breadcrumbs %}{% endblock %}
