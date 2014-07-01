@@ -1,12 +1,14 @@
 {% extends 'viewflow/base_site.html' %}
 {% load bootstrap3 %}
 
+{% block title %}{{ block.super}} | {{ activation.flow_cls.process_title }}{% endblock %}
+
 {% block content %}
 <form role="form" method="POST">
     {% csrf_token %}
     <div class="box box-primary">
         <div class="box-header">
-            <h3 class="box-title">Start {{ activation.process.flow_cls }}</h3>
+            <h3 class="box-title">{% if activation.flow_task.task_title %}{{ activation.flow_task.task_title }}{% else %}Start {{ activation.flow_cls.process_title|lower }}{% endif %}</h3>
         </div>
         <div class="box-body">
             {% bootstrap_form form %}

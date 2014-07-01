@@ -90,6 +90,14 @@ class FlowMetaClass(type):
         for name, node in nodes.items():
             node.flow_cls = new_class
 
+        # description
+        if new_class.__doc__:
+            docstring = new_class.__doc__.split('\n\n', maxsplit=1)
+            if 'process_title' not in attrs and len(docstring) > 0:
+                new_class.process_title = docstring[0].strip()
+            if 'process_description' not in attrs and len(docstring) > 1:
+                new_class.process_description = docstring[1].strip()
+
         # index view
         if not getattr(new_class, 'index_view', None):
             from viewflow.views import index
@@ -117,6 +125,9 @@ class Flow(object, metaclass=FlowMetaClass):
     task_cls = Task
     management_form_cls = ActivationDataForm
     lock_impl = lock.no_lock
+
+    process_title = None
+    process_description = None
 
     @property
     def urls(self):

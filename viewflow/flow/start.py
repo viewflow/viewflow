@@ -10,7 +10,7 @@ from django.views.generic.edit import UpdateView
 
 from viewflow.activation import StartActivation
 from viewflow.exceptions import FlowRuntimeError
-from viewflow.flow.base import Event, Edge, PermissionMixin
+from viewflow.flow.base import Event, Edge, PermissionMixin, TaskDescriptionMixin
 from viewflow import shortcuts
 
 
@@ -243,7 +243,7 @@ class StartView(StartViewActivation, UpdateView):
         return super(StartView, self).dispatch(request, *args, **kwargs)
 
 
-class Start(PermissionMixin, Event):
+class Start(PermissionMixin, TaskDescriptionMixin, Event):
     """
     Start process event
 
@@ -283,11 +283,17 @@ class Start(PermissionMixin, Event):
     task_type = 'START'
     activation_cls = StartViewActivation
 
-    def __init__(self, view_or_cls=None, activation_cls=None, **kwargs):
+    def __init__(self, view_or_cls=None, activation_cls=None, task_title=None, task_description=None, **kwargs):
         """
         Accepts view callable or CBV View class with view kwargs,
         if CBV view implements StartActivation, it used as activation_cls
         """
+        super(Start, self).__init__(
+            activation_cls=activation_cls,
+            task_title=task_title,
+            task_description=task_description,
+            **kwargs)
+
         self._activate_next = []
         self._view, self._view_cls, self._view_args = None, None, None
 
@@ -299,8 +305,6 @@ class Start(PermissionMixin, Event):
                 activation_cls = view_or_cls
         else:
             self._view = view_or_cls
-
-        super(Start, self).__init__(activation_cls=activation_cls)
 
     def _outgoing(self):
         for next_node in self._activate_next:

@@ -77,7 +77,7 @@ class Node(object):
     task_type = None
     activation_cls = None
 
-    def __init__(self, activation_cls=None):
+    def __init__(self, activation_cls=None, **kwargs):
         self._incoming_edges = []
 
         self.flow_cls = None
@@ -179,3 +179,31 @@ class PermissionMixin(object):
             self._owner_permission = '{}.{}'.format(self.flow_cls.process_cls._meta.app_label, self._owner_permission)
 
         super(PermissionMixin, self).ready()
+
+
+class TaskDescriptionMixin(object):
+    """
+    Extract task desctiption from view docstring
+    """
+    task_title = None
+    task_description = None
+
+    def __init__(self, **kwargs):
+        task_title = kwargs.get('task_title', None)
+        task_description = kwargs.get('task_description', None)
+        view_or_cls = kwargs.get('view_or_cls', None)
+
+        if task_title:
+            self.task_title = task_title
+        if task_description:
+            self.task_description = task_description
+
+        if view_or_cls:
+            if view_or_cls.__doc__ and (self.task_title is None or self.task_description is None):
+                docstring = view_or_cls.__doc__.split('\n\n', maxsplit=1)
+                if task_title is None and len(docstring) > 0:
+                    self.task_title = docstring[0].strip()
+                if task_description is None and len(docstring) > 1:
+                    self.task_description = docstring[1].strip()
+
+        super(TaskDescriptionMixin, self).__init__(**kwargs)

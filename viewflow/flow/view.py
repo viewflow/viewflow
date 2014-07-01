@@ -10,7 +10,7 @@ from django.views.generic.edit import UpdateView
 
 from viewflow.activation import ViewActivation
 from viewflow.exceptions import FlowRuntimeError
-from viewflow.flow.base import Task, Edge, PermissionMixin
+from viewflow.flow.base import Task, Edge, PermissionMixin, TaskDescriptionMixin
 from viewflow import shortcuts
 
 
@@ -223,7 +223,7 @@ class ProcessView(TaskViewActivation, UpdateView):
         return super(ProcessView, self).dispatch(request, *args, **kwargs)
 
 
-class View(PermissionMixin, Task):
+class View(PermissionMixin, TaskDescriptionMixin, Task):
     """
     View task
 
