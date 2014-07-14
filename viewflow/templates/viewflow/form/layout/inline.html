@@ -1,0 +1,13 @@
+{% load viewflow %}
+{% load viewflow_helpers %}
+
+<fieldset>
+{% if parent_contrainer.label %}
+<legend>{{ parent_contrainer.label }}</legend>
+{% endif %}
+
+{# get_context_var parent_contrainer.inline as inline #}
+
+{% for form in inline.forms %}
+    {{ form }}
+{% endfor %}

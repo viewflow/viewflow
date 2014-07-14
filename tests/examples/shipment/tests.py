@@ -21,6 +21,8 @@ class ShipmentFlowDiagrammTests(TestCase):
 
 
 class ShipmentFlowTests(TestCase):
+    fixtures = ['shipment/default_data.json']
+
     def task(self, process, flow_task):
         return Task.objects.get(process=process, flow_task=flow_task)
 

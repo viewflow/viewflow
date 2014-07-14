@@ -34,4 +34,4 @@ class InsuranceAdmin(admin.ModelAdmin):
 
 @admin.register(models.Shipment)
 class ShipmentAdmin(admin.ModelAdmin):
-    list_display = ['goods_tag', 'carrier', 'carrier_quote', 'insurance', 'package_tag']
+    list_display = ['shipment_no', 'carrier', 'carrier_quote', 'insurance', 'package_tag']

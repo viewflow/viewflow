@@ -156,6 +156,15 @@ class Fieldset(object):
                 yield element
 
 
+class Inline(object):
+    span_columns = 1
+    template_name = 'viewflow/form/layout/inline.html'
+
+    def __init__(self, label, inline):
+        self.label = label
+        self.inline = inline
+
+
 class Row(object):
     template_name = 'viewflow/form/layout/row.html'
 

@@ -15,3 +15,8 @@ def input_mask(bound_field):
     """
     input_format = bound_field.field.input_formats[0]
     return replace_all({"%d": "dd", "%m": "mm", '%Y': 'yyyy'}, input_format)
+
+
+@register.assignment_tag(takes_context=True)
+def get_context_data(context, field_name):
+    return context[field_name]

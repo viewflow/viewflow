@@ -1,7 +1,8 @@
-https://github.com/django/django/archive/1.7b4.zip
+https://github.com/django/django/archive/1.7c1.zip
 singledispatch==3.4.0.3
+django-extra-views==0.6.4
 django-fsm==2.1.0
-celery==3.1.12
+celery==3.1.13
 webtest==2.0.15
 django-webtest==1.7.7
-django-bootstrap3==4.7.0
+django-bootstrap3==4.8.2

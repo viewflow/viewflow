@@ -25,9 +25,23 @@ class Insurance(models.Model):
 
 
 class Shipment(models.Model):
-    goods_tag = models.CharField(max_length=50)
+    shipment_no = models.CharField(max_length=50)
     carrier = models.ForeignKey(Carrier, null=True)
 
+    # customer
+    first_name = models.CharField(max_length=150)
+    last_name = models.CharField(max_length=150)
+    email = models.EmailField()
+
+    # shipment addres
+    address = models.CharField(max_length=150)
+    city = models.CharField(max_length=150)
+    state = models.CharField(max_length=150)
+    zipcode = models.CharField(max_length=10)
+    country = models.CharField(max_length=150)
+    phone = models.CharField(max_length=50)
+
+    # shipment data
     need_insurance = models.BooleanField(default=False)
     insurance = models.ForeignKey('Insurance', null=True)
 
@@ -35,6 +49,12 @@ class Shipment(models.Model):
     post_label = models.TextField(blank=True, null=True)
 
     package_tag = models.CharField(max_length=50)
+
+
+class ShipmentItem(models.Model):
+    shipment = models.ForeignKey(Shipment)
+    name = models.CharField(max_length=250)
+    quantity = models.IntegerField(default=1)
 
 
 class ShipmentProcess(Process):
