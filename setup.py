@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='django-viewflow',
-    version='0.3.0',
+    version='0.4.0',
     author='Mikhail Podgurskiy',
     author_email='kmmbvnr@gmail.com',
     description='Activity based reusable workflow library for django',
@@ -30,16 +30,9 @@ setup(
                       'webtest>=2.0',
                       'django-webtest>=1.7',
                       'django-bootstrap3>=4.7.0'],
-    packages=['viewflow', 'viewflow.flow', 'viewflow.management', 'viewflow.templatetags'],
-    package_data={'viewflow': ['templates/viewflow/*.html',
-                               'templates/viewflow/flow/*.html',
-                               'templates/viewflow/form/*.html',
-                               'static/viewflow/css/*.css',
-                               'static/viewflow/css/chosen/*',
-                               'static/viewflow/css/iCheck/minimal/*.png',
-                               'static/viewflow/fonts/*',
-                               'static/viewflow/js/chosen/*.js',
-                               'static/viewflow/js/iCheck/*.js',
-                               'static/viewflow/js/input-mask/*.js',
-                               'static/viewflow/js/input-mask/phone-codes/*']},
-)
+    packages=['viewflow',
+              'viewflow.flow',
+              'viewflow.management',
+              'viewflow.site',
+              'viewflow.site.templatetags'],
+    include_package_data=True)

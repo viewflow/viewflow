@@ -1,6 +1,0 @@
-[submodule "theme"]
-	path = submodules/theme
-	url = https://github.com/almasaeed2010/AdminLTE.git
-[submodule "submodules/chosen"]
-	path = submodules/chosen
-	url = https://github.com/harvesthq/chosen.git

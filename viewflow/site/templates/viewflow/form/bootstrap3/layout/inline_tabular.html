@@ -1,0 +1,33 @@
+{% load viewform %}
+
+<fieldset>
+{% if parent.label %}
+<legend>{{ parent.label }}</legend>
+{% endif %}
+
+<table class="table">
+    <thead>
+        <tr>
+            {% for field in inline.forms.0.visible_fields %}
+            <td><label>{{ field.label }}</label></td>
+            {% endfor %}
+        </tr>
+    </thead>
+    {% with sronly='sr-only' %}
+    <tbody>
+        {% for form in inline.forms %}
+        <tr>
+            {% viewpart form visible %}
+            {% for bound_field in form.visible_fields %}
+            <td>
+                {% viewpart bound_field.field %}
+                    {% viewfield bound_field %}
+                {% endviewpart %}
+            </td>
+            {% endfor %}
+            {% endviewpart %}
+        </tr>
+        {% endfor %}
+    </tbody>
+    {% endwith %}
+</table>

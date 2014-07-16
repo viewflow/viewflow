@@ -18,9 +18,9 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_fsm',
-    'bootstrap3',
+    # viewflow
     'viewflow',
+    'viewflow.site',
     # Tests
     'unit',
     'integration',

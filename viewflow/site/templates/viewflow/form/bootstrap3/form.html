@@ -1,0 +1,31 @@
+{% load viewform %}
+
+{% viewpart form %}
+
+    {% viewpart form hidden %}
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+    {% endviewpart %}
+
+    {% if layout %}
+        {% viewpart form visible %}
+            {% include layout with parent=layout %}
+        {% endviewpart %}
+    {% else %}
+        {% viewpart form visible %}
+            {% for bound_field in form.visible_fields %}
+                {% viewpart bound_field.field %}
+                    {% viewfield bound_field %}
+                {% endviewpart %}
+            {% endfor %}
+        {% endviewpart %}
+
+        {% viewpart 'inlines' %}
+            {% for inline in inlines %}
+                {{ inline }}
+            {% endfor %}
+        {% endviewpart %}
+    {% endif %}
+
+{% endviewpart %}

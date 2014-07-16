@@ -1,0 +1,35 @@
+{% load viewform %}
+<div {% tagattrs %}
+     class="{% viewpart field group_class %}
+            form-group
+            {% if field.required%}required{% endif %}
+            {% if bound_field.errors %}has-error{% endif %}
+            {% viewpart field add_group_class %}{% endviewpart %}
+            {% endviewpart %}"{% endtagattrs %}>
+    {% viewpart field label %}
+    <label for="{{ bound_field.id_for_label }}" class="control-label">{{ bound_field.label }}</label>
+    {% endviewpart %}
+    {% viewpart field prepend %}{% endviewpart %}{% viewpart field control %}
+    {% for value, choice in field.choices %}
+    <div class="radio">
+        <label for="id_choicesradio_field_{{ forloop.counter0 }}">
+            <input {% tagattrs %}
+                   id="id_choicesradio_field_{{ forloop.counter0 }}"
+                   name="{{ bound_field.name }}"
+                   type="radio"
+                   value="{{ value }}"
+                   {% if value == bound_field.value %}checked{% endif %}{% endtagattrs %}/> {{ choice }}
+        </label>
+    </div>
+    {% endfor %}
+    {% endviewpart %}{% viewpart field append %}{% endviewpart %}
+    {% viewpart field errors %}
+        {% if bound_field.errors %}
+            {% include  'viewform/bootstrap3/field_errors.html' %}
+        {% endif %}
+    {% endviewpart %}{% viewpart field help_text %}
+        {% if field.help_text %}
+            <span class="help-block">{{ bound_field.help_text }}</span>
+        {% endif %}
+    {% endviewpart %}{{ hidden_initial }}
+</div>
