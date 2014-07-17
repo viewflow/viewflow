@@ -4,19 +4,14 @@
 {% block title %}{{ block.super}} | {{ activation.flow_cls.process_title }}{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <h1>{% if activation.flow_task.task_title %}{{ activation.flow_task.task_title }}{% else %}Start {{ activation.flow_cls.process_title|lower }}{% endif %}</h1>
+</div>
+
 <form role="form" method="POST">
     {% csrf_token %}
-    <div class="box box-primary">
-        <div class="box-header">
-            <h3 class="box-title">{% if activation.flow_task.task_title %}{{ activation.flow_task.task_title }}{% else %}Start {{ activation.flow_cls.process_title|lower }}{% endif %}</h3>
-        </div>
-        <div class="box-body">
-            {% viewform 'viewflow/bootstrap3/form.html' form=form layout=view.layout %} {% endviewform %}
-            {{ activation.management_form }}
-        </div>
-        <div class="box box-footer">
-            <button type="submit" name="start" class="btn btn-primary">Start</button>
-        </div>
-    </div>
+    {% viewform 'viewflow/form/bootstrap3/form.html' form=form layout=view.layout %} {% endviewform %}
+    {{ activation.management_form }}
+    <button type="submit" name="start" class="btn btn-primary">Start</button>
 </form>
 {% endblock %}
