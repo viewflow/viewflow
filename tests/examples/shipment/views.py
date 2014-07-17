@@ -1,21 +1,19 @@
-from django.views.generic import CreateView, UpdateView
-from viewflow.flow.start import StartInlinesViewMixin
-from viewflow.flow.view import TaskFormViewMixin
-from extra_views import InlineFormSet, CreateWithInlinesView
-from viewflow.viewform import Layout, Fieldset, Inline, Row, Span2, Span5, Span7
-
+import extra_views
+from django.views import generic
+from viewflow import flow
+from viewflow.site import LayoutMixin, Layout, Fieldset, Inline, Row, Span2, Span5, Span7
 from .models import Shipment, ShipmentItem, Insurance
 
 
-class ShipmentItemInline(InlineFormSet):
+class ItemInline(extra_views.InlineFormSet):
     model = ShipmentItem
 
 
-class StartView(StartInlinesViewMixin, CreateWithInlinesView):
+class StartView(LayoutMixin,
+                flow.StartInlinesViewMixin,
+                extra_views.NamedFormsetsMixin,
+                extra_views.CreateWithInlinesView):
     model = Shipment
-    fields = ['shipment_no', 'first_name', 'last_name', 'email',
-              'address', 'city', 'state', 'zipcode', 'country',
-              'phone']
     layout = Layout(
         Row('shipment_no'),
         Row('first_name', 'last_name', 'email'),
@@ -23,11 +21,8 @@ class StartView(StartInlinesViewMixin, CreateWithInlinesView):
         Fieldset('Address',
                  Row(Span7('address'), Span5('zipcode')),
                  Row(Span5('city'), Span2('state'), Span5('country'))),
-        Inline('Shipment Items', 'Items'),
+        Inline('Shipment Items', ItemInline),
     )
-
-    inlines = [ShipmentItemInline]
-    inlines_names = ["Items"]
 
     def activation_done(self, form, inlines):
         self.object = form.save()
@@ -39,12 +34,12 @@ class StartView(StartInlinesViewMixin, CreateWithInlinesView):
         self.activation.done()
 
 
-class ShipmentView(TaskFormViewMixin, UpdateView):
+class ShipmentView(flow.TaskFormViewMixin, generic.UpdateView):
     def get_object(self):
         return self.activation.process.shipment
 
 
-class InsuranceView(TaskFormViewMixin, CreateView):
+class InsuranceView(flow.TaskFormViewMixin, generic.CreateView):
     model = Insurance
     fields = ['company_name', 'cost']
 

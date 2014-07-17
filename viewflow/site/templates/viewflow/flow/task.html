@@ -1,5 +1,5 @@
 {% extends 'viewflow/base_site.html' %}
-{% load bootstrap3 %}
+{% load viewform %}
 
 {% block content %}
 <form role="form" method="POST">
@@ -9,7 +9,7 @@
             <h3 class="box-title">Task {{ activation.flow_task.name }}</h3>
         </div>
         <div class="box-body">
-            {% bootstrap_form form %}
+            {% viewform 'viewflow/bootstrap3/form.html' form=form layout=view.layout %}
             {{ activation.management_form }}
         </div>
         <div class="box box-footer">

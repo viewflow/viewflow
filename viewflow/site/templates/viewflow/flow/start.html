@@ -1,5 +1,5 @@
 {% extends 'viewflow/base_site.html' %}
-{% load viewflow %}
+{% load viewform %}
 
 {% block title %}{{ block.super}} | {{ activation.flow_cls.process_title }}{% endblock %}
 
@@ -11,7 +11,7 @@
             <h3 class="box-title">{% if activation.flow_task.task_title %}{{ activation.flow_task.task_title }}{% else %}Start {{ activation.flow_cls.process_title|lower }}{% endif %}</h3>
         </div>
         <div class="box-body">
-            {% viewform 'viewflow/form/layout.html' %} {% endviewform %}
+            {% viewform 'viewflow/bootstrap3/form.html' form=form layout=view.layout %} {% endviewform %}
             {{ activation.management_form }}
         </div>
         <div class="box box-footer">

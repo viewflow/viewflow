@@ -1,6 +1,6 @@
 from django.views.generic.edit import FormView
 from unit.forms import AllElementsForm
-from viewflow.viewform import Layout, Fieldset, Row, Column, Span2
+from viewflow.site import Layout, Fieldset, Row, Column, Span2
 
 
 class TestFormView(FormView):
