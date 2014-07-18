@@ -23,6 +23,19 @@ class ShipmentFlowDiagrammTests(TestCase):
 class ShipmentFlowTests(TestCase):
     fixtures = ['shipment/default_data.json']
 
+    sample_shipment = {
+        'shipment_no': '#TST-20140101-1',
+        'first_name': 'John',
+        'last_name': 'Doe',
+        'email': 'john@doe.com',
+        'phone': '+1-555000111',
+        'address': 'Nowhere St, 21',
+        'zipcode': '05501',
+        'city': 'Washington',
+        'state': 'NY',
+        'country': 'Unated states'
+    }
+
     def task(self, process, flow_task):
         return Task.objects.get(process=process, flow_task=flow_task)
 
@@ -34,7 +47,7 @@ class ShipmentFlowTests(TestCase):
         with FlowTest(ShipmentFlow) as flow:
             # Clerk start process
             flow.Task(ShipmentFlow.start).User('shipment/clerk') \
-                .Execute({'goods_tag': 'TST123'}) \
+                .Execute(self.sample_shipment) \
                 .Assert(lambda p: p.created is not None) \
                 .Assert(lambda p: self.task(p, ShipmentFlow.start).owner.username == 'shipment/clerk')
 
@@ -61,7 +74,7 @@ class ShipmentFlowTests(TestCase):
         with FlowTest(ShipmentFlow) as flow:
             # Clerk start process
             flow.Task(ShipmentFlow.start).User('shipment/clerk') \
-                .Execute({'goods_tag': 'TST123'}) \
+                .Execute(self.sample_shipment) \
                 .Assert(lambda p: p.created is not None)
 
             # Clerk decides that is normal shipment post
