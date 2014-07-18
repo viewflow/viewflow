@@ -12,10 +12,10 @@
     {% viewpart field prepend %}{% endviewpart %}{% viewpart field control %}
     {% for value, choice in field.choices %}
     <div class="radio">
-        <label for="id_choicesradio_field_{{ forloop.counter0 }}">
+        <label for="id_{{ bound_field.html_name }}_{{ forloop.counter0 }}">
             <input {% tagattrs %}
-                   id="id_choicesradio_field_{{ forloop.counter0 }}"
-                   name="{{ bound_field.name }}"
+                   id="id_{{ bound_field.html_name }}_{{ forloop.counter0 }}"
+                   name="{{ bound_field.html_name }}"
                    type="radio"
                    value="{{ value }}"
                    {% if value == bound_field.value %}checked{% endif %}{% endtagattrs %}/> {{ choice }}
@@ -25,7 +25,7 @@
     {% endviewpart %}{% viewpart field append %}{% endviewpart %}
     {% viewpart field errors %}
         {% if bound_field.errors %}
-            {% include  'viewform/bootstrap3/field_errors.html' %}
+            {% include  'viewflow/form/bootstrap3/field_errors.html' %}
         {% endif %}
     {% endviewpart %}{% viewpart field help_text %}
         {% if field.help_text %}

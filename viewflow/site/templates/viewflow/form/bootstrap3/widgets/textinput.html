@@ -14,13 +14,13 @@
         <input {% tagattrs %}
                type="{{ field.widget.input_type }}"
                class="form-control"
-               name="{{ bound_field.name }}"
-               id="id_{{ bound_field.name }}"{% endtagattrs %}{% if bound_field.value %} value="{{ bound_field.value }}"{% endif %}>
+               name="{{ bound_field.html_name }}"
+               id="id_{{ bound_field.html_name }}"{% endtagattrs %}{% if bound_field.value %} value="{{ bound_field.value }}"{% endif %}>
         {% endviewpart %}{% viewpart field append %}{% endviewpart %}
     </div>
     {% viewpart field errors %}
         {% if bound_field.errors %}
-            {% include  'viewform/bootstrap3/field_errors.html' %}
+            {% include  'viewflow/form/bootstrap3/field_errors.html' %}
         {% endif %}
     {% endviewpart %}{% viewpart field help_text %}
         {% if field.help_text %}

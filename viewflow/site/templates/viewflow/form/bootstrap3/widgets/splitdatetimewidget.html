@@ -16,7 +16,7 @@
     </div>
     {% viewpart field errors %}
         {% if bound_field.errors %}
-            {% include  'viewform/bootstrap3/field_errors.html' %}
+            {% include  'viewflow/form/bootstrap3/field_errors.html' %}
         {% endif %}
     {% endviewpart %}{% viewpart field help_text %}
         {% if field.help_text %}

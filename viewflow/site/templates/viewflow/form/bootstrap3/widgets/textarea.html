@@ -12,15 +12,13 @@
     <div class="input-group" style="width:100%">
         <textarea {% tagattrs %}
                   class="form-control"
-                  name="{{ bound_field.name }}"
-                  id="id_{{ bound_field.name }}"
-                  rows="8"{% endtagattrs %}>
-            {% if bound_field.value %}{{ bound_field.value }}{% endif %}
-        </textarea>
+                  name="{{ bound_field.html_name }}"
+                  id="id_{{ bound_field.html_name }}"
+                  rows="8"{% endtagattrs %}>{% if bound_field.value %}{{ bound_field.value }}{% endif %}</textarea>
     </div>
     {% viewpart field errors %}
         {% if bound_field.errors %}
-            {% include  'viewform/bootstrap3/field_errors.html' %}
+            {% include  'viewflow/form/bootstrap3/field_errors.html' %}
         {% endif %}
     {% endviewpart %}{% viewpart field help_text %}
         {% if field.help_text %}

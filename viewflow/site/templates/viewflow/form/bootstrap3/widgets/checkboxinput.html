@@ -10,15 +10,15 @@
     <label for="{{ bound_field.id_for_label }}">
         {% viewpart field prepend %}{% endviewpart %}{% viewpart field control %}
         <input type="checkbox"
-               name="{{ bound_field.name }}"
-               id="id_{{ bound_field.name }}"
+               name="{{ bound_field.html_name }}"
+               id="id_{{ bound_field.html_name }}"
                {% if bound_field.value %}checked{% endif %}> {{ bound_field.label }}
         {% endviewpart %}{% viewpart field append %}{% endviewpart %}
     </label>
     {% endviewpart %}
     {% viewpart field errors %}
         {% if bound_field.errors %}
-            {% include  'viewform/bootstrap3/field_errors.html' %}
+            {% include  'viewflow/form/bootstrap3/field_errors.html' %}
         {% endif %}
     {% endviewpart %}{% viewpart field help_text %}
         {% if field.help_text %}

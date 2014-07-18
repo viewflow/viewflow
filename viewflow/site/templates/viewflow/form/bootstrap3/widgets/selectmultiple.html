@@ -14,8 +14,8 @@
         <select {% tagattrs %}
                 data-viewform-control="multiselect"
                 class="form-control"
-                name="{{ bound_field.name }}"
-                id="id_{{ bound_field.name }}" multiple{% endtagattrs %}>
+                name="{{ bound_field.html_name }}"
+                id="id_{{ bound_field.html_name }}" multiple{% endtagattrs %}>
             {% for value, choice in field.choices %}
             <option value="{{ value }}" {% if value == field.value %}selected="selected"{% endif %}>{{ choice }}</option>
             {% endfor %}
@@ -24,7 +24,7 @@
     </div>
     {% viewpart field errors %}
         {% if bound_field.errors %}
-            {% include  'viewform/bootstrap3/field_errors.html' %}
+            {% include  'viewflow/form/bootstrap3/field_errors.html' %}
         {% endif %}
     {% endviewpart %}{% viewpart field help_text %}
         {% if field.help_text %}

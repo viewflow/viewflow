@@ -31,3 +31,11 @@
     </tbody>
     {% endwith %}
 </table>
+{% for form in inline.forms %}
+    {% viewpart form hidden %}
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+    {% endviewpart %}
+{% endfor %}
+{{ inline.management_form }}
