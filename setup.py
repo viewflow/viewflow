@@ -23,13 +23,20 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: Software Development :: Libraries :: Python Modules',
     ],
-    install_requires=['Django>=1.6',
-                      'celery>=3.1',
-                      'singledispatch>=3.4',
-                      'django-fsm>=2.0',
-                      'webtest>=2.0',
-                      'django-webtest>=1.7',
-                      'django-bootstrap3>=4.7.0'],
+    install_requires=[
+        # viewflow
+        'Django>=1.6',
+        'celery>=3.0',
+        'singledispatch>=3.0',
+        'django-fsm>=2.0',
+        # viewflow.site
+        'django-extra-views',
+        'django-tag-parser',
+        'django-formset-js',
+        # viewflow.test
+        'django-webtest',
+        'webtest'
+    ],
     packages=['viewflow',
               'viewflow.flow',
               'viewflow.management',

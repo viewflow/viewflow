@@ -53,16 +53,18 @@
         </div>
     </body>
     {% block js %}
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
-    <script src="{% static 'viewform/bootstrap3/datetimepicker/bootstrap-datetimepicker.min.js' %}"></script>
-    <script src="{% static 'viewform/bootstrap3/chosen/chosen.jquery.js' %}"></script>
+    <script src="{% static 'viewflow/jquery/jquery-2.1.1.min.js' %}"></script>
+    <script src="{% static 'viewflow/jquery/jquery.formset.min.js' %}"></script>
+    <script src="{% static 'viewflow/bootstrap3/js/bootstrap.min.js' %}"></script>
+    <script src="{% static 'viewflow/datetimepicker/bootstrap-datetimepicker.min.js' %}"></script>
+    <script src="{% static 'viewflow/chosen/chosen.jquery.min.js' %}"></script>
     <script>
         $(document).ready(function() {
             $('[data-viewform-control="date"]').datetimepicker({'autoclose': true});
             $('[data-viewform-control="time"]').datetimepicker({'autoclose': true});
             $('[data-viewform-control="datetime"]').datetimepicker({'autoclose': true});
-            $('[data-viewform-control="multiselect"]').chosen({ width: '100%' });
+            $('[data-viewform-control="multiselect"]').chosen({width: '100%'});
+            $('[data-viewform-control="formset"]').formset({'animateForms': true});
         });
     </script>
     {% endblock %}

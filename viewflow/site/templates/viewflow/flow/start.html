@@ -12,6 +12,6 @@
     {% csrf_token %}
     {% viewform 'viewflow/form/bootstrap3/form.html' form=form layout=view.layout %} {% endviewform %}
     {{ activation.management_form }}
-    <button type="submit" name="start" class="btn btn-primary">Start</button>
+    <button type="submit" name="start" class="btn btn-primary btn-lg">Start</button>
 </form>
 {% endblock %}

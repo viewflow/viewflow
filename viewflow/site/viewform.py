@@ -8,7 +8,7 @@ from django.utils.encoding import smart_text
 
 class LayoutNode(object):
     """
-    Base class for self-rendered nodes for {% render %} template tag,
+    Base class for self-rendered nodes for {% include %} template tag,
     based on context defined template pack
     """
     span_columns = 1
