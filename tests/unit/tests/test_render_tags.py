@@ -5,10 +5,10 @@ from unit.forms import AllElementsForm
 
 class TestRenderTag(TestCase):
     DEFAULT_RENDER_TEMPLATE = """
-        {% load viewflow %}
-        {% viewform 'viewflow/form/layout.html' %}
-            {% viewpart field 'text_input' %}
-            REDEFINED
+        {% load viewform %}
+        {% viewform 'viewflow/form/bootstrap3/form.html' form=form layout=view.layout %}
+            {% viewpart form.text_input.field %}
+                REDEFINED
             {% endviewpart %}
         {% endviewform %}
     """

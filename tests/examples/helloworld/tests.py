@@ -4,6 +4,8 @@ from examples.helloworld.flows import HelloWorldFlow
 
 
 class HelloWorldFlowTests(TestCase):
+    fixtures = ['helloworld/default_data.json']
+
     def test_normal_flow_succeed(self):
         with FlowTest(HelloWorldFlow) as flow:
             # The `employee` starts process

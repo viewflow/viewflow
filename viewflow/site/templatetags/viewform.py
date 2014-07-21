@@ -4,6 +4,7 @@ from collections import defaultdict
 
 from django import template
 from django.template.loader import get_template
+from django.utils import formats
 
 from tag_parser import template_tag
 from tag_parser.basetags import BaseNode
@@ -128,7 +129,37 @@ class ViewFieldNode(BaseNode):
 
 
 @template_tag(register, 'tagattrs')
-class CssClassNode(BaseContainerNode):
+class TagAttrsNode(BaseContainerNode):
     def render_tag(self, context):
         value = self.nodelist.render(context)
         return re.sub('[\n ]+', ' ', value).strip()
+
+
+@register.filter
+def datepicker_format(field):
+    input_format = field.input_formats[0]
+
+    # %a, %A, %z, %f %Z %j %U %W %c %x %X unsupported
+
+    subst = {
+        '%d': 'dd',    # Day of the month as a zero-padded decimal number
+        '%b': 'M',     # Month as locale’s abbreviated name
+        '%B': 'MM',    # Month as locale’s full name
+        '%m': 'mm',    # Month as a zero-padded decimal number
+        '%y': 'yy',    # Year without century as a zero-padded decimal number
+        '%Y': 'yyyy',  # Year with century as a decimal number
+        '%H': 'hh',    # Hour (24-hour clock) as a zero-padded decimal number
+        '%I': 'HH',    # Hour (12-hour clock) as a zero-padded decimal number
+        '%p': 'P',     # Locale’s equivalent of either AM or PM
+        '%M': 'ii',    # Minute as a zero-padded decimal number
+        '%S': 'ss',    # Second as a zero-padded decimal number
+        '%%': '%'      # A literal '%' character
+    }
+
+    return re.sub('|'.join(re.escape(key) for key in subst.keys()),
+                  lambda k: subst[k.group(0)], input_format)
+
+
+@register.filter
+def datepicker_value(bound_field):
+    return formats.localize_input(bound_field.value(), bound_field.field.input_formats[0])

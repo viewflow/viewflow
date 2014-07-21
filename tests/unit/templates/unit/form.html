@@ -1,6 +1,10 @@
 {% extends 'viewflow/base_site.html' %}
-{% load viewflow %}
+{% load viewform %}
+
 {% block content %}
+<div class="page-header">
+    <h1> Form rendering example</h1>
+</div>
 <div class="nav-tabs-custom">
     <ul class="nav nav-tabs" role="tablist">
         <li class="active">
@@ -13,10 +17,9 @@
     <div class="tab-content">
         <div class="tab-pane active" id="viewflow_tab">
             <form method="POST" enctype="multipart/form-data">
-                {% viewform 'viewflow/form/layout.html' %}
+                {% viewform 'viewflow/form/bootstrap3/form.html' form=form layout=view.layout %}
                      {# Add pencil icon on text_input field #}
-                     {% viewpart field_group_class_add 'text_input' %}has-feedback{% endviewpart %}
-                     {% viewpart field_icon 'text_input' %}<span class="glyphicon glyphicon glyphicon-pencil form-control-feedback"></span>{% endviewpart %}
+                     {% viewpart form.text_input.field append %}<span class="glyphicon glyphicon glyphicon-pencil input-group-addon"></span>{% endviewpart %}
                 {% endviewform %}
             </form>
         </div>
