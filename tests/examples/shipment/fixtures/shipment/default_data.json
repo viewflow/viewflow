@@ -1,57 +1,5 @@
 [
 {
-    "model": "contenttypes.contenttype",
-    "fields": {
-        "name": "shipment process",
-        "app_label": "shipment",
-        "model": "shipmentprocess"
-    }
-},
-{
-    "fields": {
-        "content_type": [
-            "shipment",
-            "shipmentprocess"
-        ],
-        "name": "Can start shipment request",
-        "codename": "can_start_request"
-    },
-    "model": "auth.permission"
-},
-{
-    "fields": {
-        "content_type": [
-            "shipment",
-            "shipmentprocess"
-        ],
-        "name": "Can take extra insurance",
-        "codename": "can_take_extra_insurance"
-    },
-    "model": "auth.permission"
-},
-{
-    "fields": {
-        "content_type": [
-            "shipment",
-            "shipmentprocess"
-        ],
-        "name": "Can package goods",
-        "codename": "can_package_goods"
-    },
-    "model": "auth.permission"
-},
-{
-    "fields": {
-        "content_type": [
-            "shipment",
-            "shipmentprocess"
-        ],
-        "name": "Can move package",
-        "codename": "can_move_package"
-    },
-    "model": "auth.permission"
-},
-{
     "fields": {
         "name": "shipment/clerk",
         "permissions": [
