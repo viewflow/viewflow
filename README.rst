@@ -56,12 +56,6 @@ Start with process database model definition
         text = models.ChatField(max_lenght=150, blank=True, null=True)
         approved = models.BooleanField(default=False)
 
-        class Meta:
-            permissions = [
-                ('can_start_request', 'Can start hello world request'),
-                ('can_approve_request', 'Can approve hello world request')
-            ]
-
 Define the actual task that says Hello to the World in `task.py`
 
 .. code-block:: python
@@ -92,11 +86,11 @@ To make the above code work just put the following flow definition in `flows.py`
         lock_impl = lock.select_for_update_lock
 
         start = flow.Start(StartView, fields=["text"]) \
-           .Permission('helloworld.can_start_request') \
+           .Permission(auto_create=True) \
            .Next(this.hello_world)
 
         approve = flow.View(ProcessView, fields=["approve"]) \
-            .Permission('helloworld.can_approve_request')
+            .Permission(auto_create=True)
             .Next(this.check_approve)
 
         check_approve = flow.If(cond=lambda p: p.approved) \

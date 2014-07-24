@@ -1,40 +1,10 @@
 [
 {
-    "model": "contenttypes.contenttype",
-    "fields": {
-        "name": "hello world process",
-        "app_label": "helloworld",
-        "model": "helloworldprocess"
-    }
-},
-{
-    "model": "auth.permission",
-    "fields": {
-        "content_type": [
-            "helloworld",
-            "helloworldprocess"
-        ],
-        "name": "Can start HelloWorld request",
-        "codename": "can_start_process"
-    }
-},
-{
-    "model": "auth.permission",
-    "fields": {
-        "content_type": [
-            "helloworld",
-            "helloworldprocess"
-        ],
-        "name": "Can approve HelloWorld request",
-        "codename": "can_approve_request"
-    }
-},
-{
     "model": "auth.user",
     "fields": {
        "user_permissions": [
             [
-                "can_start_process",
+                "can_start_helloworldprocess",
                 "helloworld",
                 "helloworldprocess"
             ]
@@ -47,7 +17,7 @@
     "fields": {
         "user_permissions": [
             [
-                "can_approve_request",
+                "can_approve_helloworldprocess",
                 "helloworld",
                 "helloworldprocess"
             ]
