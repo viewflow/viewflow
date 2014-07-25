@@ -10,7 +10,7 @@
 
     {% if layout %}
         {% viewpart form visible %}
-            {% include layout with parent=layout %}
+            {% render layout %}
         {% endviewpart %}
     {% else %}
         {% viewpart form visible %}

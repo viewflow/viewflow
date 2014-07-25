@@ -107,6 +107,22 @@ class ViewPartNode(BaseContainerNode):
         return value
 
 
+@template_tag(register, 'render')
+class RenderNode(BaseNode):
+    """
+    Simplifyed include tag for form layout elements
+
+    Usage:
+
+        {% render layout_elem %}
+    """
+    max_args = 1
+
+    def render_tag(self, context, element):
+        with context.push({'parent': element}):
+                return element.render(context)
+
+
 @template_tag(register, 'viewfield')
 class ViewFieldNode(BaseNode):
     """

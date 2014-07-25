@@ -1,9 +1,10 @@
+{% load viewform %}
 <fieldset>
 {% if parent.label %}
 <legend>{{ parent.label }}</legend>
 {% endif %}
 
 {% for element in parent.elements %}
-    {% include element with parent=element %}
+    {% render element %}
 {% endfor %}
 </fieldset>

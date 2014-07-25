@@ -1,3 +1,4 @@
+{% load viewform %}
 {% for element in parent.elements %}
-    {% include element with parent=element %}
+    {% render element %}
 {% endfor %}
