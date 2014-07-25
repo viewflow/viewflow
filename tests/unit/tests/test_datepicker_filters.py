@@ -28,4 +28,4 @@ class TestDatePickerFormatFilter(TestCase):
         for input_format, output_format in translations.items():
             field = DateTimeField(input_formats=[input_format])
             result = viewform.datepicker_format(field)
-            self.assertEquals(output_format, result)
+            self.assertEqual(output_format, result)

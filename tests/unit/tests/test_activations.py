@@ -57,7 +57,7 @@ class TestJobActivation(TestCase):
         with mock.patch('viewflow.activation.get_task_ref'):
             act = activation.JobActivation.activate(flow_task_mock, prev_activation_mock, Token('start'))
             act.task.save.assert_has_calls(())
-            self.assertEquals(1, flow_task_mock.job.apply_async.call_count)
+            self.assertEqual(1, flow_task_mock.job.apply_async.call_count)
 
     def test_job_activation_lifecycle(self):
         flow_task_mock = mock.Mock(spec=flow.Job(lambda *args, **kwargs: None))
