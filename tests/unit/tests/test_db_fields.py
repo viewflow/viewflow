@@ -1,7 +1,7 @@
 from django.test import TestCase
-from unit.models import FlowReferencedModel, TokenModel
-from unit.flows import SingleTaskFlow, AllTaskFlow
 from viewflow.token import Token
+from ..models import FlowReferencedModel, TokenModel
+from ..flows import SingleTaskFlow, AllTaskFlow
 
 
 class TestReferenceFields(TestCase):

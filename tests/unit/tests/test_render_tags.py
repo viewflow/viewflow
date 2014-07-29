@@ -1,6 +1,6 @@
 from django.template import Template, Context
 from django.test import TestCase
-from unit.forms import AllElementsForm
+from ..forms import AllElementsForm
 
 
 class TestRenderTag(TestCase):

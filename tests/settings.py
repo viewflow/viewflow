@@ -22,11 +22,11 @@ INSTALLED_APPS = (
     'viewflow',
     'viewflow.site',
     # Tests
-    'unit',
-    'integration',
+    'tests.unit',
+    'tests.integration',
     # Examples
-    'examples.shipment',
-    'examples.helloworld'
+    'tests.examples.shipment',
+    'tests.examples.helloworld'
 )
 
 MIDDLEWARE_CLASSES = (

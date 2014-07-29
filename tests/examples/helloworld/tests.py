@@ -1,6 +1,6 @@
 from django.test import TestCase
 from viewflow.test import FlowTest
-from examples.helloworld.flows import HelloWorldFlow
+from .flows import HelloWorldFlow
 
 
 class HelloWorldFlowTests(TestCase):

@@ -6,8 +6,8 @@ from viewflow.graphviz import diagram
 from viewflow.models import Task
 from viewflow.test import FlowTest
 
-from examples.shipment.flows import ShipmentFlow
-from examples.shipment.models import Carrier
+from .flows import ShipmentFlow
+from .models import Carrier
 
 
 class ShipmentFlowDiagrammTests(TestCase):

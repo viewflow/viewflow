@@ -1,8 +1,9 @@
 from viewflow import flow, lock
 from viewflow.base import Flow, this
 
-from .tasks import dummy_job
+from .tasks import dummy_job, start_process, do_task
 from .models import TestProcess
+from .signals import test_start_flow, test_done_flow_task
 
 
 @flow.flow_view()
@@ -65,4 +66,14 @@ class AutoPermissionsFlow(Flow):
         .Permission(auto_create=True) \
         .Next(this.end)
 
+    end = flow.End()
+
+
+class SignalFlow(Flow):
+    process_cls = TestProcess
+
+    start = flow.StartSignal(test_start_flow, start_process) \
+        .Next(this.task)
+    task = flow.Signal(test_done_flow_task, do_task) \
+        .Next(this.end)
     end = flow.End()

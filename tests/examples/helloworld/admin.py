@@ -1,6 +1,6 @@
 from django.contrib import admin
 from viewflow.admin import ProcessAdmin, TaskAdmin
-from examples.helloworld import models, flows
+from . import models, flows
 
 
 @admin.register(models.HelloWorldProcess)

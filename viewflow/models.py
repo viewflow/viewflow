@@ -48,6 +48,18 @@ class Process(models.Model):
     def active_tasks(self):
         return Task.objects.filter(process=self, finished__isnull=True).order_by('created')
 
+    def get_task(self, flow_task, status=None):
+        """
+        Return task instance
+        """
+        if status is None:
+            status = [Task.STATUS.NEW, Task.STATUS.ASSIGNED, Task.STATUS.STARTED]
+        elif not isinstance(status, (list, tuple)):
+            status = [status]
+
+        return self.flow_cls.task_cls._default_manager.get(
+            process=self, flow_task=flow_task, status__in=status)
+
     def __str__(self):
         if self.flow_cls:
             return "<{}/{}> - {}".format(self.flow_cls._meta.namespace, self.pk, self.get_status_display())

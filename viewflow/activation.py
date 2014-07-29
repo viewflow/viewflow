@@ -180,6 +180,28 @@ class TaskActivation(Activation):
         for outgoing in self.flow_task._outgoing():
             outgoing.dst.activate(prev_activation=self, token=self.task.token)
 
+    @classmethod
+    def activate(cls, flow_task, prev_activation, token):
+        """
+        Instantiate new task
+        """
+
+        flow_cls, flow_task = flow_task.flow_cls, flow_task
+        process = prev_activation.process
+
+        task = flow_cls.task_cls(
+            process=process,
+            flow_task=flow_task,
+            token=token)
+
+        task.save()
+        task.previous.add(prev_activation.task)
+
+        activation = cls()
+        activation.initialize(flow_task, task)
+
+        return activation
+
 
 class ViewActivation(TaskActivation):
     """

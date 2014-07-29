@@ -4,7 +4,7 @@ from django.template import Template, Context
 from django.test import TestCase
 
 from viewflow.models import Process, Task
-from unit.flows import SingleTaskFlow, AllTaskFlow
+from ..flows import SingleTaskFlow, AllTaskFlow
 
 
 urlpatterns = patterns('',  # NOQA
@@ -26,7 +26,7 @@ class TestURLPatterns(TestCase):
 
 
 class TestURLReverse(TestCase):
-    urls = 'unit.tests.test_urls'
+    urls = 'tests.unit.tests.test_urls'
 
     def test_django_reverse_flow_urls_succeed(self):
         reverse('viewflow:index', current_app=SingleTaskFlow._meta.app_label)
@@ -53,7 +53,7 @@ class TestURLReverse(TestCase):
 
 
 class TestFlowUrlTag(TestCase):
-    urls = 'unit.tests.test_urls'
+    urls = 'tests.unit.tests.test_urls'
 
     def test_index_resolve_succeed(self):
         template = Template("{% load viewflow %}{% flowurl 'unit/SingleTaskFlow' 'viewflow:index' %}")

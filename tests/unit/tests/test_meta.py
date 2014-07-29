@@ -1,5 +1,5 @@
 from django.test import TestCase
-from unit.flows import SingleTaskFlow
+from ..flows import SingleTaskFlow
 
 
 class TestMetaApi(TestCase):

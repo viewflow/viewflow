@@ -7,7 +7,7 @@ import queue
 from django.db import connection
 from viewflow.exceptions import FlowLockFailed
 from viewflow.lock import select_for_update_lock
-from integration.flows import NoTaskFlow
+from ..flows import NoTaskFlow
 
 
 @unittest.skipIf('integration' not in sys.argv, reason='Integration Test')

@@ -3,8 +3,8 @@ from viewflow.base import this, Flow
 from viewflow.views import ProcessView
 from viewflow.lock import select_for_update_lock
 
-from examples.shipment import views
-from examples.shipment.models import ShipmentProcess, ShipmentTask
+from . import views
+from .models import ShipmentProcess, ShipmentTask
 
 
 class ShipmentFlow(Flow):

@@ -5,7 +5,7 @@ from viewflow.models import Process
 
 
 def default():
-    from unit.flows import SingleTaskFlow
+    from .flows import SingleTaskFlow
     return SingleTaskFlow.start
 
 
