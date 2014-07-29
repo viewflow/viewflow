@@ -21,14 +21,19 @@ class StartSignal(Event):
         for next_node in self._activate_next:
             yield Edge(src=self, dst=next_node, edge_class='next')
 
-    def on_message(self, **kwargs):
-        activation = self.activation_cls()
-        activation.initialize(self)
-        self.receiver(activation, **kwargs)
+    def on_signal(self, **signal_kwargs):
+        if isinstance(self.receiver, type) and issubclass(self.receiver, StartActivation):
+            receiver = self.receiver()
+            receiver.initialize(self)
+            receiver(**signal_kwargs)
+        else:
+            activation = self.activation_cls()
+            activation.initialize(self)
+            self.receiver(activation, **signal_kwargs)
 
     def ready(self):
         self.signal.connect(
-            self.on_message, sender=self.sender,
+            self.on_signal, sender=self.sender,
             dispatch_uid="viewflow.flow.signal/{}.{}.{}".format(
                 self.flow_cls.__module__, self.flow_cls.__name__, self.name))
 
@@ -51,7 +56,7 @@ def flow_signal(task_loader=None, **lock_args):
     """
     def decorator(func_or_cls):
         def wrapper(flow_task, **signal_kwargs):
-            if isinstance(func_or_cls, Receiver):
+            if isinstance(func_or_cls, type) and issubclass(func_or_cls, Receiver):
                 receiver_cls = func_or_cls
             else:
                 class FuncWrapper(Receiver):
