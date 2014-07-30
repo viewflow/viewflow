@@ -94,6 +94,18 @@ def _(flow_node, resolver):
         [resolver.get_implementation(node) for node in flow_node._activate_next]
 
 
+@resolve_children_links.register(flow.StartFunction)  # NOQA
+def _(flow_node, resolver):
+    flow_node._activate_next = \
+        [resolver.get_implementation(node) for node in flow_node._activate_next]
+
+
+@resolve_children_links.register(flow.Function)  # NOQA
+def _(flow_node, resolver):
+    flow_node._activate_next = \
+        [resolver.get_implementation(node) for node in flow_node._activate_next]
+
+
 @resolve_children_links.register(flow.Signal)  # NOQA
 def _(flow_node, resolver):
     flow_node._activate_next = \

@@ -1,4 +1,4 @@
-from viewflow.flow import flow_job, flow_signal
+from viewflow.flow import flow_job, flow_signal, flow_func
 
 
 @flow_job()
@@ -12,6 +12,12 @@ def start_process(activation, **kwargs):
 
 
 @flow_signal(lambda flow_task, sender: sender.get_task(flow_task))
-def do_task(activation, **kwargs):
+def do_signal_task(activation, **kwargs):
+    activation.prepare()
+    activation.done()
+
+
+@flow_func(lambda flow_task, process: process.get_task(flow_task))
+def do_func_task(activation, process):
     activation.prepare()
     activation.done()

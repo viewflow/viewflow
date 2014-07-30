@@ -1,7 +1,7 @@
 from viewflow import flow, lock
 from viewflow.base import Flow, this
 
-from .tasks import dummy_job, start_process, do_task
+from .tasks import dummy_job, start_process, do_signal_task, do_func_task
 from .models import TestProcess
 from .signals import test_start_flow, test_done_flow_task
 
@@ -74,6 +74,16 @@ class SignalFlow(Flow):
 
     start = flow.StartSignal(test_start_flow, start_process) \
         .Next(this.task)
-    task = flow.Signal(test_done_flow_task, do_task) \
+    task = flow.Signal(test_done_flow_task, do_signal_task) \
+        .Next(this.end)
+    end = flow.End()
+
+
+class FunctionFlow(Flow):
+    process_cls = TestProcess
+
+    start = flow.StartFunction(start_process) \
+        .Next(this.task)
+    task = flow.Function(do_func_task) \
         .Next(this.end)
     end = flow.End()
