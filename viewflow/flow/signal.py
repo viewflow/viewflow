@@ -41,6 +41,9 @@ class StartSignal(Event):
         self._activate_next.append(node)
         return self
 
+    def has_perm(self, user):
+        return False
+
 
 class Receiver(object):
     def get_task(self, flow_task, **signal_kwargs):

@@ -42,6 +42,9 @@ class StartFunction(Event):
         self._activate_next.append(node)
         return self
 
+    def has_perm(self, user):
+        return False
+
 
 class FlowFunc(object):
     def get_task(self, flow_task, *func_args, **func_kwars):
