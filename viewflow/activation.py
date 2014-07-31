@@ -402,6 +402,8 @@ class GateActivation(Activation):
                     activation.execute()
             except Exception as exc:
                 activation.error(exc)
+            else:
+                activation.done()
 
         return activation
 

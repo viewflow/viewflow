@@ -1,7 +1,7 @@
 from viewflow import flow, lock
 from viewflow.base import Flow, this
 
-from .tasks import dummy_job, start_process, do_signal_task, do_func_task
+from . import tasks
 from .models import TestProcess
 from .signals import test_start_flow, test_done_flow_task
 
@@ -26,7 +26,7 @@ class AllTaskFlow(Flow):
 
     start = flow.Start().Next(this.view)
     view = flow.View(perform_task).Next(this.job)
-    job = flow.Job(dummy_job).Next(this.iff)
+    job = flow.Job(tasks.dummy_job).Next(this.iff)
     iff = flow.If(lambda act: True).OnTrue(this.switch).OnFalse(this.switch)
     switch = flow.Switch().Default(this.split)
     split = flow.Split().Always(this.join)
@@ -42,7 +42,7 @@ class FailedJobFlow(Flow):
     lock_impl = lock.cache_lock
 
     start = flow.Start().Next(this.job)
-    job = flow.Job(dummy_job).Next(this.iff)
+    job = flow.Job(tasks.dummy_job).Next(this.iff)
     iff = flow.If(lambda p: 2/(1-1)).OnTrue(this.end).OnFalse(this.end)
     end = flow.End()
 
@@ -54,7 +54,7 @@ class FailedGateFlow(Flow):
     lock_impl = lock.cache_lock
 
     start = flow.Start().Next(this.job)
-    job = flow.Job(dummy_job).Next(this.iff)
+    job = flow.Job(tasks.dummy_job).Next(this.iff)
     iff = flow.If(lambda p: 2/0).OnTrue(this.end).OnFalse(this.end)
     end = flow.End()
 
@@ -72,9 +72,9 @@ class AutoPermissionsFlow(Flow):
 class SignalFlow(Flow):
     process_cls = TestProcess
 
-    start = flow.StartSignal(test_start_flow, start_process) \
+    start = flow.StartSignal(test_start_flow, tasks.start_process) \
         .Next(this.task)
-    task = flow.Signal(test_done_flow_task, do_signal_task) \
+    task = flow.Signal(test_done_flow_task, tasks.do_signal_task) \
         .Next(this.end)
     end = flow.End()
 
@@ -82,8 +82,13 @@ class SignalFlow(Flow):
 class FunctionFlow(Flow):
     process_cls = TestProcess
 
-    start = flow.StartFunction(start_process) \
-        .Next(this.task)
-    task = flow.Function(do_func_task) \
+    start = flow.StartFunction(tasks.start_process) \
+        .Next(this.task1)
+
+    task1 = flow.Handler(tasks.do_handler_task) \
+        .Next(this.task2)
+
+    task2 = flow.Function(tasks.do_func_task) \
         .Next(this.end)
+
     end = flow.End()

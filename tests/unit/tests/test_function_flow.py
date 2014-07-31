@@ -10,9 +10,9 @@ class TestSignalFlow(TestCase):
         process = TestProcess.objects.first()
 
         # do the task
-        FunctionFlow.task.run(process)
+        FunctionFlow.task2.run(process)
         process = TestProcess.objects.first()
 
         # process should be finished
         self.assertEqual(TestProcess.STATUS.FINISHED, process.status)
-        self.assertEqual(3, process.task_set.count())
+        self.assertEqual(4, process.task_set.count())

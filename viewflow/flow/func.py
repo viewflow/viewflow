@@ -1,8 +1,9 @@
 """
 Function handlers as part of flow
 """
+from django.db import transaction
 from viewflow.flow.base import Event, Edge
-from viewflow.activation import StartActivation, TaskActivation
+from viewflow.activation import StartActivation, TaskActivation, context
 
 
 class StartFunction(Event):
@@ -107,6 +108,70 @@ class Function(Event):
 
     def run(self, *args, **kwargs):
         self.func(self, *args, **kwargs)
+
+    def Next(self, node):
+        self._activate_next.append(node)
+        return self
+
+
+class HandlerActivation(TaskActivation):
+    """
+    Executes callback handler synchronously, as soon as prev task completes
+    """
+    def execute(self):
+        self.flow_task.handler(self)
+
+    @classmethod
+    def activate(cls, flow_task, prev_activation, token):
+        """
+        Activates gate, executes it immediately, and activates next tasks.
+        """
+        flow_cls, flow_task = flow_task.flow_cls, flow_task
+        process = prev_activation.process
+
+        task = flow_cls.task_cls(
+            process=process,
+            flow_task=flow_task,
+            token=token)
+
+        task.save()
+        task.previous.add(prev_activation.task)
+
+        activation = cls()
+        activation.initialize(flow_task, task)
+        activation.prepare()
+
+        if context.propagate_exception:
+            """
+            Any execution exception would be propagated back,
+            assume that rollback will happens and no task activation would be stored
+            """
+            activation.execute()
+        else:
+            """
+            On error, save the task and not propagate exception on top
+            """
+            try:
+                with transaction.atomic(savepoint=True):
+                    activation.execute()
+            except Exception as exc:
+                activation.error(exc)
+
+        return activation
+
+
+class Handler(Event):
+    task_type = 'FUNC'
+    activation_cls = HandlerActivation
+
+    def __init__(self, handler, **kwargs):
+        self.handler = handler
+        super(Handler, self).__init__(**kwargs)
+        self._activate_next = []
+
+    def _outgoing(self):
+        for next_node in self._activate_next:
+            yield Edge(src=self, dst=next_node, edge_class='next')
 
     def Next(self, node):
         self._activate_next.append(node)
