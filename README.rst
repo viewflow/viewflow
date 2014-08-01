@@ -2,7 +2,7 @@
 django-viewflow
 ===============
 
-Ad-hoc business process automation framework for Django.
+Ad-hoc business process automation framework for Django http://viewflow.io.
 
 .. image:: https://travis-ci.org/kmmbvnr/django-viewflow.svg
    :target: https://travis-ci.org/kmmbvnr/django-viewflow
@@ -127,6 +127,15 @@ License
 
 Changelog
 =========
+
+0.4.0 2014-08-01
+-----------------
+
+* Demo and promo available at http://viewflow.io
+* Introduced django signals, python functions as flow task
+* Improved form rendering, dynamic formset support out of the box
+* Refactor viewflow.site to separate app
+
 
 0.3.0 2014-07-01
 -----------------
