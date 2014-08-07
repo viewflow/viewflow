@@ -33,7 +33,7 @@ Start with process database model definition
     from viewflow.models import Process
 
     class HelloworldProcess(Process):
-        text = models.ChatField(max_lenght=150, blank=True, null=True)
+        text = models.ChatField(max_length=150, blank=True, null=True)
         approved = models.BooleanField(default=False)
 
         class Meta:
