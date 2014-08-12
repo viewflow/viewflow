@@ -28,7 +28,8 @@
 <ul class="nav">
     <li {% if request.path == "/" %}class="active"{% endif %}><a href="/">Home</a></li>
     <li {% if "/helloworld/" in request.path %}class="active"{% endif %}><a href="{% flowurl 'helloworld/HelloWorldFlow' 'viewflow:index' %}">Hello, World</a></li>
-    <li {% if "/shipment" in request.path %}class="active"{% endif %}><a href="{% flowurl 'shipment/ShipmentFlow' 'viewflow:index' %}">Shipment</a></li>
+    <li {% if "/shipment/" in request.path %}class="active"{% endif %}><a href="{% flowurl 'shipment/ShipmentFlow' 'viewflow:index' %}">Shipment</a></li>
+    <li {% if "/dynamicsplit/" in request.path %}class="active"{% endif %}><a href="{% flowurl 'customnode/DynamicSplitFlow' 'viewflow:index' %}">Dynamic Split</a></li>
 </ul>
 {% endblock %}
 

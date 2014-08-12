@@ -26,7 +26,8 @@ INSTALLED_APPS = (
     'tests.integration',
     # Examples
     'tests.examples.shipment',
-    'tests.examples.helloworld'
+    'tests.examples.helloworld',
+    'tests.examples.customnode',
 )
 
 MIDDLEWARE_CLASSES = (
