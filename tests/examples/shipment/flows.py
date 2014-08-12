@@ -1,5 +1,6 @@
 from viewflow import flow
 from viewflow.base import this, Flow
+from viewflow.site import flowsite
 from viewflow.views import ProcessView
 from viewflow.lock import select_for_update_lock
 
@@ -69,3 +70,6 @@ class ShipmentFlow(Flow):
         .Assign(this.package_goods.owner)
 
     end = flow.End()
+
+
+flowsite.register(ShipmentFlow)

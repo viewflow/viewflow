@@ -27,10 +27,14 @@ class FlowMeta(object):
 
     @property
     def namespace(self):
+        return "{}/{}".format(self.app_label, self.flow_label)
+
+    @property
+    def flow_label(self):
         module = "{}.{}".format(self.flow_cls.__module__, self.flow_cls.__name__)
         app_config = apps.get_containing_app_config(module)
         subpath = module.lstrip(app_config.module.__package__+'.flows.')
-        return "{}/{}".format(app_config.label, subpath)
+        return subpath.lower().rstrip('flow').replace('.', '/')
 
     def nodes(self):
         """

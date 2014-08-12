@@ -113,3 +113,7 @@ body {
     background: none;
     color: #285e8e;
 }
+
+.login-panel {
+    margin-top: 25%;
+}

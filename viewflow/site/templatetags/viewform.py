@@ -151,6 +151,36 @@ class TagAttrsNode(BaseContainerNode):
         return re.sub('[\n ]+', ' ', value).strip()
 
 
+@register.inclusion_tag('viewflow/pagination.html')
+def pagination(page, on_each_side=3, on_ends=2):
+    paginator = page.paginator
+
+    page_range = []
+    if paginator.num_pages <= 10:
+        page_range = range(1, paginator.num_pages+1)
+    else:
+        # start part
+        if page.number > (on_each_side + on_ends + 1):
+            page_range.extend(range(1, on_ends+1))
+            page_range.append('.')
+            page_range.extend(range(page.number - on_each_side, page.number + 1))
+        else:
+            page_range.extend(range(1, page.number + 1))
+
+        # end part
+        if page.number < (paginator.num_pages - on_each_side - on_ends):
+            page_range.extend(range(page.number + 1, page.number + on_each_side+1))
+            page_range.append('.')
+            page_range.extend(range(paginator.num_pages - on_ends+1, paginator.num_pages+1))
+        else:
+            page_range.extend(range(page.number+1, paginator.num_pages+1))
+
+    return {
+        'page': page,
+        'page_range': page_range
+    }
+
+
 @register.filter
 def datepicker_format(field):
     input_format = field.input_formats[0]

@@ -20,7 +20,7 @@ class TestMetaApi(TestCase):
 
     def test_namespace_resolved(self):
         self.assertEqual('unit', SingleTaskFlow._meta.app_label)
-        self.assertEqual('unit/SingleTaskFlow', SingleTaskFlow._meta.namespace)
+        self.assertEqual('unit/singletask', SingleTaskFlow._meta.namespace)
 
 
 class TestMetaConstruction(TestCase):
