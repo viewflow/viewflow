@@ -1,34 +1,12 @@
 from django.core.exceptions import PermissionDenied
-from django.db import transaction
 from django.shortcuts import render, redirect
 
 from viewflow.flow.start import StartView
 from viewflow.flow.view import ProcessView, flow_view
-from viewflow.shortcuts import get_page
 
 
 start = StartView.as_view()
 task = ProcessView.as_view()
-
-
-@transaction.atomic()
-def index(request, flow_cls):
-    """
-    Default process index view for Flow
-
-    Lists all process instances with active tasks
-    """
-    process_list = flow_cls.process_cls.objects.filter(flow_cls=flow_cls) \
-                                               .order_by('-created')
-
-    templates = (
-        '{}/flow/index.html'.format(flow_cls._meta.app_label),
-        'viewflow/flow/index.html')
-
-    return render(request, templates, {'flow_cls': flow_cls,
-                                       'process_list': get_page(request, process_list),
-                                       'has_start_permission': flow_cls.start.has_perm(request.user)},
-                  current_app=flow_cls._meta.namespace)
 
 
 @flow_view()

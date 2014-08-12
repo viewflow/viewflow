@@ -6,7 +6,6 @@ from django.test import TestCase
 from viewflow.models import Process, Task
 from ..flows import SingleTaskFlow, AllTaskFlow
 
-
 urlpatterns = patterns('',  # NOQA
     url(r'^single_flow/', include(SingleTaskFlow.instance.urls)),
     url(r'^alltask_flow/', include(AllTaskFlow.instance.urls)))
@@ -20,7 +19,7 @@ class TestURLPatterns(TestCase):
         self.assertEqual(3, len(patterns))
 
         urls, app, namespace = patterns
-        self.assertEqual(4, len(urls))
+        self.assertEqual(3, len(urls))
         self.assertEqual('viewflow', app)
         self.assertEqual(SingleTaskFlow._meta.namespace, namespace)
 
@@ -29,8 +28,7 @@ class TestURLReverse(TestCase):
     urls = 'tests.unit.tests.test_urls'
 
     def test_django_reverse_flow_urls_succeed(self):
-        reverse('viewflow:index', current_app=SingleTaskFlow._meta.app_label)
-        reverse('viewflow:start', current_app=SingleTaskFlow._meta.app_label)
+        reverse('viewflow:start', current_app=SingleTaskFlow._meta.namespace)
         reverse('viewflow:task', args=[1, 1], current_app=SingleTaskFlow._meta.namespace)
         reverse('viewflow:task__assign', args=[1, 1], current_app=SingleTaskFlow._meta.namespace)
 
@@ -54,10 +52,6 @@ class TestURLReverse(TestCase):
 
 class TestFlowUrlTag(TestCase):
     urls = 'tests.unit.tests.test_urls'
-
-    def test_index_resolve_succeed(self):
-        template = Template("{% load viewflow %}{% flowurl 'unit/SingleTaskFlow' 'viewflow:index' %}")
-        self.assertEqual(template.render(Context({})), '/single_flow/')
 
     def test_task_resolve_succeed(self):
         template = Template(

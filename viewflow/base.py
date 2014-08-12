@@ -102,12 +102,6 @@ class FlowMetaClass(type):
             if 'process_description' not in attrs and len(docstring) > 1:
                 new_class.process_description = docstring[1].strip()
 
-        # index view
-        if not getattr(new_class, 'index_view', None):
-            from viewflow.views import index
-            new_class.index_view = index
-            new_class.index_view = staticmethod(new_class.index_view)
-
         # done flow setup
         for name, node in nodes.items():
             node.ready()
@@ -138,15 +132,13 @@ class Flow(object, metaclass=FlowMetaClass):
         """
         Provides ready to include urlpatterns required for this flow
         """
-        from django.conf.urls import url
-
         node_urls = [
-            url(r'^$', self.index_view, {'flow_cls': type(self)}, name='index')
         ]
 
         for node in self._meta.nodes():
             url_getter = getattr(self, 'url_{}'.format(node.name), None)
             url = url_getter() if url_getter else node_url(node)
+
             if isinstance(url, (list, tuple)):
                 node_urls += url
             elif url:
