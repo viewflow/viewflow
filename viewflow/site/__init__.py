@@ -5,4 +5,4 @@ from .viewform import (Layout, Row, Column, Fieldset, Inline,        # NOQA
                        LayoutMixin)
 
 
-flowsite = ViewSite()
+viewsite = ViewSite()

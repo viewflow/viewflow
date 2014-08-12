@@ -12,6 +12,8 @@ class FlowSiteMixin(object):
     flow_site = None
 
     def dispatch(self, request, *args, **kwargs):
+        if 'view_site' in kwargs:
+            self.view_site = kwargs['view_site']
         if 'flow_site' in kwargs:
             self.flow_site = kwargs['flow_site']
         if 'flow_cls' in kwargs:
@@ -25,7 +27,7 @@ class LoginView(FlowSiteMixin, generic.FormView):
     template_name = 'viewflow/login.html'
 
     def get_success_url(self):
-        return reverse('viewflow_site:index', current_app=self.flow_site.app_name)
+        return reverse('viewflow_site:index', current_app=self.view_site.app_name)
 
     def form_valid(self, form):
         auth_login(self.request, form.get_user())
@@ -34,7 +36,7 @@ class LoginView(FlowSiteMixin, generic.FormView):
 
 class LogoutView(FlowSiteMixin, generic.View):
     def get_success_url(self):
-        return reverse('viewflow_site:login', current_app=self.flow_site.app_name)
+        return reverse('viewflow_site:login', current_app=self.view_site.app_name)
 
     def get(self, request, *args, **kwargs):
         auth_logout(request)
@@ -63,8 +65,8 @@ def queues_view(request, flow_site=None):
 
 
 class ProcessListView(FlowSiteMixin, generic.ListView):
-    paginate_by = 3
-    paginate_orphans = 0
+    paginate_by = 15
+    paginate_orphans = 5
     context_object_name = 'process_list'
 
     def get_template_names(self):

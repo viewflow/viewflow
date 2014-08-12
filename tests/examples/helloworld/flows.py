@@ -1,6 +1,6 @@
 from viewflow import flow
 from viewflow.base import this, Flow
-from viewflow.site import flowsite
+from viewflow.site import viewsite
 from viewflow.views import StartView, ProcessView
 from viewflow.lock import select_for_update_lock
 
@@ -40,4 +40,4 @@ class HelloWorldFlow(Flow):
     end = flow.End()
 
 
-flowsite.register(HelloWorldFlow)
+viewsite.register(HelloWorldFlow)
