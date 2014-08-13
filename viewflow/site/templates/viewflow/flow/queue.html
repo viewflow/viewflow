@@ -19,7 +19,7 @@
     <tbody>
         {% for task in queue %}
         <tr>
-            <td><a href="{{ task.get_absolute_url }}">{{ task.process.id }}</a></td>
+            <td><a href="{{ task.get_absolute_url }}">{{ task.process.id }}/{{ task.id }}</a></td>
             <td>{{ task.flow_task.name }}</td>
             <td>{{ task.created }}</td>
             <td>{{ task.finished|default:"" }}</td>
@@ -29,5 +29,8 @@
         {% endfor %}
     </tbody>
 </table>
+
+{% pagination page_obj %}
+
 {% endblock %}
 

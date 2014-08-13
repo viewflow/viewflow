@@ -5,7 +5,7 @@ from . import views
 
 class FlowSite(object):
     process_list_view = staticmethod(views.ProcessListView.as_view())
-    process_detail_view = staticmethod(views.process_detail_view)
+    process_detail_view = staticmethod(views.ProcessDetailView.as_view())
     task_list_view = staticmethod(views.TaskListView.as_view())
     queue_view = staticmethod(views.QueueListView.as_view())
 
@@ -21,6 +21,8 @@ class FlowSite(object):
             '',
             url('^$', self.process_list_view,
                 {'flow_site': self, 'flow_cls': self.flow_cls}, name='index'),
+            url('^(?P<process_pk>\d+)/$', self.process_detail_view,
+                {'flow_site': self, 'flow_cls': self.flow_cls}, name='details'),
             url('^tasks/$', self.task_list_view,
                 {'flow_site': self, 'flow_cls': self.flow_cls}, name='tasks'),
             url('^queue/$', self.queue_view,

@@ -1,5 +1,5 @@
 {% extends 'viewflow/base_site.html' %}
-{% load viewform %}
+{% load viewflow viewform %}
 
 {% block title %}{{ block.super}} | {{ flow_cls.process_title }}{% endblock %}
 
@@ -28,7 +28,7 @@
     <tbody>
         {% for process in process_list %}
         <tr>
-            <td>{{ process.id }}</td>
+            <td><a href="{% flowurl 'helloworld/HelloWorldFlow' 'viewflow:details' process_pk=process.id %}"">{{ process.id }}</a></td>
             <td>{{ process.created }}</td>
             <td>{{ process.finished|default:"" }}</td>
             <td>

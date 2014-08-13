@@ -35,7 +35,9 @@ class FlowURLNode(Node):
         # resolve url name
         url = self.url_name.resolve(context)
 
-        return reverse(url, current_app=flow_cls._meta.namespace, kwargs=self.kwargs)
+        kwargs = {key: value.resolve(context) for key, value in self.kwargs.items()}
+
+        return reverse(url, current_app=flow_cls._meta.namespace, kwargs=kwargs)
 
 
 @register.tag

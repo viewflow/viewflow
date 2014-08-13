@@ -2,7 +2,6 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
-from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.views import generic
 
@@ -102,10 +101,25 @@ class ProcessListView(FlowSiteMixin, generic.ListView):
             .order_by('-created')
 
 
-def process_detail_view(request, flow_site=None, flow_cls=None):
+class ProcessDetailView(FlowSiteMixin, generic.DetailView):
     """
     Details for process
     """
+    context_object_name = 'process'
+    pk_url_kwarg = 'process_pk'
+
+    def get_template_names(self):
+        return ('{}/flow/process.html'.format(self.flow_cls._meta.app_label),
+                'viewflow/flow/process.html')
+
+    def get_context_data(self, **kwargs):
+        context = super(ProcessDetailView, self).get_context_data(**kwargs)
+        context['flow_cls'] = self.flow_cls
+        context['task_list'] = context['process'].task_set.all().order_by('created')
+        return context
+
+    def get_queryset(self):
+        return self.flow_cls.process_cls._default_manager.all()
 
 
 class TaskListView(FlowSiteMixin, generic.ListView):

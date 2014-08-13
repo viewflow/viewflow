@@ -4,9 +4,16 @@
 {% block title %}{{ block.super}} | {{ flow_cls.process_title }}{% endblock %}
 
 {% block content %}
+{% if flow_cls.process_title %}
 <div class="page-header">
-    <h1>{{ flow_cls.process_title }} task list</h1>
+    <h1>{{ flow_cls.process_title }}</h1>
 </div>
+{% endif %}
+{% if flow_cls.process_description %}
+{{ flow_cls.process_description|restructuredtext }}
+{% endif %}
+
+<h2>Tasks</h2>
 <table class="table">
     <thead>
         <th>#</th>
@@ -29,8 +36,4 @@
         {% endfor %}
     </tbody>
 </table>
-
-{% pagination page_obj %}
-
 {% endblock %}
-
