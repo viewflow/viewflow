@@ -12,7 +12,7 @@ setup(
     long_description=open('README.rst').read(),
     license='AGPLv3',
     platforms=['Any'],
-    keywords=['workflow', 'django', 'bpm'],
+    keywords=['workflow', 'django', 'bpm', 'automaton'],
     url='http://github.com/kmmbvnr/django-viewflow',
     classifiers=[
         'Development Status :: 3 - Alpha',
@@ -33,6 +33,7 @@ setup(
         'django-extra-views',
         'django-tag-parser',
         'django-formset-js',
+        'docutils',
         # viewflow.test
         'django-webtest',
         'webtest'

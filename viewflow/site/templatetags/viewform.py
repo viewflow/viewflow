@@ -3,8 +3,11 @@ import re
 from collections import defaultdict
 
 from django import template
+from django.conf import settings
 from django.template.loader import get_template
 from django.utils import formats
+from django.utils.encoding import smart_text
+from django.utils.safestring import mark_safe
 
 from tag_parser import template_tag
 from tag_parser.basetags import BaseNode
@@ -209,3 +212,18 @@ def datepicker_format(field):
 @register.filter
 def datepicker_value(bound_field):
     return formats.localize_input(bound_field.value(), bound_field.field.input_formats[0])
+
+
+@register.filter(is_safe=True)
+def restructuredtext(value):
+    try:
+        from docutils.core import publish_parts
+    except ImportError:
+        if settings.DEBUG:
+            raise template.TemplateSyntaxError(
+                "Error in 'restructuredtext' filter: The Python docutils library isn't installed.")
+        return smart_text(value)
+    else:
+        docutils_settings = getattr(settings, "RESTRUCTUREDTEXT_FILTER_SETTINGS", {})
+        parts = publish_parts(source=smart_text(value), writer_name="html4css1", settings_overrides=docutils_settings)
+        return mark_safe(smart_text(parts["fragment"]))

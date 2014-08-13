@@ -9,12 +9,14 @@
     <h1>{{ flow_cls.process_title }}</h1>
 </div>
 {% endif %}
+{% if flow_cls.process_description %}
+{{ flow_cls.process_description|restructuredtext }}
+{% endif %}
 
 {% if start_actions %}
 {% for action_url, action_name in start_actions %}
 <a class="btn btn-default" href="{{ action_url }}">{{ action_name|title }}</a>
 {% endfor %}
-</div>
 {% endif %}
 <table class="table">
     <thead>

@@ -8,6 +8,11 @@ from .nodes import DynamicSplit
 
 
 class DynamicSplitFlow(Flow):
+    """
+    Dynamic split process
+
+    Depends on initial decision, several instances on make_decision task would be instanciated
+    """
     process_cls = models.DynamicSplitProcess
 
     start = flow.Start(StartView, fields=['split_count']) \
