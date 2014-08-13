@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django_fsm import FSMField, transition
 
 from viewflow.exceptions import FlowRuntimeError
@@ -69,6 +70,26 @@ class Process(models.Model):
         verbose_name_plural = 'Process list'
 
 
+class TaskManager(models.Manager):
+    def user_queue(self, user, flow_cls=None):
+        """
+        List of tasks permitted for user
+        """
+        queryset = self.filter(flow_task_type='HUMAN')
+
+        if flow_cls is not None:
+            queryset = queryset.filter(process__flow_cls=flow_cls)
+
+        if not user.is_superuser:
+            has_permission = Q(owner_permission__in=user.get_all_permissions()) \
+                | Q(owner_permission__isnull=True) \
+                | Q(owner=user)
+
+            queryset = queryset.filter(has_permission)
+
+        return queryset
+
+
 class Task(models.Model):
     """
     Base class for Task state objects
@@ -93,7 +114,7 @@ class Task(models.Model):
     process = models.ForeignKey(Process)
     flow_task = TaskReferenceField()
     flow_task_type = models.CharField(max_length=50)
-    status = FSMField(max_length=3, choices=STATUS_CHOICES, default=STATUS.NEW)
+    status = FSMField(max_length=3, choices=STATUS_CHOICES, default=STATUS.NEW, db_index=True)
 
     created = models.DateTimeField(auto_now_add=True)
     started = models.DateTimeField(blank=True, null=True)
@@ -101,10 +122,12 @@ class Task(models.Model):
     previous = models.ManyToManyField('self')
     token = TokenField(default='start')
 
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
-    external_task_id = models.CharField(max_length=50, blank=True, null=True)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, db_index=True)
+    external_task_id = models.CharField(max_length=50, blank=True, null=True, db_index=True)
 
     owner_permission = models.CharField(max_length=50, blank=True, null=True)
+
+    objects = TaskManager()
 
     def _in_db(self):
         """

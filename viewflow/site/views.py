@@ -2,6 +2,7 @@ from django.contrib.auth import login as auth_login
 from django.contrib.auth import logout as auth_logout
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import HttpResponseRedirect
 from django.views import generic
 
@@ -107,13 +108,50 @@ def process_detail_view(request, flow_site=None, flow_cls=None):
     """
 
 
-def task_list_view(request, flow_site=None, flow_cls=None):
+class TaskListView(FlowSiteMixin, generic.ListView):
     """
     List of specific Flow tasks assigned to current user
     """
+    paginate_by = 15
+    paginate_orphans = 5
+    context_object_name = 'task_list'
+
+    def get_template_names(self):
+        return ('{}/flow/task_list.html'.format(self.flow_cls._meta.app_label),
+                'viewflow/flow/task_list.html')
+
+    def get_context_data(self, **kwargs):
+        context = super(TaskListView, self).get_context_data(**kwargs)
+        context['flow_cls'] = self.flow_cls
+        return context
+
+    def get_queryset(self):
+        return self.flow_cls.task_cls.objects \
+            .filter(process__flow_cls=self.flow_cls,
+                    owner=self.request.user,
+                    status=self.flow_cls.task_cls.STATUS.ASSIGNED) \
+            .order_by('-created')
 
 
-def queue_view(request, flow_site=None, flow_cls=None):
+class QueueListView(FlowSiteMixin, generic.ListView):
     """
     List of specific Flow unassigned tasks available for current user
     """
+    paginate_by = 15
+    paginate_orphans = 5
+    context_object_name = 'queue'
+
+    def get_template_names(self):
+        return ('{}/flow/queue.html'.format(self.flow_cls._meta.app_label),
+                'viewflow/flow/queue.html')
+
+    def get_context_data(self, **kwargs):
+        context = super(QueueListView, self).get_context_data(**kwargs)
+        context['flow_cls'] = self.flow_cls
+        return context
+
+    def get_queryset(self):
+        queryset = self.flow_cls.task_cls.objects.user_queue(self.request.user, flow_cls=self.flow_cls) \
+            .filter(status=self.flow_cls.task_cls.STATUS.NEW).order_by('-created')
+
+        return queryset

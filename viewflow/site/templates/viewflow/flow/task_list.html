@@ -1,0 +1,33 @@
+{% extends 'viewflow/base_site.html' %}
+{% load viewform %}
+
+{% block title %}{{ block.super}} | {{ flow_cls.process_title }}{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>{{ flow_cls.process_title }} task list</h1>
+</div>
+<table class="table">
+    <thead>
+        <th>#</th>
+        <th>Name</th>
+        <th class="span1">Started</th>
+        <th class="span1">Finished</th>
+        <th>Process</th>
+        <th>Status</th>
+    </thead>
+    <tbody>
+        {% for task in task_list %}
+        <tr>
+            <td><a href="{{ task.get_absolute_url }}">{{ task.process.id }}</a></td>
+            <td>{{ task.flow_task.name }}</td>
+            <td>{{ task.created }}</td>
+            <td>{{ task.finished|default:"" }}</td>
+            <td>{{ task.process }}</td>
+            <td>{{ task.get_status_display }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+
