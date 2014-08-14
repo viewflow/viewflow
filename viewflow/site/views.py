@@ -21,6 +21,10 @@ class FlowSiteMixin(object):
 
         return super(FlowSiteMixin, self).dispatch(request, *args, **kwargs)
 
+    def render_to_response(self, context, **response_kwargs):
+        response_kwargs.setdefault('current_app', self.flow_cls._meta.namespace)
+        return super(FlowSiteMixin, self).render_to_response(context, **response_kwargs)
+
 
 class LoginView(FlowSiteMixin, generic.FormView):
     form_class = AuthenticationForm

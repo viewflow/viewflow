@@ -113,6 +113,10 @@ class StartViewMixin(object):
         return ('{}/flow/start.html'.format(self.activation.flow_cls._meta.app_label),
                 'viewflow/flow/start.html')
 
+    def render_to_response(self, context, **response_kwargs):
+        response_kwargs.setdefault('current_app', self.activation.flow_cls._meta.namespace)
+        return super(StartViewMixin, self).render_to_response(context, **response_kwargs)
+
     @flow_start_view()
     def dispatch(self, request, activation, **kwargs):
         """
@@ -229,6 +233,10 @@ class StartView(StartViewActivation, UpdateView):
     def form_valid(self, form):
         self.activation_done(form)
         return HttpResponseRedirect(self.get_success_url())
+
+    def render_to_response(self, context, **response_kwargs):
+        response_kwargs.setdefault('current_app', self.flow_cls._meta.namespace)
+        return super(StartView, self).render_to_response(context, **response_kwargs)
 
     @flow_start_view()
     def dispatch(self, request, *args, **kwargs):

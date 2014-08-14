@@ -116,6 +116,10 @@ class TaskViewMixin(object):
             '{}/flow/task.html'.format(flow_cls._meta.app_label),
             'viewflow/flow/task.html')
 
+    def render_to_response(self, context, **response_kwargs):
+        response_kwargs.setdefault('current_app', self.activation.flow_cls._meta.namespace)
+        return super(TaskViewMixin, self).render_to_response(context, **response_kwargs)
+
     @flow_view()
     def dispatch(self, request, activation, **kwargs):
         self.activation = activation
@@ -213,6 +217,10 @@ class ProcessView(TaskViewActivation, UpdateView):
     def form_valid(self, form):
         self.activation_done(form)
         return HttpResponseRedirect(self.get_success_url())
+
+    def render_to_response(self, context, **response_kwargs):
+        response_kwargs.setdefault('current_app', self.flow_cls._meta.namespace)
+        return super(ProcessView, self).render_to_response(context, **response_kwargs)
 
     @flow_view()
     def dispatch(self, request, *args, **kwargs):
