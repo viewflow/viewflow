@@ -75,10 +75,8 @@ class AllProcessListView(generic.ListView):
         return 'viewflow/site_index.html'
 
     def get_queryset(self):
-        subclasses = _get_model_subclasses(flow_cls.process_cls for flow_cls in self.view_site.flow_sites)
-
         return Process.objects \
-            .select_subclasses(*subclasses) \
+            .coerce_for(self.view_site.flow_sites) \
             .order_by('-created')
 
 
@@ -95,10 +93,8 @@ class AllTaskListView(generic.ListView):
         return 'viewflow/site_tasks.html'
 
     def get_queryset(self):
-        subclasses = _get_model_subclasses(flow_cls.task_cls for flow_cls in self.view_site.flow_sites)
-
         return Task.objects \
-            .select_subclasses(*subclasses) \
+            .coerce_for(self.view_site.flow_sites) \
             .filter(owner=self.request.user,
                     status=Task.STATUS.ASSIGNED) \
             .order_by('-created')
@@ -117,11 +113,9 @@ class AllQueueListView(generic.ListView):
         return 'viewflow/site_queue.html'
 
     def get_queryset(self):
-        subclasses = _get_model_subclasses(flow_cls.task_cls for flow_cls in self.view_site.flow_sites)
-
         queryset = Task.objects \
+            .coerce_for(self.view_site.flow_sites) \
             .user_queue(self.request.user) \
-            .select_subclasses(*subclasses) \
             .filter(status=Task.STATUS.NEW) \
             .order_by('-created')
 

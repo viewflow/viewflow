@@ -4,10 +4,10 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q
 from django_fsm import FSMField, transition
-from model_utils.managers import InheritanceManager
 
-from viewflow.exceptions import FlowRuntimeError
-from viewflow.fields import FlowReferenceField, TaskReferenceField, TokenField
+from .exceptions import FlowRuntimeError
+from .fields import FlowReferenceField, TaskReferenceField, TokenField
+from .managers import ProcessManager, TaskManager
 
 
 class Process(models.Model):
@@ -31,7 +31,7 @@ class Process(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     finished = models.DateTimeField(blank=True, null=True)
 
-    objects = InheritanceManager()
+    objects = ProcessManager()
 
     @transition(field=status, source=STATUS.NEW, target=STATUS.STARTED)
     def start(self):
@@ -71,26 +71,6 @@ class Process(models.Model):
 
     class Meta:
         verbose_name_plural = 'Process list'
-
-
-class TaskManager(InheritanceManager):
-    def user_queue(self, user, flow_cls=None):
-        """
-        List of tasks permitted for user
-        """
-        queryset = self.filter(flow_task_type='HUMAN')
-
-        if flow_cls is not None:
-            queryset = queryset.filter(process__flow_cls=flow_cls)
-
-        if not user.is_superuser:
-            has_permission = Q(owner_permission__in=user.get_all_permissions()) \
-                | Q(owner_permission__isnull=True) \
-                | Q(owner=user)
-
-            queryset = queryset.filter(has_permission)
-
-        return queryset
 
 
 class Task(models.Model):
