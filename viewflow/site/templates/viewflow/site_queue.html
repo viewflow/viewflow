@@ -1,0 +1,37 @@
+{% extends 'viewflow/base_site.html' %}
+{% load viewform %}
+
+{% block title %}{{ block.super}} | All tasks{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>All Queues</h1>
+</div>
+<table class="table">
+    <thead>
+        <th>#</th>
+        <th>Process</th>
+        <th>Name</th>
+        <th class="span1">Started</th>
+        <th class="span1">Finished</th>
+        <th>Status</th>
+    </thead>
+    <tbody>
+        {% for task in queue %}
+        <tr>
+            <td><a href="{{ task.get_absolute_url }}">{{ task.process.id }}/{{ task.id }}</a></td>
+            <td><a href="{% url 'viewflow:details' process_pk=task.process.id %}">{{ task.process }}</a></td>
+            <td>{{ task.flow_task.name }}</td>
+            <td>{{ task.created }}</td>
+            <td>{{ task.finished|default:"" }}</td>
+            <td>{{ task.get_status_display }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% pagination page_obj %}
+
+{% endblock %}
+
+

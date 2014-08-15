@@ -40,9 +40,9 @@ class ViewSite(object):
     logout_view = staticmethod(views.LogoutView.as_view())
 
     # all process views
-    processes_list_view = staticmethod(views.processes_list_view)
-    tasks_list_view = staticmethod(views.tasks_list_view)
-    queues_view = staticmethod(views.queues_view)
+    processes_list_view = staticmethod(views.AllProcessListView.as_view())
+    tasks_list_view = staticmethod(views.AllTaskListView.as_view())
+    queues_view = staticmethod(views.AllQueueListView.as_view())
 
     def __init__(self, app_name='viewsite_default'):
         self.app_name = app_name
@@ -56,7 +56,7 @@ class ViewSite(object):
             url('^login/$', self.login_view, {'view_site': self}, name="login"),
             url('^logout/$', self.logout_view, {'view_site': self}, name="logout"),
             url('^tasks/$', self.tasks_list_view, {'view_site': self}, name="tasks"),
-            url('^queues/$', self.queues_view, {'view_site': self}, name="queues"),
+            url('^queue/$', self.queues_view, {'view_site': self}, name="queues"),
         )
 
         result = patterns('', url('', include(site_patterns, self.app_name, 'viewflow_site')))

@@ -6,14 +6,30 @@ from django.http import HttpResponseRedirect
 from django.views import generic
 
 from viewflow import flow
+from viewflow.models import Process, Task
+
+
+def _get_model_subclasses(models):
+    """
+    TODO Support for proxy subclasses
+    """
+    subclasses = set()
+
+    for model in models:
+        if model._meta.proxy:
+            for parent in model._meta.get_parent_list():
+                if not parent._meta.proxy:
+                    model = parent
+                    break
+        subclasses.add(model)
+
+    return subclasses
 
 
 class FlowSiteMixin(object):
     flow_site = None
 
     def dispatch(self, request, *args, **kwargs):
-        if 'view_site' in kwargs:
-            self.view_site = kwargs['view_site']
         if 'flow_site' in kwargs:
             self.flow_site = kwargs['flow_site']
         if 'flow_cls' in kwargs:
@@ -47,25 +63,82 @@ class LogoutView(FlowSiteMixin, generic.View):
         return HttpResponseRedirect(self.get_success_url())
 
 
-def processes_list_view(request, flow_site=None):
+class AllProcessListView(generic.ListView):
     """
     All process instances list available for current user
     """
-    pass
+    paginate_by = 15
+    paginate_orphans = 5
+    context_object_name = 'process_list'
+
+    def dispatch(self, request, *args, **kwargs):
+        if 'view_site' in kwargs:
+            self.view_site = kwargs['view_site']
+        return super(AllProcessListView, self).dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return 'viewflow/site_index.html'
+
+    def get_queryset(self):
+        subclasses = _get_model_subclasses(flow_cls.process_cls for flow_cls in self.view_site.flow_sites)
+
+        return Process.objects \
+            .select_subclasses(*subclasses) \
+            .order_by('-created')
 
 
-def tasks_list_view(request, flow_site=None):
+class AllTaskListView(generic.ListView):
     """
     All tasks from all processes assigned to current user
     """
-    pass
+    paginate_by = 15
+    paginate_orphans = 5
+    context_object_name = 'task_list'
+
+    def dispatch(self, request, *args, **kwargs):
+        if 'view_site' in kwargs:
+            self.view_site = kwargs['view_site']
+        return super(AllTaskListView, self).dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return 'viewflow/site_tasks.html'
+
+    def get_queryset(self):
+        subclasses = _get_model_subclasses(flow_cls.task_cls for flow_cls in self.view_site.flow_sites)
+
+        return Task.objects \
+            .select_subclasses(*subclasses) \
+            .filter(owner=self.request.user,
+                    status=Task.STATUS.ASSIGNED) \
+            .order_by('-created')
 
 
-def queues_view(request, flow_site=None):
+class AllQueueListView(generic.ListView):
     """
     All unassigned tasks available for current user
     """
-    pass
+    paginate_by = 15
+    paginate_orphans = 5
+    context_object_name = 'queue'
+
+    def dispatch(self, request, *args, **kwargs):
+        if 'view_site' in kwargs:
+            self.view_site = kwargs['view_site']
+        return super(AllQueueListView, self).dispatch(request, *args, **kwargs)
+
+    def get_template_names(self):
+        return 'viewflow/site_queue.html'
+
+    def get_queryset(self):
+        subclasses = _get_model_subclasses(flow_cls.task_cls for flow_cls in self.view_site.flow_sites)
+
+        queryset = Task.objects \
+            .user_queue(self.request.user) \
+            .select_subclasses(*subclasses) \
+            .filter(status=Task.STATUS.NEW) \
+            .order_by('-created')
+
+        return queryset
 
 
 class ProcessListView(FlowSiteMixin, generic.ListView):

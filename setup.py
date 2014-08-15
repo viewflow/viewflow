@@ -29,6 +29,7 @@ setup(
         'celery>=3.0',
         'singledispatch>=3.0',
         'django-fsm>=2.0',
+        'django-model-utils>=2.0',
         # viewflow.site
         'django-extra-views',
         'django-tag-parser',

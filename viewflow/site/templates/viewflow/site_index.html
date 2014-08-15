@@ -4,23 +4,13 @@
 {% block title %}{{ block.super}} | {{ flow_cls.process_title }}{% endblock %}
 
 {% block content %}
-{% if flow_cls.process_title %}
 <div class="page-header">
-    <h1>{{ flow_cls.process_title }}</h1>
+    <h1>All processes list</h1>
 </div>
-{% endif %}
-{% if flow_cls.process_description %}
-{{ flow_cls.process_description|restructuredtext }}
-{% endif %}
-
-{% if start_actions %}
-{% for action_url, action_name in start_actions %}
-<a class="btn btn-default" href="{{ action_url }}">{{ action_name|title }}</a>
-{% endfor %}
-{% endif %}
 <table class="table">
     <thead>
         <th>#</th>
+        <th>Process</th>
         <th class="span1">Started</th>
         <th class="span1">Finished</th>
         <th>Active Tasks</th>
@@ -29,6 +19,7 @@
         {% for process in process_list %}
         <tr>
             <td><a href="{% url 'viewflow:details' process_pk=process.id %}">{{ process.id }}</a></td>
+            <td>{{ process.flow_cls.process_title }}</td>
             <td>{{ process.created }}</td>
             <td>{{ process.finished|default:"" }}</td>
             <td>

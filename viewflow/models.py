@@ -4,6 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import Q
 from django_fsm import FSMField, transition
+from model_utils.managers import InheritanceManager
 
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.fields import FlowReferenceField, TaskReferenceField, TokenField
@@ -29,6 +30,8 @@ class Process(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     finished = models.DateTimeField(blank=True, null=True)
+
+    objects = InheritanceManager()
 
     @transition(field=status, source=STATUS.NEW, target=STATUS.STARTED)
     def start(self):
@@ -70,7 +73,7 @@ class Process(models.Model):
         verbose_name_plural = 'Process list'
 
 
-class TaskManager(models.Manager):
+class TaskManager(InheritanceManager):
     def user_queue(self, user, flow_cls=None):
         """
         List of tasks permitted for user
