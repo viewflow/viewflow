@@ -29,20 +29,17 @@ def _get_model_subclasses(models):
 class FlowSiteMixin(object):
     flow_site = None
 
-    def dispatch(self, request, *args, **kwargs):
-        if 'flow_site' in kwargs:
-            self.flow_site = kwargs['flow_site']
-        if 'flow_cls' in kwargs:
-            self.flow_cls = kwargs['flow_cls']
-
-        return super(FlowSiteMixin, self).dispatch(request, *args, **kwargs)
+    @property
+    def flow_cls(self):
+        return self.flow_site.flow_cls
 
     def render_to_response(self, context, **response_kwargs):
         response_kwargs.setdefault('current_app', self.flow_cls._meta.namespace)
         return super(FlowSiteMixin, self).render_to_response(context, **response_kwargs)
 
 
-class LoginView(FlowSiteMixin, generic.FormView):
+class LoginView(generic.FormView):
+    view_site = None
     form_class = AuthenticationForm
     template_name = 'viewflow/login.html'
 
@@ -54,7 +51,9 @@ class LoginView(FlowSiteMixin, generic.FormView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class LogoutView(FlowSiteMixin, generic.View):
+class LogoutView(generic.View):
+    view_site = None
+
     def get_success_url(self):
         return reverse('viewflow_site:login', current_app=self.view_site.app_name)
 
@@ -67,14 +66,10 @@ class AllProcessListView(generic.ListView):
     """
     All process instances list available for current user
     """
+    view_site = None
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'process_list'
-
-    def dispatch(self, request, *args, **kwargs):
-        if 'view_site' in kwargs:
-            self.view_site = kwargs['view_site']
-        return super(AllProcessListView, self).dispatch(request, *args, **kwargs)
 
     def get_template_names(self):
         return 'viewflow/site_index.html'
@@ -91,14 +86,10 @@ class AllTaskListView(generic.ListView):
     """
     All tasks from all processes assigned to current user
     """
+    view_site = None
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'task_list'
-
-    def dispatch(self, request, *args, **kwargs):
-        if 'view_site' in kwargs:
-            self.view_site = kwargs['view_site']
-        return super(AllTaskListView, self).dispatch(request, *args, **kwargs)
 
     def get_template_names(self):
         return 'viewflow/site_tasks.html'
@@ -117,14 +108,10 @@ class AllQueueListView(generic.ListView):
     """
     All unassigned tasks available for current user
     """
+    view_site = None
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'queue'
-
-    def dispatch(self, request, *args, **kwargs):
-        if 'view_site' in kwargs:
-            self.view_site = kwargs['view_site']
-        return super(AllQueueListView, self).dispatch(request, *args, **kwargs)
 
     def get_template_names(self):
         return 'viewflow/site_queue.html'

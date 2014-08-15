@@ -4,10 +4,10 @@ from . import views
 
 
 class FlowSite(object):
-    process_list_view = staticmethod(views.ProcessListView.as_view())
-    process_detail_view = staticmethod(views.ProcessDetailView.as_view())
-    task_list_view = staticmethod(views.TaskListView.as_view())
-    queue_view = staticmethod(views.QueueListView.as_view())
+    process_list_view = views.ProcessListView
+    process_detail_view = views.ProcessDetailView
+    tasks_view = views.TaskListView
+    queue_view = views.QueueListView
 
     def __init__(self, view_site, flow_cls):
         self.view_site = view_site
@@ -19,14 +19,10 @@ class FlowSite(object):
 
         list_patterns = patterns(
             '',
-            url('^$', self.process_list_view,
-                {'flow_site': self, 'flow_cls': self.flow_cls}, name='index'),
-            url('^(?P<process_pk>\d+)/$', self.process_detail_view,
-                {'flow_site': self, 'flow_cls': self.flow_cls}, name='details'),
-            url('^tasks/$', self.task_list_view,
-                {'flow_site': self, 'flow_cls': self.flow_cls}, name='tasks'),
-            url('^queue/$', self.queue_view,
-                {'flow_site': self, 'flow_cls': self.flow_cls}, name='queue')
+            url('^$', self.process_list_view.as_view(flow_site=self), name='index'),
+            url('^(?P<process_pk>\d+)/$', self.process_detail_view.as_view(flow_site=self), name='details'),
+            url('^tasks/$', self.tasks_view.as_view(flow_site=self), name='tasks'),
+            url('^queue/$', self.queue_view.as_view(flow_site=self), name='queue')
         )
 
         return patterns(
@@ -36,13 +32,13 @@ class FlowSite(object):
 
 
 class ViewSite(object):
-    login_view = staticmethod(views.LoginView.as_view())
-    logout_view = staticmethod(views.LogoutView.as_view())
+    login_view = views.LoginView
+    logout_view = views.LogoutView
 
     # all process views
-    processes_list_view = staticmethod(views.AllProcessListView.as_view())
-    tasks_list_view = staticmethod(views.AllTaskListView.as_view())
-    queues_view = staticmethod(views.AllQueueListView.as_view())
+    process_list_view = views.AllProcessListView
+    tasks_view = views.AllTaskListView
+    queue_view = views.AllQueueListView
 
     def __init__(self, app_name='viewsite_default'):
         self.app_name = app_name
@@ -52,11 +48,11 @@ class ViewSite(object):
     def urls(self):
         site_patterns = patterns(
             '',
-            url('^$', self.processes_list_view, {'view_site': self}, name="index"),
-            url('^login/$', self.login_view, {'view_site': self}, name="login"),
-            url('^logout/$', self.logout_view, {'view_site': self}, name="logout"),
-            url('^tasks/$', self.tasks_list_view, {'view_site': self}, name="tasks"),
-            url('^queue/$', self.queues_view, {'view_site': self}, name="queues"),
+            url('^$', self.process_list_view.as_view(view_site=self), name="index"),
+            url('^login/$', self.login_view.as_view(view_site=self), name="login"),
+            url('^logout/$', self.logout_view.as_view(view_site=self), name="logout"),
+            url('^tasks/$', self.tasks_view.as_view(view_site=self), name="tasks"),
+            url('^queue/$', self.queue_view.as_view(view_site=self), name="queues"),
         )
 
         result = patterns('', url('', include(site_patterns, self.app_name, 'viewflow_site')))
