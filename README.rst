@@ -36,7 +36,8 @@ And add it into INSTALLED_APPS settings
 
     INSTALLED_APPS = (
          ...
-         viewflow,
+         'viewflow',
+         'viewflow.site',
     )
 
 
@@ -65,9 +66,9 @@ Define the actual task that says Hello to the World in `task.py`
     from celery import shared_task
     from viewflow.flow import flow_job
 
-    @shared_task(bind=True)
+    @shared_task()
     @flow_job()
-    def send_hello_world_request(self, activation):
+    def send_hello_world_request(activation):
         with open(os.devnull, "w") as world:
             world.write(activation.process.text)
 
