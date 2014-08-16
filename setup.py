@@ -41,7 +41,7 @@ setup(
     packages=['viewflow',
               'viewflow.flow',
               'viewflow.management',
-              'viewflow.templatetags'
+              'viewflow.templatetags',
               'viewflow.site',
               'viewflow.site.templatetags'],
     include_package_data=True)
