@@ -54,7 +54,7 @@ Start with process database model definition
     from viewflow.models import Process
 
     class HelloWorldProcess(Process):
-        text = models.CharField(max_length=150, blank=True, null=True)
+        text = models.CharField(max_length=150)
         approved = models.BooleanField(default=False)
 
 Define the actual task that says Hello to the World in `task.py`
@@ -120,7 +120,9 @@ To make the above code work just put the following flow definition in `flows.py`
         url(r'^flows/', include(viewsite.urls)))
 
 
-That's all you need to setup this flow.
+Your Hello World process is ready to go. If you run the development server
+locally, go to http://localhost:8000/flows/helloworld/ and step through the workflow.
+
 
 Next, you can see how to define custom views, and meet other concepts of django-viewflow at
 http://kmmbvnr.github.io/django-viewflow/
