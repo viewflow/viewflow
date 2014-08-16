@@ -26,7 +26,7 @@ Full documentation is available at http://kmmbvnr.github.io/django-viewflow/
 Installation
 ============
 
-django-viewflow requires Python 3.3 or greater and django 1.7::
+django-viewflow requires Python 3.3 or greater, django 1.7 and django-tag-parser==2.0b1::
 
     pip install django-viewflow
 
@@ -52,8 +52,8 @@ Start with process database model definition
     from django.db import models
     from viewflow.models import Process
 
-    class HelloworldProcess(Process):
-        text = models.ChatField(max_lenght=150, blank=True, null=True)
+    class HelloWorldProcess(Process):
+        text = models.CharField(max_length=150, blank=True, null=True)
         approved = models.BooleanField(default=False)
 
 Define the actual task that says Hello to the World in `task.py`
@@ -78,39 +78,45 @@ To make the above code work just put the following flow definition in `flows.py`
 
     from viewflow import flow, lock
     from viewflow.base import this, Flow
-    from viewflow.views import ProcessView
-    from .models import HelloWorldProcess
+    from viewflow.views import StartView, ProcessView
+    from viewflow.site import viewsite
+
+    from . import models, tasks
+
 
     class HelloWorldFlow(Flow):
-        process_cls = HelloWorldProcess
+        process_cls = models.HelloWorldProcess
         lock_impl = lock.select_for_update_lock
 
         start = flow.Start(StartView, fields=["text"]) \
-           .Permission(auto_create=True) \
-           .Next(this.hello_world)
+            .Permission(auto_create=True) \
+            .Next(this.approve)
 
         approve = flow.View(ProcessView, fields=["approve"]) \
-            .Permission(auto_create=True)
+            .Permission(auto_create=True) \
             .Next(this.check_approve)
 
         check_approve = flow.If(cond=lambda p: p.approved) \
             .OnTrue(this.send) \
             .OnFalse(this.end)
 
-        send = flow.Job(send_hello_world_request) \
+        send = flow.Job(tasks.send_hello_world_request) \
             .Next(this.end)
 
         end = flow.End()
+
+
+    viewsite.register(HelloWorldFlow)
 
 `Flow` class contains all urls required for the task processing.
 
 .. code-block:: python
 
     from django.conf.urls import patterns, url, include
-    from .flows import HelloWorldFlow
+    from viewflow.site import viewsite
 
     urlpatterns = patterns('',
-        url(r'^helloworld/', include(HelloWorldFlow.instance.urls)))
+        url(r'^flows/', include(viewsite.urls)))
 
 
 That's all you need to setup this flow.
