@@ -24,7 +24,7 @@
 </ul>
 {% endblock %}
 
-{% block sidebar %}
+{% block sidebar2 %}
 <ul class="nav">
     <li {% if request.path == "/flows/" %}class="active"{% endif %}><a href="/flows/">Home</a></li>
     <li {% if "/helloworld/" in request.path %}class="active"{% endif %}><a href="{% flowurl 'helloworld/HelloWorldFlow' 'viewflow:index' %}">Hello, World</a></li>

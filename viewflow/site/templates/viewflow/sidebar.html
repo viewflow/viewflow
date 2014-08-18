@@ -1,0 +1,13 @@
+<ul class="nav">
+    {% for item in sideitems %}
+    <li {% if item.is_active %}class="active"{% endif %}><a href="{{ item.url }}">{{ item.title }}</a>
+    </li>
+        {% if item.is_expanded %}
+            <ul class="nav nav-second-level">
+            {% for child in item.children %}
+                <li {% if child.is_active %}class="active"{% endif %}><a href="{{ child.url }}">{{ child.title }}</a>
+            {% endfor %}
+            </ul>
+        {% endif %}
+    {% endfor %}
+</ul>

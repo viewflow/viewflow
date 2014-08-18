@@ -1,4 +1,4 @@
-{% load static %}<!doctype html>
+{% load static viewform %}<!doctype html>
 <html>
     <head>
         <meta charset="UTF-8">
@@ -38,6 +38,7 @@
                 <div class="navbar-default navbar-static-side" role="navigation">
                     <div class="sidebar-collapse">
                         {% block sidebar %}
+                        {% sidebar %}
                         {% endblock sidebar %}
                     </div>
                 </div>

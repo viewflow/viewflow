@@ -14,6 +14,7 @@ from tag_parser.basetags import BaseNode
 from tag_parser.parser import parse_token_kwargs
 
 from ..viewform import Field
+from ..sidebar import Sidebar
 
 
 register = template.Library()
@@ -227,3 +228,15 @@ def restructuredtext(value):
         docutils_settings = getattr(settings, "RESTRUCTUREDTEXT_FILTER_SETTINGS", {})
         parts = publish_parts(source=smart_text(value), writer_name="html4css1", settings_overrides=docutils_settings)
         return mark_safe(smart_text(parts["fragment"]))
+
+
+@register.inclusion_tag('viewflow/sidebar.html', takes_context=True)
+def sidebar(context, viewsite=None):
+    if 'request' not in context:
+        raise ValueError('viewflow.site requires "django.core.context_processors.request"'
+                         'to be in TEMPLATE_CONTEXT_PROCESSORS in your settings file.')
+
+    sidebar = Sidebar(viewsite)
+    return {
+        'sideitems': sidebar.render(context['request'])
+    }
