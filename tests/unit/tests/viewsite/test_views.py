@@ -31,7 +31,7 @@ class AllQueueViewTests(TestCase):
 
     def setUp(self):
         self.assertTrue(self.client.login(username='admin', password='admin'))
-        self.base_url = reverse('viewflow_site:queues')
+        self.base_url = reverse('viewflow_site:queue')
 
     def test_render_succeed(self):
         response = self.client.get(self.base_url)
