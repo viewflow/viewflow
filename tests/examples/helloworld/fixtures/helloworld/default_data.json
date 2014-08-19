@@ -7,6 +7,11 @@
                 "can_start_helloworldprocess",
                 "helloworld",
                 "helloworldprocess"
+            ],
+            [
+                "view_helloworldprocess",
+                "helloworld",
+                "helloworldprocess"
             ]
        ],
         "username": "helloworld/employee"
@@ -18,6 +23,11 @@
         "user_permissions": [
             [
                 "can_approve_helloworldprocess",
+                "helloworld",
+                "helloworldprocess"
+            ],
+            [
+                "view_helloworldprocess",
                 "helloworld",
                 "helloworldprocess"
             ]

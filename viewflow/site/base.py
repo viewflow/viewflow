@@ -5,6 +5,15 @@ from . import views
 from .sidebar import SideItem
 
 
+class FlowSideItem(SideItem):
+    def __init__(self, *args, **kwargs):
+        self.flow_cls = kwargs.pop('flow_cls')
+        super(FlowSideItem, self).__init__(*args, **kwargs)
+
+    def can_view(self, user):
+        return self.flow_cls.can_view(user)
+
+
 class FlowSite(object):
     process_list_view = views.ProcessListView
     process_detail_view = views.ProcessDetailView
@@ -33,11 +42,17 @@ class FlowSite(object):
                 include(list_patterns + flow_patterns, app_name, namespace)))
 
     def sideitems(self):
-        home = SideItem(self.flow_cls.process_title,
-                        reverse('viewflow:index', current_app=self.flow_cls._meta.namespace))
+        home = FlowSideItem(self.flow_cls.process_title,
+                            reverse('viewflow:index', current_app=self.flow_cls._meta.namespace),
+                            flow_cls=self)
         yield home
         yield SideItem('Tasks', reverse('viewflow:tasks', current_app=self.flow_cls._meta.namespace), parent=home)
         yield SideItem('Queue', reverse('viewflow:queue', current_app=self.flow_cls._meta.namespace), parent=home)
+
+    def can_view(self, user):
+        opts = self.flow_cls.process_cls._meta
+        view_perm = "{}.view_{}".format(opts.app_label, opts.model_name)
+        return user.has_perm(view_perm)
 
 
 class ViewSite(object):
@@ -60,7 +75,7 @@ class ViewSite(object):
             for flow_cls, flow_site in self.flow_sites_cls.items():
                 site = flow_site(view_site=self, flow_cls=flow_cls)
                 self.flow_sites[flow_cls] = site
-        return self.flow_sites
+        return self.flow_sites.items()
 
     @property
     def urls(self):
@@ -75,7 +90,7 @@ class ViewSite(object):
 
         result = patterns('', url('', include(site_patterns, self.app_name, 'viewflow_site')))
 
-        for flow_cls, flow_site in self.sites.items():
+        for flow_cls, flow_site in self.sites:
             result += flow_site.urls
 
         return result
@@ -86,7 +101,7 @@ class ViewSite(object):
         yield SideItem('Tasks', reverse('viewflow_site:tasks', current_app=self.app_name), parent=home)
         yield SideItem('Queue', reverse('viewflow_site:queue', current_app=self.app_name), parent=home)
 
-        for flow_cls, flow_site in sorted(self.sites.items(), key=lambda data: data[0].process_title):
+        for flow_cls, flow_site in sorted(self.sites, key=lambda data: data[0].process_title):
             for item in flow_site.sideitems():
                 yield item
 

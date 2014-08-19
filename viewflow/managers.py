@@ -43,6 +43,7 @@ class ProcessQuerySet(QuerySet):
     def coerce_for(self, flow_classes):
         self._coerced = True
 
+        flow_classes = list(flow_classes)
         related = [_get_related_path(flow_cls.process_cls, self.model)
                    for flow_cls in flow_classes]
 

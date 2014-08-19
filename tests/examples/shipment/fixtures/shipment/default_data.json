@@ -7,6 +7,11 @@
                 "can_start_request",
                 "shipment",
                 "shipmentprocess"
+            ],
+            [
+                "view_shipmentprocess",
+                "shipment",
+                "shipmentprocess"
             ]
         ]
     },
@@ -18,6 +23,11 @@
         "permissions": [
             [
                 "can_take_extra_insurance",
+                "shipment",
+                "shipmentprocess"
+            ],
+            [
+                "view_shipmentprocess",
                 "shipment",
                 "shipmentprocess"
             ]
@@ -36,6 +46,11 @@
             ],
             [
                 "can_move_package",
+                "shipment",
+                "shipmentprocess"
+            ],
+            [
+                "view_shipmentprocess",
                 "shipment",
                 "shipmentprocess"
             ]

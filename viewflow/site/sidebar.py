@@ -10,6 +10,9 @@ class SideItem(object):
         self.is_expanded = False
         self.is_active = False
 
+    def can_view(self, user):
+        return True
+
 
 class Sidebar(object):
     def __init__(self, viewsite=None):
@@ -30,7 +33,7 @@ class Sidebar(object):
 
     def render(self, request):
         current_url = request.path
-        items = copy.deepcopy(self.sideitems)
+        items = [copy.deepcopy(item) for item in self.sideitems if item.can_view(request.user)]
 
         # lookup for expanded tree
         expanded_item = None

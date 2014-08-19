@@ -102,6 +102,11 @@ class FlowMetaClass(type):
             if 'process_description' not in attrs and len(docstring) > 1:
                 new_class.process_description = docstring[1].strip()
 
+        # view process permission
+        process_options = new_class.process_cls._meta
+        if 'view' not in process_options.default_permissions:
+            process_options.default_permissions += ('view', )
+
         # done flow setup
         for name, node in nodes.items():
             node.ready()

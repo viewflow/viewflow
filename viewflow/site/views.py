@@ -4,26 +4,10 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.views import generic
+from braces import views as braces
 
 from viewflow import flow
 from viewflow.models import Process, Task
-
-
-def _get_model_subclasses(models):
-    """
-    TODO Support for proxy subclasses
-    """
-    subclasses = set()
-
-    for model in models:
-        if model._meta.proxy:
-            for parent in model._meta.get_parent_list():
-                if not parent._meta.proxy:
-                    model = parent
-                    break
-        subclasses.add(model)
-
-    return subclasses
 
 
 class FlowSiteMixin(object):
@@ -36,6 +20,27 @@ class FlowSiteMixin(object):
     def render_to_response(self, context, **response_kwargs):
         response_kwargs.setdefault('current_app', self.flow_cls._meta.namespace)
         return super(FlowSiteMixin, self).render_to_response(context, **response_kwargs)
+
+
+class SiteLoginRequiredMixin(braces.LoginRequiredMixin):
+    view_site = None
+
+    def available_flow_cls(self):
+        return (flow_cls for flow_cls, flow_site in self.view_site.sites
+                if flow_site.can_view(self.request.user))
+
+    def get_login_url(self):
+        return reverse('viewflow_site:login', current_app=self.view_site.app_name)
+
+
+class FlowViewPermissionRequiredMixin(braces.PermissionRequiredMixin):
+    flow_site = None
+
+    def get_login_url(self):
+        return reverse('viewflow_site:login', current_app=self.flow_site.view_site.app_name)
+
+    def check_permissions(self, request):
+        return self.flow_site.can_view(request.user)
 
 
 class LoginView(generic.FormView):
@@ -62,7 +67,7 @@ class LogoutView(generic.View):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class AllProcessListView(generic.ListView):
+class AllProcessListView(SiteLoginRequiredMixin, generic.ListView):
     """
     All process instances list available for current user
     """
@@ -76,11 +81,11 @@ class AllProcessListView(generic.ListView):
 
     def get_queryset(self):
         return Process.objects \
-            .coerce_for(self.view_site.flow_sites) \
+            .coerce_for(self.available_flow_cls()) \
             .order_by('-created')
 
 
-class AllTaskListView(generic.ListView):
+class AllTaskListView(SiteLoginRequiredMixin, generic.ListView):
     """
     All tasks from all processes assigned to current user
     """
@@ -94,13 +99,13 @@ class AllTaskListView(generic.ListView):
 
     def get_queryset(self):
         return Task.objects \
-            .coerce_for(self.view_site.flow_sites) \
+            .coerce_for(self.available_flow_cls()) \
             .filter(owner=self.request.user,
                     status=Task.STATUS.ASSIGNED) \
             .order_by('-created')
 
 
-class AllQueueListView(generic.ListView):
+class AllQueueListView(SiteLoginRequiredMixin, generic.ListView):
     """
     All unassigned tasks available for current user
     """
@@ -114,7 +119,7 @@ class AllQueueListView(generic.ListView):
 
     def get_queryset(self):
         queryset = Task.objects \
-            .coerce_for(self.view_site.flow_sites) \
+            .coerce_for(self.available_flow_cls()) \
             .user_queue(self.request.user) \
             .filter(status=Task.STATUS.NEW) \
             .order_by('-created')
@@ -122,7 +127,7 @@ class AllQueueListView(generic.ListView):
         return queryset
 
 
-class ProcessListView(FlowSiteMixin, generic.ListView):
+class ProcessListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.ListView):
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'process_list'
@@ -159,7 +164,7 @@ class ProcessListView(FlowSiteMixin, generic.ListView):
             .order_by('-created')
 
 
-class ProcessDetailView(FlowSiteMixin, generic.DetailView):
+class ProcessDetailView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.DetailView):
     """
     Details for process
     """
@@ -180,7 +185,7 @@ class ProcessDetailView(FlowSiteMixin, generic.DetailView):
         return self.flow_cls.process_cls._default_manager.all()
 
 
-class TaskListView(FlowSiteMixin, generic.ListView):
+class TaskListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.ListView):
     """
     List of specific Flow tasks assigned to current user
     """
@@ -205,7 +210,7 @@ class TaskListView(FlowSiteMixin, generic.ListView):
             .order_by('-created')
 
 
-class QueueListView(FlowSiteMixin, generic.ListView):
+class QueueListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.ListView):
     """
     List of specific Flow unassigned tasks available for current user
     """

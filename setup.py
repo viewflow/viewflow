@@ -31,8 +31,9 @@ setup(
         'django-fsm>=2.0',
         # viewflow.site
         'django-extra-views',
-        'django-tag-parser',
+        'django-tag-parser>=2.0b1',
         'django-formset-js',
+        'django-braces',
         'docutils',
         # viewflow.test
         'django-webtest',
