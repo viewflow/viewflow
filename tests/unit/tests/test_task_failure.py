@@ -1,4 +1,8 @@
-from unittest import mock
+try:
+    from unittest import mock
+except:
+    import mock
+
 from django.test import TestCase
 from celery import shared_task
 

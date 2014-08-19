@@ -35,7 +35,11 @@ class FlowURLNode(Node):
             if app_config is None:
                 raise TemplateSyntaxError("{} app not found".format(app_label))
 
-            flow_cls = import_by_path('{}.flows.{}'.format(app_config.module.__package__, flow_cls_path))
+            if app_config.module.__package__ is not None:
+                subpath = app_config.module.__package__
+            else:
+                subpath = app_config.module.__name__
+            flow_cls = import_by_path('{}.flows.{}'.format(subpath, flow_cls_path))
 
         # resolve url name and args
         url = self.url_name.resolve(context)

@@ -15,7 +15,11 @@ with FlowTest(RestrictedUserFlow) as flow_test:
 """
 import inspect
 from singledispatch import singledispatch
-from unittest import mock
+try:
+    from unittest import mock
+except:
+    import mock
+
 
 from django.utils.functional import cached_property
 from django_webtest import WebTestMixin

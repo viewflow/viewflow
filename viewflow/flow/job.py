@@ -2,6 +2,8 @@
 Background job executed by celery
 """
 import functools
+import six
+
 from viewflow.activation import JobActivation
 from viewflow.fields import import_task_by_ref
 from viewflow.flow.base import Task, Edge
@@ -35,7 +37,8 @@ def flow_job(**lock_args):
             flow_task = import_task_by_ref(flow_task_strref)
 
             # start
-            lock = flow_task.flow_cls.lock_impl(**lock_args)
+            lock_func = six.get_unbound_function(flow_task.flow_cls.lock_impl)
+            lock = lock_func(**lock_args)
             with lock(flow_task, process_pk):
                 try:
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)

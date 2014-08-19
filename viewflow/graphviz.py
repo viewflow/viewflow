@@ -2,6 +2,8 @@
 """
 Drawing graphviz bpmn-like workflow diagrams
 """
+from __future__ import unicode_literals
+
 import subprocess
 from singledispatch import singledispatch
 from viewflow import flow
@@ -195,7 +197,7 @@ def diagram(flow_cls, output_file_name=None):
                                stdout=subprocess.PIPE,
                                stdin=subprocess.PIPE,
                                stderr=subprocess.STDOUT)
-        dot.stdin.write(bytes(diagramm, 'UTF-8'))
+        dot.stdin.write(diagramm.encode('UTF-8'))
         stdout, _ = dot.communicate()
         assert not stdout
 

@@ -2,7 +2,10 @@ import time
 import sys
 import threading
 import unittest
-import queue
+try:
+    import queue
+except:
+    import Queue as queue
 
 from django.db import connection
 from viewflow.exceptions import FlowLockFailed
