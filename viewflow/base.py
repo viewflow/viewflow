@@ -3,6 +3,7 @@ Flow definition
 """
 import re
 from collections import defaultdict
+from six import add_metaclass
 
 from django.apps import apps
 from django.conf.urls import patterns
@@ -34,7 +35,12 @@ class FlowMeta(object):
     def flow_label(self):
         module = "{}.{}".format(self.flow_cls.__module__, self.flow_cls.__name__)
         app_config = apps.get_containing_app_config(module)
-        subpath = module.lstrip(app_config.module.__package__+'.flows.')
+        if app_config.module.__package__ is not None:
+            # python 3?
+            subpath = module.lstrip(app_config.module.__package__+'.flows.')
+        else:
+            # python 2?
+            subpath = module.lstrip(app_config.module.__name__+'.flows.')
         return subpath.lower().rstrip('flow').replace('.', '/')
 
     def nodes(self):
@@ -97,11 +103,11 @@ class FlowMetaClass(type):
 
         # description
         if new_class.__doc__:
-            docstring = new_class.__doc__.split('\n\n', maxsplit=1)
+            docstring = new_class.__doc__.split('\n\n')
             if 'process_title' not in attrs and len(docstring) > 0:
                 new_class.process_title = docstring[0].strip()
             if 'process_description' not in attrs and len(docstring) > 1:
-                new_class.process_description = docstring[1].strip()
+                new_class.process_description = "\n\n".join(docstring[1:])
         else:
             # convert camel case to separate words
             new_class.process_title = re.sub('([a-z0-9])([A-Z])', r'\1 \2',
@@ -120,7 +126,8 @@ class FlowMetaClass(type):
         return new_class
 
 
-class Flow(object, metaclass=FlowMetaClass):
+@add_metaclass(FlowMetaClass)
+class Flow(object):
     """
     Base class for flow definition
 

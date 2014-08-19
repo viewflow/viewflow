@@ -1,6 +1,8 @@
 """
 django signals as part of flow
 """
+import six
+
 from viewflow.flow.base import Event, Edge
 from viewflow.activation import StartActivation, TaskActivation
 
@@ -73,7 +75,8 @@ def flow_signal(task_loader=None, **lock_args):
 
             receiver = receiver_cls()
             task = receiver.get_task(flow_task, **signal_kwargs)
-            lock = flow_task.flow_cls.lock_impl(**lock_args)
+            lock_func = six.get_unbound_function(flow_task.flow_cls.lock_impl)
+            lock = lock_func(**lock_args)
 
             with lock(flow_task, task.process_id):
                 task = flow_task.flow_cls.task_cls._default_manager.get(pk=task.pk)

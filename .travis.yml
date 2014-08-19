@@ -3,6 +3,7 @@ before_install:
   - sudo apt-get install graphviz 
 python:
   - 3.3
+  - 2.7
 install:
   - pip install tox
 script: 
