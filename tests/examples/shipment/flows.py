@@ -9,9 +9,6 @@ from .models import ShipmentProcess, ShipmentTask
 
 
 class ShipmentFlow(Flow):
-    """
-    Shipment delivery process
-    """
     process_cls = ShipmentProcess
     task_cls = ShipmentTask
     lock_impl = select_for_update_lock

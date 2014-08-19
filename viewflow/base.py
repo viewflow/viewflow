@@ -1,6 +1,7 @@
 """
 Flow definition
 """
+import re
 from collections import defaultdict
 
 from django.apps import apps
@@ -60,8 +61,8 @@ class FlowInstanceDescriptor(object):
 
 
 class FlowMetaClass(type):
-    def __new__(cls, name, bases, attrs):
-        new_class = super(FlowMetaClass, cls).__new__(cls, name, bases, attrs)
+    def __new__(cls, class_name, bases, attrs):
+        new_class = super(FlowMetaClass, cls).__new__(cls, class_name, bases, attrs)
 
         # singleton instance
         new_class.instance = FlowInstanceDescriptor()
@@ -101,6 +102,11 @@ class FlowMetaClass(type):
                 new_class.process_title = docstring[0].strip()
             if 'process_description' not in attrs and len(docstring) > 1:
                 new_class.process_description = docstring[1].strip()
+        else:
+            # convert camel case to separate words
+            new_class.process_title = re.sub('([a-z0-9])([A-Z])', r'\1 \2',
+                                             re.sub('(.)([A-Z][a-z]+)', r'\1 \2', class_name)) \
+                .rstrip('Flow')
 
         # view process permission
         process_options = new_class.process_cls._meta

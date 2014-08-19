@@ -10,7 +10,7 @@ from .tasks import send_hello_world_request
 
 class HelloWorldFlow(Flow):
     """
-    Hello world process
+    Hello world
 
     This process demonstrates hello world approval request flow.
 

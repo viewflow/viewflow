@@ -9,7 +9,7 @@ from .nodes import DynamicSplit
 
 class DynamicSplitFlow(Flow):
     """
-    Dynamic split process
+    Dynamic split
 
     Depends on initial decision, several instances on make_decision task would be instanciated
     """
