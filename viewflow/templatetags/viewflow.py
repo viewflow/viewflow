@@ -6,6 +6,8 @@ from django.core.urlresolvers import reverse
 from django.template.base import Node, TemplateSyntaxError
 from django.utils.module_loading import import_by_path
 
+from ..base import Flow
+
 
 kwarg_re = re.compile(r"(\w+)=?(.+)")
 register = template.Library()
@@ -21,20 +23,22 @@ class FlowURLNode(Node):
         # resolve flow reference
         flow_path = self.flow_ref.resolve(context)
 
-        try:
-            app_label, flow_cls_path = flow_path.split('/')
-        except ValueError:
-            raise TemplateSyntaxError("Flow action should looks like app_label/FlowCls")
+        if isinstance(flow_path, Flow):
+            flow_cls = flow_path
+        else:
+            try:
+                app_label, flow_cls_path = flow_path.split('/')
+            except ValueError:
+                raise TemplateSyntaxError("Flow action should looks like app_label/FlowCls")
 
-        app_config = apps.get_app_config(app_label)
-        if app_config is None:
-            raise TemplateSyntaxError("{} app not found".format(app_label))
+            app_config = apps.get_app_config(app_label)
+            if app_config is None:
+                raise TemplateSyntaxError("{} app not found".format(app_label))
 
-        flow_cls = import_by_path('{}.flows.{}'.format(app_config.module.__package__, flow_cls_path))
+            flow_cls = import_by_path('{}.flows.{}'.format(app_config.module.__package__, flow_cls_path))
 
-        # resolve url name
+        # resolve url name and args
         url = self.url_name.resolve(context)
-
         kwargs = {key: value.resolve(context) for key, value in self.kwargs.items()}
 
         return reverse(url, current_app=flow_cls._meta.namespace, kwargs=kwargs)
@@ -45,11 +49,13 @@ def flowurl(parser, token):
     """
     Bound to flow {% url %} tag.
 
-    Accepts flow namespace as first argument, and rest same as url tag
-    Returns an absolute URL matching given flow action
+    Accepts flow namespace or flow class as first argument,
+    and rest same as url tag Returns an absolute URL matching
+    given flow action
 
     Examples:
 
+        {% flowurl flow_cls 'viewflow:index' %}
         {% flowurl 'app_label/FlowCls' 'viewflow:index' %}
         {% flowurl 'app_label/FlowCls' 'viewflow:task_name' process_pk=1 task_pk=2 other_arg='value' %}
     """

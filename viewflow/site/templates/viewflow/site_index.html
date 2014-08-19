@@ -18,7 +18,7 @@
     <tbody>
         {% for process in process_list %}
         <tr>
-            <td><a href="{% url 'viewflow:details' process_pk=process.id %}">{{ process.id }}</a></td>
+            <td><a href="{% flowurl process.flow_cls 'viewflow:details' process_pk=process.id %}">{{ process.id }}</a></td>
             <td>{{ process.flow_cls.process_title }}</td>
             <td>{{ process.created }}</td>
             <td>{{ process.finished|default:"" }}</td>
