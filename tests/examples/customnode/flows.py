@@ -1,7 +1,6 @@
-from viewflow import flow
+from viewflow import flow, views as flow_views
 from viewflow.base import this, Flow
 from viewflow.site import viewsite
-from viewflow.views import StartView
 
 from . import models, views
 from .nodes import DynamicSplit
@@ -15,7 +14,7 @@ class DynamicSplitFlow(Flow):
     """
     process_cls = models.DynamicSplitProcess
 
-    start = flow.Start(StartView, fields=['split_count']) \
+    start = flow.Start(flow_views.StartProcessView, fields=['split_count']) \
         .Permission(auto_create=True) \
         .Next(this.spit_on_decision)
 

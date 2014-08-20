@@ -1,7 +1,7 @@
 from viewflow import flow
 from viewflow.base import this, Flow
 from viewflow.site import viewsite
-from viewflow.views import ProcessView
+from viewflow.views.task import ProcessView
 from viewflow.lock import select_for_update_lock
 
 from . import views

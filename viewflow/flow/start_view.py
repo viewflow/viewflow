@@ -3,15 +3,11 @@ Start flow task, instantiate new flow process
 """
 import functools
 
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
 from django.db import transaction
-from django.views.generic.edit import UpdateView
 
 from viewflow.activation import StartActivation
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.flow.base import Event, Edge, PermissionMixin, TaskDescriptionMixin
-from viewflow import shortcuts
 
 
 def flow_start_view():
@@ -88,167 +84,6 @@ class StartViewActivation(StartActivation):
             if not self.management_form.is_valid():
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.management_form.errors))
             self.task = self.management_form.save(commit=False)
-
-
-class StartViewMixin(object):
-    """
-    Mixin for start views, that do not implement activation interface
-    """
-    def get_context_data(self, **kwargs):
-        """
-        Adds `activation` to context data
-        """
-        context = super(StartViewMixin, self).get_context_data(**kwargs)
-        context['activation'] = self.activation
-        return context
-
-    def get_success_url(self):
-        return shortcuts.get_next_task_url(self.activation.process, self.request.user)
-
-    def get_template_names(self):
-        """
-        Get template names, first `app_name/flow/start.html` would be checked,
-        and if it is missing, standard `viewflow/flow/start.html` will be used
-        """
-        return ('{}/flow/start.html'.format(self.activation.flow_cls._meta.app_label),
-                'viewflow/flow/start.html')
-
-    def render_to_response(self, context, **response_kwargs):
-        response_kwargs.setdefault('current_app', self.activation.flow_cls._meta.namespace)
-        return super(StartViewMixin, self).render_to_response(context, **response_kwargs)
-
-    @flow_start_view()
-    def dispatch(self, request, activation, **kwargs):
-        """
-        Check user permissions, and prepare flow to execution
-        """
-        self.activation = activation
-        if not self.activation.flow_task.has_perm(request.user):
-            raise PermissionDenied
-
-        self.activation.assign(user=request.user)
-        self.activation.prepare(request.POST or None)
-        return super(StartViewMixin, self).dispatch(request, **kwargs)
-
-
-class StartFormViewMixin(StartViewMixin):
-    """
-    Mixing for form based views
-    """
-    def activation_done(self, form):
-        """
-        Finish activation. Subclasses could override this
-        """
-        self.object = form.save()
-        self.activation.done()
-
-    def form_valid(self, form):
-        self.activation_done(form)
-        return HttpResponseRedirect(self.get_success_url())
-
-
-class StartFormsetViewMixin(StartViewMixin):
-    """
-    Mixin for formset based views
-    """
-    def activation_done(self, formset):
-        """
-        Finish activation. Subclasses could override this
-        """
-        self.object_list = formset.save()
-        self.activation.done()
-
-    def formset_valid(self, formset):
-        self.activation_done(formset)
-        return HttpResponseRedirect(self.get_success_url())
-
-
-class StartInlinesViewMixin(StartViewMixin):
-    """
-    Mixin for forms with inlines view
-    """
-    def activation_done(self, form, inlines):
-        """
-        Finish activation. Subclasses could override this
-        """
-        self.object = form.save()
-        for formset in inlines:
-            formset.save()
-        self.activation.done()
-
-    def forms_valid(self, form, inlines):
-        self.activation_done(form, inlines)
-        return HttpResponseRedirect(self.get_success_url())
-
-
-class StartView(StartViewActivation, UpdateView):
-    """
-    Generic start view, allows to modify subset of process fields,
-    implements :class:`viewflow.activation.StartActivation` interface
-    """
-    fields = []
-
-    @property
-    def model(self):
-        """
-        Returns process class
-        """
-        return self.flow_cls.process_cls
-
-    def get_context_data(self, **kwargs):
-        """
-        Adds `activation` to context data
-        """
-        context = super(StartView, self).get_context_data(**kwargs)
-        context['activation'] = self
-        return context
-
-    def get_object(self):
-        """
-        Returns process instance
-        """
-        return self.process
-
-    def get_template_names(self):
-        """
-        Get template names, first `app_name/flow/start.html` would be checked,
-        and if it is missing, standard `viewflow/flow/start.html` will be used
-        """
-        return ('{}/flow/start.html'.format(self.flow_cls._meta.app_label),
-                'viewflow/flow/start.html')
-
-    def get_success_url(self):
-        """
-        Redirects to flow index page
-        """
-        return shortcuts.get_next_task_url(self.process, self.request.user)
-
-    def activation_done(self, form):
-        """
-        Finish activation. Subclasses could override this
-        """
-        self.object = form.save()
-        self.done()
-
-    def form_valid(self, form):
-        self.activation_done(form)
-        return HttpResponseRedirect(self.get_success_url())
-
-    def render_to_response(self, context, **response_kwargs):
-        response_kwargs.setdefault('current_app', self.flow_cls._meta.namespace)
-        return super(StartView, self).render_to_response(context, **response_kwargs)
-
-    @flow_start_view()
-    def dispatch(self, request, *args, **kwargs):
-        """
-        Check user permissions, and prepare flow to execution
-        """
-        if not self.flow_task.has_perm(request.user):
-            raise PermissionDenied
-
-        self.assign(user=request.user)
-        self.prepare(request.POST or None)
-        return super(StartView, self).dispatch(request, *args, **kwargs)
 
 
 class Start(PermissionMixin, TaskDescriptionMixin, Event):
@@ -362,8 +197,8 @@ class Start(PermissionMixin, TaskDescriptionMixin, Event):
     def view(self):
         if not self._view:
             if not self._view_cls:
-                from viewflow.views import start
-                return start
+                from viewflow.views import StartProcessView
+                return StartProcessView.as_view()
             else:
                 self._view = self._view_cls.as_view(**self._view_args)
                 return self._view

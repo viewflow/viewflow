@@ -1,7 +1,8 @@
 import extra_views
 from django.views import generic
-from viewflow import flow
+from viewflow import views as flow_views
 from viewflow.site import LayoutMixin, Layout, Fieldset, Inline, Row, Span2, Span5, Span7
+
 from .models import Shipment, ShipmentItem, Insurance
 
 
@@ -10,7 +11,7 @@ class ItemInline(extra_views.InlineFormSet):
 
 
 class StartView(LayoutMixin,
-                flow.StartInlinesViewMixin,
+                flow_views.StartViewMixin,
                 extra_views.NamedFormsetsMixin,
                 extra_views.CreateWithInlinesView):
     model = Shipment
@@ -34,18 +35,16 @@ class StartView(LayoutMixin,
         self.activation.done()
 
 
-class ShipmentView(flow.TaskFormViewMixin, generic.UpdateView):
+class ShipmentView(flow_views.TaskViewMixin, generic.UpdateView):
     def get_object(self):
         return self.activation.process.shipment
 
 
-class InsuranceView(flow.TaskFormViewMixin, generic.CreateView):
+class InsuranceView(flow_views.TaskViewMixin, generic.CreateView):
     model = Insurance
     fields = ['company_name', 'cost']
 
     def activation_done(self, form):
-        self.object = form.save()
-
         shipment = self.activation.process.shipment
         shipment.insurance = self.object
         shipment.save(update_fields=['insurance'])

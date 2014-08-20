@@ -1,14 +1,16 @@
 from django.views import generic
-from viewflow import flow
+from django.http import HttpResponseRedirect
+
+from viewflow.views import task
 
 from . import models
 
 
-class DecisionView(flow.TaskFormViewMixin, generic.CreateView):
+class DecisionView(task.TaskViewMixin, generic.CreateView):
     model = models.Decision
     fields = ['decision']
 
-    def activation_done(self, form):
+    def form_valid(self, form):
         self.object = form.save(commit=False)
 
         self.object.user = self.request.user
@@ -16,3 +18,5 @@ class DecisionView(flow.TaskFormViewMixin, generic.CreateView):
         self.object.save()
 
         self.activation.done()
+
+        return HttpResponseRedirect(self.get_success_url())

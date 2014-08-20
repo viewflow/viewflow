@@ -1,8 +1,7 @@
-from viewflow import flow
+from viewflow import flow, lock, views as flow_views
 from viewflow.base import this, Flow
 from viewflow.site import viewsite
-from viewflow.views import StartView, ProcessView
-from viewflow.lock import select_for_update_lock
+
 
 from .models import HelloWorldProcess
 from .tasks import send_hello_world_request
@@ -20,13 +19,13 @@ class HelloWorldFlow(Flow):
     4. Elsewhere, request became cancelled
     """
     process_cls = HelloWorldProcess
-    lock_impl = select_for_update_lock
+    lock_impl = lock.select_for_update_lock
 
-    start = flow.Start(StartView, fields=['text']) \
+    start = flow.Start(flow_views.StartProcessView, fields=['text']) \
         .Permission(auto_create=True) \
         .Next(this.approve)
 
-    approve = flow.View(ProcessView, fields=['approved']) \
+    approve = flow.View(flow_views.ProcessView, fields=['approved']) \
         .Permission(auto_create=True) \
         .Next(this.send)
 

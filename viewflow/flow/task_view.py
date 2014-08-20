@@ -3,15 +3,11 @@ Task performed by user in django view
 """
 import functools
 
-from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.views.generic.edit import UpdateView
 
 from viewflow.activation import ViewActivation
 from viewflow.exceptions import FlowRuntimeError
 from viewflow.flow.base import Task, Edge, PermissionMixin, TaskDescriptionMixin
-from viewflow import shortcuts
 
 
 def flow_view(**lock_args):
@@ -93,142 +89,6 @@ class TaskViewActivation(ViewActivation):
             if not self.management_form.is_valid():
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.management_form.errors))
             self.task = self.management_form.save(commit=False)
-
-
-class TaskViewMixin(object):
-    """
-    Mixin for task views, that do not implement activation interface
-    """
-    def get_context_data(self, **kwargs):
-        context = super(TaskViewMixin, self).get_context_data(**kwargs)
-        context['activation'] = self.activation
-        return context
-
-    def get_success_url(self):
-        return shortcuts.get_next_task_url(self.activation.process, self.request.user)
-
-    def get_template_names(self):
-        flow_task = self.activation.flow_task
-        flow_cls = self.activation.flow_task.flow_cls
-
-        return (
-            '{}/flow/{}.html'.format(flow_cls._meta.app_label, flow_task.name),
-            '{}/flow/task.html'.format(flow_cls._meta.app_label),
-            'viewflow/flow/task.html')
-
-    def render_to_response(self, context, **response_kwargs):
-        response_kwargs.setdefault('current_app', self.activation.flow_cls._meta.namespace)
-        return super(TaskViewMixin, self).render_to_response(context, **response_kwargs)
-
-    @flow_view()
-    def dispatch(self, request, activation, **kwargs):
-        self.activation = activation
-        if not self.activation.flow_task.has_perm(request.user, self.activation.task):
-            raise PermissionDenied
-
-        self.activation.prepare(request.POST or None)
-        return super(TaskViewMixin, self).dispatch(request, **kwargs)
-
-
-class TaskFormViewMixin(TaskViewMixin):
-    """
-    Mixing for form based views
-    """
-    def activation_done(self, form):
-        """
-        Finish activation. Subclasses could override this
-        """
-        self.object = form.save()
-        self.activation.done()
-
-    def form_valid(self, form):
-        self.activation_done(form)
-        return HttpResponseRedirect(self.get_success_url())
-
-
-class TaskFormsetViewMixin(TaskViewMixin):
-    """
-    Mixin for formset based views
-    """
-    def activation_done(self, formset):
-        """
-        Finish activation. Subclasses could override this
-        """
-        self.object_list = formset.save()
-        self.activation.done()
-
-    def formset_valid(self, formset):
-        self.activation_done(formset)
-        return HttpResponseRedirect(self.get_success_url())
-
-
-class TaskInlinesViewMixin(TaskViewMixin):
-    """
-    Mixin for forms with inlines view
-    """
-    def activation_done(self, form, inlines):
-        """
-        Finish activation. Subclasses could override this
-        """
-        self.object = form.save()
-        for formset in inlines:
-            formset.save()
-        self.activation.done()
-
-    def forms_valid(self, form, inlines):
-        self.activation_done(form, inlines)
-        return HttpResponseRedirect(self.get_success_url())
-
-
-class ProcessView(TaskViewActivation, UpdateView):
-    """
-    Shortcut view for task that updates subset of Process model fields
-    """
-    fields = []
-
-    @property
-    def model(self):
-        return self.flow_cls.process_cls
-
-    def get_context_data(self, **kwargs):
-        context = super(ProcessView, self).get_context_data(**kwargs)
-        context['activation'] = self
-        return context
-
-    def get_object(self, queryset=None):
-        return self.process
-
-    def get_template_names(self):
-        return (
-            '{}/flow/{}.html'.format(self.flow_cls._meta.app_label, self.flow_task.name),
-            '{}/flow/task.html'.format(self.flow_cls._meta.app_label),
-            'viewflow/flow/task.html')
-
-    def get_success_url(self):
-        return shortcuts.get_next_task_url(self.process, self.request.user)
-
-    def activation_done(self, form):
-        """
-        Finish activation. Subclasses could override this
-        """
-        self.object = form.save()
-        self.done()
-
-    def form_valid(self, form):
-        self.activation_done(form)
-        return HttpResponseRedirect(self.get_success_url())
-
-    def render_to_response(self, context, **response_kwargs):
-        response_kwargs.setdefault('current_app', self.flow_cls._meta.namespace)
-        return super(ProcessView, self).render_to_response(context, **response_kwargs)
-
-    @flow_view()
-    def dispatch(self, request, *args, **kwargs):
-        if not self.flow_task.has_perm(request.user, self.task):
-            raise PermissionDenied
-
-        self.prepare(request.POST or None)
-        return super(ProcessView, self).dispatch(request, *args, **kwargs)
 
 
 class View(PermissionMixin, TaskDescriptionMixin, Task):
@@ -348,8 +208,8 @@ class View(PermissionMixin, TaskDescriptionMixin, Task):
 
     @property
     def assign_view(self):
-        from viewflow.views import assign
-        return self._assign_view if self._assign_view else assign
+        from viewflow.views.task import AssignView
+        return self._assign_view if self._assign_view else AssignView.as_view()
 
     def calc_owner(self, task):
         from django.contrib.auth import get_user_model
