@@ -66,6 +66,14 @@
             $('[data-viewform-control="datetime"]').datetimepicker({'autoclose': true});
             $('[data-viewform-control="multiselect"]').chosen({width: '100%'});
             $('[data-viewform-control="formset"]').formset({'animateForms': true});
+            $('form').submit(function() {
+                var submitted = $(this).data('submitted');
+                if(submitted) {
+                    return false;
+                } else {
+                    $(this).data('submitted', true);
+                }
+            });
         });
     </script>
     {% endblock %}
