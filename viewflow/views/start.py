@@ -3,7 +3,8 @@ from django.http import HttpResponseRedirect
 from django.views import generic
 
 
-from .. import flow, shortcuts
+from .. import flow
+from .base import get_next_task_url
 
 
 class StartViewMixin(object):
@@ -19,7 +20,7 @@ class StartViewMixin(object):
         return context
 
     def get_success_url(self):
-        return shortcuts.get_next_task_url(self.activation.process, self.request.user)
+        return get_next_task_url(self.request, self.activation.process)
 
     def get_template_names(self):
         """
@@ -88,7 +89,7 @@ class StartActivationViewMixin(object):
                 'viewflow/flow/start.html')
 
     def get_success_url(self):
-        return shortcuts.get_next_task_url(self.process, self.request.user)
+        return get_next_task_url(self.request, self.process)
 
     def activation_done(self, *args, **kwargs):
         self.done()

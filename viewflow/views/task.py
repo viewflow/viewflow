@@ -1,8 +1,10 @@
+from urllib.parse import quote as urlquote
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.views import generic
 
-from .. import flow, shortcuts
+from .. import flow
+from .base import get_next_task_url
 
 
 class TaskViewMixin(object):
@@ -15,7 +17,7 @@ class TaskViewMixin(object):
         return context
 
     def get_success_url(self):
-        return shortcuts.get_next_task_url(self.activation.process, self.request.user)
+        return get_next_task_url(self.request, self.activation.process)
 
     def get_template_names(self):
         flow_task = self.activation.flow_task
@@ -83,7 +85,7 @@ class TaskActivationViewMixin(object):
             'viewflow/flow/task.html')
 
     def get_success_url(self):
-        return shortcuts.get_next_task_url(self.process, self.request.user)
+        return get_next_task_url(self.request, self.process)
 
     def activation_done(self, *args, **kwargs):
         """
@@ -157,7 +159,10 @@ class AssignView(flow.TaskViewActivation, generic.TemplateView):
         return context
 
     def get_success_url(self):
-        return self.task.get_absolute_url()
+        url = self.task.get_absolute_url()
+        if 'back' in self.request.GET:
+            url = "{}?back={}".format(url, urlquote(self.request.GET['back']))
+        return url
 
     def activation_assign(self):
         self.assign(self.request.user)

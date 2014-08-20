@@ -208,7 +208,7 @@ class View(PermissionMixin, TaskDescriptionMixin, Task):
 
     @property
     def assign_view(self):
-        from viewflow.views.task import AssignView
+        from viewflow.views import AssignView
         return self._assign_view if self._assign_view else AssignView.as_view()
 
     def calc_owner(self, task):
