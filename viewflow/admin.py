@@ -32,7 +32,9 @@ class ProcessAdmin(admin.ModelAdmin):
 
     def participants(self, obj):
         user_ids = obj.task_set.exclude(owner__isnull=True).values('owner')
-        users = auth.get_user_model()._default_manager.filter(pk__in=user_ids).values_list('username')
+        USER_MODEL = auth.get_user_model()
+        username_field = USER_MODEL.USERNAME_FIELD
+        users = USER_MODEL._default_manager.filter(pk__in=user_ids).values_list(username_field)
         return ', '.join(user[0] for user in users)
 
 
