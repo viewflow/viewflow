@@ -65,14 +65,15 @@ class ViewSite(object):
     queue_view = views.AllQueueListView
 
     def __init__(self, app_name='viewsite_default'):
+        self._registry = {}
+
         self.app_name = app_name
-        self.flow_sites_cls = {}
         self.flow_sites = {}
 
     @property
     def sites(self):
         if not self.flow_sites:
-            for flow_cls, flow_site in self.flow_sites_cls.items():
+            for flow_cls, flow_site in self._registry.items():
                 site = flow_site(view_site=self, flow_cls=flow_cls)
                 self.flow_sites[flow_cls] = site
         return self.flow_sites.items()
@@ -106,8 +107,8 @@ class ViewSite(object):
                 yield item
 
     def register(self, flow_cls, flow_site=None):
-        if flow_cls not in self.flow_sites_cls:
+        if flow_cls not in self._registry:
             if flow_site is None:
                 flow_site = FlowSite
 
-            self.flow_sites_cls[flow_cls] = flow_site
+            self._registry[flow_cls] = flow_site

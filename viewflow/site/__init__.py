@@ -6,3 +6,11 @@ from .viewform import (Layout, Row, Column, Fieldset, Inline,        # NOQA
 
 
 viewsite = ViewSite()
+
+
+def autodiscover():
+    from django.utils.module_loading import autodiscover_modules
+    autodiscover_modules('flows', register_to=viewsite)
+
+
+default_app_config = 'viewflow.site.apps.ViewSiteConfig'
