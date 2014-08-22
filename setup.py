@@ -44,5 +44,6 @@ setup(
               'viewflow.management',
               'viewflow.templatetags',
               'viewflow.site',
-              'viewflow.site.templatetags'],
+              'viewflow.site.templatetags',
+              'viewflow.views'],
     include_package_data=True)
