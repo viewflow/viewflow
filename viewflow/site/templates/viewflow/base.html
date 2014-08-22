@@ -32,6 +32,21 @@
                 </div>
                 <div class="collapse navbar-collapse navbar-right" id="viewflow-navlinks">
                     {% block navright %}
+                    <ul class="nav navbar-nav">
+                        {% if request.user.is_anonymous %}
+                        <li>
+                            <a href="{% url 'viewflow_site:login' %}">Login</a>
+                        </li>
+                        {% else %}
+                        <li>
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ request.user }} <b class="caret"></b></a>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="{% url 'viewflow_site:logout' %}">Logout</a>
+                                </li>
+                            </ul>
+                        </li>
+                        {% endif %}
                     {% endblock %}
                 </div>
 

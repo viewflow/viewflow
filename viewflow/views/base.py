@@ -2,7 +2,7 @@ from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url
 
 
-def get_next_task_url(request, process, default='viewflow:index'):
+def get_next_task_url(request, process):
     """
     Heruistic for user on complete task redirect
     """
@@ -29,4 +29,6 @@ def get_next_task_url(request, process, default='viewflow:index'):
         return back_url
 
     # Back to process list
-    return default if default.startswith('/') else reverse(default, current_app=process.flow_cls._meta.namespace)
+    return reverse('viewflow:details',
+                   kwargs={'process_pk': process.pk},
+                   current_app=process.flow_cls._meta.namespace)

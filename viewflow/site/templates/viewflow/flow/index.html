@@ -15,7 +15,7 @@
 
 {% if start_actions %}
 {% for action_url, action_name in start_actions %}
-<a class="btn btn-default" href="{{ action_url }}">{{ action_name|title }}</a>
+<a class="btn btn-default" href="{{ action_url }}?back={{ request.get_full_path|urlencode }}">{{ action_name|title }}</a>
 {% endfor %}
 {% endif %}
 <table class="table">

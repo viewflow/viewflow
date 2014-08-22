@@ -10,6 +10,12 @@ from viewflow import flow
 from viewflow.models import Process, Task
 
 
+class ViewSiteMixin(object):
+    def render_to_response(self, context, **response_kwargs):
+        response_kwargs.setdefault('current_app', self.view_site.app_name)
+        return super(ViewSiteMixin, self).render_to_response(context, **response_kwargs)
+
+
 class FlowSiteMixin(object):
     flow_site = None
 
@@ -43,7 +49,7 @@ class FlowViewPermissionRequiredMixin(braces.PermissionRequiredMixin):
         return self.flow_site.can_view(request.user)
 
 
-class LoginView(generic.FormView):
+class LoginView(ViewSiteMixin, generic.FormView):
     view_site = None
     form_class = AuthenticationForm
     template_name = 'viewflow/login.html'
@@ -56,7 +62,7 @@ class LoginView(generic.FormView):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class LogoutView(generic.View):
+class LogoutView(ViewSiteMixin, generic.View):
     view_site = None
 
     def get_success_url(self):
@@ -67,7 +73,7 @@ class LogoutView(generic.View):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class AllProcessListView(SiteLoginRequiredMixin, generic.ListView):
+class AllProcessListView(ViewSiteMixin, SiteLoginRequiredMixin, generic.ListView):
     """
     All process instances list available for current user
     """
@@ -85,7 +91,7 @@ class AllProcessListView(SiteLoginRequiredMixin, generic.ListView):
             .order_by('-created')
 
 
-class AllTaskListView(SiteLoginRequiredMixin, generic.ListView):
+class AllTaskListView(ViewSiteMixin, SiteLoginRequiredMixin, generic.ListView):
     """
     All tasks from all processes assigned to current user
     """
@@ -105,7 +111,7 @@ class AllTaskListView(SiteLoginRequiredMixin, generic.ListView):
             .order_by('-created')
 
 
-class AllQueueListView(SiteLoginRequiredMixin, generic.ListView):
+class AllQueueListView(ViewSiteMixin, SiteLoginRequiredMixin, generic.ListView):
     """
     All unassigned tasks available for current user
     """
