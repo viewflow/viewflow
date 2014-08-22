@@ -93,7 +93,7 @@ To make the above code work just put the following flow definition in `flows.py`
             .Permission(auto_create=True) \
             .Next(this.approve)
 
-        approve = flow.View(ProcessView, fields=["approve"]) \
+        approve = flow.View(ProcessView, fields=["approved"]) \
             .Permission(auto_create=True) \
             .Next(this.check_approve)
 
