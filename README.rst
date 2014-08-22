@@ -57,7 +57,7 @@ Start with process database model definition
         text = models.CharField(max_length=150)
         approved = models.BooleanField(default=False)
 
-Define the actual task that says Hello to the World in `task.py`
+Define the actual task that says Hello to the World in `tasks.py`
 
 .. code-block:: python
 
