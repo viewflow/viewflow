@@ -29,6 +29,9 @@ def get_next_task_url(request, process):
         return back_url
 
     # Back to process list
-    return reverse('viewflow:details',
-                   kwargs={'process_pk': process.pk},
-                   current_app=process.flow_cls._meta.namespace)
+    if process and process.pk:
+        return reverse('viewflow:details',
+                       kwargs={'process_pk': process.pk},
+                       current_app=process.flow_cls._meta.namespace)
+    else:
+        return reverse('viewflow:index', current_app=process.flow_cls._meta.namespace)
