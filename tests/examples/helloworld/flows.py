@@ -27,7 +27,7 @@ class HelloWorldFlow(Flow):
 
     approve = flow.View(flow_views.ProcessView, fields=['approved']) \
         .Permission(auto_create=True) \
-        .Next(this.send)
+        .Next(this.check_approve)
 
     check_approve = flow.If(cond=lambda p: p.approved) \
         .OnTrue(this.send) \
