@@ -3,7 +3,6 @@ Prevents unconsistent db updates for flow.
 """
 import time
 import random
-import warnings
 from contextlib import contextmanager
 
 from django.core.cache import cache
@@ -14,12 +13,13 @@ from viewflow.exceptions import FlowLockFailed
 
 def no_lock():
     """
-    By default Flow has no locking.
+    No pessimistic locking, just execute flow task in transaction.
+    Not suitable when you have Join nodes in your flow.
     """
     @contextmanager
     def lock(flow_task, process_pk):
-        warnings.warn('No locking on flow', RuntimeWarning)
-        yield
+        with transaction.atomic():
+            yield
     return lock
 
 
