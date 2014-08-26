@@ -6,7 +6,7 @@ from django import template
 from django.conf import settings
 from django.template.loader import get_template
 from django.utils import formats
-from django.utils.encoding import smart_text
+from django.utils.encoding import smart_text, force_text
 from django.utils.safestring import mark_safe
 
 from tag_parser import template_tag
@@ -240,3 +240,7 @@ def sidebar(context, viewsite=None):
     return {
         'sideitems': sidebar.render(context['request'])
     }
+
+@register.filter()
+def force_text(value):
+    return force_text(value)
