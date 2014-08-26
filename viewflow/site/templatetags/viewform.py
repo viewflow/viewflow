@@ -241,6 +241,6 @@ def sidebar(context, viewsite=None):
         'sideitems': sidebar.render(context['request'])
     }
 
-@register.filter()
-def force_text(value):
+@register.filter('force_text')
+def force_text_impl(value):
     return force_text(value)
