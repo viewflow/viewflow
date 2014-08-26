@@ -2,7 +2,7 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.views.generic.base import TemplateView
 from viewflow.site import viewsite
-from unit.views import TestFormView
+from tests.unit.views import TestFormView
 
 
 admin.autodiscover()
@@ -14,5 +14,5 @@ urlpatterns = patterns('',  # NOQA
     url(r'^viewflow/$', TemplateView.as_view(template_name='viewflow/process_index.html')),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^examples/form/$', TestFormView.as_view()),
-    url(r'^', include('examples.website')),
+    url(r'^', include('tests.examples.website')),
 )

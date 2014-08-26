@@ -39,7 +39,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'urls'
+ROOT_URLCONF = 'tests.urls'
 
 DATABASES = {
     'default': {
@@ -67,7 +67,7 @@ TEMPLATE_DIRS = (
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
-    'examples.website.users',
+    'tests.examples.website.users',
 )
 
 # Celery
@@ -79,6 +79,6 @@ INSTALLED_APPS += ('kombu.transport.django', 'djcelery')
 CELERY_RESULT_BACKEND = 'djcelery.backends.database:DatabaseBackend'
 
 try:
-    from local_settings import *  # NOQA
+    from tests.local_settings import *  # NOQA
 except ImportError:
     pass
