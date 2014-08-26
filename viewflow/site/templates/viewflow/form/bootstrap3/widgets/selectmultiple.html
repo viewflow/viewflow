@@ -17,7 +17,7 @@
                 name="{{ bound_field.html_name }}"
                 id="id_{{ bound_field.html_name }}" multiple{% endtagattrs %}>
             {% for value, choice in field.choices %}
-            <option value="{{ value }}" {% if value == field.value %}selected="selected"{% endif %}>{{ choice }}</option>
+            <option value="{{ value }}" {% if value|force_text == bound_field.value|force_text %}selected="selected"{% endif %}>{{ choice }}</option>
             {% endfor %}
         </select>
         {% endviewpart %}{% viewpart field append %}{% endviewpart %}
