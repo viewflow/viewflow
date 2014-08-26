@@ -1,16 +1,15 @@
 {% extends 'viewflow/base_site.html' %}
 
 {% block content %}
+<div class="page-header">
+    <h1>{{ activation.flow_task }}</h1>
+</div>
+
 <form role="form" method="POST">
     {% csrf_token %}
     <div class="box box-primary">
-        <div class="box-header">
-            <h3 class="box-title">Task {{ activation.flow_task.name }}</h3>
-        </div>
-        <div class="box-body">
-        </div>
         <div class="box box-footer">
-            <button type="submit" name="assign" class="btn btn-primary">Assign</button>
+            <button type="submit" name="assign" class="btn btn-primary btn-lg">Assign</button>
         </div>
     </div>
 </form>
