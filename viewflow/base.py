@@ -160,3 +160,6 @@ class Flow(object, metaclass=FlowMetaClass):
     def reverse(self, task, **kwargs):
         reverse_impl = getattr(self, 'reverse_{}'.format(task.flow_task.name), None)
         return reverse_impl(task, **kwargs) if reverse_impl else node_url_reverse(task.flow_task, task, **kwargs)
+
+    def __str__(self):
+        return self.process_title

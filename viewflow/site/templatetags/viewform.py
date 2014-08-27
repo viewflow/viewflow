@@ -4,7 +4,7 @@ from collections import defaultdict
 
 from django import template
 from django.conf import settings
-from django.template.loader import get_template
+from django.template.loader import get_template, select_template
 from django.utils import formats
 from django.utils.encoding import smart_text, force_text
 from django.utils.safestring import mark_safe
@@ -15,6 +15,7 @@ from tag_parser.parser import parse_token_kwargs
 
 from ..viewform import Field
 from ..sidebar import Sidebar
+from .base import get_model_display_data
 
 
 register = template.Library()
@@ -241,6 +242,21 @@ def sidebar(context, viewsite=None):
         'sideitems': sidebar.render(context['request'])
     }
 
+
 @register.filter('force_text')
 def force_text_impl(value):
     return force_text(value)
+
+
+@template_tag(register, 'include_process_data')
+class IncludeProcessDataNode(BaseNode):
+    max_args = 1
+
+    def render_tag(self, context, process):
+        opts = process.flow_cls._meta
+        template_names = (
+            '{}/flow/process_data.html'.format(opts.app_label),
+            'viewflow/flow/process_data.html')
+        template = select_template(template_names)
+        with context.push({'process_data': get_model_display_data(process)}):
+            return template.render(context)

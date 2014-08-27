@@ -6,6 +6,8 @@
     <h1>{{ activation.flow_task }}</h1>
 </div>
 
+{% include_process_data activation.process %}
+
 <form role="form" method="POST">
     {% csrf_token %}
     {% viewform 'viewflow/form/bootstrap3/form.html' form=form layout=view.layout %}{% endviewform %}
