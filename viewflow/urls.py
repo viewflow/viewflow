@@ -6,7 +6,7 @@ from singledispatch import singledispatch
 from django.core.urlresolvers import reverse
 from django.conf.urls import url
 
-from viewflow import flow
+from . import flow, models
 
 
 @singledispatch
@@ -47,6 +47,8 @@ def node_url_reverse(flow_node, task, **kwargs):
 
 @node_url_reverse.register(flow.Start)  # NOQA
 def _(flow_node, task, **kwargs):
+    if task and task.status != models.Task.STATUS.NEW:
+        return None
     return reverse('viewflow:{}'.format(flow_node.name), current_app=flow_node.flow_cls._meta.namespace)
 
 
@@ -54,6 +56,9 @@ def _(flow_node, task, **kwargs):
 def _(flow_node, task, **kwargs):
     if not task:
         task = flow_node.flow_cls.task_cls._default_manager.get(pk=kwargs['pk'])
+
+    if task and task.status not in (models.Task.STATUS.NEW, models.Task.STATUS.ASSIGNED):
+        return None
 
     if not task.owner_id:
         """

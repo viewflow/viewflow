@@ -12,11 +12,6 @@ class HelloWorldFlow(Flow):
     Hello world
 
     This process demonstrates hello world approval request flow.
-
-    1. User with *helloworld.can_start_process* permission creates hello world request
-    2. Manager, who have *helloworld.can_approve_request* approves it
-    3. And if request was approved, background celery job sends it to the world
-    4. Elsewhere, request became cancelled
     """
     process_cls = HelloWorldProcess
     lock_impl = lock.select_for_update_lock

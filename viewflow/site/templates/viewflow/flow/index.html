@@ -33,7 +33,15 @@
             <td>{{ process.finished|default:"" }}</td>
             <td>
                 {% for task in process.active_tasks %}
-                <a href="{{ task.get_absolute_url }}?back={{ request.get_full_path|urlencode }}">{{ task.flow_task }}</a>{% if not forloop.last %}, {% endif %}
+                {% with task.get_absolute_url as task_url %}
+                {% if task_url %}
+                <a href="{{ task_url }}?back={{ request.get_full_path|urlencode }}">
+                    {{ task.flow_task }}
+                </a>
+                {% else %}
+                    {{ task.flow_task }}
+                {% endif %}
+                {% endwith %}
                 {% endfor %}
             </td>
 
