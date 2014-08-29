@@ -1,9 +1,8 @@
 import threading
-from django.db import transaction
-from celery.utils import uuid
+from uuid import uuid4
 
+from django.db import transaction
 from viewflow import signals
-from viewflow.fields import get_task_ref
 
 
 _context_stack = threading.local()
@@ -250,7 +249,7 @@ class ViewActivation(TaskActivation):
         return activation
 
 
-class JobActivation(TaskActivation):
+class AbstractJobActivation(TaskActivation):
     """
     Activation for long-running background celery tasks.
     """
@@ -263,14 +262,14 @@ class JobActivation(TaskActivation):
         self.task.assign(external_task_id=external_task_id)
         self.task.save()
 
+    def create_task_uuid(self):
+        return str(uuid4())
+
     def schedule(self, task_id):
         """
         Async task schedule
         """
-        self.flow_task.job.apply_async(
-            args=[get_task_ref(self.flow_task), self.task.process_id, self.task.pk],
-            task_id=task_id,
-            countdown=1)
+        raise NotImplementedError
 
     def start(self):
         """
@@ -290,14 +289,14 @@ class JobActivation(TaskActivation):
         Celery task finished with `result`, finishes the flow task
         """
         with Context(propagate_exception=False):
-            super(JobActivation, self).done()
+            super(AbstractJobActivation, self).done()
 
     def activate_next(self):
         """
         If Job is successfully completed, next task activation failure can't drop this
         """
         with Context(propagate_exception=False):
-            super(JobActivation, self).activate_next()
+            super(AbstractJobActivation, self).activate_next()
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
@@ -321,7 +320,7 @@ class JobActivation(TaskActivation):
         activation = cls()
         activation.initialize(flow_task, task)
 
-        external_task_id = uuid()
+        external_task_id = activation.create_task_uuid()
         activation.assign(external_task_id)
         activation.schedule(external_task_id)
 

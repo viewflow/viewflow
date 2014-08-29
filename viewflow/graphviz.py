@@ -86,13 +86,13 @@ def _(flow_node):
     return '\n'.join(edges)
 
 
-@graphviz_node.register(flow.Job)  # NOQA
+@graphviz_node.register(flow.AbstractJob)  # NOQA
 def _(flow_node):
     return '%s [label="%s"];' \
         % (_nodename(flow_node), _nodelabel(flow_node))
 
 
-@graphviz_outedges.register(flow.Job)  # NOQA
+@graphviz_outedges.register(flow.AbstractJob)  # NOQA
 def _(flow_node):
     edges = []
     for target in flow_node._activate_next:

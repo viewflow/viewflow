@@ -1,6 +1,7 @@
 from viewflow import flow, lock, views as flow_views
 from viewflow.base import this, Flow
 from viewflow.site import viewsite
+from viewflow.contrib import celery
 
 
 from .models import HelloWorldProcess
@@ -28,7 +29,7 @@ class HelloWorldFlow(Flow):
         .OnTrue(this.send) \
         .OnFalse(this.end)
 
-    send = flow.Job(send_hello_world_request) \
+    send = celery.Job(send_hello_world_request) \
         .Next(this.end)
 
     end = flow.End()

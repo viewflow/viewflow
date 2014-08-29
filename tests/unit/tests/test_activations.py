@@ -5,6 +5,7 @@ from viewflow import activation, flow
 from viewflow.flow import gates
 from viewflow.models import Process, Task
 from viewflow.token import Token
+from viewflow.contrib import celery
 
 
 class TestStartActivation(TestCase):
@@ -48,23 +49,23 @@ class TestViewActivation(TestCase):
         flow_task_mock._outgoing.assert_any_call()
 
 
-class TestJobActivation(TestCase):
+class TestCeleryJobActivation(TestCase):
     def test_job_activation_activate(self):
-        flow_task_mock = mock.Mock(spec=flow.Job(lambda *args, **kwargs: None))
+        flow_task_mock = mock.Mock(spec=celery.Job(lambda *args, **kwargs: None))
         flow_task_mock._outgoing = mock.Mock(return_value=[])
         prev_activation_mock = mock.Mock(spec=activation.StartActivation())
 
-        with mock.patch('viewflow.activation.get_task_ref'):
-            act = activation.JobActivation.activate(flow_task_mock, prev_activation_mock, Token('start'))
+        with mock.patch('viewflow.contrib.celery.get_task_ref'):
+            act = celery.JobActivation.activate(flow_task_mock, prev_activation_mock, Token('start'))
             act.task.save.assert_has_calls(())
             self.assertEqual(1, flow_task_mock.job.apply_async.call_count)
 
     def test_job_activation_lifecycle(self):
-        flow_task_mock = mock.Mock(spec=flow.Job(lambda *args, **kwargs: None))
+        flow_task_mock = mock.Mock(spec=celery.Job(lambda *args, **kwargs: None))
         flow_task_mock._outgoing = mock.Mock(return_value=[])
         task_mock = mock.Mock(spec=Task())
 
-        act = activation.JobActivation()
+        act = celery.JobActivation()
         act.initialize(flow_task_mock, task_mock)
         act.prepare()
         act.start()

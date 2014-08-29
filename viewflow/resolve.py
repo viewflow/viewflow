@@ -20,7 +20,7 @@ def _(flow_node):
     return flow_node.view
 
 
-@node_callable.register(flow.Job)  # NOQA
+@node_callable.register(flow.AbstractJob)  # NOQA
 def _(flow_node):
     return flow_node._job
 
@@ -52,7 +52,7 @@ def _(flow_node, resolver):
         [resolver.get_implementation(node) for node in flow_node._activate_next]
 
 
-@resolve_children_links.register(flow.Job)  # NOQA
+@resolve_children_links.register(flow.AbstractJob)  # NOQA
 def _(flow_node, resolver):
     flow_node._activate_next = \
         [resolver.get_implementation(node) for node in flow_node._activate_next]

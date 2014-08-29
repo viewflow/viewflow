@@ -26,7 +26,6 @@ setup(
     install_requires=[
         # viewflow
         'Django>=1.6',
-        'celery>=3.0',
         'singledispatch>=3.0',
         'django-fsm>=2.0',
         # viewflow.site

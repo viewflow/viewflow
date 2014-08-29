@@ -15,7 +15,6 @@ with FlowTest(RestrictedUserFlow) as flow_test:
 """
 import inspect
 from singledispatch import singledispatch
-from unittest import mock
 
 from django.utils.functional import cached_property
 from django_webtest import WebTestMixin
@@ -74,26 +73,12 @@ def _(flow_node, test_task, **post_kwargs):
     form.submit().follow()
 
 
-@flow_do.register(flow.Job)  # NOQA
-def _(flow_node, test_task, **post_kwargs):
-    """
-    Eager run of delayed job call
-    """
-    args, kwargs = flow_node._job.apply_async.call_args
-    flow_node._job.apply(*args, **kwargs).get()
-
-
 @singledispatch
 def flow_patch_manager(flow_node):
     """
     context manager for flow mock setup
     """
     return None
-
-
-@flow_patch_manager.register(flow.Job)  # NOQA
-def _(flow_node):
-    return mock.patch.object(flow_node._job, 'apply_async')
 
 
 class FlowTaskTest(object):

@@ -4,6 +4,7 @@ from celery import shared_task
 
 from viewflow import activation, flow
 from viewflow.models import Task
+from viewflow.contrib import celery
 
 
 @shared_task()
@@ -21,9 +22,9 @@ def successful_job(activation):
 class TestJobActivation(TestCase):
     def test_failed_job(self):
         task_mock = mock.Mock(spec=Task())
-        flow_task_mock = mock.MagicMock(spec=flow.Job(lambda p: None))
+        flow_task_mock = mock.MagicMock(spec=celery.Job(lambda p: None))
         flow_task_mock.flow_cls.task_cls.objects.get = mock.Mock(return_value=task_mock)
-        flow_task_mock.activation_cls = mock.Mock(return_value=activation.JobActivation())
+        flow_task_mock.activation_cls = mock.Mock(return_value=celery.JobActivation())
 
         with mock.patch('viewflow.flow.job.import_task_by_ref', return_value=flow_task_mock):
             with self.assertRaises(NotImplementedError):
@@ -43,9 +44,9 @@ class TestJobActivation(TestCase):
         next_flow_task_mock.dst.activate = \
             lambda prev_activation, token: activation.GateActivation().activate(next_flow_task_mock, prev_activation, token)  # NOQA
 
-        flow_task_mock = mock.MagicMock(spec=flow.Job(lambda p: None))
+        flow_task_mock = mock.MagicMock(spec=celery.Job(lambda p: None))
         flow_task_mock.flow_cls.task_cls.objects.get = mock.Mock(return_value=job_task_mock)
-        flow_task_mock.activation_cls = mock.Mock(return_value=activation.JobActivation())
+        flow_task_mock.activation_cls = mock.Mock(return_value=celery.JobActivation())
         flow_task_mock._outgoing = mock.Mock(return_value=[next_flow_task_mock])
 
         with mock.patch('viewflow.flow.job.import_task_by_ref', return_value=flow_task_mock):

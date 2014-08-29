@@ -2,9 +2,10 @@
 Background job executed by celery
 """
 import functools
-from viewflow.activation import JobActivation
-from viewflow.fields import import_task_by_ref
-from viewflow.flow.base import Task, Edge
+
+from ..activation import AbstractJobActivation
+from ..fields import import_task_by_ref
+from ..flow.base import Task, Edge
 
 
 def flow_job(**lock_args):
@@ -40,8 +41,8 @@ def flow_job(**lock_args):
                 try:
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
                 except flow_task.flow_cls.task_cls.DoesNotExists:
-                    #There was rollback on job task created transaction,
-                    #we don't need to do the job
+                    # There was rollback on job task created transaction,
+                    # we don't need to do the job
                     return
                 else:
                     activation = self.activation if self.activation else flow_task.activation_cls()
@@ -80,16 +81,16 @@ def flow_job(**lock_args):
                 return self
 
             func = self.func.__get__(instance, type)
-            activation = instance if isinstance(instance, JobActivation) else None
+            activation = instance if isinstance(instance, AbstractJobActivation) else None
 
             return self.__class__(func, activation=activation)
 
     return flow_task_decorator
 
 
-class Job(Task):
+class AbstractJob(Task):
     """
-    Task that runs in background
+    Base class for task that runs in background
 
     Example::
 
@@ -97,10 +98,9 @@ class Job(Task):
             .Next(this.end)
     """
     task_type = 'JOB'
-    activation_cls = JobActivation
 
     def __init__(self, job):
-        super(Job, self).__init__()
+        super(AbstractJob, self).__init__()
         self._activate_next = []
         self._job = job
 

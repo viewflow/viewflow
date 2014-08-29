@@ -79,6 +79,7 @@ To make the above code work just put the following flow definition in `flows.py`
 
     from viewflow import flow, lock
     from viewflow.base import this, Flow
+    from viewflow.contrib import celery
     from viewflow.views import StartView, ProcessView
     from viewflow.site import viewsite
 
@@ -101,7 +102,7 @@ To make the above code work just put the following flow definition in `flows.py`
             .OnTrue(this.send) \
             .OnFalse(this.end)
 
-        send = flow.Job(tasks.send_hello_world_request) \
+        send = celery.Job(tasks.send_hello_world_request) \
             .Next(this.end)
 
         end = flow.End()
