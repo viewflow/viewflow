@@ -39,6 +39,7 @@ setup(
         'webtest'
     ],
     packages=['viewflow',
+              'viewflow.contrib',
               'viewflow.flow',
               'viewflow.management',
               'viewflow.templatetags',
