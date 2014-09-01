@@ -11,5 +11,6 @@ Required users count determined in the first step.
    :width: 400px
 
 `nodes.DynamicSplit`_  - Custom dynamic split node example
+
 .. _`nodes.DynamicSplit`: nodes.py
 
