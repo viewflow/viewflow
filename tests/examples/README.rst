@@ -4,6 +4,8 @@ Viewflow Examples
 
 Checkout and run:
 
+.. code-block:: shell
+
     tox migrate
     tox loaddata tests/helloworld/fixtures/default_data.json
     tox loaddata tests/shipment/fixtures/default_data.json
