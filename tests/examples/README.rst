@@ -2,7 +2,7 @@
 Viewflow Examples
 =================
 
-Checkout and run:
+See live at: http://examples.viewflow.io or checkout and run:
 
 .. code-block:: shell
 
@@ -11,7 +11,7 @@ Checkout and run:
     tox loaddata tests/shipment/fixtures/default_data.json
     tox runserver
 
-And get access on http://127.0.0.1:8000 or see live at: http://examples.viewflow.io
+And get access on http://127.0.0.1:8000
 
 
 * HelloWorld_  - Viewflow introduction sample
