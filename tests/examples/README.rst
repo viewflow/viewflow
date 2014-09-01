@@ -13,5 +13,5 @@ HelloWorld_  - Viewflow introduction sample
 Shipment_ - Automate shipment process for ecommerce website
 Dynamic split:<customnode/>` - Custom flow node example
 
-_HelloWorld: helloworld/
-_Shipment: shipment/
+.. _HelloWorld: helloworld/
+.. _Shipment: shipment/
