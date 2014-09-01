@@ -196,5 +196,5 @@ Roadmap
 =======
 
 * 0.5.0 going to be the last alpha release
-* 0.6.0 at 1st October would have considered first release with stable API
+* 0.6.0 at 1st October would have considered first beta release with stable API
 * 1.0.0 LTS estimated at January/February 2015 would have lifetime support same as django 1.6
