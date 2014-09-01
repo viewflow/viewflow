@@ -4,10 +4,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 SECRET_KEY = 'zrfxckyu67_26vav-c(utux0+f*lnt*e6ob9u+3mew_00x+gkb'
-DEBUG = True
-TEMPLATE_DEBUG = True
+DEBUG = not os.path.exists(os.path.join(BASE_DIR, 'deploy'))
+TEMPLATE_DEBUG = DEBUG
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['examples.viewflow.io', '127.0.0.1']
 
 
 # Application definition
@@ -59,6 +59,12 @@ USE_TZ = False
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
+
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, 'tests/static'),
+)
+
+STATIC_ROOT = os.path.join(BASE_DIR, 'deploy/static')
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'tests/templates'),
