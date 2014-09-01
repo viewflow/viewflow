@@ -43,6 +43,10 @@ And add it into INSTALLED_APPS settings
 
 Quick start
 ===========
+See the introduction video_ or read below:
+
+.. _video: http://vimeo.com/m/104701259
+
 Let's define basic Hello Process where one could start hello world request, another person approves it,
 and as soon as the request is approved it should be send into background.
 
@@ -138,6 +142,18 @@ License
 Changelog
 =========
 
+0.5.0 2014-09-01
+----------------
+
+* Many improvements on viewsite
+    - Explicit flow registration on viewsite
+    - Process details, task and queus views
+    - Permission base filtering
+* New example: custom flow node and dynamic splitting
+* Celery dependecy optional and moved to contrib package
+* Examples available live at http://examples.viewflow.io
+* Started introduction video series - https://vimeo.com/104701259
+
 0.4.0 2014-08-01
 -----------------
 
@@ -174,3 +190,11 @@ Changelog
 
 * Initial public prototype
 * Basic set of tasks support (View, Job, If/Switch, Split/Join)
+
+
+Roadmap
+=======
+
+* 0.5.0 going to be the last alpha release
+* 0.6.0 at 1st October would have considered first release with stable API
+* 1.0.0 LTS estimated at January/February 2015 would have lifetime support same as django 1.6
