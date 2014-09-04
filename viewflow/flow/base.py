@@ -97,6 +97,11 @@ class Node(object):
         """
         return iter(self._incoming_edges)
 
+    def _resolve(self, resolver):
+        """
+        Resolve and store outgoing links
+        """
+
     def __str__(self):
         if self.name:
             return self.name.title().replace('_', ' ')
@@ -132,6 +137,29 @@ class Gateway(Node):
     """
     Base class for task gateways
     """
+
+
+class NextNodeMixin(object):
+    """
+    Single next node mixin
+    """
+    def __init__(self, *args, **kwargs):
+        self._next = None
+        super(NextNodeMixin, self).__init__(*args, **kwargs)
+
+    def Next(self, node):
+        assert self._next is None, 'Next node already specified'
+        self._next = node
+        return self
+
+    def _resolve(self, resolver):
+        if self._next:
+            self._next = resolver.get_implementation(self._next)
+
+    def _outgoing(self):
+        if self._next:
+            yield Edge(src=self, dst=self._next, edge_class='next')
+        return iter([])
 
 
 class PermissionMixin(object):

@@ -2,11 +2,11 @@
 Finishes the process and cancels all other active tasks
 """
 
-from viewflow.flow.base import Event
-from viewflow.activation import EndActivation
+from ..activation import EndActivation
+from . import base
 
 
-class End(Event):
+class End(base.Event):
     """
     Ends process event.
     """

@@ -5,7 +5,7 @@ import functools
 
 from ..activation import AbstractJobActivation
 from ..fields import import_task_by_ref
-from ..flow.base import Task, Edge
+from . import base
 
 
 def flow_job(**lock_args):
@@ -88,7 +88,7 @@ def flow_job(**lock_args):
     return flow_task_decorator
 
 
-class AbstractJob(Task):
+class AbstractJob(base.NextNodeMixin, base.Task):
     """
     Base class for task that runs in background
 
@@ -101,16 +101,7 @@ class AbstractJob(Task):
 
     def __init__(self, job):
         super(AbstractJob, self).__init__()
-        self._activate_next = []
         self._job = job
-
-    def _outgoing(self):
-        for next_node in self._activate_next:
-            yield Edge(src=self, dst=next_node, edge_class='next')
-
-    def Next(self, node):
-        self._activate_next.append(node)
-        return self
 
     @property
     def job(self):

@@ -1,8 +1,8 @@
-from viewflow.activation import Activation, GateActivation
-from viewflow.exceptions import FlowRuntimeError
-from viewflow.flow.base import Gateway, Edge
-from viewflow.models import Task
-from viewflow.token import Token
+from ..activation import Activation, GateActivation
+from ..exceptions import FlowRuntimeError
+from ..models import Task
+from ..token import Token
+from . import base
 
 
 class IfActivation(GateActivation):
@@ -20,7 +20,7 @@ class IfActivation(GateActivation):
             self.flow_task._on_false.activate(prev_activation=self, token=self.task.token)
 
 
-class If(Gateway):
+class If(base.Gateway):
     """
     Activates one of paths based on condition
 
@@ -40,8 +40,12 @@ class If(Gateway):
         self._on_false = None
 
     def _outgoing(self):
-        yield Edge(src=self, dst=self._on_true, edge_class='cond_true')
-        yield Edge(src=self, dst=self._on_false, edge_class='cond_false')
+        yield base.Edge(src=self, dst=self._on_true, edge_class='cond_true')
+        yield base.Edge(src=self, dst=self._on_false, edge_class='cond_false')
+
+    def _resolve(self, resolver):
+        self._on_true = resolver.get_implementation(self._on_true)
+        self._on_false = resolver.get_implementation(self._on_false)
 
     def OnTrue(self, node):
         self._on_true = node
@@ -77,7 +81,7 @@ class SwitchActivation(GateActivation):
         self.next_task.activate(prev_activation=self, token=self.task.token)
 
 
-class Switch(Gateway):
+class Switch(base.Gateway):
     """
     Activates first path with matched condition
     """
@@ -91,7 +95,12 @@ class Switch(Gateway):
     def _outgoing(self):
         for next_node, cond in self._activate_next:
             edge_class = 'cond_true' if cond else 'default'
-            yield Edge(src=self, dst=next_node, edge_class=edge_class)
+            yield base.Edge(src=self, dst=next_node, edge_class=edge_class)
+
+    def _resolve(self, resolver):
+        self._activate_next = \
+            [(resolver.get_implementation(node), cond)
+             for node, cond in self._activate_next]
 
     @property
     def branches(self):
@@ -194,7 +203,7 @@ class JoinActivation(Activation):
         return activation
 
 
-class Join(Gateway):
+class Join(base.NextNodeMixin, base.Gateway):
     """
     Waits for one or all incoming links and activates next path.
 
@@ -211,15 +220,6 @@ class Join(Gateway):
     def __init__(self, wait_all=True):
         super(Join, self).__init__()
         self._wait_all = wait_all
-        self._activate_next = []
-
-    def _outgoing(self):
-        for next_node in self._activate_next:
-            yield Edge(src=self, dst=next_node, edge_class='next')
-
-    def Next(self, node):
-        self._activate_next.append(node)
-        return self
 
 
 class SplitActivation(GateActivation):
@@ -245,7 +245,7 @@ class SplitActivation(GateActivation):
             next_task.activate(prev_activation=self, token=next(token_source))
 
 
-class Split(Gateway):
+class Split(base.Gateway):
     """
     Activates outgoing path in-parallel depends on per-path condition.
 
@@ -265,7 +265,12 @@ class Split(Gateway):
     def _outgoing(self):
         for next_node, cond in self._activate_next:
             edge_class = 'cond_true' if cond else 'default'
-            yield Edge(src=self, dst=next_node, edge_class=edge_class)
+            yield base.Edge(src=self, dst=next_node, edge_class=edge_class)
+
+    def _resolve(self, resolver):
+        self._activate_next = \
+            [(resolver.get_implementation(node), cond)
+             for node, cond in self._activate_next]
 
     @property
     def branches(self):
@@ -280,7 +285,7 @@ class Split(Gateway):
         return self
 
 
-class First(Gateway):
+class First(base.Gateway):
     """
     TODO: Wait for first of outgoing task to be completed and cancels all others
     """
@@ -291,8 +296,12 @@ class First(Gateway):
         self._activate_list = []
 
     def _outgoing(self):
-        for next_node in self._activate_next:
-            yield Edge(src=self, dst=next_node, edge_class='next')
+        for next_node in self._activate_list:
+            yield base.Edge(src=self, dst=next_node, edge_class='next')
+
+    def _resolve(self, resolver):
+        self._activate_list = \
+            [resolver.get_implementation(node) for node in self._activate_list]
 
     def Of(self, node):
         self._activate_list.append(node)

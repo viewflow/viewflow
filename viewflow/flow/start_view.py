@@ -5,9 +5,9 @@ import functools
 
 from django.db import transaction
 
-from viewflow.activation import StartActivation
-from viewflow.exceptions import FlowRuntimeError
-from viewflow.flow.base import Event, Edge, PermissionMixin, TaskDescriptionMixin
+from ..activation import StartActivation
+from ..exceptions import FlowRuntimeError
+from . import base
 
 
 def flow_start_view():
@@ -86,7 +86,10 @@ class StartViewActivation(StartActivation):
             self.task = self.management_form.save(commit=False)
 
 
-class Start(PermissionMixin, TaskDescriptionMixin, Event):
+class Start(base.PermissionMixin,
+            base.TaskDescriptionMixin,
+            base.NextNodeMixin,
+            base.Event):
     """
     Start process event
 
@@ -137,7 +140,6 @@ class Start(PermissionMixin, TaskDescriptionMixin, Event):
             task_description=task_description,
             **kwargs)
 
-        self._activate_next = []
         self._view, self._view_cls, self._view_args = None, None, None
 
         if isinstance(view_or_cls, type):
@@ -148,14 +150,6 @@ class Start(PermissionMixin, TaskDescriptionMixin, Event):
                 activation_cls = view_or_cls
         else:
             self._view = view_or_cls
-
-    def _outgoing(self):
-        for next_node in self._activate_next:
-            yield Edge(src=self, dst=next_node, edge_class='next')
-
-    def Next(self, node):
-        self._activate_next.append(node)
-        return self
 
     def Permission(self, permission=None, auto_create=False, help_text=None):
         """

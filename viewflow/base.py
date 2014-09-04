@@ -7,14 +7,36 @@ from collections import defaultdict
 from django.apps import apps
 from django.conf.urls import patterns
 
-from viewflow import flow, lock
-from viewflow.models import Process, Task
-from viewflow.urls import node_url, node_url_reverse
-from viewflow.resolve import Resolver
-from viewflow.forms import ActivationDataForm
+from . import flow, lock, models, forms
+from .flow.base import ThisObject
+from .urls import node_url, node_url_reverse
 
 
 this = flow.This()
+
+
+class _Resolver(object):
+    """
+    Resolver of task inter-links
+    """
+    def __init__(self, nodes):
+        self.nodes = nodes  # map name -> node instance
+
+    def get_implementation(self, link):
+        if isinstance(link, flow.Node):
+            return link
+        elif isinstance(link, ThisObject):
+            node = self.nodes.get(link.name)
+            if not node:
+                raise ValueError("Can't found node with name %s" % link.name)
+            return node
+        elif isinstance(link, str):
+            node = self.nodes.get(link)
+            if not node:
+                raise ValueError("Can't found node with name %s" % link)
+            return node
+
+        raise ValueError("Can't resolve %s" % link)
 
 
 class FlowMeta(object):
@@ -73,9 +95,9 @@ class FlowMetaClass(type):
         for name, node in nodes.items():
             node.name = name
 
-        resolver = Resolver(nodes)
+        resolver = _Resolver(nodes)
         for node in nodes.values():
-            resolver.resolve_children_links(node)
+            node._resolve(resolver)
 
         incoming = defaultdict(lambda: [])  # node -> [incoming_nodes]
         for _, node in nodes.items():
@@ -130,9 +152,9 @@ class Flow(object, metaclass=FlowMetaClass):
     :keyword lock_impl: Locking implementation for flow
 
     """
-    process_cls = Process
-    task_cls = Task
-    management_form_cls = ActivationDataForm
+    process_cls = models.Process
+    task_cls = models.Task
+    management_form_cls = forms.ActivationDataForm
     lock_impl = lock.no_lock
 
     process_title = None

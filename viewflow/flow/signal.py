@@ -1,11 +1,11 @@
 """
 django signals as part of flow
 """
-from viewflow.flow.base import Event, Edge
-from viewflow.activation import StartActivation, TaskActivation
+from ..activation import StartActivation, TaskActivation
+from . import base
 
 
-class StartSignal(Event):
+class StartSignal(base.NextNodeMixin, base.Event):
     task_type = 'START'
     activation_cls = StartActivation
 
@@ -15,11 +15,6 @@ class StartSignal(Event):
         self.sender = sender
 
         super(StartSignal, self).__init__(**kwargs)
-        self._activate_next = []
-
-    def _outgoing(self):
-        for next_node in self._activate_next:
-            yield Edge(src=self, dst=next_node, edge_class='next')
 
     def on_signal(self, **signal_kwargs):
         if isinstance(self.receiver, type) and issubclass(self.receiver, StartActivation):
@@ -36,10 +31,6 @@ class StartSignal(Event):
             self.on_signal, sender=self.sender,
             dispatch_uid="viewflow.flow.signal/{}.{}.{}".format(
                 self.flow_cls.__module__, self.flow_cls.__name__, self.name))
-
-    def Next(self, node):
-        self._activate_next.append(node)
-        return self
 
     def has_perm(self, user):
         return False
@@ -90,7 +81,7 @@ def flow_signal(task_loader=None, **lock_args):
     return decorator
 
 
-class Signal(Event):
+class Signal(base.NextNodeMixin, base.Event):
     """
     Executes code on django signal
 
@@ -107,11 +98,6 @@ class Signal(Event):
         self.receiver = receiver
         self.sender = sender
         super(Signal, self).__init__(**kwargs)
-        self._activate_next = []
-
-    def _outgoing(self):
-        for next_node in self._activate_next:
-            yield Edge(src=self, dst=next_node, edge_class='next')
 
     def on_signal(self, **signal_kwargs):
         self.receiver(self, **signal_kwargs)
@@ -121,7 +107,3 @@ class Signal(Event):
             self.on_signal, sender=self.sender,
             dispatch_uid="viewflow.flow.signal/{}.{}.{}".format(
                 self.flow_cls.__module__, self.flow_cls.__name__, self.name))
-
-    def Next(self, node):
-        self._activate_next.append(node)
-        return self

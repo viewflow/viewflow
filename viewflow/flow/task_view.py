@@ -5,9 +5,9 @@ import functools
 
 from django.shortcuts import get_object_or_404
 
-from viewflow.activation import ViewActivation
-from viewflow.exceptions import FlowRuntimeError
-from viewflow.flow.base import Task, Edge, PermissionMixin, TaskDescriptionMixin
+from ..activation import ViewActivation
+from ..exceptions import FlowRuntimeError
+from . import base
 
 
 def flow_view(**lock_args):
@@ -91,7 +91,10 @@ class TaskViewActivation(ViewActivation):
             self.task = self.management_form.save(commit=False)
 
 
-class View(PermissionMixin, TaskDescriptionMixin, Task):
+class View(base.PermissionMixin,
+           base.TaskDescriptionMixin,
+           base.NextNodeMixin,
+           base.Task):
     """
     View task
 
@@ -137,7 +140,6 @@ class View(PermissionMixin, TaskDescriptionMixin, Task):
         if CBV view implements ViewActivation, it used as activation_cls
         """
         self.description = description or ""
-        self._activate_next = []
 
         self._view, self._view_cls, self._view_args = None, None, None
         self._assign_view = None
@@ -152,14 +154,6 @@ class View(PermissionMixin, TaskDescriptionMixin, Task):
             self._view = view_or_cls
 
         super(View, self).__init__(activation_cls=activation_cls)
-
-    def _outgoing(self):
-        for next_node in self._activate_next:
-            yield Edge(src=self, dst=next_node, edge_class='next')
-
-    def Next(self, node):
-        self._activate_next.append(node)
-        return self
 
     def Assign(self, owner=None, **owner_kwargs):
         """

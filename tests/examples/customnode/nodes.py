@@ -1,5 +1,5 @@
 from viewflow.activation import GateActivation
-from viewflow.flow.base import Gateway, Edge
+from viewflow.flow import base
 from viewflow.token import Token
 
 
@@ -11,10 +11,10 @@ class DynamicSplitActivation(GateActivation):
         if self._split_count:
             token_source = Token.split_token_source(self.task.token, self.task.pk)
             for _ in range(self._split_count):
-                self.flow_task._next_task.activate(prev_activation=self, token=next(token_source))
+                self.flow_task._next.activate(prev_activation=self, token=next(token_source))
 
 
-class DynamicSplit(Gateway):
+class DynamicSplit(base.NextNodeMixin, base.Gateway):
     """
     Activates several outgoing task instances depends on callback value
 
@@ -34,20 +34,5 @@ class DynamicSplit(Gateway):
 
     def __init__(self, callback):
         super(DynamicSplit, self).__init__()
-        self._next_task, self._task_count_callback = None, callback
+        self._task_count_callback = callback
 
-    def _outgoing(self):
-        yield Edge(src=self, dst=self._next_task, edge_class='next')
-
-    def Next(self, node):
-        self._next_task = node
-        return self
-
-
-# TODO: Some boilerplate to remove
-from viewflow.resolve import resolve_children_links
-
-
-@resolve_children_links.register(DynamicSplit)
-def _(flow_node, resolver):
-    flow_node._next_task = resolver.get_implementation(flow_node._next_task)
