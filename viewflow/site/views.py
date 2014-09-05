@@ -139,8 +139,11 @@ class ProcessListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.Li
     context_object_name = 'process_list'
 
     def get_template_names(self):
-        return ('{}/flow/index.html'.format(self.flow_cls._meta.app_label),
-                'viewflow/flow/index.html')
+        opts = self.flow_cls._meta
+
+        return (
+            '{}/{}/process_index.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/process_index.html')
 
     def available_start_actions(self):
         """
@@ -178,8 +181,11 @@ class ProcessDetailView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.
     pk_url_kwarg = 'process_pk'
 
     def get_template_names(self):
-        return ('{}/flow/process.html'.format(self.flow_cls._meta.app_label),
-                'viewflow/flow/process.html')
+        opts = self.flow_cls._meta
+
+        return (
+            '{}/{}/process.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/process.html')
 
     def get_context_data(self, **kwargs):
         context = super(ProcessDetailView, self).get_context_data(**kwargs)
@@ -200,8 +206,11 @@ class TaskListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.ListV
     context_object_name = 'task_list'
 
     def get_template_names(self):
-        return ('{}/flow/task_list.html'.format(self.flow_cls._meta.app_label),
-                'viewflow/flow/task_list.html')
+        opts = self.flow_cls._meta
+
+        return (
+            '{}/{}/task_list.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/task_list.html')
 
     def get_context_data(self, **kwargs):
         context = super(TaskListView, self).get_context_data(**kwargs)
@@ -225,8 +234,11 @@ class QueueListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.List
     context_object_name = 'queue'
 
     def get_template_names(self):
-        return ('{}/flow/queue.html'.format(self.flow_cls._meta.app_label),
-                'viewflow/flow/queue.html')
+        opts = self.flow_cls._meta
+
+        return (
+            '{}/{}/queue.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/queue.html')
 
     def get_context_data(self, **kwargs):
         context = super(QueueListView, self).get_context_data(**kwargs)

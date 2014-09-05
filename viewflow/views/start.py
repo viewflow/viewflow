@@ -23,12 +23,13 @@ class StartViewMixin(object):
         return get_next_task_url(self.request, self.activation.process)
 
     def get_template_names(self):
-        """
-        Get template names, first `app_name/flow/start.html` would be checked,
-        and if it is missing, standard `viewflow/flow/start.html` will be used
-        """
-        return ('{}/flow/start.html'.format(self.activation.flow_cls._meta.app_label),
-                'viewflow/flow/start.html')
+        flow_task = self.activation.flow_task
+        opts = self.activation.flow_task.flow_cls._meta
+
+        return (
+            '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
+            '{}/{}/start.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/start.html')
 
     def render_to_response(self, context, **response_kwargs):
         response_kwargs.setdefault('current_app', self.activation.flow_cls._meta.namespace)
@@ -85,8 +86,13 @@ class StartActivationViewMixin(object):
         return context
 
     def get_template_names(self):
-        return ('{}/flow/start.html'.format(self.flow_cls._meta.app_label),
-                'viewflow/flow/start.html')
+        flow_task = self.flow_task
+        opts = self.flow_task.flow_cls._meta
+
+        return (
+            '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
+            '{}/{}/start.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/start.html')
 
     def get_success_url(self):
         return get_next_task_url(self.request, self.process)

@@ -255,7 +255,7 @@ class IncludeProcessDataNode(BaseNode):
     def render_tag(self, context, process):
         opts = process.flow_cls._meta
         template_names = (
-            '{}/flow/process_data.html'.format(opts.app_label),
+            '{}/{}/process_data.html'.format(opts.app_label, opts.flow_label),
             'viewflow/flow/process_data.html')
         template = select_template(template_names)
         with context.push({'process_data': get_model_display_data(process)}):

@@ -21,11 +21,11 @@ class TaskViewMixin(object):
 
     def get_template_names(self):
         flow_task = self.activation.flow_task
-        flow_cls = self.activation.flow_task.flow_cls
+        opts = self.activation.flow_task.flow_cls._meta
 
         return (
-            '{}/flow/{}.html'.format(flow_cls._meta.app_label, flow_task.name),
-            '{}/flow/task.html'.format(flow_cls._meta.app_label),
+            '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
+            '{}/{}/task.html'.format(opts.app_label, opts.flow_label),
             'viewflow/flow/task.html')
 
     def render_to_response(self, context, **response_kwargs):
@@ -79,9 +79,12 @@ class TaskActivationViewMixin(object):
         return context
 
     def get_template_names(self):
+        flow_task = self.flow_task
+        opts = self.flow_task.flow_cls._meta
+
         return (
-            '{}/flow/{}.html'.format(self.flow_cls._meta.app_label, self.flow_task.name),
-            '{}/flow/task.html'.format(self.flow_cls._meta.app_label),
+            '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
+            '{}/{}/task.html'.format(opts.app_label, opts.flow_label),
             'viewflow/flow/task.html')
 
     def get_success_url(self):
@@ -148,10 +151,13 @@ class AssignView(flow.TaskViewActivation, generic.TemplateView):
     Get confirmation from user, assigns task and redirects to task pages
     """
     def get_template_names(self):
+        flow_task = self.flow_task
+        opts = self.flow_task.flow_cls._meta
+
         return (
-            '{}/flow/{}_assign.html'.format(self.flow_task.flow_cls._meta.app_label, self.flow_task.name),
-            '{}/flow/assign.html'.format(self.flow_task.flow_cls._meta.app_label),
-            'viewflow/flow/assign.html')
+            '{}/{}/{}_assign.html'.format(opts.app_label, opts.flow_label, flow_task.name),
+            '{}/{}/task_assign.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/task_assign.html')
 
     def get_context_data(self, **kwargs):
         context = super(AssignView, self).get_context_data(**kwargs)
