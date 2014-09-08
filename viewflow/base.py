@@ -9,7 +9,6 @@ from django.conf.urls import patterns
 
 from . import flow, lock, models, forms
 from .flow.base import ThisObject
-from .urls import node_url, node_url_reverse
 
 
 this = flow.This()
@@ -43,6 +42,8 @@ class FlowMeta(object):
     """
     Flow options
     """
+    urls_namespace = 'viewflow'
+
     def __init__(self, app_label, flow_cls, nodes):
         self.app_label = app_label
         self.flow_cls = flow_cls
@@ -170,18 +171,13 @@ class Flow(object, metaclass=FlowMetaClass):
 
         for node in self._meta.nodes():
             url_getter = getattr(self, 'url_{}'.format(node.name), None)
-            url = url_getter() if url_getter else node_url(node)
+            node_urls += url_getter() if url_getter else node.urls()
 
-            if isinstance(url, (list, tuple)):
-                node_urls += url
-            elif url:
-                node_urls.append(url)
-
-        return patterns('', *node_urls), 'viewflow', self._meta.namespace
+        return patterns('', *node_urls), self._meta.urls_namespace, self._meta.namespace
 
     def reverse(self, task, **kwargs):
         reverse_impl = getattr(self, 'reverse_{}'.format(task.flow_task.name), None)
-        return reverse_impl(task, **kwargs) if reverse_impl else node_url_reverse(task.flow_task, task, **kwargs)
+        return reverse_impl(task, **kwargs) if reverse_impl else task.flow_task.get_task_url(task, **kwargs)
 
     def __str__(self):
         return self.process_title

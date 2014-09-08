@@ -4,9 +4,12 @@ Start flow task, instantiate new flow process
 import functools
 
 from django.db import transaction
+from django.core.urlresolvers import reverse
+from django.conf.urls import url
 
 from ..activation import StartActivation
 from ..exceptions import FlowRuntimeError
+
 from . import base
 
 
@@ -186,6 +189,15 @@ class Start(base.PermissionMixin,
         else:
             self._owner = owner_kwargs
         return self
+
+    def urls(self):
+        return [url(r'^{}/$'.format(self.name), self.view, {'flow_task': self}, name=self.name)]
+
+    def get_task_url(self, task, url_type=None, **kwargs):
+        if task and task.status != self.flow_cls.task_cls.STATUS.NEW:
+            return None
+        return reverse('{}:{}'.format(self.flow_cls._meta.urls_namespace, self.name),
+                       current_app=self.flow_cls._meta.namespace)
 
     @property
     def view(self):

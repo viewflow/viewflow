@@ -114,6 +114,18 @@ class Node(object):
         Subclasses could perform additional initialisation here
         """
 
+    def urls(self):
+        """
+        List of urls for flow node views
+        """
+        return []
+
+    def get_task_url(self, task, url_type=None, **kwargs):
+        """
+        Return url for the task, if url_type is none
+        guess most probable url
+        """
+
     def activate(self, prev_activation, token):
         """
         Creates task activation

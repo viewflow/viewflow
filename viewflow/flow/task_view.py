@@ -3,6 +3,8 @@ Task performed by user in django view
 """
 import functools
 
+from django.core.urlresolvers import reverse
+from django.conf.urls import url
 from django.shortcuts import get_object_or_404
 
 from ..activation import ViewActivation
@@ -204,6 +206,34 @@ class View(base.PermissionMixin,
     def assign_view(self):
         from viewflow.views import AssignView
         return self._assign_view if self._assign_view else AssignView.as_view()
+
+    def urls(self):
+        return [url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/$'.format(self.name),
+                    self.view, {'flow_task': self}, name=self.name),
+                url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/assign/$'.format(self.name),
+                    self.assign_view, {'flow_task': self}, name="{}__assign".format(self.name))]
+
+    def get_task_url(self, task, url_type=None, **kwargs):
+        if not task:
+            task = self.flow_cls.task_cls._default_manager.get(pk=kwargs['pk'])
+
+        if task and task.status not in (self.flow_cls.task_cls.STATUS.NEW, self.flow_cls.task_cls.STATUS.ASSIGNED):
+            return None
+
+        if url_type is None:
+            if not task.owner_id:
+                url_type = 'assign'
+            else:
+                url_type = 'execute'
+
+        if url_type == 'assign':
+            url_name = '{}:{}__assign'.format(self.flow_cls._meta.urls_namespace, self.name)
+        elif url_type == 'execute':
+            url_name = '{}:{}'.format(self.flow_cls._meta.urls_namespace, self.name)
+        else:
+            raise ValueError('Unknown url type - {}'.format(url_type))
+
+        return reverse(url_name, args=[task.process_id, task.pk], current_app=self.flow_cls._meta.namespace)
 
     def calc_owner(self, task):
         from django.contrib.auth import get_user_model

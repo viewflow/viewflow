@@ -22,7 +22,6 @@ from django_webtest import WebTestMixin
 from viewflow import flow
 from viewflow.models import Task
 from viewflow.signals import task_finished
-from viewflow.urls import node_url_reverse
 
 
 @singledispatch
@@ -40,7 +39,8 @@ def _(flow_node, test_task, **post_kwargs):
     """
     url_args = test_task.url_args.copy()
     url_args.setdefault('task', None)
-    task_url = node_url_reverse(flow_node, **url_args)
+
+    task_url = flow_node.get_task_url(**url_args)
 
     form = test_task.app.get(task_url, user=test_task.user).form
 
@@ -61,7 +61,7 @@ def _(flow_node, test_task, **post_kwargs):
 
     url_args = test_task.url_args.copy()
     url_args.setdefault('task', task)
-    task_url = node_url_reverse(flow_node, **url_args)
+    task_url = flow_node.get_task_url(**url_args)
 
     form = test_task.app.get(task_url, user=test_task.user).form
     if not task.owner:
