@@ -9,7 +9,7 @@ from .fields import FlowReferenceField, TaskReferenceField, TokenField
 from .managers import ProcessManager, TaskManager
 
 
-class Process(models.Model):
+class AbstractProcess(models.Model):
     """
     Base class for Process data object
     """
@@ -69,12 +69,17 @@ class Process(models.Model):
         return "<Process {}> - {}".format(self.pk, self.get_status_display())
 
     class Meta:
-        verbose_name_plural = 'Process list'
+        abstract = True
 
 
-class Task(models.Model):
+class AbstractTask(models.Model):
     """
-    Base class for Task state objects
+    Base class for Task state objects.
+
+    In addition, you have to define at least process foreign key field::
+
+        process = models.ForeignKey(Process)
+
     """
     class STATUS:
         NEW = 'NEW'
@@ -93,7 +98,6 @@ class Task(models.Model):
                       (STATUS.CANCELLED, 'Cancelled'),
                       (STATUS.ERROR, 'Error'))
 
-    process = models.ForeignKey(Process)
     flow_task = TaskReferenceField()
     flow_task_type = models.CharField(max_length=50)
     status = FSMField(max_length=3, choices=STATUS_CHOICES, default=STATUS.NEW, db_index=True)
@@ -104,11 +108,6 @@ class Task(models.Model):
     previous = models.ManyToManyField('self')
     token = TokenField(default='start')
 
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, db_index=True)
-    external_task_id = models.CharField(max_length=50, blank=True, null=True, db_index=True)
-
-    owner_permission = models.CharField(max_length=50, blank=True, null=True)
-
     objects = TaskManager()
 
     def _in_db(self):
@@ -118,13 +117,12 @@ class Task(models.Model):
         return self.pk
 
     @transition(field=status, source=STATUS.NEW, target=STATUS.ASSIGNED)
-    def assign(self, user=None, external_task_id=None):
+    def assign(self, *args, **kwargs):
         """
         Tasks that perform some activity should be associated with
         the task owner user or background task id.
         """
-        self.owner = user
-        self.external_task_id = external_task_id
+        raise NotImplementedError
 
     @transition(field=status, source=[STATUS.NEW, STATUS.ASSIGNED], target=STATUS.PREPARED)
     def prepare(self):
@@ -168,7 +166,7 @@ class Task(models.Model):
         if self.flow_task:
             self.flow_task_type = self.flow_task.task_type
 
-        super(Task, self).save(*args, **kwargs)
+        super(AbstractTask, self).save(*args, **kwargs)
 
     def __str__(self):
         if self.flow_task:
@@ -178,3 +176,27 @@ class Task(models.Model):
                 self.pk,
                 self.get_status_display())
         return "<Task {}> - {}".format(self.pk, self.get_status_display())
+
+    class Meta:
+        abstract = True
+
+
+class Process(AbstractProcess):
+    class Meta:
+        verbose_name_plural = 'Process list'
+
+
+class Task(AbstractTask):
+    process = models.ForeignKey(Process)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, db_index=True)
+    external_task_id = models.CharField(max_length=50, blank=True, null=True, db_index=True)
+    owner_permission = models.CharField(max_length=50, blank=True, null=True)
+
+    @transition(field='status', source=AbstractTask.STATUS.NEW, target=AbstractTask.STATUS.ASSIGNED)
+    def assign(self, user=None, external_task_id=None):
+        """
+        Tasks that perform some activity should be associated with
+        the task owner user or background task id.
+        """
+        self.owner = user
+        self.external_task_id = external_task_id
