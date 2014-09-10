@@ -1,6 +1,8 @@
 from itertools import count
+from django.utils.deconstruct import deconstructible
 
 
+@deconstructible
 class Token(object):
     """
     Hellper for tree-like flow token management

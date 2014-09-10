@@ -40,6 +40,9 @@ class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
         return value
 
     def get_prep_value(self, value):
+        if value is None:
+            return None
+
         if not isinstance(value, type):
             # HACK: Django calls callable due query parameter
             # preparation. So here we can get Flow instance,
@@ -67,7 +70,9 @@ class TaskReferenceField(models.CharField, metaclass=models.SubfieldBase):
         return value
 
     def get_prep_value(self, value):
-        if not isinstance(value, str):
+        if value is None:
+            return None
+        elif not isinstance(value, str):
             return get_task_ref(value)
         return super(TaskReferenceField, self).get_prep_value(value)
 
