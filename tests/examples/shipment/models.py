@@ -45,7 +45,7 @@ class Shipment(models.Model):
     need_insurance = models.BooleanField(default=False)
     insurance = models.ForeignKey('Insurance', null=True)
 
-    carrier_quote = models.IntegerField(blank=True, default=0)
+    carrier_quote = models.IntegerField(default=0)
     post_label = models.TextField(blank=True, null=True)
 
     package_tag = models.CharField(max_length=50)

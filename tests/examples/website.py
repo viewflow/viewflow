@@ -24,7 +24,7 @@ def login_as(request):
     else:
         logout(request)
 
-    return redirect(request.META.get('HTTP_REFERER', '/'))
+    return redirect('/')
 
 
 urlpatterns = patterns('',  # NOQA
