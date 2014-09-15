@@ -8,6 +8,7 @@ from .models import Shipment, ShipmentItem, Insurance
 
 class ItemInline(extra_views.InlineFormSet):
     model = ShipmentItem
+    fields = ['name', 'quantity']
 
 
 class StartView(LayoutMixin,
