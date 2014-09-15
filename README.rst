@@ -26,9 +26,17 @@ Full documentation is available at http://kmmbvnr.github.io/django-viewflow/
 Installation
 ============
 
-django-viewflow requires Python 3.3 or greater, django 1.7 and django-tag-parser==2.0b1::
+django-viewflow requires Python 3.3 or greater, django 1.7::
 
     pip install django-viewflow
+
+For installing viewflow-pro with Python 2.7 support::
+
+    pip install django-viewflow  --extra-index-url http://<your_id>.pypi.viewflow.io/
+
+Or inside of your project by adding the following statement to requirements.txt::
+
+    --extra-index-url http://<your_id>.pypi.viewflow.io/
 
 And add it into INSTALLED_APPS settings
 
@@ -137,7 +145,12 @@ More examples are available in the `tests/examples` directory.
 
 License
 =======
-`The GNU Affero General Public License v3.0 <https://www.gnu.org/copyleft/gpl.html>`_
+Viewflow is an Open Source project licensed under the terms of
+the AGPL license - `The GNU Affero General Public License v3.0 <https://www.gnu.org/copyleft/gpl.html>`_
+
+Viewflow Pro has a commercial-friendly license allowing private forks
+and modifications of Viewflow. You can find the commercial license terms in COMM-LICENSE.
+Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for more detail.  
 
 Changelog
 =========
