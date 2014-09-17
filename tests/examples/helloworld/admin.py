@@ -3,14 +3,12 @@ from viewflow.admin import ProcessAdmin, TaskAdmin
 from . import models, flows
 
 
-@admin.register(models.HelloWorldProcess)
 class HelloWorldProcessAdmin(ProcessAdmin):
     list_display = ['pk', 'created', 'get_status_display', 'participants',
                     'text', 'approved']
     list_display_links = ['pk', 'created']
 
 
-@admin.register(models.HelloWorldTask)
 class HelloWorldTaskAdmin(TaskAdmin):
     list_display = ['pk', 'created', 'get_status_display',
                     'owner', 'owner_permission', 'token',
@@ -20,3 +18,7 @@ class HelloWorldTaskAdmin(TaskAdmin):
     def get_queryset(self, request):
         qs = super(HelloWorldTaskAdmin, self).get_queryset(request)
         return qs.filter(process__flow_cls=flows.HelloWorldFlow)
+
+
+admin.site.register(models.HelloWorldProcess, HelloWorldProcessAdmin)
+admin.site.register(models.HelloWorldTask, HelloWorldTaskAdmin)

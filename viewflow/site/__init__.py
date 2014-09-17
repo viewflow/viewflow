@@ -9,7 +9,7 @@ viewsite = ViewSite()
 
 
 def autodiscover():
-    from django.utils.module_loading import autodiscover_modules
+    from ..compat import autodiscover_modules
     autodiscover_modules('flows', register_to=viewsite)
 
 

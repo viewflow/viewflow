@@ -24,9 +24,15 @@ class LayoutNode(object):
         return get_template("{}/{}".format(context['_viewform_template_pack'], template_name))
 
     def render(self, context):
-        with context.push(self.get_context_data(context)):
+        context.push()
+        try:
+            for key, value in self.get_context_data(context).items():
+                context[key] = value
+
             template = self.get_template(context)
             return template.render(context)
+        finally:
+            context.pop()
 
 
 def _convert_to_field(elements):
@@ -137,11 +143,14 @@ class Span(object):
             if bound_field.field.show_hidden_initial:
                 hidden_initial = bound_field.as_hidden(only_initial=True)
 
-            with context.push({
-                    'bound_field': bound_field,
-                    'field': bound_field.field,
-                    'hidden_initial': hidden_initial}):
+            context.push()
+            try:
+                context['bound_field'] = bound_field
+                context['field'] = bound_field.field
+                context['hidden_initial'] = hidden_initial
                 return template.render(context)
+            finally:
+                context.pop()
 
     def __str__(self):
         return 'Span{}({})'.format(self.span_columns, self.field_name)

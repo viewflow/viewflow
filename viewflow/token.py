@@ -1,5 +1,5 @@
 from itertools import count
-from django.utils.deconstruct import deconstructible
+from .compat import deconstructible
 
 
 @deconstructible

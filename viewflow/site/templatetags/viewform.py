@@ -66,11 +66,12 @@ class ViewFormNode(BaseContainerNode):
 
         parts = defaultdict(dict)  # part -> section -> value
 
-        with context.push({
-                'form': form,
-                'layout': layout,
-                '_viewform_template_pack': os.path.dirname(template_name),
-                '_viewform_parts': parts}):
+        context.push()
+        try:
+            context['form'] = form
+            context['layout'] = layout
+            context['_viewform_template_pack'] = os.path.dirname(template_name)
+            context['_viewform_parts'] = parts
 
             children = (node for node in self.nodelist if isinstance(node, ViewPartNode))
             for partnode in children:
@@ -78,6 +79,8 @@ class ViewFormNode(BaseContainerNode):
                 context['_viewform_parts'][partnode.resolve_part(context)][partnode.section] = value
 
             return template.render(context)
+        finally:
+            context.pop()
 
 
 @template_tag(register, 'viewpart')
@@ -124,8 +127,12 @@ class RenderNode(BaseNode):
     max_args = 1
 
     def render_tag(self, context, element):
-        with context.push({'parent': element}):
-                return element.render(context)
+        context.push()
+        try:
+            context['parent'] = element
+            return element.render(context)
+        finally:
+            context.pop()
 
 
 @template_tag(register, 'viewfield')
@@ -145,8 +152,13 @@ class ViewFieldNode(BaseNode):
         if template:
             context_kwargs[template] = template
 
-        with context.push(context_kwargs):
-                return Field(field.name).render(context)
+        context.push()
+        try:
+            for key, value in context_kwargs.items():
+                context[key] = value
+            return Field(field.name).render(context)
+        finally:
+            context.pop()
 
 
 @template_tag(register, 'tagattrs')
@@ -258,5 +270,10 @@ class IncludeProcessDataNode(BaseNode):
             '{}/{}/process_data.html'.format(opts.app_label, opts.flow_label),
             'viewflow/flow/process_data.html')
         template = select_template(template_names)
-        with context.push({'process_data': get_model_display_data(process)}):
+
+        context.push()
+        try:
+            context['process_data'] = get_model_display_data(process)
             return template.render(context)
+        finally:
+            context.pop()

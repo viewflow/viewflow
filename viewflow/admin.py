@@ -17,7 +17,6 @@ class TaskInline(admin.TabularInline):
         return False
 
 
-@admin.register(Process)
 class ProcessAdmin(admin.ModelAdmin):
     """
     List all of viewflow process
@@ -36,7 +35,6 @@ class ProcessAdmin(admin.ModelAdmin):
         return ', '.join(user[0] for user in users)
 
 
-@admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
     """
     List all of viewflow tasks
@@ -49,3 +47,7 @@ class TaskAdmin(admin.ModelAdmin):
     list_display_links = ['pk', 'created', 'process']
     list_filter = ['status']
     readonly_fields = ['process', 'flow_task', 'started', 'finished', 'previous', 'token']
+
+
+admin.site.register(Process, ProcessAdmin)
+admin.site.register(Task, TaskAdmin)

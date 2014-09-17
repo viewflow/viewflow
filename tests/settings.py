@@ -1,5 +1,7 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+import django
+
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -44,7 +46,7 @@ ROOT_URLCONF = 'tests.urls'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3')
+        'NAME': os.path.join(BASE_DIR, 'db{}{}.sqlite3'.format(django.VERSION[0], django.VERSION[1]))
     }
 }
 
@@ -79,6 +81,11 @@ TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + (
 # Celery
 INSTALLED_APPS += ('kombu.transport.django', )
 BROKER_URL = 'django://'
+
+# South
+if django.VERSION < (1, 7):
+    INSTALLED_APPS += ('south', )
+
 
 try:
     from tests.local_settings import *  # NOQA

@@ -4,12 +4,11 @@ Flow definition
 import re
 from collections import defaultdict
 
-from django.apps import apps
 from django.conf.urls import patterns
 
 from . import flow, lock, models, forms
+from .compat import get_containing_app_data
 from .flow.base import ThisObject
-
 
 this = flow.This()
 
@@ -56,8 +55,8 @@ class FlowMeta(object):
     @property
     def flow_label(self):
         module = "{}.{}".format(self.flow_cls.__module__, self.flow_cls.__name__)
-        app_config = apps.get_containing_app_config(module)
-        subpath = module.lstrip(app_config.module.__package__+'.flows.')
+        app_label, app_package = get_containing_app_data(module)
+        subpath = module.lstrip(app_package+'.flows.')
         return subpath.lower().rstrip('flow').replace('.', '/')
 
     def nodes(self):
@@ -108,11 +107,11 @@ class FlowMetaClass(type):
             target._incoming_edges = edges
 
         # set up workflow meta
-        app_config = apps.get_containing_app_config(new_class.__module__)
+        app_label, _ = get_containing_app_data(new_class.__module__)
 
-        if app_config is None:
+        if app_label is None:
             raise ImportError("Flow can't be imported before app setup")
-        new_class._meta = FlowMeta(app_config.label, new_class, nodes)
+        new_class._meta = FlowMeta(app_label, new_class, nodes)
 
         # flow back reference
         for name, node in nodes.items():
@@ -133,8 +132,17 @@ class FlowMetaClass(type):
 
         # view process permission
         process_options = new_class.process_cls._meta
-        if 'view' not in process_options.default_permissions:
-            process_options.default_permissions += ('view', )
+        if hasattr(process_options, 'default_permissions'):
+            # django 1.7
+            if 'view' not in process_options.default_permissions:
+                process_options.default_permissions += ('view', )
+        else:
+            # django 1.6
+            permission = ('view_{}'.format(process_options.model_name),
+                          'View {}'.format(process_options.model_name))
+
+            if permission not in process_options.permissions:
+                process_options.permissions.append(permission)
 
         # done flow setup
         for name, node in nodes.items():

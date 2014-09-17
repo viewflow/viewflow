@@ -1,12 +1,12 @@
 import re
 
 from django import template
-from django.apps import apps
 from django.core.urlresolvers import reverse
 from django.template.base import Node, TemplateSyntaxError
 from django.utils.module_loading import import_by_path
 
 from ..base import Flow
+from ..compat import get_app_package
 
 
 kwarg_re = re.compile(r"(\w+)=?(.+)")
@@ -31,11 +31,11 @@ class FlowURLNode(Node):
             except ValueError:
                 raise TemplateSyntaxError("Flow action should looks like app_label/FlowCls")
 
-            app_config = apps.get_app_config(app_label)
-            if app_config is None:
+            app_package = get_app_package(app_label)
+            if app_package is None:
                 raise TemplateSyntaxError("{} app not found".format(app_label))
 
-            flow_cls = import_by_path('{}.flows.{}'.format(app_config.module.__package__, flow_cls_path))
+            flow_cls = import_by_path('{}.flows.{}'.format(app_package, flow_cls_path))
 
         # resolve url name and args
         url = self.url_name.resolve(context)
