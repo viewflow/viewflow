@@ -21,9 +21,14 @@ try:
         app_config = apps.get_containing_app_config(module)
         return app_config.label, app_config.module.__package__
 
+    def manager_from_queryset(manager_cls, queryset_class, class_name=None):
+        return manager_cls.from_queryset(queryset_class, class_name=class_name)
+
 except ImportError:
-    # djagno 1.6
+    # djagno 1.6 backport
+    import inspect
     from django.db.models import loading
+    from django.utils import six
 
     def get_app_package(app_label):
         return loading.get_app(app_label).__package__
@@ -73,3 +78,43 @@ except ImportError:
 
                     if module_has_submodule(mod, module_to_search):
                         raise
+
+    def _get_queryset_methods(manager_cls, queryset_class):
+        def create_method(name, method):
+            def manager_method(self, *args, **kwargs):
+                return getattr(self.get_queryset(), name)(*args, **kwargs)
+            manager_method.__name__ = method.__name__
+            manager_method.__doc__ = method.__doc__
+            return manager_method
+
+        new_methods = {}
+        # Refs http://bugs.python.org/issue1785.
+        predicate = inspect.isfunction if six.PY3 else inspect.ismethod
+        for name, method in inspect.getmembers(queryset_class, predicate=predicate):
+            # Only copy missing methods.
+            if hasattr(manager_cls, name):
+                continue
+            # Only copy public methods or methods with the attribute `queryset_only=False`.
+            queryset_only = getattr(method, 'queryset_only', None)
+            if queryset_only or (queryset_only is None and name.startswith('_')):
+                if name != '_update':  # django 1.6 have no queryset_only attrubutes on methods
+                    continue
+            elif name == 'delete':
+                continue
+            # Copy the method onto the manager.
+            new_methods[name] = create_method(name, method)
+
+        # Fix get_queryset
+        def get_queryset(self):
+            return self._queryset_class(self.model, using=self._db)
+        new_methods['get_queryset'] = get_queryset
+        return new_methods
+
+    def manager_from_queryset(manager_cls, queryset_class, class_name=None):
+        if class_name is None:
+            class_name = '%sFrom%s' % (manager_cls.__name__, queryset_class.__name__)
+        class_dict = {
+            '_queryset_class': queryset_class,
+        }
+        class_dict.update(_get_queryset_methods(manager_cls, queryset_class))
+        return type(class_name, (manager_cls,), class_dict)

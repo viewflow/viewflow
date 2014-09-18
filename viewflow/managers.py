@@ -3,6 +3,7 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.db.models.constants import LOOKUP_SEP
+from .compat import manager_from_queryset
 
 
 def _get_related_path(model, base_model):
@@ -75,14 +76,6 @@ class ProcessQuerySet(QuerySet):
                 yield process
 
 
-class ProcessManager(models.Manager):
-    def get_queryset(self):
-        return ProcessQuerySet(self.model)
-
-    def coerce_for(self, flow_classes):
-        return self.get_queryset().coerce_for(flow_classes)
-
-
 class TaskQuerySet(QuerySet):
     def coerce_for(self, flow_classes):
         self._coerced = True
@@ -137,12 +130,5 @@ class TaskQuerySet(QuerySet):
                 yield task
 
 
-class TaskManager(models.Manager):
-    def get_queryset(self):
-        return TaskQuerySet(self.model)
-
-    def coerce_for(self, flow_classes):
-        return self.get_queryset().coerce_for(flow_classes)
-
-    def user_queue(self, user, flow_cls=None):
-        return self.get_queryset().user_queue(user, flow_cls)
+ProcessManager = manager_from_queryset(models.Manager, ProcessQuerySet)
+TaskManager = manager_from_queryset(models.Manager, TaskQuerySet)
