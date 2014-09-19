@@ -49,7 +49,9 @@ class AbstractProcess(models.Model):
         pass
 
     def active_tasks(self):
-        return Task.objects.filter(process=self, finished__isnull=True).order_by('created')
+        return self.flow_cls.task_cls._default_manager \
+            .filter(process=self, finished__isnull=True) \
+            .order_by('created')
 
     def get_task(self, flow_task, status=None):
         """
