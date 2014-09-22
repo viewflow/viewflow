@@ -109,7 +109,7 @@ class StartActivation(Activation):
         self.task.prepare()
         signals.task_prepared.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-    def done(self, process=None, user=None):
+    def done(self, process=None):
         """
         Creates and starts new process instance.
         """
@@ -118,8 +118,6 @@ class StartActivation(Activation):
         self.process.save()
 
         self.task.process = self.process
-        if user:
-            self.task.owner = user
         self.task.done()
         self.task.save()
 
@@ -139,7 +137,7 @@ class StartActivation(Activation):
             outgoing.dst.activate(prev_activation=self, token=self.task.token)
 
     def has_perm(self, user):
-        return self.flow_task.has_perm(user, self.process)
+        return self.flow_task.has_perm(user)
 
 
 class TaskActivation(Activation):
@@ -183,18 +181,18 @@ class TaskActivation(Activation):
             outgoing.dst.activate(prev_activation=self, token=self.task.token)
 
     @classmethod
+    def create_task(cls, flow_task, prev_activation, token):
+        return flow_task.flow_cls.task_cls(
+            process=prev_activation.process,
+            flow_task=flow_task,
+            token=token)
+
+    @classmethod
     def activate(cls, flow_task, prev_activation, token):
         """
         Instantiate new task
         """
-
-        flow_cls, flow_task = flow_task.flow_cls, flow_task
-        process = prev_activation.process
-
-        task = flow_cls.task_cls(
-            process=process,
-            flow_task=flow_task,
-            token=token)
+        task = cls.create_task(flow_task, prev_activation, token)
 
         task.save()
         task.previous.add(prev_activation.task)
@@ -209,50 +207,8 @@ class ViewActivation(TaskActivation):
     """
     Activation for task performed by human in django views
     """
-
-    def assign(self, user):
-        """
-        Assigns the user to the task.
-        """
-        self.task.assign(user=user)
-        self.task.save()
-
     def has_perm(self, user, task):
         return self.flow_task.has_perm(user, task)
-
-    @classmethod
-    def activate(cls, flow_task, prev_activation, token):
-        """
-        Instantiate new task, calculate and store required user permissions.
-
-        If task can be assigned to user, assigns it.
-        """
-
-        flow_cls, flow_task = flow_task.flow_cls, flow_task
-        process = prev_activation.process
-
-        task = flow_cls.task_cls(
-            process=process,
-            flow_task=flow_task,
-            token=token)
-
-        # Try to assign permission
-        owner_permission = flow_task.calc_owner_permission(task)
-        if owner_permission:
-            task.owner_permission = owner_permission
-
-        task.save()
-        task.previous.add(prev_activation.task)
-
-        activation = cls()
-        activation.initialize(flow_task, task)
-
-        # Try to assign owner
-        owner = flow_task.calc_owner(task)
-        if owner:
-            activation.assign(owner)
-
-        return activation
 
 
 class AbstractJobActivation(TaskActivation):

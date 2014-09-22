@@ -71,8 +71,7 @@ class StartViewMixin(object):
         if not self.activation.has_perm(request.user):
             raise PermissionDenied
 
-        self.activation.assign(user=request.user)
-        self.activation.prepare(request.POST or None)
+        self.activation.prepare(request.POST or None, user=request.user)
         return super(StartViewMixin, self).dispatch(request, **kwargs)
 
 
@@ -136,8 +135,7 @@ class StartActivationViewMixin(object):
         if not self.has_perm(request.user):
             raise PermissionDenied
 
-        self.assign(user=request.user)
-        self.prepare(request.POST or None)
+        self.prepare(request.POST or None, user=request.user)
         return super(StartActivationViewMixin, self).dispatch(request, *args, **kwargs)
 
 

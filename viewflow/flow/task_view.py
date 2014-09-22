@@ -81,8 +81,11 @@ class TaskViewActivation(ViewActivation):
         else:
             return self.flow_cls.management_form_cls
 
-    def prepare(self, data=None):
+    def prepare(self, data=None, user=None):
         super(TaskViewActivation, self).prepare()
+
+        if user:
+            self.task.assign(user=user)
 
         management_form_cls = self.get_management_form_cls()
         self.management_form = management_form_cls(data=data, instance=self.task)
@@ -91,6 +94,22 @@ class TaskViewActivation(ViewActivation):
             if not self.management_form.is_valid():
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.management_form.errors))
             self.task = self.management_form.save(commit=False)
+
+    @classmethod
+    def create_task(cls, flow_task, prev_activation, token):
+        task = ViewActivation.create_task(flow_task, prev_activation, token)
+
+        # Try to assign permission
+        owner_permission = flow_task.calc_owner_permission(task)
+        if owner_permission:
+            task.owner_permission = owner_permission
+
+        # Try to assign owner
+        owner = flow_task.calc_owner(task)
+        if owner:
+            task.assign(user=owner)
+
+        return task
 
 
 class BaseView(base.TaskDescriptionMixin,

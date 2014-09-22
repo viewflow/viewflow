@@ -171,7 +171,8 @@ class AssignView(flow.TaskViewActivation, generic.TemplateView):
         return url
 
     def activation_assign(self):
-        self.assign(self.request.user)
+        self.task.assign(user=self.request.user)
+        self.task.save()
 
     def post(self, request, *args, **kwargs):
         if 'assign' in request.POST:

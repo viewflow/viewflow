@@ -77,7 +77,10 @@ class StartViewActivation(StartActivation):
     def assign(self, user):
         self.task.assign(user=user)
 
-    def prepare(self, data=None):
+    def prepare(self, data=None, user=None):
+        if user:
+            self.assign(user=user)
+
         super(StartViewActivation, self).prepare()
 
         management_form_cls = self.get_management_form_cls()
@@ -191,7 +194,7 @@ class Start(base.PermissionMixin, BaseStart):
         return reverse('{}:{}'.format(self.flow_cls._meta.urls_namespace, self.name),
                        current_app=self.flow_cls._meta.namespace)
 
-    def has_perm(self, user, process):
+    def has_perm(self, user):
         from django.contrib.auth import get_user_model
 
         if self._owner:
@@ -207,7 +210,7 @@ class Start(base.PermissionMixin, BaseStart):
             obj = None
             if self._owner_permission_obj:
                 if callable(self._owner_permission_obj):
-                    obj = self._owner_permission_obj(process)
+                    obj = self._owner_permission_obj()
                 else:
                     obj = self._owner_permission_obj
 
