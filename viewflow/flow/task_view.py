@@ -93,10 +93,48 @@ class TaskViewActivation(ViewActivation):
             self.task = self.management_form.save(commit=False)
 
 
-class View(base.PermissionMixin,
-           base.TaskDescriptionMixin,
-           base.NextNodeMixin,
-           base.Task):
+class BaseView(base.TaskDescriptionMixin,
+               base.NextNodeMixin,
+               base.Task,
+               base.ViewArgsMixin):
+    """
+    Base class for ViewTasks
+    """
+    task_type = 'HUMAN'
+    activation_cls = TaskViewActivation
+
+    def __init__(self, view_or_cls, **kwargs):
+        """
+        Accepts view callable or CBV View class with view kwargs,
+        if CBV view implements ViewActivation, it used as activation_cls
+        """
+        self._view, self._view_cls, self._view_args = None, None, None
+
+        if isinstance(view_or_cls, type):
+            self._view_cls = view_or_cls
+
+            if issubclass(view_or_cls, ViewActivation):
+                kwargs.setdefault('activation_cls', view_or_cls)
+        else:
+            self._view = view_or_cls
+
+        super(BaseView, self).__init__(view_or_cls=view_or_cls, **kwargs)
+
+    @property
+    def view(self):
+        if not self._view:
+            self._view = self._view_cls.as_view(**self._view_args)
+        return self._view
+
+    def urls(self):
+        return [url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/$'.format(self.name),
+                    self.view, {'flow_task': self}, name=self.name)]
+
+    def get_task_url(self, task, url_type=None, **kwargs):
+        raise NotImplementedError
+
+
+class View(base.PermissionMixin, BaseView):
     """
     View task
 
@@ -133,29 +171,9 @@ class View(base.PermissionMixin,
                   <button type="submit"/>
              </form>
     """
-    task_type = 'HUMAN'
-    activation_cls = TaskViewActivation
-
-    def __init__(self, view_or_cls, description=None, activation_cls=None, **kwargs):
-        """
-        Accepts view callable or CBV View class with view kwargs,
-        if CBV view implements ViewActivation, it used as activation_cls
-        """
-        self.description = description or ""
-
-        self._view, self._view_cls, self._view_args = None, None, None
+    def __init__(self, *args, **kwargs):
         self._assign_view = None
-
-        if isinstance(view_or_cls, type):
-            self._view_cls = view_or_cls
-            self._view_args = kwargs
-
-            if issubclass(view_or_cls, ViewActivation):
-                activation_cls = view_or_cls
-        else:
-            self._view = view_or_cls
-
-        super(View, self).__init__(activation_cls=activation_cls)
+        super(View, self).__init__(*args, **kwargs)
 
     def Assign(self, owner=None, **owner_kwargs):
         """
@@ -197,21 +215,15 @@ class View(base.PermissionMixin,
             help_text=help_text)
 
     @property
-    def view(self):
-        if not self._view:
-            self._view = self._view_cls.as_view(**self._view_args)
-        return self._view
-
-    @property
     def assign_view(self):
         from viewflow.views import AssignView
         return self._assign_view if self._assign_view else AssignView.as_view()
 
     def urls(self):
-        return [url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/$'.format(self.name),
-                    self.view, {'flow_task': self}, name=self.name),
-                url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/assign/$'.format(self.name),
-                    self.assign_view, {'flow_task': self}, name="{}__assign".format(self.name))]
+        urls = super(View, self).urls()
+        urls.append(url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/assign/$'.format(self.name),
+                    self.assign_view, {'flow_task': self}, name="{}__assign".format(self.name)))
+        return urls
 
     def get_task_url(self, task, url_type=None, **kwargs):
         if not task:

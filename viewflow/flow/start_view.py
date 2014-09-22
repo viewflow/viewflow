@@ -89,10 +89,52 @@ class StartViewActivation(StartActivation):
             self.task = self.management_form.save(commit=False)
 
 
-class Start(base.PermissionMixin,
-            base.TaskDescriptionMixin,
-            base.NextNodeMixin,
-            base.Event):
+class BaseStart(base.TaskDescriptionMixin,
+                base.NextNodeMixin,
+                base.Event,
+                base.ViewArgsMixin):
+    """
+    Base class for Start Process Views
+    """
+    task_type = 'START'
+    activation_cls = StartViewActivation
+
+    def __init__(self, view_or_cls=None, **kwargs):
+        """
+        Accepts view callable or CBV View class with view kwargs,
+        if CBV view implements StartActivation, it used as activation_cls
+        """
+        self._view, self._view_cls, self._view_args = None, None, None
+
+        if isinstance(view_or_cls, type):
+            self._view_cls = view_or_cls
+
+            if issubclass(view_or_cls, StartActivation):
+                kwargs.setdefault('activation_cls', view_or_cls)
+        else:
+            self._view = view_or_cls
+
+        super(BaseStart, self).__init__(view_or_cls=view_or_cls, **kwargs)
+
+    @property
+    def view(self):
+        if not self._view:
+            if not self._view_cls:
+                from viewflow.views import StartProcessView
+                return StartProcessView.as_view()
+            else:
+                self._view = self._view_cls.as_view(**self._view_args)
+                return self._view
+        return self._view
+
+    def urls(self):
+        return [url(r'^{}/$'.format(self.name), self.view, {'flow_task': self}, name=self.name)]
+
+    def get_task_url(self, task, url_type=None, **kwargs):
+        raise NotImplementedError
+
+
+class Start(base.PermissionMixin, BaseStart):
     """
     Start process event
 
@@ -129,31 +171,6 @@ class Start(base.PermissionMixin,
                   <button type="submit"/>
              </form>
     """
-    task_type = 'START'
-    activation_cls = StartViewActivation
-
-    def __init__(self, view_or_cls=None, activation_cls=None, task_title=None, task_description=None, **kwargs):
-        """
-        Accepts view callable or CBV View class with view kwargs,
-        if CBV view implements StartActivation, it used as activation_cls
-        """
-        super(Start, self).__init__(
-            activation_cls=activation_cls,
-            task_title=task_title,
-            task_description=task_description,
-            **kwargs)
-
-        self._view, self._view_cls, self._view_args = None, None, None
-
-        if isinstance(view_or_cls, type):
-            self._view_cls = view_or_cls
-            self._view_args = kwargs
-
-            if issubclass(view_or_cls, StartActivation):
-                activation_cls = view_or_cls
-        else:
-            self._view = view_or_cls
-
     def Permission(self, permission=None, auto_create=False, help_text=None):
         """
         Make process start available for users with specific permission.
@@ -190,25 +207,11 @@ class Start(base.PermissionMixin,
             self._owner = owner_kwargs
         return self
 
-    def urls(self):
-        return [url(r'^{}/$'.format(self.name), self.view, {'flow_task': self}, name=self.name)]
-
     def get_task_url(self, task, url_type=None, **kwargs):
         if task and task.status != self.flow_cls.task_cls.STATUS.NEW:
             return None
         return reverse('{}:{}'.format(self.flow_cls._meta.urls_namespace, self.name),
                        current_app=self.flow_cls._meta.namespace)
-
-    @property
-    def view(self):
-        if not self._view:
-            if not self._view_cls:
-                from viewflow.views import StartProcessView
-                return StartProcessView.as_view()
-            else:
-                self._view = self._view_cls.as_view(**self._view_args)
-                return self._view
-        return self._view
 
     def has_perm(self, user):
         from django.contrib.auth import get_user_model

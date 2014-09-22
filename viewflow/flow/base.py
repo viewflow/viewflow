@@ -82,8 +82,11 @@ class Node(object):
 
         self.flow_cls = None
         self.name = None
+
         if activation_cls:
             self.activation_cls = activation_cls
+
+        super(Node, self).__init__(**kwargs)
 
     def _outgoing(self):
         """
@@ -178,13 +181,13 @@ class PermissionMixin(object):
     """
     Node mixing with permission restricted access
     """
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         self._owner = None
         self._owner_permission = None
         self._owner_permission_auto_create = False
         self._owner_permission_help_text = None
 
-        super(PermissionMixin, self).__init__(**kwargs)
+        super(PermissionMixin, self).__init__(*args, **kwargs)
 
     def Permission(self, permission=None, auto_create=False, help_text=None):
         if permission is None and not auto_create:
@@ -228,11 +231,7 @@ class TaskDescriptionMixin(object):
     task_title = None
     task_description = None
 
-    def __init__(self, **kwargs):
-        task_title = kwargs.get('task_title', None)
-        task_description = kwargs.get('task_description', None)
-        view_or_cls = kwargs.get('view_or_cls', None)
-
+    def __init__(self, view_or_cls=None, task_title=None, task_description=None, **kwargs):
         if task_title:
             self.task_title = task_title
         if task_description:
@@ -247,3 +246,12 @@ class TaskDescriptionMixin(object):
                     self.task_description = docstring[1].strip()
 
         super(TaskDescriptionMixin, self).__init__(**kwargs)
+
+
+class ViewArgsMixin(object):
+    """
+    Capture rest of kwargs as view kwags.
+    Put this mixing always the last in inheritance order
+    """
+    def __init__(self, **kwargs):
+        self._view_args = kwargs
