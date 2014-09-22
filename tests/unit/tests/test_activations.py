@@ -30,7 +30,7 @@ class TestViewActivation(TestCase):
         flow_task_mock._outgoing = mock.Mock(return_value=[])
         prev_activation_mock = mock.Mock(spec=activation.StartActivation())
 
-        act = activation.ViewActivation.activate(flow_task_mock, prev_activation_mock, Token('start'))
+        act = activation.TaskActivation.activate(flow_task_mock, prev_activation_mock, Token('start'))
 
         act.task.save.assert_has_calls(())
 
@@ -39,7 +39,7 @@ class TestViewActivation(TestCase):
         flow_task_mock._outgoing = mock.Mock(return_value=[])
         task_mock = mock.Mock(spec=Task())
 
-        act = activation.ViewActivation()
+        act = activation.TaskActivation()
         act.initialize(flow_task_mock, task_mock)
         act.prepare()
         act.done()

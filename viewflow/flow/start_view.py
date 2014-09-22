@@ -91,6 +91,9 @@ class StartViewActivation(StartActivation):
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.management_form.errors))
             self.task = self.management_form.save(commit=False)
 
+    def has_perm(self, user):
+        return self.flow_task.has_perm(user)
+
 
 class BaseStart(base.TaskDescriptionMixin,
                 base.NextNodeMixin,

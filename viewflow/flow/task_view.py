@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.conf.urls import url
 from django.shortcuts import get_object_or_404
 
-from ..activation import ViewActivation
+from ..activation import TaskActivation
 from ..exceptions import FlowRuntimeError
 from . import base
 
@@ -17,7 +17,7 @@ def flow_view(**lock_args):
     Decorator that locks and runs the flow view in transaction.
 
     Expects view with the signature `(request, activation, **kwargs)`
-    or CBV view that implements ViewActivation, in this case, dispatch
+    or CBV view that implements TaskActivation, in this case, dispatch
     with would be called with `(request, **kwargs)`
 
     Returns `(request, flow_task, process_pk, task_pk, **kwargs)`
@@ -35,13 +35,13 @@ def flow_view(**lock_args):
 
                 if self.activation:
                     """
-                    Class-based view that implements ViewActivation interface
+                    Class-based view that implements TaskActivation interface
                     """
                     self.activation.initialize(flow_task, task)
                     return self.func(request, **kwargs)
                 else:
                     """
-                    Function based view or CBV without ViewActvation interface implementation
+                    Function based view or CBV without TaskActvation interface implementation
                     """
                     activation = flow_task.activation_cls()
                     activation.initialize(flow_task, task)
@@ -56,14 +56,14 @@ def flow_view(**lock_args):
                 return self
 
             func = self.func.__get__(instance, type)
-            activation = instance if isinstance(instance, ViewActivation) else None
+            activation = instance if isinstance(instance, TaskActivation) else None
 
             return self.__class__(func, activation=activation)
 
     return flow_view_decorator
 
 
-class TaskViewActivation(ViewActivation):
+class TaskViewActivation(TaskActivation):
     """
     Tracks task statistics in activation form
     """
@@ -95,9 +95,12 @@ class TaskViewActivation(ViewActivation):
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.management_form.errors))
             self.task = self.management_form.save(commit=False)
 
+    def has_perm(self, user, task):
+        return self.flow_task.has_perm(user, task)
+
     @classmethod
     def create_task(cls, flow_task, prev_activation, token):
-        task = ViewActivation.create_task(flow_task, prev_activation, token)
+        task = TaskActivation.create_task(flow_task, prev_activation, token)
 
         # Try to assign permission
         owner_permission = flow_task.calc_owner_permission(task)
@@ -132,7 +135,7 @@ class BaseView(base.TaskDescriptionMixin,
         if isinstance(view_or_cls, type):
             self._view_cls = view_or_cls
 
-            if issubclass(view_or_cls, ViewActivation):
+            if issubclass(view_or_cls, TaskActivation):
                 kwargs.setdefault('activation_cls', view_or_cls)
         else:
             self._view = view_or_cls

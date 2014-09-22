@@ -136,9 +136,6 @@ class StartActivation(Activation):
         for outgoing in self.flow_task._outgoing():
             outgoing.dst.activate(prev_activation=self, token=self.task.token)
 
-    def has_perm(self, user):
-        return self.flow_task.has_perm(user)
-
 
 class TaskActivation(Activation):
     """
@@ -201,14 +198,6 @@ class TaskActivation(Activation):
         activation.initialize(flow_task, task)
 
         return activation
-
-
-class ViewActivation(TaskActivation):
-    """
-    Activation for task performed by human in django views
-    """
-    def has_perm(self, user, task):
-        return self.flow_task.has_perm(user, task)
 
 
 class AbstractJobActivation(TaskActivation):
