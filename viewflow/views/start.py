@@ -68,7 +68,7 @@ class StartViewMixin(object):
         Check user permissions, and prepare flow to execution
         """
         self.activation = activation
-        if not self.activation.flow_task.has_perm(request.user):
+        if not self.activation.has_perm(request.user):
             raise PermissionDenied
 
         self.activation.assign(user=request.user)
@@ -133,7 +133,7 @@ class StartActivationViewMixin(object):
         """
         Check user permissions, and prepare flow to execution
         """
-        if not self.flow_task.has_perm(request.user):
+        if not self.has_perm(request.user):
             raise PermissionDenied
 
         self.assign(user=request.user)

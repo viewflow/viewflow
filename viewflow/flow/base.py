@@ -189,11 +189,28 @@ class PermissionMixin(object):
 
         super(PermissionMixin, self).__init__(*args, **kwargs)
 
-    def Permission(self, permission=None, auto_create=False, help_text=None):
+    def Permission(self, permission=None, auto_create=False, obj=None, help_text=None):
+        """
+        Make task available for users with specific permission,
+        aceps permissions name of callable :: Process -> permission_name::
+
+            .Permission('my_app.can_approve')
+            .Permission(lambda process: 'my_app.department_manager_{}'.format(process.depratment.pk))
+
+        Task specific permission could be auto created during migration::
+
+            # Creates `processcls_app.can_do_task_processcls` permission
+            do_task = View().Permission(auto_create=True)
+
+            # You can specify permission codename and description right here
+            # The following creates `processcls_app.can_execure_task` permission
+            do_task = View().Permission('can_execute_task', help_text='Custom text', auto_create=True)
+        """
         if permission is None and not auto_create:
             raise ValueError('Please specify existion permission name or mark as auto_create=True')
 
         self._owner_permission = permission
+        self._owner_permission_obj = obj
         self._owner_permission_auto_create = auto_create
         self._owner_permission_help_text = help_text
 

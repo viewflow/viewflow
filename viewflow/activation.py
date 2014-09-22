@@ -138,6 +138,9 @@ class StartActivation(Activation):
         for outgoing in self.flow_task._outgoing():
             outgoing.dst.activate(prev_activation=self, token=self.task.token)
 
+    def has_perm(self, user):
+        return self.flow_task.has_perm(user, self.process)
+
 
 class TaskActivation(Activation):
     """
@@ -213,6 +216,9 @@ class ViewActivation(TaskActivation):
         """
         self.task.assign(user=user)
         self.task.save()
+
+    def has_perm(self, user, task):
+        return self.flow_task.has_perm(user, task)
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):

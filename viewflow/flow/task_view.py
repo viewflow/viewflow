@@ -172,7 +172,7 @@ class View(base.PermissionMixin, BaseView):
              </form>
     """
     def __init__(self, *args, **kwargs):
-        self._assign_view = None
+        self._assign_view = kwargs.pop('assign_view', None)
         super(View, self).__init__(*args, **kwargs)
 
     def Assign(self, owner=None, **owner_kwargs):
@@ -188,31 +188,6 @@ class View(base.PermissionMixin, BaseView):
         else:
             self._owner = owner_kwargs
         return self
-
-    def Permission(self, permission=None, assign_view=None, auto_create=False, help_text=None):
-        """
-        Make task available for users with specific permission,
-        aceps permissions name of callable :: Process -> permission_name::
-
-            .Permission('my_app.can_approve')
-            .Permission(lambda process: 'my_app.department_manager_{}'.format(process.depratment.pk))
-
-        Task specific permission could be auto created during migration::
-
-            # Creates `processcls_app.can_do_task_processcls` permission
-            do_task = View().Permission(auto_create=True)
-
-            # You can specify permission codename and description right here
-            # The following creates `processcls_app.can_execure_task` permission
-            do_task = View().Permission('can_execute_task', help_text='Custom text', auto_create=True)
-        """
-
-        self._assign_view = assign_view
-
-        return super(View, self).Permission(
-            permission=permission,
-            auto_create=auto_create,
-            help_text=help_text)
 
     @property
     def assign_view(self):
@@ -276,7 +251,14 @@ class View(base.PermissionMixin, BaseView):
             """
             return True
 
-        return user.has_perm(task.owner_permission)
+        obj = None
+        if self._owner_permission_obj:
+            if callable(self._owner_permission_obj):
+                obj = self._owner_permission_obj(task.process)
+            else:
+                obj = self._owner_permission_obj
+
+        return user.has_perm(task.owner_permission, obj=obj)
 
     def has_perm(self, user, task):
         return task.owner == user

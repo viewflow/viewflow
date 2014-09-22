@@ -150,7 +150,7 @@ class Start(base.PermissionMixin, BaseStart):
 
         @flow_start_view()
         def start_process(request, activation):
-             if not activation.flow_task.has_perm(request.user):
+             if not activation.has_perm(request.user):
                  raise PermissionDenied
 
              activation.prepare(request.POST or None)
@@ -171,28 +171,6 @@ class Start(base.PermissionMixin, BaseStart):
                   <button type="submit"/>
              </form>
     """
-    def Permission(self, permission=None, auto_create=False, help_text=None):
-        """
-        Make process start available for users with specific permission.
-        For existing permission accepts permissions name or callable predicate :: User -> bool::
-
-            .Permission('processmodel.can_approve')
-            .Permission(lambda user: user.department_id is not None)
-
-        Task specific permission could be auto created during migration::
-
-            # Creates `processcls_app.can_do_task_processcls` permission
-            do_task = Start().Permission(auto_create=True)
-
-            # You can specify permission codename and description right here
-            # The following creates `processcls_app.can_execure_task` permission
-            do_task = Start().Permission('can_execute_task', help_text='Custom text', auto_create=True)
-        """
-        return super(Start, self).Permission(
-            permission=permission,
-            auto_create=auto_create,
-            help_text=help_text)
-
     def Available(self, owner=None, **owner_kwargs):
         """
         Make process start action available for the User
@@ -213,7 +191,7 @@ class Start(base.PermissionMixin, BaseStart):
         return reverse('{}:{}'.format(self.flow_cls._meta.urls_namespace, self.name),
                        current_app=self.flow_cls._meta.namespace)
 
-    def has_perm(self, user):
+    def has_perm(self, user, process):
         from django.contrib.auth import get_user_model
 
         if self._owner:
@@ -225,7 +203,15 @@ class Start(base.PermissionMixin, BaseStart):
         elif self._owner_permission:
             if callable(self._owner_permission) and self._owner_permission(user):
                 return True
-            return user.has_perm(self._owner_permission)
+
+            obj = None
+            if self._owner_permission_obj:
+                if callable(self._owner_permission_obj):
+                    obj = self._owner_permission_obj(process)
+                else:
+                    obj = self._owner_permission_obj
+
+            return user.has_perm(self._owner_permission, obj=obj)
 
         else:
             """
