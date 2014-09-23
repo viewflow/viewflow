@@ -48,6 +48,11 @@ class AbstractProcess(models.Model):
     def restart(self):
         pass
 
+    @property
+    def created_by(self):
+        return self.flow_cls.task_cls._default_manager \
+            .get(process=self, flow_task_type='START').owner
+
     def active_tasks(self):
         return self.flow_cls.task_cls._default_manager \
             .filter(process=self, finished__isnull=True) \
