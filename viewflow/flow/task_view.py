@@ -82,10 +82,10 @@ class TaskViewActivation(TaskActivation):
             return self.flow_cls.management_form_cls
 
     def prepare(self, data=None, user=None):
-        super(TaskViewActivation, self).prepare()
-
         if user:
             self.task.assign(user=user)
+
+        super(TaskViewActivation, self).prepare()
 
         management_form_cls = self.get_management_form_cls()
         self.management_form = management_form_cls(data=data, instance=self.task)
