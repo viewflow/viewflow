@@ -78,3 +78,14 @@ def flowurl(parser, token):
             kwargs[name] = parser.compile_filter(value)
 
     return FlowURLNode(flow_ref, actionname, kwargs)
+
+
+@register.assignment_tag
+def flow_perm(user, task):
+    """
+    {% flow_perm request.user task as task_perm  %}
+    """
+    if not hasattr(task.flow_task, 'has_perm'):
+        return False
+    else:
+        return task.flow_task.has_perm(user, task)
