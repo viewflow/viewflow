@@ -87,5 +87,9 @@ def flow_perm(user, task):
     """
     if not hasattr(task.flow_task, 'has_perm'):
         return False
-    else:
-        return task.flow_task.has_perm(user, task)
+    elif task.flow_task.has_perm(user, task):
+        return True
+    elif not hasattr(task.flow_task, 'can_be_assigned'):
+        return False
+    elif task.flow_task.can_be_assigned(user, task):
+        return True
