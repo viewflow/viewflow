@@ -62,7 +62,7 @@ class TaskViewMixin(object):
     @flow.flow_view()
     def dispatch(self, request, activation, **kwargs):
         self.activation = activation
-        if not self.activation.has_perm(request.user, self.activation.task):
+        if not self.activation.has_perm(request.user):
             raise PermissionDenied
 
         self.activation.prepare(request.POST or None)
@@ -123,7 +123,7 @@ class TaskActivationViewMixin(object):
 
     @flow.flow_view()
     def dispatch(self, request, *args, **kwargs):
-        if not self.has_perm(request.user, self.task):
+        if not self.has_perm(request.user):
             raise PermissionDenied
 
         self.prepare(request.POST or None)

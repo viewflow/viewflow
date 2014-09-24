@@ -95,8 +95,8 @@ class TaskViewActivation(TaskActivation):
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.management_form.errors))
             self.task = self.management_form.save(commit=False)
 
-    def has_perm(self, user, task):
-        return self.flow_task.has_perm(user, task)
+    def has_perm(self, user):
+        return self.flow_task.has_perm(user, self.task)
 
     @classmethod
     def create_task(cls, flow_task, prev_activation, token):
