@@ -96,7 +96,7 @@ class TaskViewActivation(TaskActivation):
             self.task = self.management_form.save(commit=False)
 
     def has_perm(self, user):
-        return self.flow_task.has_perm(user, self.task)
+        return self.flow_task.can_execute(user, self.task)
 
     @classmethod
     def create_task(cls, flow_task, prev_activation, token):
@@ -152,11 +152,8 @@ class BaseView(base.TaskDescriptionMixin,
         return [url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/$'.format(self.name),
                     self.view, {'flow_task': self}, name=self.name)]
 
-    def get_task_url(self, task, url_type=None, **kwargs):
-        raise NotImplementedError
 
-
-class View(base.PermissionMixin, BaseView):
+class View(base.PermissionMixin, base.DetailsViewMixin, BaseView):
     """
     View task
 
@@ -222,27 +219,18 @@ class View(base.PermissionMixin, BaseView):
                     self.assign_view, {'flow_task': self}, name="{}__assign".format(self.name)))
         return urls
 
-    def get_task_url(self, task, url_type=None, **kwargs):
-        if not task:
-            task = self.flow_cls.task_cls._default_manager.get(pk=kwargs['pk'])
-
-        if task and task.status not in (self.flow_cls.task_cls.STATUS.NEW, self.flow_cls.task_cls.STATUS.ASSIGNED):
-            return None
-
-        if url_type is None:
-            if not task.owner_id:
-                url_type = 'assign'
-            else:
-                url_type = 'execute'
-
+    def get_task_url(self, task, url_type, **kwargs):
+        url_name = None
         if url_type == 'assign':
             url_name = '{}:{}__assign'.format(self.flow_cls._meta.urls_namespace, self.name)
         elif url_type == 'execute':
             url_name = '{}:{}'.format(self.flow_cls._meta.urls_namespace, self.name)
-        else:
-            raise ValueError('Unknown url type - {}'.format(url_type))
 
-        return reverse(url_name, args=[task.process_id, task.pk], current_app=self.flow_cls._meta.namespace)
+        if url_name:
+            return reverse(url_name, args=[task.process_id, task.pk],
+                           current_app=self.flow_cls._meta.namespace)
+        else:
+            return super(View, self).get_task_url(task, url_type, **kwargs)
 
     def calc_owner(self, task):
         from django.contrib.auth import get_user_model
@@ -260,7 +248,7 @@ class View(base.PermissionMixin, BaseView):
             owner_permission = owner_permission(task.process)
         return owner_permission
 
-    def can_be_assigned(self, user, task):
+    def can_assign(self, user, task):
         if task.owner_id:
             return False
 
@@ -282,5 +270,5 @@ class View(base.PermissionMixin, BaseView):
 
         return user.has_perm(task.owner_permission, obj=obj)
 
-    def has_perm(self, user, task):
+    def can_execute(self, user, task):
         return task.owner == user

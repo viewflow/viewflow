@@ -6,7 +6,7 @@ from ..activation import EndActivation
 from . import base
 
 
-class End(base.Event):
+class End(base.DetailsViewMixin, base.Event):
     """
     Ends process event.
     """

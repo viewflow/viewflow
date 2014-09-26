@@ -40,7 +40,7 @@ def _(flow_node, test_task, **post_kwargs):
     url_args = test_task.url_args.copy()
     url_args.setdefault('task', None)
 
-    task_url = flow_node.get_task_url(**url_args)
+    task_url = flow_node.get_task_url(url_type='execute', **url_args)
 
     form = test_task.app.get(task_url, user=test_task.user).form
 
@@ -61,11 +61,16 @@ def _(flow_node, test_task, **post_kwargs):
 
     url_args = test_task.url_args.copy()
     url_args.setdefault('task', task)
-    task_url = flow_node.get_task_url(**url_args)
 
-    form = test_task.app.get(task_url, user=test_task.user).form
+    # Assign
     if not task.owner:
+        task_url = flow_node.get_task_url(url_type='assign', **url_args)
+        form = test_task.app.get(task_url, user=test_task.user).form
         form = form.submit('assign').follow().form
+
+    # Execute
+    task_url = flow_node.get_task_url(url_type='execute', **url_args)
+    form = test_task.app.get(task_url, user=test_task.user).form
 
     for key, value in post_kwargs.items():
         form[key] = value

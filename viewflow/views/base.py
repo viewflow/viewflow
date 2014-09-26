@@ -1,5 +1,9 @@
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url
+from django.views import generic
+
+from .. import flow
 
 
 def get_next_task_url(request, process):
@@ -35,3 +39,32 @@ def get_next_task_url(request, process):
                        current_app=process.flow_cls._meta.namespace)
     else:
         return reverse('viewflow:index', current_app=process.flow_cls._meta.namespace)
+
+
+class DetailsView(generic.TemplateView):
+    """
+    Default details view for flow task
+
+    Get confirmation from user, assigns task and redirects to task pages
+    """
+    def get_template_names(self):
+        flow_task = self.activation.flow_task
+        opts = self.activation.flow_task.flow_cls._meta
+
+        return (
+            '{}/{}/{}_details.html'.format(opts.app_label, opts.flow_label, flow_task.name),
+            '{}/{}/task_details.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/task_details.html')
+
+    def get_context_data(self, **kwargs):
+        context = super(DetailsView, self).get_context_data(**kwargs)
+        context['activation'] = self.activation
+        return context
+
+    @flow.flow_view()
+    def dispatch(self, request, activation, *args, **kwargs):
+        self.activation = activation
+
+        if not self.activation.flow_task.can_view(request.user, self.activation.task):
+            raise PermissionDenied
+        return super(DetailsView, self).dispatch(request, *args, **kwargs)

@@ -19,7 +19,8 @@ class TestURLPatterns(TestCase):
         self.assertEqual(3, len(patterns))
 
         urls, app, namespace = patterns
-        self.assertEqual(3, len(urls))
+
+        self.assertEqual(6, len(urls))
         self.assertEqual('viewflow', app)
         self.assertEqual(SingleTaskFlow._meta.namespace, namespace)
 
@@ -36,13 +37,13 @@ class TestURLReverse(TestCase):
         process = Process.objects.create(flow_cls=SingleTaskFlow)
 
         task = Task.objects.create(process=process, flow_task=SingleTaskFlow.start)
-        SingleTaskFlow.instance.reverse(task)
+        SingleTaskFlow.instance.get_user_task_url(task=task, user=None)
 
         task = Task.objects.create(process=process, flow_task=SingleTaskFlow.task)
-        SingleTaskFlow.instance.reverse(task)
+        SingleTaskFlow.instance.get_user_task_url(task=task, user=None)
 
         task = Task.objects.create(process=process, flow_task=SingleTaskFlow.end)
-        SingleTaskFlow.instance.reverse(task)
+        SingleTaskFlow.instance.get_user_task_url(task=task, user=None)
 
     def test_get_task_absolute_url_succeed(self):
         process = Process.objects.create(flow_cls=SingleTaskFlow)

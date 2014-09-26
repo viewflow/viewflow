@@ -88,7 +88,7 @@ def flow_job(**lock_args):
     return flow_task_decorator
 
 
-class AbstractJob(base.NextNodeMixin, base.Task):
+class AbstractJob(base.NextNodeMixin, base.DetailsViewMixin, base.Task):
     """
     Base class for task that runs in background
 

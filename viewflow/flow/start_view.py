@@ -92,11 +92,12 @@ class StartViewActivation(StartActivation):
             self.task = self.management_form.save(commit=False)
 
     def has_perm(self, user):
-        return self.flow_task.has_perm(user)
+        return self.flow_task.can_execute(user)
 
 
 class BaseStart(base.TaskDescriptionMixin,
                 base.NextNodeMixin,
+                base.DetailsViewMixin,
                 base.Event,
                 base.ViewArgsMixin):
     """
@@ -134,10 +135,10 @@ class BaseStart(base.TaskDescriptionMixin,
         return self._view
 
     def urls(self):
-        return [url(r'^{}/$'.format(self.name), self.view, {'flow_task': self}, name=self.name)]
-
-    def get_task_url(self, task, url_type=None, **kwargs):
-        raise NotImplementedError
+        urls = super(BaseStart, self).urls()
+        urls.append(
+            url(r'^{}/$'.format(self.name), self.view, {'flow_task': self}, name=self.name))
+        return urls
 
 
 class Start(base.PermissionMixin, BaseStart):
@@ -192,12 +193,15 @@ class Start(base.PermissionMixin, BaseStart):
         return self
 
     def get_task_url(self, task, url_type=None, **kwargs):
-        if task and task.status != self.flow_cls.task_cls.STATUS.NEW:
-            return None
-        return reverse('{}:{}'.format(self.flow_cls._meta.urls_namespace, self.name),
-                       current_app=self.flow_cls._meta.namespace)
+        if url_type == 'execute':
+            url_name = '{}:{}'.format(self.flow_cls._meta.urls_namespace, self.name)
+            return reverse(url_name, current_app=self.flow_cls._meta.namespace)
+        else:
+            super(Start, self).get_task_url(task, url_type=None, **kwargs)
 
-    def has_perm(self, user):
+    def can_execute(self, user, task=None):
+        # TODO check task status
+
         from django.contrib.auth import get_user_model
 
         if self._owner:

@@ -5,7 +5,7 @@ from ..activation import StartActivation, TaskActivation
 from . import base
 
 
-class StartSignal(base.NextNodeMixin, base.Event):
+class StartSignal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     task_type = 'START'
     activation_cls = StartActivation
 
@@ -32,8 +32,6 @@ class StartSignal(base.NextNodeMixin, base.Event):
             dispatch_uid="viewflow.flow.signal/{}.{}.{}".format(
                 self.flow_cls.__module__, self.flow_cls.__name__, self.name))
 
-    def has_perm(self, user):
-        return False
 
 
 class Receiver(object):
@@ -81,7 +79,7 @@ def flow_signal(task_loader=None, **lock_args):
     return decorator
 
 
-class Signal(base.NextNodeMixin, base.Event):
+class Signal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     """
     Executes code on django signal
 

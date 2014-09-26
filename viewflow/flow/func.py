@@ -7,7 +7,7 @@ from ..activation import StartActivation, TaskActivation, context
 from . import base
 
 
-class StartFunction(base.NextNodeMixin, base.Event):
+class StartFunction(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     """
     def create_requst(activation):
         activation.done()
@@ -34,9 +34,6 @@ class StartFunction(base.NextNodeMixin, base.Event):
             activation = self.activation_cls()
             activation.initialize(self)
             self.func(activation, *args, **kwargs)
-
-    def has_perm(self, user):
-        return False
 
 
 class FlowFunc(object):
@@ -85,7 +82,7 @@ def flow_func(task_loader=None, **lock_args):
     return decorator
 
 
-class Function(base.NextNodeMixin, base.Event):
+class Function(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     task_type = 'FUNC'
     activation_cls = TaskActivation
 
@@ -143,7 +140,7 @@ class HandlerActivation(TaskActivation):
         return activation
 
 
-class Handler(base.NextNodeMixin, base.Event):
+class Handler(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     task_type = 'FUNC'
     activation_cls = HandlerActivation
 

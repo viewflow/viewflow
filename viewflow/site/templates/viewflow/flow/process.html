@@ -1,5 +1,5 @@
 {% extends 'viewflow/base_site.html' %}
-{% load viewform %}
+{% load viewflow viewform %}
 
 {% block title %}{{ block.super}} | {{ flow_cls.process_title }}{% endblock %}
 
@@ -29,7 +29,7 @@
         {% for task in task_list %}
         <tr>
             <td>
-                {% with task.get_absolute_url as task_url %}
+                {% flow_usertask_url task request.user as task_url %}
                 {% if task_url %}
                 <a href="{{ task_url }}?back={{ request.get_full_path|urlencode }}">
                     {{ task.process.id }}/{{ task.id }}
@@ -37,7 +37,6 @@
                 {% else %}
                     {{ task.process.id }}/{{ task.id }}
                 {% endif %}
-                {% endwith %}
             </td>
             <td>{{ task.flow_task }}</td>
             <td>{{ task.created }}</td>

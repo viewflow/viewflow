@@ -80,16 +80,57 @@ def flowurl(parser, token):
     return FlowURLNode(flow_ref, actionname, kwargs)
 
 
+class FlowUserTaskUrlNode(Node):
+    def __init__(self, user, task, target_var=None):
+        self.user = user
+        self.task = task
+        self.target_var = target_var
+
+    def render(self, context):
+        user = self.user.resolve(context)
+        task = self.task.resolve(context)
+
+        url = task.flow_task.flow_cls.instance.get_user_task_url(task=task, user=user)
+
+        if self.target_var:
+            context[self.target_var] = url
+            return ''
+        else:
+            return url
+
+
+@register.tag
+def flow_usertask_url(parser, token):
+    """
+    {% flow_usertask_url request.user task 'execute' %}
+    {% flow_usertask_url request.user task 'execute' as task_url %}
+    """
+    bits = token.split_contents()
+
+    if len(bits) < 3 or bits[-2] != 'as':
+        raise TemplateSyntaxError("'{}' takes at least two arguments (user task)".format(bits[0]))
+
+    task = parser.compile_filter(bits[1])
+    user = parser.compile_filter(bits[2])
+    target_var = bits[-1]
+
+    return FlowUserTaskUrlNode(user, task, target_var)
+
+
 @register.assignment_tag
-def flow_perm(user, task):
+def flow_perms(user, task):
     """
-    {% flow_perm request.user task as task_perm  %}
+    Assigns list of permissions
+
+    {% flow_perms request.user task as task_perms  %}
     """
-    if not hasattr(task.flow_task, 'has_perm'):
-        return False
-    elif task.flow_task.has_perm(user, task):
-        return True
-    elif not hasattr(task.flow_task, 'can_be_assigned'):
-        return False
-    elif task.flow_task.can_be_assigned(user, task):
-        return True
+    result = []
+
+    if hasattr(task.flow_task, 'can_execute') and task.flow_task.can_execute(user, task):
+        result.append('can_execute')
+    elif hasattr(task.flow_task, 'can_assign') and task.flow_task.can_assign(user, task):
+        result.append('can_assign')
+    elif hasattr(task.flow_task, 'can_view') and task.flow_task.can_view(user, task):
+        result.append('can_view')
+
+    return result

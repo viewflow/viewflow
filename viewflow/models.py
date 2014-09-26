@@ -162,10 +162,6 @@ class AbstractTask(models.Model):
     def error(self):
         pass
 
-    def get_absolute_url(self):
-        if self.process and self.flow_task:
-            return self.process.flow_cls.instance.reverse(self)
-
     def save(self, *args, **kwargs):
         if self.status == Task.STATUS.PREPARED:
             raise FlowRuntimeError("Can't save task with intermediate status - PREPARED")
@@ -198,6 +194,10 @@ class Task(AbstractTask):
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, db_index=True)
     external_task_id = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     owner_permission = models.CharField(max_length=50, blank=True, null=True)
+
+    def get_absolute_url(self, user=None):
+        if self.process_id and self.flow_task:
+            return self.process.flow_cls.instance.get_user_task_url(task=self, user=user)
 
     @transition(field='status', source=AbstractTask.STATUS.NEW, target=AbstractTask.STATUS.ASSIGNED)
     def assign(self, user=None, external_task_id=None):

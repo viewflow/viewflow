@@ -152,7 +152,7 @@ class ProcessListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.Li
 
         actions = []
         for node in self.flow_cls._meta.nodes():
-            if isinstance(node, flow.Start) and node.has_perm(self.request.user):
+            if isinstance(node, flow.Start) and node.can_execute(self.request.user):
                 node_url = reverse(
                     'viewflow:{}'.format(node.name),
                     current_app=self.flow_cls._meta.namespace)

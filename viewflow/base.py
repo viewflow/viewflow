@@ -174,18 +174,22 @@ class Flow(object, metaclass=FlowMetaClass):
         """
         Provides ready to include urlpatterns required for this flow
         """
-        node_urls = [
-        ]
-
+        node_urls = []
         for node in self._meta.nodes():
-            url_getter = getattr(self, 'url_{}'.format(node.name), None)
-            node_urls += url_getter() if url_getter else node.urls()
+            node_urls += node.urls()
 
         return patterns('', *node_urls), self._meta.urls_namespace, self._meta.namespace
 
-    def reverse(self, task, **kwargs):
-        reverse_impl = getattr(self, 'reverse_{}'.format(task.flow_task.name), None)
-        return reverse_impl(task, **kwargs) if reverse_impl else task.flow_task.get_task_url(task, **kwargs)
+    def get_user_task_url(self, task, user=None, **kwargs):
+        flow_task = task.flow_task
+
+        if user:
+            if hasattr(flow_task, 'can_execute') and flow_task.can_execute(user, task):
+                return flow_task.get_task_url(task, 'execute', **kwargs)
+            elif hasattr(flow_task, 'can_assign') and flow_task.can_assign(user, task):
+                return flow_task.get_task_url(task, 'assign', **kwargs)
+
+        return flow_task.get_task_url(task, 'details', **kwargs)
 
     def __str__(self):
         return self.process_title

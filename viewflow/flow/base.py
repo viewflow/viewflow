@@ -1,6 +1,8 @@
 """
 Base definitions for flow task declaration
 """
+from django.conf.urls import url
+from django.core.urlresolvers import reverse
 
 
 class ThisObject(object):
@@ -123,10 +125,9 @@ class Node(object):
         """
         return []
 
-    def get_task_url(self, task, url_type=None, **kwargs):
+    def get_task_url(self, task, url_type, **kwargs):
         """
-        Return url for the task, if url_type is none
-        guess most probable url
+        Return url for the task
         """
 
     def activate(self, prev_activation, token):
@@ -175,6 +176,34 @@ class NextNodeMixin(object):
         if self._next:
             yield Edge(src=self, dst=self._next, edge_class='next')
         return iter([])
+
+
+class DetailsViewMixin(object):
+    def __init__(self, *args, details_view=None, **kwargs):
+        self._details_view = details_view
+        super(DetailsViewMixin, self).__init__(*args, **kwargs)
+
+    @property
+    def details_view(self):
+        from viewflow.views import DetailsView
+        return self._details_view if self._details_view else DetailsView.as_view()
+
+    def urls(self):
+        urls = super(DetailsViewMixin, self).urls()
+        urls.append(url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/details/$'.format(self.name),
+                    self.details_view, {'flow_task': self}, name="{}__details".format(self.name)))
+        return urls
+
+    def get_task_url(self, task, url_type, **kwargs):
+        url_name = '{}:{}__details'.format(self.flow_cls._meta.urls_namespace, self.name)
+        return reverse(
+            url_name, args=[task.process_id, task.pk],
+            current_app=self.flow_cls._meta.namespace)
+
+    def can_view(self, user, task):
+        opts = self.flow_cls.process_cls._meta
+        view_perm = "{}.view_{}".format(opts.app_label, opts.model_name)
+        return user.has_perm(view_perm)
 
 
 class PermissionMixin(object):
@@ -267,7 +296,7 @@ class TaskDescriptionMixin(object):
 
 class ViewArgsMixin(object):
     """
-    Capture rest of kwargs as view kwags.
+    Capture rest of kwargs as view kwargs.
     Put this mixing always the last in inheritance order
     """
     def __init__(self, **kwargs):

@@ -165,7 +165,7 @@ class AssignView(flow.TaskViewActivation, generic.TemplateView):
         return context
 
     def get_success_url(self):
-        url = self.task.get_absolute_url()
+        url = self.task.get_absolute_url(user=self.request.user)
         if 'back' in self.request.GET:
             url = "{}?back={}".format(url, urlquote(self.request.GET['back']))
         return url
@@ -183,6 +183,6 @@ class AssignView(flow.TaskViewActivation, generic.TemplateView):
 
     @flow.flow_view()
     def dispatch(self, request, *args, **kwargs):
-        if not self.flow_task.can_be_assigned(request.user, self.task):
+        if not self.flow_task.can_assign(request.user, self.task):
             raise PermissionDenied
         return super(AssignView, self).dispatch(request, *args, **kwargs)

@@ -20,7 +20,7 @@ class IfActivation(GateActivation):
             self.flow_task._on_false.activate(prev_activation=self, token=self.task.token)
 
 
-class If(base.Gateway):
+class If(base.DetailsViewMixin, base.Gateway):
     """
     Activates one of paths based on condition
 
@@ -81,7 +81,7 @@ class SwitchActivation(GateActivation):
         self.next_task.activate(prev_activation=self, token=self.task.token)
 
 
-class Switch(base.Gateway):
+class Switch(base.DetailsViewMixin, base.Gateway):
     """
     Activates first path with matched condition
     """
@@ -203,7 +203,7 @@ class JoinActivation(Activation):
         return activation
 
 
-class Join(base.NextNodeMixin, base.Gateway):
+class Join(base.NextNodeMixin, base.DetailsViewMixin, base.Gateway):
     """
     Waits for one or all incoming links and activates next path.
 
@@ -245,7 +245,7 @@ class SplitActivation(GateActivation):
             next_task.activate(prev_activation=self, token=next(token_source))
 
 
-class Split(base.Gateway):
+class Split(base.DetailsViewMixin, base.Gateway):
     """
     Activates outgoing path in-parallel depends on per-path condition.
 
@@ -285,7 +285,7 @@ class Split(base.Gateway):
         return self
 
 
-class First(base.Gateway):
+class First(base.DetailsViewMixin, base.Gateway):
     """
     TODO: Wait for first of outgoing task to be completed and cancels all others
     """
