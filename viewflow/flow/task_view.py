@@ -271,4 +271,7 @@ class View(base.PermissionMixin, base.DetailsViewMixin, BaseView):
         return user.has_perm(task.owner_permission, obj=obj)
 
     def can_execute(self, user, task):
+        if task.owner_permission is None and task.owner is None:
+            return True
+
         return task.owner == user

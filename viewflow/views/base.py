@@ -18,12 +18,12 @@ def get_next_task_url(request, process):
             .filter(process=process, owner=request.user, status=task_cls.STATUS.ASSIGNED)
 
         if user_tasks.exists():
-            return user_tasks.first().get_absolute_url()
+            return user_tasks.first().get_absolute_url(user=request.user)
         else:
             user_tasks = task_cls._default_manager.user_queue(request.user)\
                 .filter(process=process, status=task_cls.STATUS.NEW)
             if user_tasks.exists():
-                return user_tasks.first().get_absolute_url()
+                return user_tasks.first().get_absolute_url(user=request.user)
 
     elif 'back' in request.GET:
         # Back to task list

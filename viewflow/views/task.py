@@ -1,6 +1,10 @@
 from urllib.parse import quote as urlquote
+
+from django_fsm import can_proceed
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.views import generic
 
 from .. import flow
@@ -62,6 +66,11 @@ class TaskViewMixin(object):
     @flow.flow_view()
     def dispatch(self, request, activation, **kwargs):
         self.activation = activation
+
+        if not can_proceed(activation.task.prepare):
+            messages.info(request, 'Task cannot be executed')
+            return redirect(activation.task.get_absolute_url(user=request.user, url_type='details'))
+
         if not self.activation.has_perm(request.user):
             raise PermissionDenied
 
@@ -123,6 +132,10 @@ class TaskActivationViewMixin(object):
 
     @flow.flow_view()
     def dispatch(self, request, *args, **kwargs):
+        if not can_proceed(self.task.prepare):
+            messages.info(request, 'Task cannot be executed')
+            return redirect(self.task.get_absolute_url(user=request.user, url_type='details'))
+
         if not self.has_perm(request.user):
             raise PermissionDenied
 
@@ -183,6 +196,10 @@ class AssignView(flow.TaskViewActivation, generic.TemplateView):
 
     @flow.flow_view()
     def dispatch(self, request, *args, **kwargs):
+        if not can_proceed(self.task.assign):
+            messages.info(request, 'Task cannot be assigned')
+            return redirect(self.task.get_absolute_url(user=request.user))
+
         if not self.flow_task.can_assign(request.user, self.task):
             raise PermissionDenied
         return super(AssignView, self).dispatch(request, *args, **kwargs)

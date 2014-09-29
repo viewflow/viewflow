@@ -59,8 +59,17 @@
                 </div>
             </nav>
             <div id="page-wrapper">
+                {% if messages %}
                 <div class="row">
                     <div class="col-lg-12">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+                <div class="row">
+                    <div class="col-lg-12">                        
                         {% block content %}
                         {% endblock content %}
                     </div>
