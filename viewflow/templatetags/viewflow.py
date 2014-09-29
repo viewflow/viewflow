@@ -1,10 +1,10 @@
-import re
 from inspect import getargspec
 
 from django import template
 from django.core.urlresolvers import reverse
 from django.template.base import TemplateSyntaxError, TagHelperNode, parse_bits
 from django.utils.module_loading import import_by_path
+from django_fsm import can_proceed
 
 from ..base import Flow
 from ..compat import get_app_package
@@ -92,9 +92,9 @@ def flow_perms(user, task):
     """
     result = []
 
-    if hasattr(task.flow_task, 'can_execute') and task.flow_task.can_execute(user, task):
+    if can_proceed(task.prepare) and hasattr(task.flow_task, 'can_execute') and task.flow_task.can_execute(user, task):
         result.append('can_execute')
-    elif hasattr(task.flow_task, 'can_assign') and task.flow_task.can_assign(user, task):
+    elif can_proceed(task.assign) and hasattr(task.flow_task, 'can_assign') and task.flow_task.can_assign(user, task):
         result.append('can_assign')
     elif hasattr(task.flow_task, 'can_view') and task.flow_task.can_view(user, task):
         result.append('can_view')
