@@ -1,120 +1,86 @@
 import re
+from inspect import getargspec
 
 from django import template
 from django.core.urlresolvers import reverse
-from django.template.base import Node, TemplateSyntaxError
+from django.template.base import TemplateSyntaxError, TagHelperNode, parse_bits
 from django.utils.module_loading import import_by_path
 
 from ..base import Flow
 from ..compat import get_app_package
+from ..models import AbstractProcess, AbstractTask
 
-
-kwarg_re = re.compile(r"(\w+)=?(.+)")
 register = template.Library()
 
 
-class FlowURLNode(Node):
-    def __init__(self, flow_ref, url_name, kwargs):
-        self.flow_ref = flow_ref
-        self.url_name = url_name
-        self.kwargs = kwargs
+@register.tag
+def flowurl(parser, token):
+    """
+        Returns flow url::
 
-    def render(self, context):
-        # resolve flow reference
-        flow_path = self.flow_ref.resolve(context)
+            {% flowurl ref [urlname] [user=]  [as varname]%}
 
-        if isinstance(flow_path, Flow):
-            flow_cls = flow_path
+        Usage examples::
+
+           {% flowurl 'app_label/FlowCls' 'viewflow:index' %}
+           {% flowurl flow_cls 'index' as index_url %}
+           {% flowurl process 'index' %}
+           {% flowurl process 'details' %}
+           {% flowurl task 'assign' user=request.user %}
+           {% flowurl task user=request.user %}
+    """
+    def geturl(ref, url_name=None, user=None):
+        if isinstance(ref, Flow):
+            url_ref = 'viewflow:{}'.format(url_name if url_name else 'index')
+            return reverse(url_ref, current_app=ref._meta.namespace)
+        elif isinstance(ref, AbstractProcess):
+            kwargs, url_ref = {}, 'viewflow:{}'.format(url_name if url_name else 'index')
+            if url_name == 'details':
+                kwargs['process_pk'] = ref.pk
+            return reverse(url_ref, current_app=ref.flow_cls._meta.namespace, kwargs=kwargs)
+        elif isinstance(ref, AbstractTask):
+            return ref.get_absolute_url(user=user, url_type=url_name)
         else:
             try:
-                app_label, flow_cls_path = flow_path.split('/')
+                app_label, flow_cls_path = ref.split('/')
             except ValueError:
-                raise TemplateSyntaxError("Flow action should looks like app_label/FlowCls")
+                raise TemplateSyntaxError(
+                    "Flow reference string should  looks like 'app_label/FlowCls' but '{}'".format(ref))
 
             app_package = get_app_package(app_label)
             if app_package is None:
                 raise TemplateSyntaxError("{} app not found".format(app_label))
 
             flow_cls = import_by_path('{}.flows.{}'.format(app_package, flow_cls_path))
+            url_ref = 'viewflow:{}'.format(url_name if url_name else 'index')
+            return reverse(url_ref, current_app=flow_cls._meta.namespace)
 
-        # resolve url name and args
-        url = self.url_name.resolve(context)
-        kwargs = {key: value.resolve(context) for key, value in self.kwargs.items()}
+    class URLNode(TagHelperNode):
+        def __init__(self, args, kwargs, target_var):
+            super(URLNode, self).__init__(takes_context=False, args=args, kwargs=kwargs)
+            self.target_var = target_var
 
-        return reverse(url, current_app=flow_cls._meta.namespace, kwargs=kwargs)
+        def render(self, context):
+            resolved_args, resolved_kwargs = self.get_resolved_arguments(context)
+            url = geturl(*resolved_args, **resolved_kwargs)
+            if self.target_var:
+                context[self.target_var] = url
+                return ''
+            else:
+                return url
 
+    bits = token.split_contents()[1:]
 
-@register.tag
-def flowurl(parser, token):
-    """
-    Bound to flow {% url %} tag.
+    target_var = None
+    if bits[-2] == 'as':
+        target_var = bits[-1]
+        bits = bits[:-2]
 
-    Accepts flow namespace or flow class as first argument,
-    and rest same as url tag Returns an absolute URL matching
-    given flow action
-
-    Examples:
-
-        {% flowurl flow_cls 'viewflow:index' %}
-        {% flowurl 'app_label/FlowCls' 'viewflow:index' %}
-        {% flowurl 'app_label/FlowCls' 'viewflow:task_name' process_pk=1 task_pk=2 other_arg='value' %}
-    """
-    bits = token.split_contents()
-    if len(bits) < 3:
-        raise TemplateSyntaxError("'{}' takes at least two arguments (flow namespace)".format(bits[0]))
-
-    kwargs = {}
-
-    flow_ref = parser.compile_filter(bits[1])
-    actionname = parser.compile_filter(bits[2])
-
-    for bit in bits[3:]:
-        match = kwarg_re.match(bit)
-        if not match:
-            raise TemplateSyntaxError("Malformed arguments in flow_url tag {}".format(bit))
-
-        name, value = match.groups()
-        if name:
-            kwargs[name] = parser.compile_filter(value)
-
-    return FlowURLNode(flow_ref, actionname, kwargs)
-
-
-class FlowUserTaskUrlNode(Node):
-    def __init__(self, user, task, target_var=None):
-        self.user = user
-        self.task = task
-        self.target_var = target_var
-
-    def render(self, context):
-        user = self.user.resolve(context)
-        task = self.task.resolve(context)
-
-        url = task.flow_task.flow_cls.instance.get_user_task_url(task=task, user=user)
-
-        if self.target_var:
-            context[self.target_var] = url
-            return ''
-        else:
-            return url
-
-
-@register.tag
-def flow_usertask_url(parser, token):
-    """
-    {% flow_usertask_url request.user task 'execute' %}
-    {% flow_usertask_url request.user task 'execute' as task_url %}
-    """
-    bits = token.split_contents()
-
-    if len(bits) < 3 or bits[-2] != 'as':
-        raise TemplateSyntaxError("'{}' takes at least two arguments (user task)".format(bits[0]))
-
-    task = parser.compile_filter(bits[1])
-    user = parser.compile_filter(bits[2])
-    target_var = bits[-1]
-
-    return FlowUserTaskUrlNode(user, task, target_var)
+    params, varargs, varkw, defaults = getargspec(geturl)
+    args, kwargs = parse_bits(
+        parser, bits, params, varargs, varkw, defaults,
+        takes_context=False, name='flowurl')
+    return URLNode(args, kwargs, target_var)
 
 
 @register.assignment_tag

@@ -195,7 +195,7 @@ class Task(AbstractTask):
     external_task_id = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     owner_permission = models.CharField(max_length=50, blank=True, null=True)
 
-    def get_absolute_url(self, user=None):
+    def get_absolute_url(self, user=None, url_type=None):
         if self.process_id and self.flow_task:
             return self.process.flow_cls.instance.get_user_task_url(task=self, user=user)
 

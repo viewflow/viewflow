@@ -2,11 +2,12 @@
     {% for root, fields in process_data %}
     <div class="col-lg-3">
         <h4>{{ root }}</h4>
-        <ul>
+        <dl class="dl-horizontal">
             {% for name, value in fields %}
-            <li><strong>{{ name }}:</strong> {{ value }}</li>
+            <dt>{{ name }}:</dt> 
+            <dd>{{ value }}</dd>
             {% endfor %}
-        </ul>
+        </dl>
     </div>
     {% endfor %}
 </div>

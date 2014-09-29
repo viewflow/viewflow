@@ -142,8 +142,8 @@ class ProcessListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.Li
         opts = self.flow_cls._meta
 
         return (
-            '{}/{}/process_index.html'.format(opts.app_label, opts.flow_label),
-            'viewflow/flow/process_index.html')
+            '{}/{}/process_list.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/process_list.html')
 
     def available_start_actions(self):
         """
@@ -184,8 +184,8 @@ class ProcessDetailView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.
         opts = self.flow_cls._meta
 
         return (
-            '{}/{}/process.html'.format(opts.app_label, opts.flow_label),
-            'viewflow/flow/process.html')
+            '{}/{}/process_details.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/process_details.html')
 
     def get_context_data(self, **kwargs):
         context = super(ProcessDetailView, self).get_context_data(**kwargs)

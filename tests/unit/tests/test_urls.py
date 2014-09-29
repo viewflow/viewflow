@@ -12,7 +12,7 @@ urlpatterns = patterns('',  # NOQA
 
 
 class TestURLPatterns(TestCase):
-    def test_patterns_contains_all_flow(self):
+    def test_tterns_contains_all_flow(self):
         patterns = SingleTaskFlow.instance.urls
 
         self.assertIsNotNone(patterns)
@@ -54,14 +54,20 @@ class TestURLReverse(TestCase):
 class TestFlowUrlTag(TestCase):
     urls = 'tests.unit.tests.test_urls'
 
-    def test_task_resolve_succeed(self):
+    def setUp(self):
+        self.process = Process.objects.create(flow_cls=SingleTaskFlow)
+        self.task = Task.objects.create(process=self.process, flow_task=SingleTaskFlow.task)
+
+    def _test_task_resolve_succeed(self):
         template = Template(
-            "{% load viewflow %}{% flowurl 'unit/SingleTaskFlow' 'viewflow:task' process_pk=1 task_pk=2 %}")
+            "{% load viewflow %}{% flowurl task %}")
 
-        self.assertEqual(template.render(Context({})), '/single_flow/1/task/2/')
+        self.assertEqual(template.render(Context({'task': self.task})),
+                         '/single_flow/{}/task/{}/'.format(self.task.process_id, self.task.pk))
 
-    def test_task_assign_resolve_succeed(self):
+    def _test_task_assign_resolve_succeed(self):
         template = Template(
-            "{% load viewflow %}{% flowurl 'unit/SingleTaskFlow' 'viewflow:task__assign' process_pk=1 task_pk=2 %}")
+            "{% load viewflow %}{% flowurl task 'assign' %}")
 
-        self.assertEqual(template.render(Context({})), '/single_flow/1/task/2/assign/')
+        self.assertEqual(template.render(Context({'task': self.task})),
+                         '/single_flow/{}/task/{}/assign/'.format(self.task.process_id, self.task.pk))

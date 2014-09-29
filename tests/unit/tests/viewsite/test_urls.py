@@ -31,6 +31,5 @@ class TestFlowUrlTag(TestCase):
     urls = 'tests.unit.tests.viewsite.test_urls'
 
     def test_index_resolve_succeed(self):
-        template = Template("{% load viewflow %}{% flowurl 'unit/SingleTaskFlow' 'viewflow:index' %}")
+        template = Template("{% load viewflow %}{% flowurl 'unit/SingleTaskFlow' 'index' %}")
         self.assertEqual(template.render(Context({})), '/singletask/')
-

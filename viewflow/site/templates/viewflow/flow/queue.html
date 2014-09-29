@@ -1,5 +1,5 @@
 {% extends 'viewflow/base_site.html' %}
-{% load viewform %}
+{% load viewflow viewform %}
 
 {% block title %}{{ block.super}} | {{ flow_cls.process_title }}{% endblock %}
 
@@ -19,11 +19,11 @@
     <tbody>
         {% for task in queue %}
         <tr>
-            <td><a href="{{ task.get_absolute_url }}?back={{ request.get_full_path|urlencode }}">{{ task.process.id }}/{{ task.id }}</a></td>
+            <td><a href="{% flowurl task user=request.user %}?back={{ request.get_full_path|urlencode }}">{{ task.process.id }}/{{ task.id }}</a></td>
             <td>{{ task.flow_task }}</td>
             <td>{{ task.created }}</td>
             <td>{{ task.finished|default:"" }}</td>
-            <td>{{ task.process }}</td>
+            <td><a href="{% flowurl task.process 'details' %}">{{ task.process }}</td>
             <td>{{ task.get_status_display }}</td>
         </tr>
         {% endfor %}

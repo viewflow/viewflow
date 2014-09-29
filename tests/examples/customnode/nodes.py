@@ -14,7 +14,7 @@ class DynamicSplitActivation(GateActivation):
                 self.flow_task._next.activate(prev_activation=self, token=next(token_source))
 
 
-class DynamicSplit(base.NextNodeMixin, base.Gateway):
+class DynamicSplit(base.NextNodeMixin, base.DetailsViewMixin, base.Gateway):
     """
     Activates several outgoing task instances depends on callback value
 

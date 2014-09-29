@@ -19,8 +19,8 @@
     <tbody>
         {% for task in task_list %}
         <tr>
-            <td><a href="{{ task.get_absolute_url }}">{{ task.process.id }}/{{ task.id }}</a></td>
-            <td><a href="{% flowurl task.process.flow_cls 'viewflow:details' process_pk=task.process.id %}">{{ task.process }}</a></td>
+            <td><a href="{% flowurl task user=request.user %}">{{ task.process.id }}/{{ task.id }}</a></td>
+            <td><a href="{% flowurl task.process 'details' %}">{{ task.process.id }}</a></td>
             <td>{{ task.flow_task }}</td>
             <td>{{ task.created }}</td>
             <td>{{ task.finished|default:"" }}</td>
