@@ -11,7 +11,7 @@ from django.db import transaction, DatabaseError
 from viewflow.exceptions import FlowLockFailed
 
 
-def no_lock():
+def no_lock(flow):
     """
     No pessimistic locking, just execute flow task in transaction.
     Not suitable when you have Join nodes in your flow.
@@ -23,7 +23,7 @@ def no_lock():
     return lock
 
 
-def select_for_update_lock(nowait=True, attempts=5):
+def select_for_update_lock(flow, nowait=True, attempts=5):
     """
     Uses `select ... for update` on process instance row for locking,
     bound to database transaction.
@@ -54,7 +54,7 @@ def select_for_update_lock(nowait=True, attempts=5):
     return lock
 
 
-def cache_lock(attempts=5, expires=120):
+def cache_lock(flow, attempts=5, expires=120):
     """
     Use it if primary cache backend has transactional `add` functionality,
     like `memcached`.

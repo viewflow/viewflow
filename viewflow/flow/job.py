@@ -36,7 +36,7 @@ def flow_job(**lock_args):
             flow_task = import_task_by_ref(flow_task_strref)
 
             # start
-            lock = flow_task.flow_cls.lock_impl(**lock_args)
+            lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
             with lock(flow_task, process_pk):
                 try:
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)

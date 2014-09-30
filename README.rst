@@ -26,13 +26,13 @@ Full documentation is available at http://kmmbvnr.github.io/django-viewflow/
 Installation
 ============
 
-django-viewflow requires Python 3.3 or greater, django 1.7::
+django-viewflow requires Python 3.3 or greater, django 1.6::
 
     pip install django-viewflow
 
 For installing viewflow-pro with Python 2.7 support::
 
-    pip install django-viewflow  --extra-index-url http://<your_id>.pypi.viewflow.io/
+    pip install mock django-viewflow  --extra-index-url http://<your_id>.pypi.viewflow.io/
 
 Or inside of your project by adding the following statement to requirements.txt::
 

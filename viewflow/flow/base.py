@@ -175,12 +175,11 @@ class NextNodeMixin(object):
     def _outgoing(self):
         if self._next:
             yield Edge(src=self, dst=self._next, edge_class='next')
-        return iter([])
 
 
 class DetailsViewMixin(object):
-    def __init__(self, *args, details_view=None, **kwargs):
-        self._details_view = details_view
+    def __init__(self, *args, **kwargs):
+        self._details_view = kwargs.pop('details_view', None)
         super(DetailsViewMixin, self).__init__(*args, **kwargs)
 
     @property
@@ -285,7 +284,7 @@ class TaskDescriptionMixin(object):
 
         if view_or_cls:
             if view_or_cls.__doc__ and (self.task_title is None or self.task_description is None):
-                docstring = view_or_cls.__doc__.split('\n\n', maxsplit=1)
+                docstring = view_or_cls.__doc__.split('\n\n', 1)
                 if task_title is None and len(docstring) > 0:
                     self.task_title = docstring[0].strip()
                 if task_description is None and len(docstring) > 1:

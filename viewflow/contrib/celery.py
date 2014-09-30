@@ -1,6 +1,5 @@
-from unittest import mock
-
 from ..activation import AbstractJobActivation
+from ..compat import mock
 from ..fields import get_task_ref
 from ..flow.job import AbstractJob
 from .. import test as flow_test

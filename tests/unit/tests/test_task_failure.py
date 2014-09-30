@@ -1,8 +1,8 @@
-from unittest import mock
 from django.test import TestCase
 from celery import shared_task
 
 from viewflow import activation, flow
+from viewflow.compat import mock
 from viewflow.models import Task
 from viewflow.contrib import celery
 

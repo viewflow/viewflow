@@ -120,7 +120,7 @@ class FlowMetaClass(type):
 
         # description
         if new_class.__doc__:
-            docstring = new_class.__doc__.split('\n\n', maxsplit=1)
+            docstring = new_class.__doc__.split('\n\n', 1)
             if 'process_title' not in attrs and len(docstring) > 0:
                 new_class.process_title = docstring[0].strip()
             if 'process_description' not in attrs and len(docstring) > 1:

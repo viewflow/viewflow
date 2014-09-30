@@ -2,6 +2,12 @@
 Django compatibility utils
 """
 try:
+    from unittest import mock  # NOQA
+except ImportError:
+    import mock  # NOQA
+
+
+try:
     # djagno 1.7
     from django.apps import apps
     from django.utils.deconstruct import deconstructible  # NOQA
@@ -12,14 +18,18 @@ try:
         Return app package string
         """
         app_config = apps.get_app_config(app_label)
-        return app_config.module.__package__
+        if not app_config:
+            return None
+        return app_config.module.__name__
 
     def get_containing_app_data(module):
         """
         Return app label and package string
         """
         app_config = apps.get_containing_app_config(module)
-        return app_config.label, app_config.module.__package__
+        if not app_config:
+            return None, None
+        return app_config.label, app_config.module.__name__
 
     def manager_from_queryset(manager_cls, queryset_class, class_name=None):
         return manager_cls.from_queryset(queryset_class, class_name=class_name)
@@ -31,11 +41,17 @@ except ImportError:
     from django.utils import six
 
     def get_app_package(app_label):
-        return loading.get_app(app_label).__package__
+        app_config = loading.get_app(app_label)
+        if not app_config:
+            return None
+        return app_config.__package__
 
     def _get_containing_app(object_name):
         candidates = []
         for app_config in loading.get_apps():
+            if app_config.__package__ is None:
+                app_config.__package__ = app_config.__name__.rpartition('.')[0]
+
             if object_name.startswith(app_config.__package__):
                 subpath = object_name[len(app_config.__package__):]
                 if subpath == '' or subpath[0] == '.':

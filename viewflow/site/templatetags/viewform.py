@@ -206,14 +206,14 @@ def datepicker_format(field):
 
     subst = {
         '%d': 'dd',    # Day of the month as a zero-padded decimal number
-        '%b': 'M',     # Month as locale’s abbreviated name
-        '%B': 'MM',    # Month as locale’s full name
+        '%b': 'M',     # Month as locale's abbreviated name
+        '%B': 'MM',    # Month as locale's full name
         '%m': 'mm',    # Month as a zero-padded decimal number
         '%y': 'yy',    # Year without century as a zero-padded decimal number
         '%Y': 'yyyy',  # Year with century as a decimal number
         '%H': 'hh',    # Hour (24-hour clock) as a zero-padded decimal number
         '%I': 'HH',    # Hour (12-hour clock) as a zero-padded decimal number
-        '%p': 'P',     # Locale’s equivalent of either AM or PM
+        '%p': 'P',     # Locale's equivalent of either AM or PM
         '%M': 'ii',    # Minute as a zero-padded decimal number
         '%S': 'ss',    # Second as a zero-padded decimal number
         '%%': '%'      # A literal '%' character

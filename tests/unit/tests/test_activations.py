@@ -1,7 +1,7 @@
-from unittest import mock
 from django.test import TestCase
 
 from viewflow import activation, flow
+from viewflow.compat import mock
 from viewflow.flow import gates
 from viewflow.models import Process, Task
 from viewflow.token import Token
