@@ -4,15 +4,6 @@ django-viewflow
 
 Ad-hoc business process automation framework for Django http://viewflow.io.
 
-.. image:: https://travis-ci.org/kmmbvnr/django-viewflow.svg
-   :target: https://travis-ci.org/kmmbvnr/django-viewflow
-
-.. image:: https://requires.io/github/kmmbvnr/django-viewflow/requirements.png?branch=master
-   :target: https://requires.io/github/kmmbvnr/django-viewflow/requirements/?branch=master
-
-.. image:: https://coveralls.io/repos/kmmbvnr/django-viewflow/badge.png?branch=master
-   :target: https://coveralls.io/r/kmmbvnr/django-viewflow?branch=master
-
 The process logic defined with django-viewflow is concentrated in one clearly defined `flow`.
 You can organize your views, background jobs, user permission checking in a simple, intuitive django-friendly way.
 
@@ -25,6 +16,16 @@ Please give us feedback about viewflow library! Short `survey <https://docs.goog
 django-viewflow allows to implement such process, just in about hundred lines of code, and you would still have pure django views for that.
 
 Full documentation is available at http://kmmbvnr.github.io/django-viewflow/
+
+.. image:: https://travis-ci.org/kmmbvnr/django-viewflow.svg
+   :target: https://travis-ci.org/kmmbvnr/django-viewflow
+
+.. image:: https://requires.io/github/kmmbvnr/django-viewflow/requirements.png?branch=master
+   :target: https://requires.io/github/kmmbvnr/django-viewflow/requirements/?branch=master
+
+.. image:: https://coveralls.io/repos/kmmbvnr/django-viewflow/badge.png?branch=master
+   :target: https://coveralls.io/r/kmmbvnr/django-viewflow?branch=master
+
 
 Installation
 ============
