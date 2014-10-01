@@ -146,7 +146,7 @@ More examples are available in the `tests/examples` directory.
 License
 =======
 Viewflow is an Open Source project licensed under the terms of
-the AGPL license - `The GNU Affero General Public License v3.0 <https://www.gnu.org/copyleft/gpl.html>`_
+the AGPL license - `The GNU Affero General Public License v3.0 <http://www.gnu.org/licenses/agpl-3.0.html>`_
 
 Viewflow Pro has a commercial-friendly license allowing private forks
 and modifications of Viewflow. You can find the commercial license terms in COMM-LICENSE.
@@ -154,6 +154,23 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 
 Changelog
 =========
+
+0.6.0 2014-10-01
+----------------
+
+* First beta version. First public available release with commercial support and licencing.
+* All API that could be imported as `from viewflow.some_package import cls_or_function` considered stable and
+  not going to be changed much till 1.0 release (except `viewflow.site` that's still under develpment)
+* Django 1.6 support available in public version of viewflow library
+* Added task details views
+* Custom tag creation simplified
+* Split flow base classes to be independed from Django permission system
+* Object level permission support for tasks.
+* Improved {% flowurl %} tag
+* {% flow_perms %} tag for task permission list in template
+* Base abstract classes for models
+* New video: Viewflow Internals - https://vimeo.com/107698021
+
 
 0.5.0 2014-09-01
 ----------------
