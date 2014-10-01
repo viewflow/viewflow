@@ -155,6 +155,10 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Changelog
 =========
 
+Please give us feedback about viewflow library! Short `survey <https://docs.google.com/forms/d/1sfysLTvw5UPwezikDC3RP8pcHwgbVVb4_CG5lUNHw_M/viewform>`_ available.
+
+
+
 0.6.0 2014-10-01
 ----------------
 
