@@ -159,6 +159,11 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Changelog
 =========
 
+GIT Version
+-----------
+
+* Moving to https://github.com/viewflow/ Stay tuned!
+
 
 0.6.0 2014-10-01
 ----------------
@@ -230,6 +235,5 @@ Changelog
 Roadmap
 =======
 
-* 0.5.0 going to be the last alpha release
-* 0.6.0 at 1st October would have considered first beta release with stable API
+* in 0.7.0 at 1st November we going to split out forms library and viewsite modules system to separate apps
 * 1.0.0 LTS estimated at January/February 2015 would have lifetime support same as django 1.6
