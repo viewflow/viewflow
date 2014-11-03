@@ -28,12 +28,7 @@ setup(
         'Django>=1.6',
         'singledispatch>=3.0',
         'django-fsm>=2.0',
-        # viewflow.site
-        'django-extra-views',
-        'django-tag-parser>=2.0b1',
-        'django-formset-js',
-        'django-braces',
-        'docutils',
+        'mock',
         # viewflow.test
         'django-webtest',
         'webtest'

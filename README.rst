@@ -34,9 +34,9 @@ django-viewflow requires Python 3.3 or greater, django 1.6::
 
     pip install django-viewflow
 
-For installing viewflow-pro with Python 2.7 support::
+For installing `Viewflow-Pro <http://viewflow.io/#viewflow_pro>`_ with Python 2.7 support::
 
-    pip install mock django-viewflow  --extra-index-url https://pypi.viewflow.io/<your_id>/
+    pip install django-viewflow-pro  --extra-index-url https://pypi.viewflow.io/<your_id>/
 
 Or inside of your project by adding the following statement to requirements.txt::
 
@@ -168,7 +168,7 @@ GIT Version
 ----------------------------
 
 * HTTPS for ViewflowPro pypi
-* viewflow.site separated to viewflow_site app
+* viewflow.site removed. Pro user still could install it with `pip install django-viewflow-site`
 
 
 0.6.0 2014-10-01
