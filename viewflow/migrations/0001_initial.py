@@ -43,7 +43,7 @@ class Migration(migrations.Migration):
                 ('external_task_id', models.CharField(blank=True, null=True, max_length=50, db_index=True)),
                 ('owner_permission', models.CharField(blank=True, null=True, max_length=50)),
                 ('owner', models.ForeignKey(null=True, blank=True, to=settings.AUTH_USER_MODEL)),
-                ('previous', models.ManyToManyField(to='viewflow.Task')),
+                ('previous', models.ManyToManyField(related_name='previous_rel_+', to='viewflow.Task')),
                 ('process', models.ForeignKey(to='viewflow.Process')),
             ],
             options={

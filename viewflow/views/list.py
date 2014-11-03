@@ -1,83 +1,43 @@
-from django.contrib.auth import login as auth_login
-from django.contrib.auth import logout as auth_logout
-from django.contrib.auth.forms import AuthenticationForm
-from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
 from django.views import generic
-from braces import views as braces
+from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import login_required, permission_required
+from django.utils.decorators import method_decorator
 
-from viewflow import flow
-from viewflow.models import Process, Task
-
-
-class ViewSiteMixin(object):
-    def render_to_response(self, context, **response_kwargs):
-        response_kwargs.setdefault('current_app', self.view_site.app_name)
-        return super(ViewSiteMixin, self).render_to_response(context, **response_kwargs)
+from .. import flow, models
 
 
-class FlowSiteMixin(object):
-    flow_site = None
-
-    @property
-    def flow_cls(self):
-        return self.flow_site.flow_cls
-
-    def render_to_response(self, context, **response_kwargs):
-        response_kwargs.setdefault('current_app', self.flow_cls._meta.namespace)
-        return super(FlowSiteMixin, self).render_to_response(context, **response_kwargs)
+def _available_flows(flow_classes, user):
+    result = []
+    for flow_cls in flow_classes:
+        opts = flow_cls.process_cls._meta
+        view_perm = "{}.view_{}".format(opts.app_label, opts.model_name)
+        if user.has_perm(view_perm):
+            result.append(flow_cls)
+    return result
 
 
-class SiteLoginRequiredMixin(braces.LoginRequiredMixin):
-    view_site = None
-
-    def available_flow_cls(self):
-        return (flow_cls for flow_cls, flow_site in self.view_site.sites
-                if flow_site.can_view(self.request.user))
-
-    def get_login_url(self):
-        return reverse('viewflow_site:login', current_app=self.view_site.app_name)
+class LoginRequiredMixin(object):
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
 
 
-class FlowViewPermissionRequiredMixin(braces.PermissionRequiredMixin):
-    flow_site = None
+class FlowPermissionMixin(object):
+    flow_cls = None
 
-    def get_login_url(self):
-        return reverse('viewflow_site:login', current_app=self.flow_site.view_site.app_name)
+    def dispatch(self, *args, **kwargs):
+        opts = self.flow_cls.process_cls._meta
+        view_perm = "{}.view_{}".format(opts.app_label, opts.model_name)
 
-    def check_permissions(self, request):
-        return self.flow_site.can_view(request.user)
-
-
-class LoginView(ViewSiteMixin, generic.FormView):
-    view_site = None
-    form_class = AuthenticationForm
-    template_name = 'viewflow/login.html'
-
-    def get_success_url(self):
-        return reverse('viewflow_site:index', current_app=self.view_site.app_name)
-
-    def form_valid(self, form):
-        auth_login(self.request, form.get_user())
-        return HttpResponseRedirect(self.get_success_url())
+        return permission_required(view_perm)(super(FlowPermissionMixin, self).dispatch)(*args, **kwargs)
 
 
-class LogoutView(ViewSiteMixin, generic.View):
-    view_site = None
-
-    def get_success_url(self):
-        return reverse('viewflow_site:login', current_app=self.view_site.app_name)
-
-    def get(self, request, *args, **kwargs):
-        auth_logout(request)
-        return HttpResponseRedirect(self.get_success_url())
-
-
-class AllProcessListView(ViewSiteMixin, SiteLoginRequiredMixin, generic.ListView):
+class AllProcessListView(LoginRequiredMixin, generic.ListView):
     """
     All process instances list available for current user
     """
-    view_site = None
+    flow_classes = []
+
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'process_list'
@@ -86,16 +46,17 @@ class AllProcessListView(ViewSiteMixin, SiteLoginRequiredMixin, generic.ListView
         return 'viewflow/site_index.html'
 
     def get_queryset(self):
-        return Process.objects \
-            .coerce_for(self.available_flow_cls()) \
+        return models.Process.objects \
+            .coerce_for(_available_flows(self.flow_classes, self.request.user)) \
             .order_by('-created')
 
 
-class AllTaskListView(ViewSiteMixin, SiteLoginRequiredMixin, generic.ListView):
+class AllTaskListView(LoginRequiredMixin, generic.ListView):
     """
     All tasks from all processes assigned to current user
     """
-    view_site = None
+    flow_classes = []
+
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'task_list'
@@ -104,18 +65,18 @@ class AllTaskListView(ViewSiteMixin, SiteLoginRequiredMixin, generic.ListView):
         return 'viewflow/site_tasks.html'
 
     def get_queryset(self):
-        return Task.objects \
-            .coerce_for(self.available_flow_cls()) \
-            .filter(owner=self.request.user,
-                    status=Task.STATUS.ASSIGNED) \
+        return models.Task.objects \
+            .coerce_for(_available_flows(self.flow_classes, self.request.user)) \
+            .filter(owner=self.request.user, status=models.Task.STATUS.ASSIGNED) \
             .order_by('-created')
 
 
-class AllQueueListView(ViewSiteMixin, SiteLoginRequiredMixin, generic.ListView):
+class AllQueueListView(LoginRequiredMixin, generic.ListView):
     """
     All unassigned tasks available for current user
     """
-    view_site = None
+    flow_classes = []
+
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'queue'
@@ -124,16 +85,16 @@ class AllQueueListView(ViewSiteMixin, SiteLoginRequiredMixin, generic.ListView):
         return 'viewflow/site_queue.html'
 
     def get_queryset(self):
-        queryset = Task.objects \
-            .coerce_for(self.available_flow_cls()) \
+        queryset = models.Task.objects \
+            .coerce_for(_available_flows(self.flow_classes, self.request.user)) \
             .user_queue(self.request.user) \
-            .filter(status=Task.STATUS.NEW) \
+            .filter(status=models.Task.STATUS.NEW) \
             .order_by('-created')
 
         return queryset
 
 
-class ProcessListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.ListView):
+class ProcessListView(FlowPermissionMixin, generic.ListView):
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'process_list'
@@ -173,7 +134,7 @@ class ProcessListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.Li
             .order_by('-created')
 
 
-class ProcessDetailView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.DetailView):
+class ProcessDetailView(FlowPermissionMixin, generic.DetailView):
     """
     Details for process
     """
@@ -197,7 +158,7 @@ class ProcessDetailView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.
         return self.flow_cls.process_cls._default_manager.all()
 
 
-class TaskListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.ListView):
+class TaskListView(FlowPermissionMixin, generic.ListView):
     """
     List of specific Flow tasks assigned to current user
     """
@@ -225,7 +186,7 @@ class TaskListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.ListV
             .order_by('-created')
 
 
-class QueueListView(FlowViewPermissionRequiredMixin, FlowSiteMixin, generic.ListView):
+class QueueListView(FlowPermissionMixin, generic.ListView):
     """
     List of specific Flow unassigned tasks available for current user
     """
