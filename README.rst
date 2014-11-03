@@ -36,11 +36,11 @@ django-viewflow requires Python 3.3 or greater, django 1.6::
 
 For installing viewflow-pro with Python 2.7 support::
 
-    pip install mock django-viewflow  --extra-index-url http://<your_id>.pypi.viewflow.io/
+    pip install mock django-viewflow  --extra-index-url https://pypi.viewflow.io/<your_id>/
 
 Or inside of your project by adding the following statement to requirements.txt::
 
-    --extra-index-url http://<your_id>.pypi.viewflow.io/
+    --extra-index-url https://pypi.viewflow.io/<your_id>/
 
 And add it into INSTALLED_APPS settings
 
@@ -163,6 +163,12 @@ GIT Version
 -----------
 
 * Moving to https://github.com/viewflow/ Stay tuned!
+
+0.7.0 - going to be released
+----------------------------
+
+* HTTPS for ViewflowPro pypi
+* viewflow.site separated to viewflow_site app
 
 
 0.6.0 2014-10-01
