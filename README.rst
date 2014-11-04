@@ -140,7 +140,7 @@ To make the above code work just put the following flow definition in `flows.py`
 
 
 Your Hello World process is ready to go. If you run the development server
-locally, go to http://localhost:8000/flows/helloworld/ and step through the workflow.
+locally, go to http://localhost:8000/helloworld/ and step through the workflow.
 
 
 Next, you can see how to define custom views, and meet other concepts of django-viewflow at
