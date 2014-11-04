@@ -126,6 +126,8 @@ To make the above code work just put the following flow definition in `flows.py`
 .. code-block:: python
 
     from django.conf.urls import patterns, url, include
+    from viewflow import views as viewflow
+    from .helloworld.flows import HelloWorldFlow
 
     urlpatterns = patterns('',
         url(r'^helloworld/', include([
