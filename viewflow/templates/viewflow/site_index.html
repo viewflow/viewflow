@@ -1,0 +1,47 @@
+{% extends 'viewflow/base.html' %}
+{% load viewflow %}
+
+{% block title %}{{ block.super}} | All processes{% endblock %}
+
+{% block content %}
+<div>
+    <h1>All processes list</h1>
+</div>
+<table class="table">
+    <thead>
+        <th>#</th>
+        <th>Process</th>
+        <th>Started</th>
+        <th>Finished</th>
+        <th>Active Tasks</th>
+    </thead>
+    <tbody>
+        {% for process in process_list %}
+        <tr>
+            <td><a href="{% flowurl process 'details' %}">{{ process.id }}</a></td>
+            <td>{{ process.flow_cls.process_title }}</td>
+            <td>{{ process.created }}</td>
+            <td>{{ process.finished|default:"" }}</td>
+            <td>
+                {% for task in process.active_tasks %}
+                {% flowurl task user=request.user as task_url %}
+                {% if task_url %}
+                <a href="{{ task_url }}?back={{ request.get_full_path|urlencode }}">
+                    {{ task.flow_task }}
+                </a>
+                {% else %}
+                    {{ task.flow_task }}
+                {% endif %}
+                {% endfor %}
+            </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No process yet</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

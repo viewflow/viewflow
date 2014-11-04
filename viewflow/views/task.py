@@ -32,10 +32,6 @@ class TaskViewMixin(object):
             '{}/{}/task.html'.format(opts.app_label, opts.flow_label),
             'viewflow/flow/task.html')
 
-    def render_to_response(self, context, **response_kwargs):
-        response_kwargs.setdefault('current_app', self.activation.flow_cls._meta.namespace)
-        return super(TaskViewMixin, self).render_to_response(context, **response_kwargs)
-
     def activation_done(self, *args, **kwargs):
         """
         Finish activation. Subclasses could override this
@@ -125,10 +121,6 @@ class TaskActivationViewMixin(object):
         super(TaskActivationViewMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         return HttpResponseRedirect(self.get_success_url())
-
-    def render_to_response(self, context, **response_kwargs):
-        response_kwargs.setdefault('current_app', self.flow_cls._meta.namespace)
-        return super(TaskActivationViewMixin, self).render_to_response(context, **response_kwargs)
 
     @flow.flow_view()
     def dispatch(self, request, *args, **kwargs):

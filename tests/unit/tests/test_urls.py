@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 from django.core.urlresolvers import reverse
 from django.template import Template, Context
 from django.test import TestCase
@@ -6,32 +6,28 @@ from django.test import TestCase
 from viewflow.models import Process, Task
 from ..flows import SingleTaskFlow, AllTaskFlow
 
-urlpatterns = patterns('',  # NOQA
-    url(r'^single_flow/', include(SingleTaskFlow.instance.urls)),
-    url(r'^alltask_flow/', include(AllTaskFlow.instance.urls)))
+urlpatterns = [
+    url(r'^single_flow/', include([SingleTaskFlow.instance.urls], namespace=SingleTaskFlow.instance.namespace)),
+    url(r'^alltask_flow/', include([AllTaskFlow.instance.urls], namespace=AllTaskFlow.instance.namespace))
+]
 
 
 class TestURLPatterns(TestCase):
-    def test_tterns_contains_all_flow(self):
+    def test_patterns_contains_all_flow(self):
         patterns = SingleTaskFlow.instance.urls
 
         self.assertIsNotNone(patterns)
-        self.assertEqual(3, len(patterns))
 
-        urls, app, namespace = patterns
-
-        self.assertEqual(7, len(urls))
-        self.assertEqual('viewflow', app)
-        self.assertEqual(SingleTaskFlow._meta.namespace, namespace)
+        self.assertEqual(6, len(patterns.url_patterns))
 
 
 class TestURLReverse(TestCase):
     urls = 'tests.unit.tests.test_urls'
 
     def test_django_reverse_flow_urls_succeed(self):
-        reverse('viewflow:start', current_app=SingleTaskFlow._meta.namespace)
-        reverse('viewflow:task', args=[1, 1], current_app=SingleTaskFlow._meta.namespace)
-        reverse('viewflow:task__assign', args=[1, 1], current_app=SingleTaskFlow._meta.namespace)
+        reverse('{}:start'.format(SingleTaskFlow.instance.namespace))
+        reverse('{}:task'.format(SingleTaskFlow.instance.namespace), args=[1, 1])
+        reverse('{}:task__assign'.format(SingleTaskFlow.instance.namespace), args=[1, 1])
 
     def test_flow_reverse_urls_succeed(self):
         process = Process.objects.create(flow_cls=SingleTaskFlow)

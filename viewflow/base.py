@@ -4,10 +4,10 @@ Flow definition
 import re
 from collections import defaultdict
 
-from django.conf.urls import patterns, url
+from django.conf.urls import include, url
 from django_fsm import can_proceed
 
-from . import views, flow, lock, models, forms
+from . import flow, lock, models, forms
 from .compat import get_containing_app_data
 from .flow.base import ThisObject
 
@@ -42,8 +42,6 @@ class FlowMeta(object):
     """
     Flow options
     """
-    urls_namespace = 'viewflow'
-
     def __init__(self, app_label, flow_cls, nodes):
         self.app_label = app_label
         self.flow_cls = flow_cls
@@ -170,26 +168,20 @@ class Flow(object, metaclass=FlowMetaClass):
     process_title = None
     process_description = None
 
-    process_index_view = views.ProcessListView
-    process_details_view = views.ProcessDetailView
-    task_list_view = views.TaskListView
-    queue_list_view = views.QueueListView
+    @property
+    def namespace(self):
+        return "{}/{}".format(self._meta.app_label, self._meta.flow_label)
 
     @property
     def urls(self):
         """
         Provides ready to include urlpatterns required for this flow
         """
-        node_urls = [
-            url('^$', views.ProcessListView.as_view(flow_cls=self), name='index'),
-            url('^details/(?P<process_pk>\d+)/$', self.process_details_view.as_view(flow_cls=self),
-                name="details")
-        ]
-
+        node_urls = []
         for node in self._meta.nodes():
             node_urls += node.urls()
 
-        return patterns('', *node_urls), self._meta.urls_namespace, self._meta.namespace
+        return url('^', include(node_urls))
 
     def get_user_task_url(self, task, user=None, url_type=None, **kwargs):
         flow_task = task.flow_task

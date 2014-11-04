@@ -1,0 +1,56 @@
+{% extends 'viewflow/base_site.html' %}
+{% load viewflow %}
+
+{% block title %}{{ block.super}} | {{ flow_cls.process_title }}{% endblock %}
+
+{% block content %}
+{% if flow_cls.process_title %}
+<h1>{{ flow_cls.process_title }}</h1>
+{% endif %}
+
+{% if flow_cls.process_description %}
+<p>{{ flow_cls.process_description }}</p>
+{% endif %}
+
+{% if start_actions %}
+{% for action_url, action_name in start_actions %}
+<a class="btn btn-default" href="{{ action_url }}?back={{ request.get_full_path|urlencode }}">{{ action_name|title }}</a>
+{% endfor %}
+{% endif %}
+
+<table class="table">
+    <thead>
+        <th>#</th>
+        <th class="span1">Started</th>
+        <th class="span1">Finished</th>
+        <th>Active Tasks</th>
+    </thead>
+    <tbody>
+        {% for process in process_list %}
+        <tr>
+            <td><a href="{% flowurl process 'details' %}">{{ process.id }}</a></td>
+            <td>{{ process.created }}</td>
+            <td>{{ process.finished|default:"" }}</td>
+            <td>
+                {% for task in process.active_tasks %}
+                {% flowurl task user=request.user as task_url %}
+                {% if task_url %}
+                <a href="{{ task_url }}?back={{ request.get_full_path|urlencode }}">
+                    {{ task.flow_task }}
+                </a>
+                {% else %}
+                    {{ task.flow_task }}
+                {% endif %}
+                {% endfor %}
+            </td>
+
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3">No process yet</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

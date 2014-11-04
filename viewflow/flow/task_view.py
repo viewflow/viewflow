@@ -222,13 +222,12 @@ class View(base.PermissionMixin, base.DetailsViewMixin, BaseView):
     def get_task_url(self, task, url_type, **kwargs):
         url_name = None
         if url_type == 'assign':
-            url_name = '{}:{}__assign'.format(self.flow_cls._meta.urls_namespace, self.name)
+            url_name = '{}:{}__assign'.format(self.flow_cls.instance.namespace, self.name)
         elif url_type == 'execute':
-            url_name = '{}:{}'.format(self.flow_cls._meta.urls_namespace, self.name)
+            url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
 
         if url_name:
-            return reverse(url_name, args=[task.process_id, task.pk],
-                           current_app=self.flow_cls._meta.namespace)
+            return reverse(url_name, args=[task.process_id, task.pk])
         else:
             return super(View, self).get_task_url(task, url_type, **kwargs)
 

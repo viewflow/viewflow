@@ -194,10 +194,8 @@ class DetailsViewMixin(object):
         return urls
 
     def get_task_url(self, task, url_type, **kwargs):
-        url_name = '{}:{}__details'.format(self.flow_cls._meta.urls_namespace, self.name)
-        return reverse(
-            url_name, args=[task.process_id, task.pk],
-            current_app=self.flow_cls._meta.namespace)
+        url_name = '{}:{}__details'.format(self.flow_cls.instance.namespace, self.name)
+        return reverse(url_name, args=[task.process_id, task.pk])
 
     def can_view(self, user, task):
         opts = self.flow_cls.process_cls._meta

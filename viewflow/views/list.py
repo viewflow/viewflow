@@ -26,6 +26,7 @@ class FlowPermissionMixin(object):
     flow_cls = None
 
     def dispatch(self, *args, **kwargs):
+        self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
         opts = self.flow_cls.process_cls._meta
         view_perm = "{}.view_{}".format(opts.app_label, opts.model_name)
 
@@ -115,8 +116,7 @@ class ProcessListView(FlowPermissionMixin, generic.ListView):
         for node in self.flow_cls._meta.nodes():
             if isinstance(node, flow.Start) and node.can_execute(self.request.user):
                 node_url = reverse(
-                    'viewflow:{}'.format(node.name),
-                    current_app=self.flow_cls._meta.namespace)
+                    '{}:{}'.format(self.flow_cls.instance.namespace, node.name))
 
                 actions.append((node_url, node.name))
 

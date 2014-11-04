@@ -34,11 +34,10 @@ def get_next_task_url(request, process):
 
     # Back to process list
     if process and process.pk:
-        return reverse('viewflow:details',
-                       kwargs={'process_pk': process.pk},
-                       current_app=process.flow_cls._meta.namespace)
+        return reverse('{}:details'.format(process.flow_cls.instance.namespace),
+                       kwargs={'process_pk': process.pk})
     else:
-        return reverse('viewflow:index', current_app=process.flow_cls._meta.namespace)
+        return reverse('{}:index'.format(process.flow_cls.instance.namespace))
 
 
 class DetailsView(generic.TemplateView):

@@ -194,8 +194,8 @@ class Start(base.PermissionMixin, BaseStart):
 
     def get_task_url(self, task, url_type=None, **kwargs):
         if url_type == 'execute':
-            url_name = '{}:{}'.format(self.flow_cls._meta.urls_namespace, self.name)
-            return reverse(url_name, current_app=self.flow_cls._meta.namespace)
+            url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
+            return reverse(url_name)
         else:
             super(Start, self).get_task_url(task, url_type=None, **kwargs)
 

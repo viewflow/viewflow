@@ -36,11 +36,11 @@ django-viewflow requires Python 3.3 or greater, django 1.6::
 
 For installing `Viewflow-Pro <http://viewflow.io/#viewflow_pro>`_ with Python 2.7 support::
 
-    pip install django-viewflow-pro  --extra-index-url https://pypi.viewflow.io/<your_id>/
+    pip install django-viewflow-pro  --extra-index-url https://pypi.viewflow.io/<licence_id>/simple/
 
 Or inside of your project by adding the following statement to requirements.txt::
 
-    --extra-index-url https://pypi.viewflow.io/<your_id>/
+    --extra-index-url https://pypi.viewflow.io/<licence_id>/
 
 And add it into INSTALLED_APPS settings
 
@@ -49,7 +49,6 @@ And add it into INSTALLED_APPS settings
     INSTALLED_APPS = (
          ...
          'viewflow',
-         'viewflow.site',
     )
 
 
@@ -97,7 +96,6 @@ To make the above code work just put the following flow definition in `flows.py`
     from viewflow.base import this, Flow
     from viewflow.contrib import celery
     from viewflow.views import StartView, ProcessView
-    from viewflow.site import viewsite
 
     from . import models, tasks
 
@@ -123,18 +121,20 @@ To make the above code work just put the following flow definition in `flows.py`
 
         end = flow.End()
 
-
-    viewsite.register(HelloWorldFlow)
-
 `Flow` class contains all urls required for the task processing.
 
 .. code-block:: python
 
     from django.conf.urls import patterns, url, include
-    from viewflow.site import viewsite
 
     urlpatterns = patterns('',
-        url(r'^flows/', include(viewsite.urls)))
+        url(r'^helloworld/', include([
+            HelloWorldFlow.instance.urls,
+            url('^$', viewflow.ProcessListView.as_view(), name='index'),
+            url('^tasks/$', viewflow.TaskListView.as_view(), name='tasks'),
+            url('^queue/$', viewflow.QueueListView.as_view(), name='queue'),
+            url('^details/(?P<process_pk>\d+)/$', viewflow.ProcessDetailView.as_view(), name='details'),
+        ], namespace=HelloWorldFlow.instance.namespace), {'flow_cls': HelloWorldFlow}))
 
 
 Your Hello World process is ready to go. If you run the development server
@@ -159,16 +159,16 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Changelog
 =========
 
-GIT Version
------------
-
 * Moving to https://github.com/viewflow/ Stay tuned!
 
 0.7.0 - going to be released
 ----------------------------
 
-* HTTPS for ViewflowPro pypi
+* HTTPS pypi server available for pro users.
 * viewflow.site removed. Pro user still could install it with `pip install django-viewflow-site`
+* Tasks and Process list views became part of the viewflow library
+* Flow urls simplified. Application instance namespaces not used anymore
+* Fixed migrations for stable django 1.7
 
 
 0.6.0 2014-10-01

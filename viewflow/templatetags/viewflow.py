@@ -34,13 +34,13 @@ def flowurl(parser, token):
     """
     def geturl(ref, url_name=None, user=None):
         if isinstance(ref, Flow):
-            url_ref = 'viewflow:{}'.format(url_name if url_name else 'index')
-            return reverse(url_ref, current_app=ref._meta.namespace)
+            url_ref = '{}:{}'.format(ref.namespace, url_name if url_name else 'index')
+            return reverse(url_ref)
         elif isinstance(ref, AbstractProcess):
-            kwargs, url_ref = {}, 'viewflow:{}'.format(url_name if url_name else 'index')
+            kwargs, url_ref = {}, '{}:{}'.format(ref.flow_cls.instance.namespace, url_name if url_name else 'index')
             if url_name == 'details':
                 kwargs['process_pk'] = ref.pk
-            return reverse(url_ref, current_app=ref.flow_cls._meta.namespace, kwargs=kwargs)
+            return reverse(url_ref, kwargs=kwargs)
         elif isinstance(ref, AbstractTask):
             return ref.get_absolute_url(user=user, url_type=url_name)
         else:
@@ -55,8 +55,8 @@ def flowurl(parser, token):
                 raise TemplateSyntaxError("{} app not found".format(app_label))
 
             flow_cls = import_by_path('{}.flows.{}'.format(app_package, flow_cls_path))
-            url_ref = 'viewflow:{}'.format(url_name if url_name else 'index')
-            return reverse(url_ref, current_app=flow_cls._meta.namespace)
+            url_ref = '{}:{}'.format(flow_cls.instance.namespace, url_name if url_name else 'index')
+            return reverse(url_ref)
 
     class URLNode(TagHelperNode):
         def __init__(self, args, kwargs, target_var):
