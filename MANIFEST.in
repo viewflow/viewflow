@@ -1,5 +1,4 @@
 include LICENSE
 include MANIFEST.in
 include README.rst
-recursive-include viewflow/site/templates *
-recursive-include viewflow/site/static *
+recursive-include viewflow/templates *

@@ -1,7 +1,7 @@
 import extra_views
 from django.views import generic
 from viewflow import views as flow_views
-from viewflow.site import LayoutMixin, Layout, Fieldset, Inline, Row, Span2, Span5, Span7
+from viewform import LayoutMixin, Layout, Fieldset, Inline, Row, Span2, Span5, Span7
 
 from .models import Shipment, ShipmentItem, Insurance
 

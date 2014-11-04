@@ -5,10 +5,10 @@ from setuptools import setup
 
 setup(
     name='django-viewflow',
-    version='0.6.0',
+    version='0.7.0',
     author='Mikhail Podgurskiy',
     author_email='kmmbvnr@gmail.com',
-    description='Activity based reusable workflow library for django',
+    description='Reusable workflow library for django',
     long_description=open('README.rst').read(),
     license='AGPLv3',
     platforms=['Any'],
@@ -40,7 +40,5 @@ setup(
               'viewflow.migrations',
               'viewflow.south_migrations',
               'viewflow.templatetags',
-              'viewflow.site',
-              'viewflow.site.templatetags',
               'viewflow.views'],
     include_package_data=True)

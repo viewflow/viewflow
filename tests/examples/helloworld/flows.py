@@ -1,6 +1,5 @@
 from viewflow import flow, lock, views as flow_views
 from viewflow.base import this, Flow
-from viewflow.site import viewsite
 from viewflow.contrib import celery
 
 
@@ -33,6 +32,3 @@ class HelloWorldFlow(Flow):
         .Next(this.end)
 
     end = flow.End()
-
-
-viewsite.register(HelloWorldFlow)

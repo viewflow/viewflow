@@ -3,12 +3,15 @@ from inspect import getargspec
 from django import template
 from django.core.urlresolvers import reverse
 from django.template.base import TemplateSyntaxError, TagHelperNode, parse_bits
+from django.template.loader import select_template
 from django.utils.module_loading import import_by_path
 from django_fsm import can_proceed
 
 from ..base import Flow
 from ..compat import get_app_package
 from ..models import AbstractProcess, AbstractTask
+from .base import get_model_display_data
+
 
 register = template.Library()
 
@@ -100,3 +103,22 @@ def flow_perms(user, task):
         result.append('can_view')
 
     return result
+
+
+@register.simple_tag(takes_context=True)
+def include_process_data(context, process):
+    """
+    Shortcut tag for list all data from linked process models
+    """
+    opts = process.flow_cls._meta
+    template_names = (
+        '{}/{}/process_data.html'.format(opts.app_label, opts.flow_label),
+        'viewflow/flow/process_data.html')
+    template = select_template(template_names)
+
+    context.push()
+    try:
+        context['process_data'] = get_model_display_data(process)
+        return template.render(context)
+    finally:
+        context.pop()

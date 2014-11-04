@@ -4,10 +4,10 @@ Flow definition
 import re
 from collections import defaultdict
 
-from django.conf.urls import patterns
+from django.conf.urls import patterns, url
 from django_fsm import can_proceed
 
-from . import flow, lock, models, forms
+from . import views, flow, lock, models, forms
 from .compat import get_containing_app_data
 from .flow.base import ThisObject
 
@@ -170,12 +170,22 @@ class Flow(object, metaclass=FlowMetaClass):
     process_title = None
     process_description = None
 
+    process_index_view = views.ProcessListView
+    process_details_view = views.ProcessDetailView
+    task_list_view = views.TaskListView
+    queue_list_view = views.QueueListView
+
     @property
     def urls(self):
         """
         Provides ready to include urlpatterns required for this flow
         """
-        node_urls = []
+        node_urls = [
+            url('^$', views.ProcessListView.as_view(flow_cls=self), name='index'),
+            url('^details/(?P<process_pk>\d+)/$', self.process_details_view.as_view(flow_cls=self),
+                name="details")
+        ]
+
         for node in self._meta.nodes():
             node_urls += node.urls()
 

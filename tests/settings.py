@@ -22,7 +22,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # viewflow
     'viewflow',
-    'viewflow.site',
+    'viewform',
     # Tests
     'tests.unit',
     'tests.integration',

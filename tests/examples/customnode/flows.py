@@ -1,6 +1,5 @@
 from viewflow import flow, views as flow_views
 from viewflow.base import this, Flow
-from viewflow.site import viewsite
 
 from . import models, views
 from .nodes import DynamicSplit
@@ -28,6 +27,3 @@ class DynamicSplitFlow(Flow):
         .Next(this.end)
 
     end = flow.End()
-
-
-viewsite.register(DynamicSplitFlow)
