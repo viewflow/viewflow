@@ -2,20 +2,27 @@
 django-viewflow
 ===============
 
-Ad-hoc business process automation framework for Django http://viewflow.io.
+Reusable workflow library for Django http://viewflow.io.
 
-The process logic defined with django-viewflow is concentrated in one clearly defined `flow`.
-You can organize your views, background jobs, user permission checking in a simple, intuitive django-friendly way.
+Designed for:
 
-Please give us feedback about viewflow library! Short `survey <https://docs.google.com/forms/d/1sfysLTvw5UPwezikDC3RP8pcHwgbVVb4_CG5lUNHw_M/viewform>`_ available.
+* Back office automation
+* People coolaboration software
+* Business process
 
+Features:
+
+* Simple integration with django views/signals/models
+* User and background tasks support
+* Complex Split/Joins for parallel task execution
+* Bolerplate url/permissions handling
+
+Demo: http://examples.viewflow.io
 
 .. image:: tests/examples/shipment/doc/ShipmentProcess.png
    :width: 400px
 
 django-viewflow allows to implement such process, just in about hundred lines of code, and you would still have pure django views for that.
-
-Full documentation is available at http://kmmbvnr.github.io/django-viewflow/
 
 .. image:: https://travis-ci.org/kmmbvnr/django-viewflow.svg
    :target: https://travis-ci.org/kmmbvnr/django-viewflow
@@ -166,11 +173,12 @@ Changelog
 0.7.0 - going to be released
 ----------------------------
 
-* HTTPS pypi server available for pro users.
+* Form handling moved to separate library - https://github.com/viewflow/viewform
 * viewflow.site removed. Pro user still could install it with `pip install django-viewflow-site`
 * Tasks and Process list views became part of the viewflow library
 * Flow urls simplified. Application instance namespaces not used anymore
 * Fixed migrations for stable django 1.7
+* HTTPS pypi server available for pro users.
 
 
 0.6.0 2014-10-01
