@@ -13,9 +13,9 @@ setup(
     license='AGPLv3',
     platforms=['Any'],
     keywords=['workflow', 'django', 'bpm', 'automaton'],
-    url='http://github.com/kmmbvnr/django-viewflow',
+    url='http://github.com/viewflow/viewflow',
     classifiers=[
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: BSD License',
         'Natural Language :: English',

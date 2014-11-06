@@ -169,14 +169,14 @@ Viewflow Pro has a commercial-friendly license allowing private forks
 and modifications of Viewflow. You can find the commercial license terms in COMM-LICENSE.
 Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for more detail.  
 
+
 Changelog
 =========
 
-* Moving to https://github.com/viewflow/ Stay tuned!
-
-0.7.0 - going to be released
+0.7.0 - 2014-11-06
 ----------------------------
 
+* Repository moved to https://github.com/viewflow/
 * Form handling moved to separate library - https://github.com/viewflow/viewform
 * viewflow.site removed. Pro user still could install it with `pip install django-viewflow-site`
 * Fancy ready to use templates available within `Karenina cookiecuter project template <https://github.com/viewflow/karenina>`_
@@ -186,75 +186,8 @@ Changelog
 * HTTPS pypi server available for pro users.
 
 
-0.6.0 2014-10-01
-----------------
-
-* First beta version. First public available release with commercial support and licencing.
-* All API that could be imported as `from viewflow.some_package import cls_or_function` considered stable and
-  not going to be changed much till 1.0 release (except `viewflow.site` that's still under develpment)
-* Django 1.6 support available in public version of viewflow library
-* Added task details views
-* Custom tag creation simplified
-* Split flow base classes to be independed from Django permission system
-* Object level permission support for tasks.
-* Improved {% flowurl %} tag
-* {% flow_perms %} tag for task permission list in template
-* Base abstract classes for models
-* New video: Viewflow Internals - https://vimeo.com/107698021
-
-
-0.5.0 2014-09-01
-----------------
-
-* Many improvements on viewsite
-    - Explicit flow registration on viewsite
-    - Process details, task and queus views
-    - Permission base filtering
-* New example: custom flow node and dynamic splitting
-* Celery dependecy optional and moved to contrib package
-* Examples available live at http://examples.viewflow.io
-* Started introduction video series - https://vimeo.com/104701259
-
-0.4.0 2014-08-01
------------------
-
-* Demo and promo available at http://viewflow.io
-* Introduced django signals, python functions as flow task
-* Improved form rendering, dynamic formset support out of the box
-* Refactor viewflow.site to separate app
-
-
-0.3.0 2014-07-01
------------------
-
-* Added auto create task permission shortcuts
-* Allow to provide process and task description in docstrings
-* Started bootstrap based viewflow base site interface
-* Bootstrap based custom form redefinable form rendering
-* django-extra-views friendly views mixins
-* Fix start task owner assigenment
-* Task done redirect now points to next flow assigned task if exists
-* Flow Start.Activate renamed to .Next in order to be same as flow.View interface
-
-
-0.2.0 2014-06-02
-----------------
-
-* Back reference for task owner for next tasks assignment
-* Auto create for task permissions support
-* Basic django admin interace
-* Exception handling during flow task activation and for broken celery jobs
-
-
-0.1.0  2014-05-01
------------------
-
-* Initial public prototype
-* Basic set of tasks support (View, Job, If/Switch, Split/Join)
-
-
 Roadmap
 =======
 
-* in 0.7.0 at 1st November we going to split out forms library and viewsite modules system to separate apps
-* 1.0.0 LTS estimated at January/February 2015 would have lifetime support same as django 1.6
+* in 0.8.0 at December we going to add support for task undo and reassign
+* 1.0.0 LTS estimated at February 2015 would have lifetime support same as django 1.6
