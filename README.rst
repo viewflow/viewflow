@@ -28,14 +28,14 @@ About hundred lines of code required to make this process `life
 <tests/examples/shipment/>`_ with django-viewflow and django class
 based views.
 
-.. image:: https://travis-ci.org/kmmbvnr/django-viewflow.svg
-   :target: https://travis-ci.org/kmmbvnr/django-viewflow
+.. image:: https://travis-ci.org/viewflow/viewflow.svg
+   :target: https://travis-ci.org/viewflow/viewflow
 
-.. image:: https://requires.io/github/kmmbvnr/django-viewflow/requirements.png?branch=master
-   :target: https://requires.io/github/kmmbvnr/django-viewflow/requirements/?branch=master
+.. image:: https://requires.io/github/viewflow/viewflow/requirements.png?branch=master
+   :target: https://requires.io/github/viewflow/viewflow/requirements/?branch=master
 
-.. image:: https://coveralls.io/repos/kmmbvnr/django-viewflow/badge.png?branch=master
-   :target: https://coveralls.io/r/kmmbvnr/django-viewflow?branch=master
+.. image:: https://coveralls.io/repos/viewflow/viewflow/badge.png?branch=master
+   :target: https://coveralls.io/r/viewflow/viewflow?branch=master
 
 
 Installation
