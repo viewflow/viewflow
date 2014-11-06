@@ -4,11 +4,13 @@ django-viewflow
 
 Reusable workflow library for Django http://viewflow.io.
 
+Needle and thread to tie simple CRUD views and python functions in a complex business process.
+
 Designed for:
 
 * Back office automation
-* People coolaboration software
-* Business process
+* People collaboration software
+* Business process implementation
 
 Features:
 
