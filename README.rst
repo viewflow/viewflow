@@ -17,14 +17,16 @@ Features:
 * Simple integration with django views/signals/models
 * User and background tasks support
 * Complex Split/Joins for parallel task execution
-* Bolerplate url/permissions handling
+* Boilerplate urls registration and permission checks handling
 
 Demo: http://examples.viewflow.io
 
 .. image:: tests/examples/shipment/doc/ShipmentProcess.png
    :width: 400px
 
-django-viewflow allows to implement such process, just in about hundred lines of code, and you would still have pure django views for that.
+About hundred lines of code required to make this process `life
+<tests/examples/shipment/>`_ with django-viewflow and django class
+based views.
 
 .. image:: https://travis-ci.org/kmmbvnr/django-viewflow.svg
    :target: https://travis-ci.org/kmmbvnr/django-viewflow
@@ -177,6 +179,7 @@ Changelog
 
 * Form handling moved to separate library - https://github.com/viewflow/viewform
 * viewflow.site removed. Pro user still could install it with `pip install django-viewflow-site`
+* Fancy ready to use templates available within `Karenina cookiecuter project template <https://github.com/viewflow/karenina>`_
 * Tasks and Process list views became part of the viewflow library
 * Flow urls simplified. Application instance namespaces not used anymore
 * Fixed migrations for stable django 1.7

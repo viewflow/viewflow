@@ -2,7 +2,7 @@
 Extending Viewflow
 ==================
 
-http://examples.viewflow.io/flows/dynamicsplit/
+http://examples.viewflow.io/workflow/dynamicsplit/
 
 In this process we are collecting responses (yes, no) from different users and Join that.
 Required users count determined in the first step.
