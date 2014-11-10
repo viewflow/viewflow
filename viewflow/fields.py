@@ -17,7 +17,7 @@ def import_task_by_ref(task_strref):
 def get_task_ref(flow_task):
     module = flow_task.flow_cls.__module__
     app_label, app_package = get_containing_app_data(module)
-    subpath = module.lstrip(app_package+'.')
+    subpath = module[len(app_package)+1:]
 
     return "{}/{}.{}.{}".format(app_label, subpath, flow_task.flow_cls.__name__, flow_task.name)
 
@@ -49,7 +49,7 @@ class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
 
         module = "{}.{}".format(value.__module__, value.__name__)
         app_label, app_package = get_containing_app_data(module)
-        subpath = module.lstrip(app_package+'.')
+        subpath = module[len(app_package)+1:]
         return "{}/{}".format(app_label, subpath)
 
     def value_to_string(self, obj):

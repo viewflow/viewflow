@@ -10,6 +10,7 @@ from . import base
 class StartFunction(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     """
     def create_requst(activation):
+        activation.prepare()
         activation.done()
 
     class MyFlow(Flow):
@@ -29,11 +30,11 @@ class StartFunction(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
         if isinstance(self.func, type) and issubclass(self.func, StartActivation):
             receiver = self.func()
             receiver.initialize(self)
-            receiver(*args, **kwargs)
+            return receiver(*args, **kwargs)
         else:
             activation = self.activation_cls()
             activation.initialize(self)
-            self.func(activation, *args, **kwargs)
+            return self.func(activation, *args, **kwargs)
 
 
 class FlowFunc(object):

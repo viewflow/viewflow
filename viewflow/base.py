@@ -55,8 +55,14 @@ class FlowMeta(object):
     def flow_label(self):
         module = "{}.{}".format(self.flow_cls.__module__, self.flow_cls.__name__)
         app_label, app_package = get_containing_app_data(module)
-        subpath = module.lstrip(app_package+'.flows.')
-        return subpath.lower().rstrip('flow').replace('.', '/')
+
+        subpath = module[len(app_package)+1:]
+        if subpath.startswith('flows.'):
+            subpath = subpath[len('flows.'):]
+        if subpath.endswith('Flow'):
+            subpath = subpath[:-len('Flow')]
+
+        return subpath.lower().replace('.', '/')
 
     def nodes(self):
         """
@@ -109,6 +115,7 @@ class FlowMetaClass(type):
         app_label, _ = get_containing_app_data(new_class.__module__)
 
         if app_label is None:
+            get_containing_app_data(new_class.__module__)
             raise ImportError("Flow can't be imported before app setup")
         new_class._meta = FlowMeta(app_label, new_class, nodes)
 

@@ -40,7 +40,7 @@ def flow_job(**lock_args):
             with lock(flow_task, process_pk):
                 try:
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
-                except flow_task.flow_cls.task_cls.DoesNotExists:
+                except flow_task.flow_cls.task_cls.DoesNotExist:
                     # There was rollback on job task created transaction,
                     # we don't need to do the job
                     return
@@ -61,9 +61,11 @@ def flow_job(**lock_args):
                 with lock(flow_task, process_pk):
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
                     activation = self.activation if self.activation else flow_task.activation_cls()
+                    activation.initialize(flow_task, task)
                     activation.error(exc)
                 raise
             else:
+                print('ok')
                 # mark as done
                 with lock(flow_task, process_pk):
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)

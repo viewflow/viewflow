@@ -273,7 +273,15 @@ class AbstractJobActivation(TaskActivation):
 
         external_task_id = activation.create_task_uuid()
         activation.assign(external_task_id)
-        activation.schedule(external_task_id)
+
+        if context.propagate_exception:
+            activation.schedule(external_task_id)
+        else:
+            try:
+                with transaction.atomic(savepoint=True):
+                    activation.execute()
+            except Exception as exc:
+                activation.error(exc)
 
         return activation
 

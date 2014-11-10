@@ -43,12 +43,20 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'tests.urls'
 
-DATABASES = {
-    'default': {
+
+# Databases
+
+import dj_database_url
+DATABASES = {}
+
+DATABASES['default'] = dj_database_url.config()
+if not DATABASES['default']:
+    DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db{}{}.sqlite3'.format(django.VERSION[0], django.VERSION[1]))
+        'NAME': os.path.join(BASE_DIR, 'db{}{}.sqlite3'.format(django.VERSION[0], django.VERSION[1])),
+        'TEST_NAME': os.path.join(BASE_DIR, 'db{}{}.sqlite3'.format(django.VERSION[0], django.VERSION[1]))
     }
-}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/dev/topics/i18n/
@@ -82,9 +90,27 @@ TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + (
 INSTALLED_APPS += ('kombu.transport.django', )
 BROKER_URL = 'django://'
 
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+CELERY_IMPORTS = [
+    os.path.join(root, filename)[len(BASE_DIR)+1: -3].replace('/', '.')
+    for root, dirs, files in os.walk(os.path.join(BASE_DIR, 'tests'))
+    for filename in files
+    if filename.startswith('test_') and filename.endswith('.py')]
+
+
 # South
 if django.VERSION < (1, 7):
     INSTALLED_APPS += ('south', )
+
+
+# Jenkins
+INSTALLED_APPS += ('django_jenkins',)
+JENKINS_TASKS = (
+    'django_jenkins.tasks.run_flake8',
+    'django_jenkins.tasks.run_sloccount',
+)
 
 
 try:

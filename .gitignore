@@ -2,6 +2,7 @@
 .tox
 .coveralls.yml
 dist
+reports
 django_viewflow.egg-info
 MANIFEST
 db*.sqlite3

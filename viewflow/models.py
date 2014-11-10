@@ -17,12 +17,10 @@ class AbstractProcess(models.Model):
         NEW = 'NEW'
         STARTED = 'STR'
         FINISHED = 'FNS'
-        ERROR = 'ERR'
 
     STATUS_CHOICES = ((STATUS.NEW, 'New'),
                       (STATUS.STARTED, 'Stated'),
-                      (STATUS.FINISHED, 'Finished'),
-                      (STATUS.ERROR, 'Error'))
+                      (STATUS.FINISHED, 'Finished'))
 
     flow_cls = FlowReferenceField()
     status = FSMField(max_length=3, choices=STATUS_CHOICES, default=STATUS.NEW)
@@ -40,12 +38,11 @@ class AbstractProcess(models.Model):
     def finish(self):
         self.finished = datetime.now()
 
-    @transition(field=status, source=STATUS.STARTED, target=STATUS.ERROR)
-    def error(self):
-        pass
-
-    @transition(field=status, source=STATUS.ERROR, target=STATUS.STARTED)
-    def restart(self):
+    @transition(field=status, source=STATUS.FINISHED, target=STATUS.STARTED)
+    def rerun(self):
+        """
+        Undo of end task
+        """
         pass
 
     @property
