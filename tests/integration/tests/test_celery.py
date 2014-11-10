@@ -14,6 +14,7 @@ from viewflow.contrib import celery
 from viewflow.models import Process, Task
 
 from tests import celery_app
+from .. import integration_test
 
 
 class TestCeleryProcess(Process):
@@ -46,6 +47,7 @@ class TestCeleryFlow(Flow):
     end = flow.End()
 
 
+@integration_test
 class TestCelery(TransactionTestCase):
     def setUp(self):
         """
@@ -56,6 +58,9 @@ class TestCelery(TransactionTestCase):
             database_url = env['DATABASE_URL']
             env['DATABASE_URL'] = '{}/{}'.format(database_url[:database_url.rfind('/')],
                                                  connection.settings_dict['NAME'])
+        else:
+            env['DATABASE_URL'] = 'sqlite:///{}'.format(connection.settings_dict['NAME'])
+
         cmd = ['celery', 'worker', '-A', 'tests.celery_app', '-l', 'debug']
 
         self.process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env)
