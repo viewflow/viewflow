@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, primary_key=True, auto_created=True)),
                 ('flow_cls', viewflow.fields.FlowReferenceField(max_length=250)),
-                ('status', django_fsm.FSMField(choices=[('NEW', 'New'), ('STR', 'Stated'), ('FNS', 'Finished'), ('ERR', 'Error')], max_length=3, default='NEW')),
+                ('status', django_fsm.FSMField(choices=[('NEW', 'New'), ('STR', 'Stated'), ('FNS', 'Finished')], max_length=3, default='NEW')),
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('finished', models.DateTimeField(blank=True, null=True)),
             ],
