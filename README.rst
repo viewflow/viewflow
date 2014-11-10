@@ -31,7 +31,7 @@ based views.
 .. image:: https://travis-ci.org/viewflow/viewflow.svg
    :target: https://travis-ci.org/viewflow/viewflow
 
-.. image:: https://requires.io/github/viewflow/viewflow/requirements.png?branch=master
+.. image:: https://requires.io/github/viewflow/viewflow/requirements.svg?branch=master
    :target: https://requires.io/github/viewflow/viewflow/requirements/?branch=master
 
 .. image:: https://coveralls.io/repos/viewflow/viewflow/badge.png?branch=master
