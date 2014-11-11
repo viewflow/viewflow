@@ -33,7 +33,6 @@ class StartSignal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
                 self.flow_cls.__module__, self.flow_cls.__name__, self.name))
 
 
-
 class Receiver(object):
     def get_task(self, flow_task, **signal_kwargs):
         raise NotImplementedError

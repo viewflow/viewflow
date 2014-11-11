@@ -35,4 +35,3 @@ class DynamicSplit(base.NextNodeMixin, base.DetailsViewMixin, base.Gateway):
     def __init__(self, callback):
         super(DynamicSplit, self).__init__()
         self._task_count_callback = callback
-
