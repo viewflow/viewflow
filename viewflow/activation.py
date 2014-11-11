@@ -1,4 +1,5 @@
 import threading
+import traceback
 from uuid import uuid4
 
 from django.db import transaction
@@ -236,10 +237,11 @@ class AbstractJobActivation(TaskActivation):
         self.task.save()
         signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-    def error(self, exc):
-        self.task.error()
+    def error(self, exc, traceback):
+        self.task.error(exc, traceback)
         self.task.save()
-        signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task, exeception=exc)
+        signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task,
+                                 exeception=exc, traceback=traceback)
 
     def resume(self):
         if context.propagate_exception:
@@ -249,7 +251,7 @@ class AbstractJobActivation(TaskActivation):
                 with transaction.atomic(savepoint=True):
                     self.schedule_resume()
             except Exception as exc:
-                self.error(exc)
+                self.error(exc, traceback.format_exc())
 
     def done(self, result):
         """
@@ -297,7 +299,7 @@ class AbstractJobActivation(TaskActivation):
                 with transaction.atomic(savepoint=True):
                     activation.execute()
             except Exception as exc:
-                activation.error(exc)
+                activation.error(exc, traceback.format_exc())
 
         return activation
 
@@ -328,10 +330,29 @@ class GateActivation(Activation):
         """
         raise NotImplementedError
 
-    def error(self, exc):
-        self.task.error()
+    def error(self, exc, traceback):
+        self.task.error(exc, traceback)
         self.task.save()
-        signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task, exeception=exc)
+        signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task,
+                                 exeception=exc, traceback=traceback)
+
+    def resume(self):
+        if context.propagate_exception:
+            self.task.resume()
+            self.prepare()
+            self.start()
+            self.execute()
+            self.done()
+        else:
+            try:
+                with transaction.atomic(savepoint=True):
+                    self.task.resume()
+                    self.prepare()
+                    self.start()
+                    self.execute()
+                    self.done()
+            except Exception as exc:
+                self.error(exc, traceback.format_exc())
 
     def done(self):
         self.task.done()
@@ -365,6 +386,7 @@ class GateActivation(Activation):
             Any execution exception would be propagated back,
             assume that rollback will happens and no task activation would be stored
             """
+            activation.start()
             activation.execute()
             activation.done()
         else:
@@ -373,11 +395,11 @@ class GateActivation(Activation):
             """
             try:
                 with transaction.atomic(savepoint=True):
+                    activation.start()
                     activation.execute()
+                    activation.done()
             except Exception as exc:
-                activation.error(exc)
-            else:
-                activation.done()
+                activation.error(exc, traceback.format_exc())
 
         return activation
 

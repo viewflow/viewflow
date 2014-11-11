@@ -35,8 +35,6 @@ def create_test_flow(activation, throw_error=False):
 @celery_app.task()
 @flow.flow_job()
 def celery_test_job(activation):
-    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
-    print(id(activation), activation.process.throw_error)
     if activation.process.throw_error:
         raise ValueError('Process raised error')
 

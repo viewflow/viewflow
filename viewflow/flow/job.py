@@ -2,6 +2,7 @@
 Background job executed by celery
 """
 import functools
+import traceback
 
 from ..activation import AbstractJobActivation
 from ..fields import import_task_by_ref
@@ -62,7 +63,7 @@ def flow_job(**lock_args):
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
                     activation = self.activation if self.activation else flow_task.activation_cls()
                     activation.initialize(flow_task, task)
-                    activation.error(exc)
+                    activation.error(exc, traceback.format_exc())
                 raise
             else:
                 print('ok')

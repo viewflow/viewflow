@@ -153,6 +153,11 @@ class Gateway(Node):
     """
     Base class for task gateways
     """
+    def resume(self, task):
+        activation = self.activation_cls()
+        activation.initialize(self, task)
+        activation.resume()
+        return activation
 
 
 class NextNodeMixin(object):

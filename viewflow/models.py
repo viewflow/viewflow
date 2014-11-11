@@ -1,4 +1,4 @@
-from datetime import datetime
+from django.utils.timezone import now
 
 from django.conf import settings
 from django.db import models
@@ -36,7 +36,7 @@ class AbstractProcess(models.Model):
 
     @transition(field=status, source=STATUS.STARTED, target=STATUS.FINISHED)
     def finish(self):
-        self.finished = datetime.now()
+        self.finished = now()
 
     @transition(field=status, source=STATUS.FINISHED, target=STATUS.STARTED)
     def rerun(self):
@@ -134,7 +134,7 @@ class AbstractTask(models.Model):
         Task is going to be started. Task can be initialized several times (probably on GET request).
         Initialized tasks could not be saved.
         """
-        self.started = datetime.now()
+        self.started = now()
 
     @transition(field=status, source=STATUS.PREPARED, target=STATUS.STARTED, conditions=[_in_db])
     def start(self):
@@ -149,20 +149,20 @@ class AbstractTask(models.Model):
         """
         Mark task as done.
         """
-        self.finished = datetime.now()
+        self.finished = now()
 
     @transition(field=status, source=[STATUS.ASSIGNED, STATUS.STARTED], target=STATUS.CANCELLED, conditions=[_in_db])
     def cancel(self):
-        self.finished = datetime.now()
+        self.finished = now()
 
     @transition(field=status,
                 source=[STATUS.ASSIGNED, STATUS.STARTED, STATUS.ERROR],
                 target=STATUS.ERROR,
                 conditions=[_in_db])
-    def error(self):
+    def error(self, exc, traceback):
         pass
 
-    @transition(field=status, source=STATUS.ERROR, target=STATUS.ASSIGNED, conditions=[_in_db])
+    @transition(field=status, source=STATUS.ERROR, target=STATUS.NEW, conditions=[_in_db])
     def resume(self):
         """
         Resume failed task
@@ -197,13 +197,23 @@ class Process(AbstractProcess):
 
 class Task(AbstractTask):
     process = models.ForeignKey(Process)
+
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, db_index=True)
     external_task_id = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     owner_permission = models.CharField(max_length=50, blank=True, null=True)
 
+    comments = models.TextField(blank=True, null=True)
+
     def get_absolute_url(self, user=None, url_type=None):
         if self.process_id and self.flow_task:
             return self.process.flow_cls.instance.get_user_task_url(task=self, user=user)
+
+    @transition(field='status',
+                source=[AbstractTask.STATUS.ASSIGNED, AbstractTask.STATUS.STARTED, AbstractTask.STATUS.ERROR],
+                target=AbstractTask.STATUS.ERROR,
+                conditions=[AbstractTask._in_db])
+    def error(self, exc, traceback):
+        self.comments = "{}\n{}".format(exc, traceback)
 
     @transition(field='status', source=AbstractTask.STATUS.NEW, target=AbstractTask.STATUS.ASSIGNED)
     def assign(self, user=None, external_task_id=None):

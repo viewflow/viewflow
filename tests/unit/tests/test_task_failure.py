@@ -32,7 +32,7 @@ class TestJobActivation(TestCase):
 
         task_mock.prepare.assert_called_once_with()
         task_mock.start.assert_called_once_with()
-        task_mock.error.assert_called_once_with()
+        self.assertTrue(task_mock.error.called)
         self.assertFalse(task_mock.done.called)
 
     def test_failed_activate_next(self):
@@ -58,5 +58,5 @@ class TestJobActivation(TestCase):
         self.assertFalse(job_task_mock.error.called)
 
         gate_task_mock.prepare.assert_called_once_with()
-        gate_task_mock.error.assert_called_once_with()
+        self.assertTrue(gate_task_mock.error.called)
         self.assertFalse(gate_task_mock.done.called)
