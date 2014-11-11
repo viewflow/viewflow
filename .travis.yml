@@ -1,9 +1,19 @@
 language: python
-before_install:
-  - sudo apt-get install graphviz 
+
 python:
   - 3.3
+
+services: postgresql
+
+before_script:
+  - psql -c "CREATE DATABASE viewflow;" -U postgres
+
+before_install:
+  - export DATABASE_URL=postgres://postgres@localhost/viewflow
+
 install:
   - pip install tox
+  - pip install psycopg2
+
 script: 
   - tox -e travis
