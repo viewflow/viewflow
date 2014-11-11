@@ -155,9 +155,18 @@ class AbstractTask(models.Model):
     def cancel(self):
         self.finished = datetime.now()
 
-    @transition(field=status, source=[STATUS.ASSIGNED, STATUS.STARTED], target=STATUS.ERROR, conditions=[_in_db])
+    @transition(field=status,
+                source=[STATUS.ASSIGNED, STATUS.STARTED, STATUS.ERROR],
+                target=STATUS.ERROR,
+                conditions=[_in_db])
     def error(self):
         pass
+
+    @transition(field=status, source=STATUS.ERROR, target=STATUS.ASSIGNED, conditions=[_in_db])
+    def resume(self):
+        """
+        Resume failed task
+        """
 
     def save(self, *args, **kwargs):
         if self.status == Task.STATUS.PREPARED:

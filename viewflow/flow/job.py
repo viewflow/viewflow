@@ -108,3 +108,15 @@ class AbstractJob(base.NextNodeMixin, base.DetailsViewMixin, base.Task):
     @property
     def job(self):
         return self._job
+
+    def resume(self, task):
+        if isinstance(self.job, type) and issubclass(self.func, AbstractJobActivation):
+            activation = self.job()
+            activation.initialize(self, task)
+        else:
+            activation = self.activation_cls()
+            activation.initialize(self, task)
+
+        activation.resume()
+
+        return activation

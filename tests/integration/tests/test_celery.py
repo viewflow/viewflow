@@ -35,6 +35,8 @@ def create_test_flow(activation, throw_error=False):
 @celery_app.task()
 @flow.flow_job()
 def celery_test_job(activation):
+    print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
+    print(id(activation), activation.process.throw_error)
     if activation.process.throw_error:
         raise ValueError('Process raised error')
 
@@ -77,7 +79,7 @@ class TestCelery(TransactionTestCase):
             print(stderr.decode(), file=sys.stderr)
 
     def wait_for_task(self, process, flow_task, status=None):
-        for _ in range(5):
+        for _ in range(10):
             try:
                 return process.get_task(flow_task, status=status)
             except Task.DoesNotExist:
@@ -94,4 +96,15 @@ class TestCelery(TransactionTestCase):
 
     def test_flow_failed(self):
         activation = TestCeleryFlow.start.run(throw_error=True)
-        self.wait_for_task(activation.process, TestCeleryFlow.task, status=[Task.STATUS.ERROR])
+        task = self.wait_for_task(activation.process, TestCeleryFlow.task, status=[Task.STATUS.ERROR])
+
+        process = TestCeleryProcess.objects.get(pk=task.process_id)
+        process.throw_error = False
+        process.save()
+
+        TestCeleryFlow.task.resume(task)
+
+        task = self.wait_for_task(activation.process, TestCeleryFlow.task, status=[Task.STATUS.FINISHED])
+
+        process = TestCeleryProcess.objects.get(pk=task.process_id)
+        self.assertEqual(Process.STATUS.FINISHED, process.status)

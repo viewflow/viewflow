@@ -222,6 +222,12 @@ class AbstractJobActivation(TaskActivation):
         """
         raise NotImplementedError
 
+    def schedule_resume(self):
+        self.task.resume()
+        self.task.save()
+        self.schedule(self.task.external_task_id)
+        signals.task_resume.send(sender=self.flow_cls, process=self.process, task=self.task)
+
     def start(self):
         """
         Persist that job is started
@@ -234,6 +240,16 @@ class AbstractJobActivation(TaskActivation):
         self.task.error()
         self.task.save()
         signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task, exeception=exc)
+
+    def resume(self):
+        if context.propagate_exception:
+            self.schedule_resume()
+        else:
+            try:
+                with transaction.atomic(savepoint=True):
+                    self.schedule_resume()
+            except Exception as exc:
+                self.error(exc)
 
     def done(self, result):
         """
