@@ -9,6 +9,7 @@ from django.db import models, connection
 from django.test import TransactionTestCase
 
 from viewflow import flow
+from viewflow.activation import STATUS
 from viewflow.base import Flow, this
 from viewflow.contrib import celery
 from viewflow.models import Process, Task
@@ -87,22 +88,22 @@ class TestCelery(TransactionTestCase):
     def test_flow_succeed(self):
         activation = TestCeleryFlow.start.run(throw_error=False)
 
-        self.wait_for_task(activation.process, TestCeleryFlow.task, status=[Task.STATUS.FINISHED])
+        self.wait_for_task(activation.process, TestCeleryFlow.task, status=STATUS.DONE)
 
         process = TestCeleryProcess.objects.get(pk=activation.process.pk)
-        self.assertEqual(Process.STATUS.FINISHED, process.status)
+        self.assertEqual(STATUS.DONE, process.status)
 
     def test_flow_failed(self):
         activation = TestCeleryFlow.start.run(throw_error=True)
-        task = self.wait_for_task(activation.process, TestCeleryFlow.task, status=[Task.STATUS.ERROR])
+        task = self.wait_for_task(activation.process, TestCeleryFlow.task, status=STATUS.ERROR)
 
         process = TestCeleryProcess.objects.get(pk=task.process_id)
         process.throw_error = False
         process.save()
 
-        TestCeleryFlow.task.resume(task)
+        task.activate().retry()
 
-        task = self.wait_for_task(activation.process, TestCeleryFlow.task, status=[Task.STATUS.FINISHED])
+        task = self.wait_for_task(activation.process, TestCeleryFlow.task, status=STATUS.DONE)
 
         process = TestCeleryProcess.objects.get(pk=task.process_id)
-        self.assertEqual(Process.STATUS.FINISHED, process.status)
+        self.assertEqual(STATUS.DONE, process.status)

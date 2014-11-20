@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.conf.urls import url
 from django.shortcuts import get_object_or_404
 
-from ..activation import TaskActivation
+from ..activation import Activation, ViewActivation, STATUS
 from ..exceptions import FlowRuntimeError
 from . import base
 
@@ -28,7 +28,7 @@ def flow_view(**lock_args):
             self.activation = activation
             functools.update_wrapper(self, func)
 
-        def __call__(self, request, flow_task, process_pk, task_pk, **kwargs):
+        def __call__(self, request, flow_cls, flow_task, process_pk, task_pk, **kwargs):
             lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
             with lock(flow_task, process_pk):
                 task = get_object_or_404(flow_task.flow_cls.task_cls._default_manager, pk=task_pk)
@@ -56,24 +56,23 @@ def flow_view(**lock_args):
                 return self
 
             func = self.func.__get__(instance, type)
-            activation = instance if isinstance(instance, TaskActivation) else None
+            activation = instance if isinstance(instance, ViewActivation) else None
 
             return self.__class__(func, activation=activation)
 
     return flow_view_decorator
 
 
-class TaskViewActivation(TaskActivation):
+class ManagedViewActivation(ViewActivation):
     """
     Tracks task statistics in activation form
     """
     management_form_cls = None
 
-    def __init__(self, management_form_cls=None, **kwargs):
-        super(TaskViewActivation, self).__init__(**kwargs)
+    def __init__(self, **kwargs):
+        super(ManagedViewActivation, self).__init__(**kwargs)
         self.management_form = None
-        if management_form_cls:
-            self.management_form_cls = management_form_cls
+        self.management_form_cls = kwargs.pop('management_form_cls', None)
 
     def get_management_form_cls(self):
         if self.management_form_cls:
@@ -81,11 +80,10 @@ class TaskViewActivation(TaskActivation):
         else:
             return self.flow_cls.management_form_cls
 
+    @Activation.status.super()
     def prepare(self, data=None, user=None):
-        if user:
-            self.task.assign(user=user)
-
-        super(TaskViewActivation, self).prepare()
+        super(ManagedViewActivation, self).prepare.original()
+        self.task.owner = user
 
         management_form_cls = self.get_management_form_cls()
         self.management_form = management_form_cls(data=data, instance=self.task)
@@ -100,7 +98,7 @@ class TaskViewActivation(TaskActivation):
 
     @classmethod
     def create_task(cls, flow_task, prev_activation, token):
-        task = TaskActivation.create_task(flow_task, prev_activation, token)
+        task = ViewActivation.create_task(flow_task, prev_activation, token)
 
         # Try to assign permission
         owner_permission = flow_task.calc_owner_permission(task)
@@ -110,7 +108,8 @@ class TaskViewActivation(TaskActivation):
         # Try to assign owner
         owner = flow_task.calc_owner(task)
         if owner:
-            task.assign(user=owner)
+            task.owner = owner
+            task.status = STATUS.ASSIGNED
 
         return task
 
@@ -123,7 +122,7 @@ class BaseView(base.TaskDescriptionMixin,
     Base class for ViewTasks
     """
     task_type = 'HUMAN'
-    activation_cls = TaskViewActivation
+    activation_cls = ManagedViewActivation
 
     def __init__(self, view_or_cls, **kwargs):
         """
@@ -135,7 +134,7 @@ class BaseView(base.TaskDescriptionMixin,
         if isinstance(view_or_cls, type):
             self._view_cls = view_or_cls
 
-            if issubclass(view_or_cls, TaskActivation):
+            if issubclass(view_or_cls, ViewActivation):
                 kwargs.setdefault('activation_cls', view_or_cls)
         else:
             self._view = view_or_cls

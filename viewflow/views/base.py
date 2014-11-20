@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url
 from django.views import generic
 
-from .. import flow
+from .. import flow, activation
 
 
 def get_next_task_url(request, process):
@@ -15,13 +15,13 @@ def get_next_task_url(request, process):
         task_cls = process.flow_cls.task_cls
 
         user_tasks = task_cls._default_manager \
-            .filter(process=process, owner=request.user, status=task_cls.STATUS.ASSIGNED)
+            .filter(process=process, owner=request.user, status=activation.STATUS.ASSIGNED)
 
         if user_tasks.exists():
             return user_tasks.first().get_absolute_url(user=request.user)
         else:
             user_tasks = task_cls._default_manager.user_queue(request.user)\
-                .filter(process=process, status=task_cls.STATUS.NEW)
+                .filter(process=process, status=activation.STATUS.NEW)
             if user_tasks.exists():
                 return user_tasks.first().get_absolute_url(user=request.user)
 

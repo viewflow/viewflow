@@ -48,7 +48,6 @@ def flow_job(**lock_args):
                 else:
                     activation = self.activation if self.activation else flow_task.activation_cls()
                     activation.initialize(flow_task, task)
-                    activation.prepare()
                     activation.start()
 
             # execute
@@ -63,16 +62,15 @@ def flow_job(**lock_args):
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
                     activation = self.activation if self.activation else flow_task.activation_cls()
                     activation.initialize(flow_task, task)
-                    activation.error(exc, traceback.format_exc())
+                    activation.error(comments="{}\n{}".format(exc, traceback.format_exc()))
                 raise
             else:
-                print('ok')
                 # mark as done
                 with lock(flow_task, process_pk):
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
                     activation = self.activation if self.activation else flow_task.activation_cls()
                     activation.initialize(flow_task, task)
-                    activation.done(result)
+                    activation.done()
 
                 return result
 
@@ -109,15 +107,3 @@ class AbstractJob(base.NextNodeMixin, base.DetailsViewMixin, base.Task):
     @property
     def job(self):
         return self._job
-
-    def resume(self, task):
-        if isinstance(self.job, type) and issubclass(self.func, AbstractJobActivation):
-            activation = self.job()
-            activation.initialize(self, task)
-        else:
-            activation = self.activation_cls()
-            activation.initialize(self, task)
-
-        activation.resume()
-
-        return activation

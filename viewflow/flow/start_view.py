@@ -7,7 +7,7 @@ from django.db import transaction
 from django.core.urlresolvers import reverse
 from django.conf.urls import url
 
-from ..activation import StartActivation
+from ..activation import Activation, StartViewActivation
 from ..exceptions import FlowRuntimeError
 
 from . import base
@@ -29,14 +29,14 @@ def flow_start_view():
             self.activation = activation
             functools.update_wrapper(self, func)
 
-        def __call__(self, request, flow_task, **kwargs):
+        def __call__(self, request, flow_cls, flow_task, **kwargs):
             if self.activation:
-                self.activation.initialize(flow_task)
+                self.activation.initialize(flow_task, None)
                 with transaction.atomic():
                     return self.func(request, **kwargs)
             else:
                 activation = flow_task.activation_cls()
-                activation.initialize(flow_task)
+                activation.initialize(flow_task, None)
                 with transaction.atomic():
                     return self.func(request, activation, **kwargs)
 
@@ -49,24 +49,23 @@ def flow_start_view():
                 return self
 
             func = self.func.__get__(instance, type)
-            activation = instance if isinstance(instance, StartActivation) else None
+            activation = instance if isinstance(instance, StartViewActivation) else None
 
             return self.__class__(func, activation=activation)
 
     return StartViewDecorator
 
 
-class StartViewActivation(StartActivation):
+class ManagedStartViewActivation(StartViewActivation):
     """
     Tracks task statistics in activation form
     """
     management_form_cls = None
 
-    def __init__(self, management_form_cls=None, **kwargs):
+    def __init__(self, **kwargs):
         super(StartViewActivation, self).__init__(**kwargs)
         self.management_form = None
-        if management_form_cls:
-            self.management_form_cls = management_form_cls
+        self.management_form_cls = kwargs.pop('management_form_cls', None)
 
     def get_management_form_cls(self):
         if self.management_form_cls:
@@ -74,14 +73,10 @@ class StartViewActivation(StartActivation):
         else:
             return self.flow_cls.management_form_cls
 
-    def assign(self, user):
-        self.task.assign(user=user)
-
+    @Activation.status.super()
     def prepare(self, data=None, user=None):
-        if user:
-            self.assign(user=user)
-
-        super(StartViewActivation, self).prepare()
+        super(ManagedStartViewActivation, self).prepare.original()
+        self.task.owner = user
 
         management_form_cls = self.get_management_form_cls()
         self.management_form = management_form_cls(data=data, instance=self.task)
@@ -104,7 +99,7 @@ class BaseStart(base.TaskDescriptionMixin,
     Base class for Start Process Views
     """
     task_type = 'START'
-    activation_cls = StartViewActivation
+    activation_cls = ManagedStartViewActivation
 
     def __init__(self, view_or_cls=None, **kwargs):
         """
@@ -116,7 +111,7 @@ class BaseStart(base.TaskDescriptionMixin,
         if isinstance(view_or_cls, type):
             self._view_cls = view_or_cls
 
-            if issubclass(view_or_cls, StartActivation):
+            if issubclass(view_or_cls, StartViewActivation):
                 kwargs.setdefault('activation_cls', view_or_cls)
         else:
             self._view = view_or_cls

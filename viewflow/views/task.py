@@ -1,6 +1,5 @@
 from urllib.parse import quote as urlquote
 
-from django_fsm import can_proceed
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
@@ -63,7 +62,7 @@ class TaskViewMixin(object):
     def dispatch(self, request, activation, **kwargs):
         self.activation = activation
 
-        if not can_proceed(activation.task.prepare):
+        if not activation.prepare.can_proceed():
             messages.info(request, 'Task cannot be executed')
             return redirect(activation.task.get_absolute_url(user=request.user, url_type='details'))
 
@@ -124,7 +123,7 @@ class TaskActivationViewMixin(object):
 
     @flow.flow_view()
     def dispatch(self, request, *args, **kwargs):
-        if not can_proceed(self.task.prepare):
+        if not self.prepare.can_proceed():
             messages.info(request, 'Task cannot be executed')
             return redirect(self.task.get_absolute_url(user=request.user, url_type='details'))
 
@@ -135,7 +134,7 @@ class TaskActivationViewMixin(object):
         return super(TaskActivationViewMixin, self).dispatch(request, *args, **kwargs)
 
 
-class ProcessView(flow.TaskViewActivation, TaskActivationViewMixin, generic.UpdateView):
+class ProcessView(flow.ManagedViewActivation, TaskActivationViewMixin, generic.UpdateView):
     """
     Shortcut view for task that updates subset of Process model fields
     """
@@ -149,7 +148,7 @@ class ProcessView(flow.TaskViewActivation, TaskActivationViewMixin, generic.Upda
         return self.process
 
 
-class AssignView(flow.TaskViewActivation, generic.TemplateView):
+class AssignView(flow.ManagedViewActivation, generic.TemplateView):
     """
     Default assign view for flow task
 
@@ -175,20 +174,16 @@ class AssignView(flow.TaskViewActivation, generic.TemplateView):
             url = "{}?back={}".format(url, urlquote(self.request.GET['back']))
         return url
 
-    def activation_assign(self):
-        self.task.assign(user=self.request.user)
-        self.task.save()
-
     def post(self, request, *args, **kwargs):
         if 'assign' in request.POST:
-            self.activation_assign()
+            self.assign(self.request.user)
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.get(request, *args, **kwargs)
 
     @flow.flow_view()
     def dispatch(self, request, *args, **kwargs):
-        if not can_proceed(self.task.assign):
+        if not self.assign.can_proceed():
             messages.info(request, 'Task cannot be assigned')
             return redirect(self.task.get_absolute_url(user=request.user))
 

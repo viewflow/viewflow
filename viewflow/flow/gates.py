@@ -1,18 +1,23 @@
-from ..activation import Activation, GateActivation
+import traceback
+
+from django.db import transaction
+from django.utils.timezone import now
+
+from ..activation import context, Activation, AbstractGateActivation, STATUS
 from ..exceptions import FlowRuntimeError
-from ..models import Task
 from ..token import Token
 from . import base
 
 
-class IfActivation(GateActivation):
+class IfActivation(AbstractGateActivation):
     def __init__(self, **kwargs):
         self.condition_result = None
         super(IfActivation, self).__init__(**kwargs)
 
-    def execute(self):
+    def calculate_next(self):
         self.condition_result = self.flow_task.condition(self.process)
 
+    @Activation.status.super()
     def activate_next(self):
         if self.condition_result:
             self.flow_task._on_true.activate(prev_activation=self, token=self.task.token)
@@ -60,12 +65,12 @@ class If(base.DetailsViewMixin, base.Gateway):
         return self._condition
 
 
-class SwitchActivation(GateActivation):
+class SwitchActivation(AbstractGateActivation):
     def __init__(self, **kwargs):
         self.next_task = None
         super(SwitchActivation, self).__init__(**kwargs)
 
-    def execute(self):
+    def calculate_next(self):
         for node, cond in self.flow_task.branches:
             if cond:
                 if cond(self.process):
@@ -77,6 +82,7 @@ class SwitchActivation(GateActivation):
         if not self.next_task:
             raise FlowRuntimeError('No next task available for {}'.format(self.flow_task.name))
 
+    @Activation.status.super()
     def activate_next(self):
         self.next_task.activate(prev_activation=self, token=self.task.token)
 
@@ -126,18 +132,27 @@ class JoinActivation(Activation):
         self.next_task = None
         super(JoinActivation, self).__init__(**kwargs)
 
-    def prepare(self):
-        self.task.prepare()
-
+    @Activation.status.transition(source=STATUS.NEW, target=STATUS.STARTED)
     def start(self):
-        self.task.start()
         self.task.save()
 
+    @Activation.status.transition(source=STATUS.STARTED)
     def done(self):
-        self.task.done()
-        self.task.save()
+        try:
+            with transaction.atomic(savepoint=True):
+                self.task.finished = now()
+                self.set_status(STATUS.DONE)
+                self.task.save()
 
-        self.activate_next()
+                self.activate_next()
+        except Exception as exc:
+            if not context.propagate_exception:
+                self.task.comments = "{}\n{}".format(exc, traceback.format_exc())
+                self.task.finished = now()
+                self.set_status(STATUS.ERROR)
+                self.task.save()
+            else:
+                raise
 
     def is_done(self):
         if not self.flow_task._wait_all:
@@ -152,9 +167,14 @@ class JoinActivation(Activation):
 
         active = self.flow_cls.task_cls._default_manager \
             .filter(process=self.process, token__startswith=join_token_prefix) \
-            .exclude(status=Task.STATUS.FINISHED)
+            .exclude(status=STATUS.DONE)
 
         return not active.exists()
+
+    @Activation.status.transition(source=STATUS.ERROR)
+    def retry(self):
+        if self.is_done():
+            self.done.original()
 
     def activate_next(self):
         """
@@ -172,7 +192,7 @@ class JoinActivation(Activation):
         tasks = flow_cls.task_cls._default_manager.filter(
             flow_task=flow_task,
             process=process,
-            status=flow_cls.task_cls.STATUS.STARTED)
+            status=STATUS.STARTED)
 
         if len(tasks) > 1:
             raise FlowRuntimeError('More than one join instance for process found')
@@ -191,8 +211,8 @@ class JoinActivation(Activation):
 
             task.save()
             task.previous.add(prev_activation.task)
+
             activation.initialize(flow_task, task)
-            activation.prepare()
             activation.start()
         else:
             activation.initialize(flow_task, task)
@@ -222,12 +242,12 @@ class Join(base.NextNodeMixin, base.DetailsViewMixin, base.Gateway):
         self._wait_all = wait_all
 
 
-class SplitActivation(GateActivation):
+class SplitActivation(AbstractGateActivation):
     def __init__(self, **kwargs):
         self.next_tasks = []
         super(SplitActivation, self).__init__(**kwargs)
 
-    def execute(self):
+    def calculate_next(self):
         for node, cond in self.flow_task.branches:
             if cond:
                 if cond(self.process):
@@ -238,6 +258,7 @@ class SplitActivation(GateActivation):
         if not self.next_tasks:
             raise FlowRuntimeError('No next task available for {}'.format(self.flow_task.name))
 
+    @Activation.status.super()
     def activate_next(self):
         token_source = Token.split_token_source(self.task.token, self.task.pk)
 

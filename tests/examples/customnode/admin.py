@@ -4,7 +4,7 @@ from . import models
 
 
 class DynamicSplitAdmin(ProcessAdmin):
-    list_display = ['pk', 'created', 'get_status_display', 'participants',
+    list_display = ['pk', 'created', 'status', 'participants',
                     'split_count', 'decisions_list']
 
     list_display_links = ['pk', 'created']

@@ -20,6 +20,7 @@ from django.utils.functional import cached_property
 from django_webtest import WebTestMixin
 
 from viewflow import flow
+from viewflow.activation import STATUS
 from viewflow.models import Task
 from viewflow.signals import task_finished
 
@@ -57,7 +58,7 @@ def _(flow_node, test_task, **post_kwargs):
     """
     task = test_task.flow_cls.task_cls._default_manager.get(
         flow_task=test_task.flow_task,
-        status__in=[Task.STATUS.NEW, Task.STATUS.ASSIGNED])
+        status__in=[STATUS.NEW, STATUS.ASSIGNED])
 
     url_args = test_task.url_args.copy()
     url_args.setdefault('task', task)
@@ -133,6 +134,7 @@ class FlowTaskTest(object):
             data = {}
 
         task_finished.connect(self.task_finished)
+
         try:
             flow_do(self.flow_task, self, **data)
         finally:

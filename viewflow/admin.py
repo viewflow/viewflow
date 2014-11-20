@@ -23,7 +23,7 @@ class ProcessAdmin(admin.ModelAdmin):
     """
     actions = None
     date_hierarchy = 'created'
-    list_display = ['pk', 'created', 'flow_cls', 'get_status_display', 'participants']
+    list_display = ['pk', 'created', 'flow_cls', 'status', 'participants']
     list_display_links = ['pk', 'created', 'flow_cls']
     list_filter = ['status']
     readonly_fields = ['flow_cls', 'status', 'finished']
@@ -41,7 +41,7 @@ class TaskAdmin(admin.ModelAdmin):
     """
     actions = None
     date_hierarchy = 'created'
-    list_display = ['pk', 'created', 'process', 'get_status_display',
+    list_display = ['pk', 'created', 'process', 'status',
                     'owner', 'owner_permission', 'token',
                     'started', 'finished']
     list_display_links = ['pk', 'created', 'process']

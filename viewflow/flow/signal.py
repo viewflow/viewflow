@@ -1,13 +1,13 @@
 """
 django signals as part of flow
 """
-from ..activation import StartActivation, TaskActivation
+from ..activation import Activation
 from . import base
 
 
 class StartSignal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     task_type = 'START'
-    activation_cls = StartActivation
+    activation_cls = Activation ## TODO
 
     def __init__(self, signal, receiver, sender=None, **kwargs):
         self.signal = signal
@@ -17,7 +17,7 @@ class StartSignal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
         super(StartSignal, self).__init__(**kwargs)
 
     def on_signal(self, **signal_kwargs):
-        if isinstance(self.receiver, type) and issubclass(self.receiver, StartActivation):
+        if isinstance(self.receiver, type) and issubclass(self.receiver, StartActivation): 
             receiver = self.receiver()
             receiver.initialize(self)
             receiver(**signal_kwargs)
@@ -88,7 +88,7 @@ class Signal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
 
     """
     task_type = 'FUNC'
-    activation_cls = TaskActivation
+    activation_cls = Activation  # TODO
 
     def __init__(self, signal, receiver, sender=None, **kwargs):
         self.signal = signal

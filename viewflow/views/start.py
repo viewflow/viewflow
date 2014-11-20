@@ -131,7 +131,7 @@ class StartActivationViewMixin(object):
         return super(StartActivationViewMixin, self).dispatch(request, *args, **kwargs)
 
 
-class StartProcessView(flow.StartViewActivation, StartActivationViewMixin, generic.UpdateView):
+class StartProcessView(flow.ManagedStartViewActivation, StartActivationViewMixin, generic.UpdateView):
     """
     Generic start view, allows to modify subset of process fields,
     implements :class:`viewflow.activation.StartActivation` interface

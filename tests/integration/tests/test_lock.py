@@ -6,10 +6,16 @@ import queue
 from django.db import connection
 from django.test import skipUnlessDBFeature
 
+from viewflow import flow
+from viewflow.base import Flow, this
 from viewflow.exceptions import FlowLockFailed
 from viewflow.lock import select_for_update_lock
-from ..flows import NoTaskFlow
 from .. import integration_test
+
+
+class NoTaskFlow(Flow):
+    start = flow.Start().Next(this.end)
+    end = flow.End()
 
 
 @integration_test

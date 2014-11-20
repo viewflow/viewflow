@@ -1,12 +1,31 @@
 import threading
 import traceback
-from uuid import uuid4
+import uuid
 
 from django.db import transaction
-from viewflow import signals
+from django.utils.timezone import now
+
+from . import fsm, signals
+
+
+class STATUS(object):
+    ASSIGNED = 'ASSIGNED'
+    CANCELED = 'CANCELED'
+    DONE = 'DONE'
+    ERROR = 'ERROR'
+    NEW = 'NEW'
+    PREPARED = 'PREPARED'
+    SCHEDULED = 'SCHEDULED'
+    STARTED = 'STARTED'
+    UNRIPE = 'UNRIPE'
 
 
 _context_stack = threading.local()
+
+
+def all_leading_canceled(activation):
+    non_canceled_count = activation.task.leading.exclude(status=STATUS.CANCELED).count()
+    return non_canceled_count == 0
 
 
 class Context(object):
@@ -59,23 +78,58 @@ context = Context.create(propagate_exception=True)
 
 class Activation(object):
     """
-    Activation is responsible for managing livecycle and persistance of flow task instance
+    Flow task state machine
     """
+    status = fsm.State()
 
-    def __init__(self, **kwargs):
+    def __init__(self, *args, **kwargs):
         """
-        Activation should be available for instance without any constructor parameters.
+        Activation should be available for instantiate without any
+        constructor parameters
         """
         self.flow_cls, self.flow_task = None, None
         self.process, self.task = None, None
 
-        super(Activation, self).__init__(**kwargs)
+        super(Activation, self).__init__(*args, **kwargs)
 
+    @status.setter()
+    def set_status(self, value):
+        if self.task:
+            self.task.status = value
+
+    @status.getter()
+    def get_status(self):
+        if self.task:
+            return self.task.status
+        return STATUS.UNRIPE
+
+    @status.transition(source=STATUS.UNRIPE)
+    def initialize(self, flow_task, task):
+        self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
+
+        self.process = self.flow_cls.process_cls._default_manager.get(flow_cls=self.flow_cls, pk=task.process_id)
+        self.task = task
+
+    @status.transition(source=STATUS.DONE)
     def activate_next(self):
         """
         Activates next connected flow tasks
         """
         raise NotImplementedError
+
+    @status.transition(source=STATUS.DONE, target=STATUS.NEW, conditions=[all_leading_canceled])
+    def undo(self):
+        """
+        Undo the task
+        """
+        self.task.save()
+
+    @status.transition(source=STATUS.NEW, target=STATUS.CANCELED)
+    def cancel(self):
+        """
+        Cancel existing task
+        """
+        self.task.save()
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
@@ -86,97 +140,153 @@ class Activation(object):
 
 
 class StartActivation(Activation):
-    """
-    Base activation that creates new process instance.
-
-    Start activations could not be activated by other tasks.
-    """
-
-    def initialize(self, flow_task):
-        """
-        Initialize new activation instance.
-        """
+    @Activation.status.super()
+    def initialize(self, flow_task, task):
         self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
 
-        self.process = self.flow_cls.process_cls(flow_cls=self.flow_cls)
-        self.task = self.flow_cls.task_cls(process=self.process, flow_task=self.flow_task)
+        if task:
+            self.process, self.task = task.process, task
+        else:
+            self.process = self.flow_cls.process_cls(flow_cls=self.flow_cls)
+            self.task = self.flow_cls.task_cls(process=self.process, flow_task=self.flow_task)
 
+    @Activation.status.transition(source=STATUS.NEW, target=STATUS.PREPARED)
     def prepare(self):
         """
         Initialize start task for execution.
 
         No db changes performed. It is safe to call it on GET requests.
         """
-        self.task.prepare()
-        signals.task_prepared.send(sender=self.flow_cls, process=self.process, task=self.task)
+        self.task.started = now()
 
-    def done(self, process=None):
+    @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
+    def done(self):
         """
         Creates and starts new process instance.
         """
-        if process:
-            self.process = process
+        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+
         self.process.save()
 
         self.task.process = self.process
-        self.task.done()
+        self.task.finished = now()
         self.task.save()
 
-        self.process.start()
-        self.process.save()
-
-        signals.flow_started.send(sender=self.flow_cls, process=self.process, task=self.task)
         signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.flow_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
         self.activate_next()
 
+    @Activation.status.super()
     def activate_next(self):
         """
         Activate all outgoing edges.
         """
-        for outgoing in self.flow_task._outgoing():
-            outgoing.dst.activate(prev_activation=self, token=self.task.token)
+        self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
 
-class TaskActivation(Activation):
+class StartViewActivation(Activation):
     """
-    Base class for flow tasks that do some work.
+    Start process from user request
     """
 
+    @Activation.status.super()
     def initialize(self, flow_task, task):
-        """
-        Initialize new activation instance.
-        """
         self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
 
-        self.process = self.flow_cls.process_cls._default_manager.get(flow_cls=self.flow_cls, pk=task.process_id)
-        self.task = task
+        if task:
+            self.process, self.task = task.process, task
+        else:
+            self.process = self.flow_cls.process_cls(flow_cls=self.flow_cls)
+            self.task = self.flow_cls.task_cls(process=self.process, flow_task=self.flow_task)
 
+    @Activation.status.transition(source=STATUS.NEW, target=STATUS.PREPARED)
     def prepare(self):
         """
-        Initialize task for execution.
+        Initialize start task for execution.
 
         No db changes performed. It is safe to call it on GET requests.
         """
-        self.task.prepare()
-        signals.task_prepared.send(sender=self.flow_cls, process=self.process, task=self.task)
+        self.task.started = now()
 
+    @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
     def done(self):
         """
-        Finishes the task and activates next.
+        Creates and starts new process instance.
         """
-        self.task.done()
+        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+
+        self.process.save()
+
+        self.task.process = self.process
+        self.task.finished = now()
         self.task.save()
+
         signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
         self.activate_next()
 
+    @Activation.status.super()
     def activate_next(self):
         """
         Activate all outgoing edges.
         """
-        for outgoing in self.flow_task._outgoing():
-            outgoing.dst.activate(prev_activation=self, token=self.task.token)
+        self.flow_task._next.activate(prev_activation=self, token=self.task.token)
+
+
+class ViewActivation(Activation):
+    @Activation.status.transition(source=STATUS.NEW, target=STATUS.ASSIGNED)
+    def assign(self, user=None):
+        """
+        Assign user to the task
+        """
+        if user:
+            self.task.owner = user
+        self.task.save()
+
+    @Activation.status.transition(source=STATUS.ASSIGNED, target=STATUS.NEW)
+    def unassign(self):
+        """
+        Remove user from the task assignment
+        """
+        self.task.owner = None
+        self.task.save()
+
+    @Activation.status.transition(source=STATUS.ASSIGNED)
+    def reassign(self, user=None):
+        """
+        Reassign another user
+        """
+        if user:
+            self.task.owner = user
+        self.task.save()
+
+    @Activation.status.transition(source=STATUS.ASSIGNED, target=STATUS.PREPARED)
+    def prepare(self):
+        """
+        Initialize start task for execution.
+
+        No db changes performed. It is safe to call it on GET requests.
+        """
+        self.task.started = now()
+
+    @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
+    def done(self):
+        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+
+        self.task.finished = now()
+        self.task.save()
+
+        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+
+        self.activate_next()
+
+    @Activation.status.super()
+    def activate_next(self):
+        """
+        Activate all outgoing edges.
+        """
+        self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @classmethod
     def create_task(cls, flow_task, prev_activation, token):
@@ -201,71 +311,51 @@ class TaskActivation(Activation):
         return activation
 
 
-class AbstractJobActivation(TaskActivation):
-    """
-    Activation for long-running background celery tasks.
-    """
-    fail_on_children_error = False
-
-    def assign(self, external_task_id):
+class AbstractGateActivation(Activation):
+    def calculate_next(self):
         """
-        Saves scheduled celery task_id.
-        """
-        self.task.assign(external_task_id=external_task_id)
-        self.task.save()
-
-    def create_task_uuid(self):
-        return str(uuid4())
-
-    def schedule(self, task_id):
-        """
-        Async task schedule
+        Calculate next tasks for activation
         """
         raise NotImplementedError
 
-    def schedule_resume(self):
-        self.task.resume()
-        self.task.save()
-        self.schedule(self.task.external_task_id)
-        signals.task_resume.send(sender=self.flow_cls, process=self.process, task=self.task)
+    @Activation.status.transition(source=STATUS.NEW)
+    def perform(self):
+        try:
+            with transaction.atomic(savepoint=True):
+                self.task.started = now()
+                self.task.save()
 
-    def start(self):
-        """
-        Persist that job is started
-        """
-        self.task.start()
-        self.task.save()
-        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+                signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-    def error(self, exc, traceback):
-        self.task.error(exc, traceback)
-        self.task.save()
-        signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task,
-                                 exeception=exc, traceback=traceback)
+                self.calculate_next()
 
-    def resume(self):
-        if context.propagate_exception:
-            self.schedule_resume()
-        else:
-            try:
-                with transaction.atomic(savepoint=True):
-                    self.schedule_resume()
-            except Exception as exc:
-                self.error(exc, traceback.format_exc())
+                self.task.finished = now()
+                self.set_status(STATUS.DONE)
+                self.task.save()
 
-    def done(self, result):
-        """
-        Celery task finished with `result`, finishes the flow task
-        """
-        with Context(propagate_exception=False):
-            super(AbstractJobActivation, self).done()
+                signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-    def activate_next(self):
+                self.activate_next()
+        except Exception as exc:
+            if not context.propagate_exception:
+                self.task.comments = "{}\n{}".format(exc, traceback.format_exc())
+                self.task.finished = now()
+                self.set_status(STATUS.ERROR)
+                self.task.save()
+                signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task)
+            else:
+                raise
+
+    @Activation.status.transition(source=STATUS.ERROR)
+    def retry(self):
+        self.perform.original()
+
+    @Activation.status.transition(source=[STATUS.ERROR, STATUS.DONE], target=STATUS.NEW)
+    def undo(self):
         """
-        If Job is successfully completed, next task activation failure can't drop this
+        Undo the task
         """
-        with Context(propagate_exception=False):
-            super(AbstractJobActivation, self).activate_next()
+        super(AbstractGateActivation, self).undo.original()
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
@@ -288,83 +378,94 @@ class AbstractJobActivation(TaskActivation):
 
         activation = cls()
         activation.initialize(flow_task, task)
-
-        external_task_id = activation.create_task_uuid()
-        activation.assign(external_task_id)
-
-        if context.propagate_exception:
-            activation.schedule(external_task_id)
-        else:
-            try:
-                with transaction.atomic(savepoint=True):
-                    activation.execute()
-            except Exception as exc:
-                activation.error(exc, traceback.format_exc())
+        activation.perform()
 
         return activation
 
 
-class GateActivation(Activation):
-    """
-    Activation for task gates.
-    """
-    def initialize(self, flow_task, task):
-        self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
+class AbstractJobActivation(Activation):
+    def async(self):
+        raise NotImplementedError
 
-        self.process = self.flow_cls.process_cls._default_manager.get(flow_cls=self.flow_cls, pk=task.process_id)
-        self.task = task
+    @Activation.status.transition(source=STATUS.NEW, target=STATUS.ASSIGNED)
+    def assign(self):
+        self.task.started = now()
+        self.task.external_task_id = str(uuid.uuid4())
+        self.task.save()
 
-    def prepare(self):
-        self.task.prepare()
-        signals.task_prepared.send(sender=self.flow_cls, process=self.process, task=self.task)
+    @Activation.status.transition(source=STATUS.ASSIGNED)
+    def schedule(self):
+        try:
+            with transaction.atomic(savepoint=True):
+                self.async()
+                self.set_status(STATUS.SCHEDULED)
+                self.task.save()
+        except Exception as exc:
+            if not context.propagate_exception:
+                self.task.comments = "{}\n{}".format(exc, traceback.format_exc())
+                self.task.finished = now()
+                self.set_status(STATUS.ERROR)
+                self.task.save()
+            else:
+                raise
 
+    @Activation.status.transition(source=STATUS.SCHEDULED, target=STATUS.STARTED)
     def start(self):
-        self.task.start()
+        self.task.started = now()
         self.task.save()
         signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-    def execute(self):
-        """
-        Execute gate conditions, prepare data required to determine
-        next tasks for activation.
-        """
-        raise NotImplementedError
-
-    def error(self, exc, traceback):
-        self.task.error(exc, traceback)
-        self.task.save()
-        signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task,
-                                 exeception=exc, traceback=traceback)
-
-    def resume(self):
-        if context.propagate_exception:
-            self.task.resume()
-            self.prepare()
-            self.start()
-            self.execute()
-            self.done()
-        else:
-            try:
-                with transaction.atomic(savepoint=True):
-                    self.task.resume()
-                    self.prepare()
-                    self.start()
-                    self.execute()
-                    self.done()
-            except Exception as exc:
-                self.error(exc, traceback.format_exc())
-
+    @Activation.status.transition(source=STATUS.STARTED, target=STATUS.DONE)
     def done(self):
-        self.task.done()
+        self.task.finished = now()
+        self.set_status(STATUS.DONE)
         self.task.save()
+
         signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
         self.activate_next()
 
+    @Activation.status.transition(source=STATUS.STARTED, target=STATUS.ERROR)
+    def error(self, comments=""):
+        self.task.comments = comments
+        self.task.finished = now()
+        self.task.save()
+        signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task)
+
+    @Activation.status.transition(source=[STATUS.SCHEDULED, STATUS.STARTED, STATUS.ERROR])
+    def retry(self):
+        self.schedule.original()
+
+    @Activation.status.transition(
+        source=[STATUS.SCHEDULED, STATUS.STARTED, STATUS.ERROR, STATUS.DONE],
+        target=STATUS.ASSIGNED)
+    def undo(self):
+        """
+        Undo the task
+        """
+        super(AbstractJobActivation, self).undo.original()
+
+    @Activation.status.transition(source=[STATUS.NEW, STATUS.ASSIGNED], target=STATUS.CANCELED)
+    def cancel(self):
+        """
+        Cancel existing task
+        """
+        super(AbstractJobActivation, self).cancel.original()
+
+    @Activation.status.super()
+    def activate_next(self):
+        """
+        Activate all outgoing edges.
+        """
+        self.flow_task._next.activate(prev_activation=self, token=self.task.token)
+
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
         """
-        Activates gate, executes it immediately, and activates next tasks.
+        Activate and schedule for background job execution.
+
+        It is safe to schedule job just now b/c the process instance is locked,
+        and job will wait until this transaction completes.
         """
         flow_cls, flow_task = flow_task.flow_cls, flow_task
         process = prev_activation.process
@@ -379,60 +480,34 @@ class GateActivation(Activation):
 
         activation = cls()
         activation.initialize(flow_task, task)
-        activation.prepare()
-
-        if context.propagate_exception:
-            """
-            Any execution exception would be propagated back,
-            assume that rollback will happens and no task activation would be stored
-            """
-            activation.start()
-            activation.execute()
-            activation.done()
-        else:
-            """
-            On error, save the task and not propagate exception on top
-            """
-            try:
-                with transaction.atomic(savepoint=True):
-                    activation.start()
-                    activation.execute()
-                    activation.done()
-            except Exception as exc:
-                activation.error(exc, traceback.format_exc())
+        activation.assign()
+        activation.schedule()
 
         return activation
 
 
 class EndActivation(Activation):
-    """
-    Activation that finishes the process, and cancels all other active tasks.
-    """
-    def initialize(self, flow_task, task):
-        """
-        Initialize new activation instance.
-        """
-        self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
+    @Activation.status.transition(source=STATUS.NEW, target=STATUS.DONE)
+    def perform(self):
+        with transaction.atomic(savepoint=True):
+            self.task.started = now()
+            self.task.save()
 
-        self.process = self.flow_cls.process_cls._default_manager.get(flow_cls=self.flow_cls, pk=task.process_id)
-        self.task = task
+            signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-    def prepare(self):
-        self.task.prepare()
-        signals.task_prepared.send(sender=self.flow_cls, process=self.process, task=self.task)
+            self.process.status = STATUS.DONE
+            self.process.finished = now()
+            self.process.save()
 
-    def done(self):
-        self.task.done()
-        self.task.save()
+            for task in self.process.active_tasks():
+                if task != self.task:
+                    task.activate().cancel()
 
-        self.process.finish()
-        self.process.save()
+            self.task.finished = now()
+            self.task.save()
 
-        for task in self.process.active_tasks():
-            task.flow_task.deactivate(task)
-
-        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
-        signals.flow_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+            signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+            signals.flow_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
@@ -452,7 +527,6 @@ class EndActivation(Activation):
 
         activation = cls()
         activation.initialize(flow_task, task)
-        activation.prepare()
-        activation.done()
+        activation.perform()
 
         return activation

@@ -6,13 +6,13 @@ from .. import test as flow_test
 
 
 class JobActivation(AbstractJobActivation):
-    def schedule(self, task_id):
+    def async(self):
         """
         Async task schedule
         """
         self.flow_task.job.apply_async(
             args=[get_task_ref(self.flow_task), self.task.process_id, self.task.pk],
-            task_id=task_id,
+            task_id=self.task.external_task_id,
             countdown=1)
 
 

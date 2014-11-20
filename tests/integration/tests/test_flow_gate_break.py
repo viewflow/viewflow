@@ -2,9 +2,9 @@ from django.db import models, transaction
 from django.test import TestCase
 
 from viewflow import flow
-from viewflow.activation import Context
+from viewflow.activation import Context, STATUS
 from viewflow.base import Flow, this
-from viewflow.models import Process, Task
+from viewflow.models import Process
 
 from .. import integration_test
 
@@ -41,7 +41,7 @@ class TestBrokenGate(TestCase):
         activation = BrokenGateFlow.start.run(throw_error=False)
 
         process = BrokenGateProcess.objects.get(pk=activation.process.pk)
-        self.assertEqual(Process.STATUS.FINISHED, process.status)
+        self.assertEqual(STATUS.DONE, process.status)
 
     def test_broken_gate_start_failed(self):
         try:
@@ -63,15 +63,15 @@ class TestBrokenGate(TestCase):
         # Process created, but there is a task in errpr state
         self.assertEqual(1, BrokenGateProcess.objects.count())
 
-        task = activation.process.get_task(BrokenGateFlow.gate, status=Task.STATUS.ERROR)
+        task = activation.process.get_task(BrokenGateFlow.gate, status=STATUS.ERROR)
 
         # Fix process data and resume task
         process = BrokenGateProcess.objects.get(pk=task.process_id)
         process.throw_error = False
         process.save()
 
-        BrokenGateFlow.gate.resume(task)
+        task.activate().retry()
 
         # Great, process, finished successfully
         process = BrokenGateProcess.objects.get(pk=task.process_id)
-        self.assertEqual(Process.STATUS.FINISHED, process.status)
+        self.assertEqual(STATUS.DONE, process.status)

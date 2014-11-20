@@ -32,6 +32,10 @@ class Child(Base):
         pass
 
 
+class SubChild(Child):
+    pass
+
+
 class StateSetter(object):
     state = State()
 
@@ -89,6 +93,21 @@ class TestFsm(unittest.TestCase):
         child.state = 'initial'
         self.assertEqual('initial', child.state)
         self.assertTrue(child.prepare.can_proceed())
+
+    def test_subchild_transitions(self):
+        sub_child = SubChild()
+
+        sub_child.prepare()
+        self.assertEqual('prepared', sub_child.state)
+
+        sub_child.start()
+        self.assertEqual('started', sub_child.state)
+
+        sub_child.done()
+        self.assertEqual('finalizing', sub_child.state)
+
+        sub_child.shutdown()
+        self.assertEqual('done', sub_child.state)
 
     def test_state_setter(self):
         state_setter = StateSetter()

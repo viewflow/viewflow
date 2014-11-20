@@ -4,6 +4,8 @@ Base definitions for flow task declaration
 from django.conf.urls import url
 from django.core.urlresolvers import reverse
 
+from ..activation import STATUS
+
 
 class ThisObject(object):
     """
@@ -24,7 +26,7 @@ class ThisObject(object):
             task = flow_cls.task_cls.objects.get(
                 process=process,
                 flow_task=task_node,
-                status=flow_cls.task_cls.STATUS.FINISHED)
+                status=STATUS.DONE)
             return task.owner
         return get_task_owner
 
@@ -153,11 +155,6 @@ class Gateway(Node):
     """
     Base class for task gateways
     """
-    def resume(self, task):
-        activation = self.activation_cls()
-        activation.initialize(self, task)
-        activation.resume()
-        return activation
 
 
 class NextNodeMixin(object):

@@ -3,7 +3,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils.decorators import method_decorator
 
-from .. import flow, models
+from .. import activation, flow, models
 
 
 def _available_flows(flow_classes, user):
@@ -68,7 +68,7 @@ class AllTaskListView(LoginRequiredMixin, generic.ListView):
     def get_queryset(self):
         return models.Task.objects \
             .coerce_for(_available_flows(self.flow_classes, self.request.user)) \
-            .filter(owner=self.request.user, status=models.Task.STATUS.ASSIGNED) \
+            .filter(owner=self.request.user, status=activation.STATUS.ASSIGNED) \
             .order_by('-created')
 
 
@@ -89,7 +89,7 @@ class AllQueueListView(LoginRequiredMixin, generic.ListView):
         queryset = models.Task.objects \
             .coerce_for(_available_flows(self.flow_classes, self.request.user)) \
             .user_queue(self.request.user) \
-            .filter(status=models.Task.STATUS.NEW) \
+            .filter(status=activation.STATUS.NEW) \
             .order_by('-created')
 
         return queryset
@@ -182,7 +182,7 @@ class TaskListView(FlowPermissionMixin, generic.ListView):
         return self.flow_cls.task_cls.objects \
             .filter(process__flow_cls=self.flow_cls,
                     owner=self.request.user,
-                    status=self.flow_cls.task_cls.STATUS.ASSIGNED) \
+                    status=activation.STATUS.ASSIGNED) \
             .order_by('-created')
 
 
@@ -208,6 +208,6 @@ class QueueListView(FlowPermissionMixin, generic.ListView):
 
     def get_queryset(self):
         queryset = self.flow_cls.task_cls.objects.user_queue(self.request.user, flow_cls=self.flow_cls) \
-            .filter(status=self.flow_cls.task_cls.STATUS.NEW).order_by('-created')
+            .filter(status=activation.STATUS.NEW).order_by('-created')
 
         return queryset

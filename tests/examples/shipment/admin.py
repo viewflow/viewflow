@@ -4,13 +4,13 @@ from . import models, flows
 
 
 class ShipmentProcessAdmin(ProcessAdmin):
-    list_display = ['pk', 'created_by', 'get_status_display', 'participants',
+    list_display = ['pk', 'created_by', 'status', 'participants',
                     'is_normal_post', 'need_extra_insurance']
     list_display_links = ['pk', 'created_by']
 
 
 class ShipmentTaskAdmin(TaskAdmin):
-    list_display = ['pk', 'created', 'get_status_display',
+    list_display = ['pk', 'created', 'status',
                     'owner', 'owner_permission', 'token',
                     'started', 'finished']
     list_display_links = ['pk', 'created']

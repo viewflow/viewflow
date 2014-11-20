@@ -4,13 +4,13 @@ from . import models, flows
 
 
 class HelloWorldProcessAdmin(ProcessAdmin):
-    list_display = ['pk', 'created', 'get_status_display', 'participants',
+    list_display = ['pk', 'created', 'status', 'participants',
                     'text', 'approved']
     list_display_links = ['pk', 'created']
 
 
 class HelloWorldTaskAdmin(TaskAdmin):
-    list_display = ['pk', 'created', 'get_status_display',
+    list_display = ['pk', 'created', 'status',
                     'owner', 'owner_permission', 'token',
                     'started', 'finished']
     list_display_links = ['pk', 'created']

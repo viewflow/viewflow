@@ -1,9 +1,11 @@
 """
 Function handlers as part of flow
 """
+import traceback
 from django.db import transaction
+from django.utils.timezone import now
 
-from ..activation import StartActivation, TaskActivation, context
+from ..activation import Activation, StartActivation, STATUS, context
 from . import base
 
 
@@ -33,8 +35,46 @@ class StartFunction(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
             return receiver(*args, **kwargs)
         else:
             activation = self.activation_cls()
-            activation.initialize(self)
+            activation.initialize(self, None)
             return self.func(activation, *args, **kwargs)
+
+
+class FuncActivation(Activation):
+    @Activation.status.transition(source=STATUS.NEW, target=STATUS.PREPARED)
+    def prepare(self):
+        self.task.started = now()
+
+    @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
+    def done(self):
+        self.task.finished = now()
+        self.task.save()
+
+        self.activate_next()
+
+    @Activation.status.super()
+    def activate_next(self):
+        """
+        Activate all outgoing edges.
+        """
+        self.flow_task._next.activate(prev_activation=self, token=self.task.token)
+
+    @classmethod
+    def activate(cls, flow_task, prev_activation, token):
+        """
+        Instantiate new task
+        """
+        task = flow_task.flow_cls.task_cls(
+            process=prev_activation.process,
+            flow_task=flow_task,
+            token=token)
+
+        task.save()
+        task.previous.add(prev_activation.task)
+
+        activation = cls()
+        activation.initialize(flow_task, task)
+
+        return activation
 
 
 class FlowFunc(object):
@@ -70,7 +110,7 @@ def flow_func(task_loader=None, **lock_args):
 
             with lock(flow_task, task.process_id):
                 task = flow_task.flow_cls.task_cls._default_manager.get(pk=task.pk)
-                if isinstance(receiver, TaskActivation):
+                if isinstance(receiver, FuncActivation):
                     receiver.initialize(flow_task, task)
                     receiver(*func_args, **func_kwargs)
                 else:
@@ -85,7 +125,7 @@ def flow_func(task_loader=None, **lock_args):
 
 class Function(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     task_type = 'FUNC'
-    activation_cls = TaskActivation
+    activation_cls = FuncActivation
 
     def __init__(self, func, **kwargs):
         self.func = func
@@ -95,23 +135,44 @@ class Function(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
         self.func(self, *args, **kwargs)
 
 
-class HandlerActivation(TaskActivation):
-    """
-    Executes callback handler synchronously, as soon as prev task completes
-    """
+class HandlerActivation(Activation):
     def execute(self):
         self.flow_task.handler(self)
+
+    @Activation.status.transition(source=STATUS.NEW)
+    def perform(self):
+        try:
+            self.task.started = now()
+
+            with transaction.atomic(savepoint=True):
+                self.execute()
+                self.task.finished = now()
+                self.set_status(STATUS.DONE)
+                self.task.save()
+                self.activate_next()
+        except Exception as exc:
+            if not context.propagate_exception:
+                self.task.comments = "{}\n{}".format(exc, traceback.format_exc())
+                self.task.finished = now()
+                self.set_status(STATUS.ERROR)
+                self.task.save()
+            else:
+                raise
+
+    @Activation.status.super()
+    def activate_next(self):
+        """
+        Activate all outgoing edges.
+        """
+        self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
         """
-        Activates gate, executes it immediately, and activates next tasks.
+        Instantiate new task
         """
-        flow_cls, flow_task = flow_task.flow_cls, flow_task
-        process = prev_activation.process
-
-        task = flow_cls.task_cls(
-            process=process,
+        task = flow_task.flow_cls.task_cls(
+            process=prev_activation.process,
             flow_task=flow_task,
             token=token)
 
@@ -120,23 +181,7 @@ class HandlerActivation(TaskActivation):
 
         activation = cls()
         activation.initialize(flow_task, task)
-        activation.prepare()
-
-        if context.propagate_exception:
-            """
-            Any execution exception would be propagated back,
-            assume that rollback will happens and no task activation would be stored
-            """
-            activation.execute()
-        else:
-            """
-            On error, save the task and not propagate exception on top
-            """
-            try:
-                with transaction.atomic(savepoint=True):
-                    activation.execute()
-            except Exception as exc:
-                activation.error(exc)
+        activation.perform()
 
         return activation
 

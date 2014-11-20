@@ -2,144 +2,158 @@ from django.test import TestCase
 
 from viewflow import activation, flow
 from viewflow.compat import mock
-from viewflow.flow import gates
-from viewflow.models import Process, Task
-from viewflow.token import Token
-from viewflow.contrib import celery
+from viewflow.models import Task
 
 
-class TestStartActivation(TestCase):
-    def test_start_activation_lifecycle(self):
-        flow_task_mock = mock.Mock(spec=flow.Start())
-        flow_task_mock._outgoing = mock.Mock(return_value=[])
+class ProcessStub(object):
+    _default_manager = mock.Mock()
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def save(self):
+        pass
+
+
+class TaskStub(object):
+    process_id = 1
+    status = activation.STATUS.NEW
+    token = 'start'
+
+    def __init__(self, *args, **kwargs):
+        pass
+
+    @property
+    def leading(self):
+        return Task.objects.none()
+
+    def save(self):
+        pass
+
+
+class UserStub(object):
+    pass
+
+
+class NextTaskStub(object):
+    def activate(self, prev_activation, token):
+        pass
+
+
+class FlowStub(object):
+    process_cls = ProcessStub
+    task_cls = TaskStub
+
+
+class TestGateAcitation(activation.AbstractGateActivation):
+    def __init__(self, *args, **kwargs):
+        self.throw_error = kwargs.pop('throw_error', False)
+        super(TestGateAcitation, self).__init__(*args, **kwargs)
+
+    def calculate_next(self):
+        if self.throw_error:
+            raise ValueError('Gate Error')
+
+    @activation.Activation.status.super()
+    def activate_next(self):
+        pass
+
+
+class TestJobAcitation(activation.AbstractJobActivation):
+    def __init__(self, *args, **kwargs):
+        self.throw_on_schedule_error = kwargs.pop('throw_on_schedule_error', False)
+        super(TestJobAcitation, self).__init__(*args, **kwargs)
+
+    def async(self):
+        if self.throw_on_schedule_error:
+            raise ValueError('Job scheduler error')
+
+    @activation.Activation.status.super()
+    def activate_next(self):
+        pass
+
+
+class TestActivations(TestCase):
+    def init(self, flow_task):
+        if hasattr(flow_task, 'Next'):
+            flow_task.Next(NextTaskStub())
+        flow_task.flow_cls = FlowStub
+        return flow_task
+
+    def test_startactivation_lifecycle(self):
+        flow_task = self.init(flow.Start())
 
         act = activation.StartActivation()
-        act.initialize(flow_task_mock)
+        act.initialize(flow_task, None)
+
         act.prepare()
         act.done()
+        act.undo()
+        act.cancel()
 
-        act.task.prepare.assert_called_once_with()
-        act.task.done.assert_called_once_with()
-        act.process.start.assert_called_once_with()
-        flow_task_mock._outgoing.assert_any_call()
+    def test_startviewactivation_lifecycle(self):
+        act = activation.StartViewActivation()
+        act.initialize(self.init(flow.Start()), None)
 
-
-class TestViewActivation(TestCase):
-    def test_view_activation_activate(self):
-        flow_task_mock = mock.Mock(spec=flow.View(lambda *args, **kwargs: None))
-        flow_task_mock._outgoing = mock.Mock(return_value=[])
-        prev_activation_mock = mock.Mock(spec=activation.StartActivation())
-
-        act = activation.TaskActivation.activate(flow_task_mock, prev_activation_mock, Token('start'))
-
-        act.task.save.assert_has_calls(())
-
-    def test_view_activation_lifecycle(self):
-        flow_task_mock = mock.Mock(spec=flow.View(lambda *args, **kwargs: None))
-        flow_task_mock._outgoing = mock.Mock(return_value=[])
-        task_mock = mock.Mock(spec=Task())
-
-        act = activation.TaskActivation()
-        act.initialize(flow_task_mock, task_mock)
         act.prepare()
         act.done()
+        act.undo()
+        act.cancel()
 
-        act.task.prepare.assert_called_once_with()
-        act.task.done.assert_called_once_with()
-        flow_task_mock._outgoing.assert_any_call()
+    def test_viewactivation_lifecycle(self):
+        flow_task = self.init(flow.View(lambda _: None))
 
+        act = activation.ViewActivation()
+        act.initialize(flow_task, TaskStub())
 
-class TestCeleryJobActivation(TestCase):
-    def test_job_activation_activate(self):
-        flow_task_mock = mock.Mock(spec=celery.Job(lambda *args, **kwargs: None))
-        flow_task_mock._outgoing = mock.Mock(return_value=[])
-        prev_activation_mock = mock.Mock(spec=activation.StartActivation())
+        # assign
+        act.assign(UserStub())
+        act.reassign(UserStub())
+        act.unassign()
+        act.assign(UserStub())
 
-        with mock.patch('viewflow.contrib.celery.get_task_ref'):
-            act = celery.JobActivation.activate(flow_task_mock, prev_activation_mock, Token('start'))
-            act.task.save.assert_has_calls(())
-            self.assertEqual(1, flow_task_mock.job.apply_async.call_count)
-
-    def test_job_activation_lifecycle(self):
-        flow_task_mock = mock.Mock(spec=celery.Job(lambda *args, **kwargs: None))
-        flow_task_mock._outgoing = mock.Mock(return_value=[])
-        task_mock = mock.Mock(spec=Task())
-
-        act = celery.JobActivation()
-        act.initialize(flow_task_mock, task_mock)
         act.prepare()
-        act.start()
-        act.done(result=None)
+        act.done()
+        act.undo()
+        act.cancel()
 
-        act.task.done.assert_called_once_with()
-        flow_task_mock._outgoing.assert_any_call()
+    def test_gateactivation_lifecycle(self):
+        flow_task = self.init(flow.Node())
 
+        act = TestGateAcitation(throw_error=True)
+        act.initialize(flow_task, TaskStub())
 
-class TestEndActivation(TestCase):
-    def test_end_activation_activate(self):
-        active_task_mock = mock.Mock()
-        process_mock = mock.Mock(spec=Process())
-        process_mock.active_tasks = mock.Mock(return_value=[active_task_mock])
+        self.assertRaises(ValueError, act.perform)
 
-        flow_task_mock = mock.Mock(spec=flow.End())
-        flow_task_mock._outgoing = mock.Mock(return_value=[])
-        flow_task_mock.flow_cls.process_cls._default_manager.get = mock.Mock(return_value=process_mock)
-        prev_activation_mock = mock.Mock(spec=activation.StartActivation())
+        with activation.Context(propagate_exception=False):
+            act.perform()
+            act.retry()
 
-        act = activation.EndActivation.activate(flow_task_mock, prev_activation_mock, Token('start'))
+            act.throw_error = False
+            act.retry()
+            act.undo()
+            act.cancel()
 
-        act.task.save.assert_has_calls(())
-        act.process.finish.assert_has_calls(())
-        active_task_mock.flow_task.deactivate.assert_called_once_with(mock.ANY)
+    def test_jobactivation_lifecycle(self):
+        flow_task = self.init(flow.Node())
 
+        act = TestJobAcitation(throw_on_schedule_error=True)
+        act.initialize(flow_task, TaskStub())
 
-class TestIfActivation(TestCase):
-    def test_if_activation_activate(self):
-        flow_task_mock = mock.Mock(spec=flow.If(lambda act: True))
-        flow_task_mock._outgoing = mock.Mock(return_value=[])
-        prev_activation_mock = mock.Mock(spec=activation.StartActivation())
+        act.assign()
+        self.assertRaises(ValueError, act.schedule)
 
-        act = gates.IfActivation.activate(flow_task_mock, prev_activation_mock, Token('start'))
-        act.task.save.assert_has_calls(())
+        with activation.Context(propagate_exception=False):
+            act.schedule()
+            act.retry()
+            act.throw_on_schedule_error = False
+            act.retry()
 
+            act.start()
+            act.error()
 
-class TestSwitchActivation(TestCase):
-    def test_switch_activation_activate(self):
-        flow_task_mock = mock.Mock(spec=flow.Switch())
-        flow_task_mock._outgoing = mock.Mock(return_value=[])
-        type(flow_task_mock).branches = mock.PropertyMock(return_value=[(mock.Mock(), lambda p: True)])
-        prev_activation_mock = mock.Mock(spec=activation.StartActivation())
-
-        act = gates.SwitchActivation.activate(flow_task_mock, prev_activation_mock, Token('start'))
-        act.task.save.assert_has_calls(())
-
-
-class TestJoinActivation(TestCase):
-    def test_join_activation_activate(self):
-        prev_task_mock = mock.Mock(spec=Task())
-        prev_task_mock.token = Token('start/1_2')
-
-        task_mock = mock.Mock(spec=Task())
-        task_mock.previous.all = mock.Mock(return_value=[prev_task_mock])
-
-        flow_task_mock = mock.Mock(spec=flow.Join())
-        flow_task_mock._outgoing = mock.Mock(return_value=[])
-        flow_task_mock.flow_cls.task_cls = mock.Mock(return_value=task_mock)
-        flow_task_mock.flow_cls.task_cls._default_manager.filter = mock.Mock(return_value=Task.objects.none())
-
-        prev_activation_mock = mock.Mock(spec=activation.StartActivation())
-
-        act = gates.JoinActivation.activate(flow_task_mock, prev_activation_mock, Token('start'))
-        act.task.save.assert_has_calls(())
-        flow_task_mock._outgoing.assert_any_call()
-
-
-class TestSplitActivation(TestCase):
-    def test_switch_activation_activate(self):
-        flow_task_mock = mock.Mock(spec=flow.Split())
-        flow_task_mock._outgoing = mock.Mock(return_value=[])
-        type(flow_task_mock).branches = mock.PropertyMock(return_value=[(mock.Mock(), lambda p: True)])
-        prev_activation_mock = mock.Mock(spec=activation.StartActivation())
-
-        act = gates.SplitActivation.activate(flow_task_mock, prev_activation_mock, Token('start'))
-        act.task.save.assert_has_calls(())
+            act.retry()
+            act.start()
+            act.done()
+            act.undo()
+            act.cancel()

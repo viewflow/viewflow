@@ -49,7 +49,8 @@ def get_model_display_data(root_instance):
 
         # backward relations
         for relation in root._meta.get_all_related_objects():
-            for related in getattr(root, relation.get_accessor_name()).all():
+            if not isinstance(relation.field, models.OneToOneField):
+                for related in getattr(root, relation.get_accessor_name()).all():
                     if expand_required(related):
                         new_objects.append((related._meta.verbose_name.title(), related))
 
