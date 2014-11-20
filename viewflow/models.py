@@ -12,7 +12,7 @@ class AbstractProcess(models.Model):
     Base class for Process data object
     """
     flow_cls = FlowReferenceField()
-    status = models.CharField(max_length=3, default=STATUS.NEW)
+    status = models.CharField(max_length=50, default=STATUS.NEW)
 
     created = models.DateTimeField(auto_now_add=True)
     finished = models.DateTimeField(blank=True, null=True)
@@ -61,7 +61,7 @@ class AbstractTask(models.Model):
     """
     flow_task = TaskReferenceField()
     flow_task_type = models.CharField(max_length=50)
-    status = models.CharField(max_length=3, default=STATUS.NEW, db_index=True)
+    status = models.CharField(max_length=50, default=STATUS.NEW, db_index=True)
 
     created = models.DateTimeField(auto_now_add=True)
     started = models.DateTimeField(blank=True, null=True)

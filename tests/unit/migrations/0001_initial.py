@@ -10,7 +10,7 @@ import viewflow.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('viewflow', '0002_task_comments'),
+        ('viewflow', '0002_fsmchange'),
     ]
 
     operations = [

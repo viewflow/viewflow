@@ -7,7 +7,7 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('viewflow', '0001_initial'),
+        ('viewflow', '0002_fsmchange'),
     ]
 
     operations = [
