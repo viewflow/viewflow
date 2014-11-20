@@ -31,7 +31,7 @@ class StartFunction(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     def run(self, *args, **kwargs):
         if isinstance(self.func, type) and issubclass(self.func, StartActivation):
             receiver = self.func()
-            receiver.initialize(self)
+            receiver.initialize(self, None)
             return receiver(*args, **kwargs)
         else:
             activation = self.activation_cls()

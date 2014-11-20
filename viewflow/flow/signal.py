@@ -1,13 +1,13 @@
 """
 django signals as part of flow
 """
-from ..activation import Activation
-from . import base
+from ..activation import StartActivation
+from . import base, func
 
 
 class StartSignal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     task_type = 'START'
-    activation_cls = Activation ## TODO
+    activation_cls = StartActivation
 
     def __init__(self, signal, receiver, sender=None, **kwargs):
         self.signal = signal
@@ -17,13 +17,13 @@ class StartSignal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
         super(StartSignal, self).__init__(**kwargs)
 
     def on_signal(self, **signal_kwargs):
-        if isinstance(self.receiver, type) and issubclass(self.receiver, StartActivation): 
+        if isinstance(self.receiver, type) and issubclass(self.receiver, StartActivation):
             receiver = self.receiver()
-            receiver.initialize(self)
+            receiver.initialize(self, None)
             receiver(**signal_kwargs)
         else:
             activation = self.activation_cls()
-            activation.initialize(self)
+            activation.initialize(self, None)
             self.receiver(activation, **signal_kwargs)
 
     def ready(self):
@@ -52,7 +52,7 @@ def flow_signal(task_loader=None, **lock_args):
             else:
                 class FuncWrapper(Receiver):
                     def get_task(self, flow_task, **kwargs):
-                        return task_loader(flow_task, kwargs['sender'])
+                        return task_loader(flow_task, **kwargs)
 
                     def __call__(self, activation, *args, **kwargs):
                         return func_or_cls(activation, *args, **kwargs)
@@ -65,7 +65,7 @@ def flow_signal(task_loader=None, **lock_args):
 
             with lock(flow_task, task.process_id):
                 task = flow_task.flow_cls.task_cls._default_manager.get(pk=task.pk)
-                if isinstance(receiver, TaskActivation):
+                if isinstance(receiver, func.FuncActivation):
                     receiver.initialize(flow_task, task)
                     receiver(**signal_kwargs)
                 else:
@@ -88,7 +88,7 @@ class Signal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
 
     """
     task_type = 'FUNC'
-    activation_cls = Activation  # TODO
+    activation_cls = func.FuncActivation
 
     def __init__(self, signal, receiver, sender=None, **kwargs):
         self.signal = signal
