@@ -62,7 +62,7 @@ class TestViewFlow(WebTest):
 
         process = ViewFlow.process_cls.objects.get()
         task = process.get_task(ViewFlow.task)
-        task_url = task.get_absolute_url(user=self.user)
+        task_url = ViewFlow.task.get_task_url(task, url_type='assign', user=self.user)
 
         # assign
         self.assertIn('assign', task_url)
@@ -70,7 +70,7 @@ class TestViewFlow(WebTest):
         assign_form.submit('assign')
 
         task = process.get_task(ViewFlow.task)
-        task_url = task.get_absolute_url(user=self.user)
+        task_url = ViewFlow.task.get_task_url(task, url_type='execute', user=self.user)
 
         # execute
         self.assertNotIn('details', task_url)
