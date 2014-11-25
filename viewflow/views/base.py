@@ -18,12 +18,14 @@ def get_next_task_url(request, process):
             .filter(process=process, owner=request.user, status=activation.STATUS.ASSIGNED)
 
         if user_tasks.exists():
-            return user_tasks.first().get_absolute_url(user=request.user)
+            task = user_tasks.first()
+            return task.flow_task.get_task_url(task, url_type='guess', user=request.user)
         else:
             user_tasks = task_cls._default_manager.user_queue(request.user)\
                 .filter(process=process, status=activation.STATUS.NEW)
             if user_tasks.exists():
-                return user_tasks.first().get_absolute_url(user=request.user)
+                task = user_tasks.first()
+                return task.flow_task.get_task_url(task, url_type='guess', user=request.user)
 
     elif 'back' in request.GET:
         # Back to task list

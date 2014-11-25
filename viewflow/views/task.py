@@ -64,7 +64,7 @@ class TaskViewMixin(object):
 
         if not activation.prepare.can_proceed():
             messages.info(request, 'Task cannot be executed')
-            return redirect(activation.task.get_absolute_url(user=request.user, url_type='details'))
+            return redirect(activation.flow_task.get_task_url(activation.task, url_type='details', user=request.user))
 
         if not self.activation.has_perm(request.user):
             raise PermissionDenied
@@ -125,7 +125,7 @@ class TaskActivationViewMixin(object):
     def dispatch(self, request, *args, **kwargs):
         if not self.prepare.can_proceed():
             messages.info(request, 'Task cannot be executed')
-            return redirect(self.task.get_absolute_url(user=request.user, url_type='details'))
+            return redirect(self.flow_task.get_task_url(self.task, url_type='details', user=request.user))
 
         if not self.has_perm(request.user):
             raise PermissionDenied
@@ -169,7 +169,7 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
         return context
 
     def get_success_url(self):
-        url = self.task.get_absolute_url(user=self.request.user)
+        url = self.flow_task.get_task_url(self.task, url_type='guess', user=self.request.user)
         if 'back' in self.request.GET:
             url = "{}?back={}".format(url, urlquote(self.request.GET['back']))
         return url
@@ -185,7 +185,7 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
     def dispatch(self, request, *args, **kwargs):
         if not self.assign.can_proceed():
             messages.info(request, 'Task cannot be assigned')
-            return redirect(self.task.get_absolute_url(user=request.user))
+            return redirect(self.flow_task.get_task_url(self.task, url_type='details', user=request.user))
 
         if not self.flow_task.can_assign(request.user, self.task):
             raise PermissionDenied

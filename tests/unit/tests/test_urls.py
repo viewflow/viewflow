@@ -33,18 +33,13 @@ class TestURLReverse(TestCase):
         process = Process.objects.create(flow_cls=SingleTaskFlow)
 
         task = Task.objects.create(process=process, flow_task=SingleTaskFlow.start)
-        SingleTaskFlow.instance.get_user_task_url(task=task, user=None)
+        self.assertIsNotNone(task.flow_task.get_task_url(task, url_type='details'))
 
         task = Task.objects.create(process=process, flow_task=SingleTaskFlow.task)
-        SingleTaskFlow.instance.get_user_task_url(task=task, user=None)
+        self.assertIsNotNone(task.flow_task.get_task_url(task, url_type='details'))
 
         task = Task.objects.create(process=process, flow_task=SingleTaskFlow.end)
-        SingleTaskFlow.instance.get_user_task_url(task=task, user=None)
-
-    def test_get_task_absolute_url_succeed(self):
-        process = Process.objects.create(flow_cls=SingleTaskFlow)
-        task = Task.objects.create(process=process, flow_task=SingleTaskFlow.task)
-        task.get_absolute_url()
+        self.assertIsNotNone(task.flow_task.get_task_url(task, url_type='details'))
 
 
 class TestFlowUrlTag(TestCase):

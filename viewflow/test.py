@@ -16,12 +16,12 @@ with FlowTest(RestrictedUserFlow) as flow_test:
 import inspect
 from singledispatch import singledispatch
 
+from django.contrib import auth
 from django.utils.functional import cached_property
 from django_webtest import WebTestMixin
 
 from viewflow import flow
 from viewflow.activation import STATUS
-from viewflow.models import Task
 from viewflow.signals import task_finished
 
 
@@ -40,6 +40,7 @@ def _(flow_node, test_task, **post_kwargs):
     """
     url_args = test_task.url_args.copy()
     url_args.setdefault('task', None)
+    url_args.setdefault('user', auth.authenticate(django_webtest_user=test_task.user))
 
     task_url = flow_node.get_task_url(url_type='execute', **url_args)
 
@@ -62,12 +63,14 @@ def _(flow_node, test_task, **post_kwargs):
 
     url_args = test_task.url_args.copy()
     url_args.setdefault('task', task)
+    url_args.setdefault('user', auth.authenticate(django_webtest_user=test_task.user))
 
     # Assign
     if not task.owner:
         task_url = flow_node.get_task_url(url_type='assign', **url_args)
         form = test_task.app.get(task_url, user=test_task.user).form
         form = form.submit('assign').follow().form
+        url_args['task'] = flow_node.flow_cls.task_cls._default_manager.get(pk=url_args['task'].pk)
 
     # Execute
     task_url = flow_node.get_task_url(url_type='execute', **url_args)

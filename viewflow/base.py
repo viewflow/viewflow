@@ -189,30 +189,5 @@ class Flow(object, metaclass=FlowMetaClass):
 
         return url('^', include(node_urls))
 
-    def get_user_task_url(self, task, user=None, url_type=None, **kwargs):
-        """
-        TODO Move to activation class
-        """
-        flow_task = task.flow_task
-
-        if user:
-            if url_type is None:
-                activation = task.activate()
-
-                if hasattr(activation, 'prepare') \
-                   and activation.prepare.can_proceed() \
-                   and hasattr(flow_task, 'can_execute') \
-                   and flow_task.can_execute(user, task):
-                    return flow_task.get_task_url(task, 'execute', **kwargs)
-                elif (hasattr(activation, 'assign')
-                      and activation.assign.can_proceed()
-                      and hasattr(flow_task, 'can_assign')
-                      and flow_task.can_assign(user, task)):
-                    return flow_task.get_task_url(task, 'assign', **kwargs)
-            else:
-                return flow_task.get_task_url(task, url_type, **kwargs)
-
-        return flow_task.get_task_url(task, 'details', **kwargs)
-
     def __str__(self):
         return self.process_title

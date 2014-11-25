@@ -219,15 +219,22 @@ class View(base.PermissionMixin, base.DetailsViewMixin, BaseView):
         return urls
 
     def get_task_url(self, task, url_type, **kwargs):
-        url_name = None
-        if url_type == 'assign':
-            url_name = '{}:{}__assign'.format(self.flow_cls.instance.namespace, self.name)
-        elif url_type == 'execute':
-            url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
+        user = kwargs.get('user', None)
 
-        if url_name:
-            return reverse(url_name, args=[task.process_id, task.pk])
-        else:
+        # assign
+        if url_type in ['assign', 'guess']:
+            if task.status == STATUS.NEW and self.can_assign(user, task):
+                url_name = '{}:{}__assign'.format(self.flow_cls.instance.namespace, self.name)
+                return reverse(url_name, kwargs={'process_pk': task.process_id, 'task_pk': task.pk})
+
+        # execute
+        if url_type in ['execute', 'guess']:
+            if task.status == STATUS.ASSIGNED and self.can_execute(user, task):
+                url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
+                return reverse(url_name, kwargs={'process_pk': task.process_id, 'task_pk': task.pk})
+
+        # details
+        if url_type in ['details', 'guess']:
             return super(View, self).get_task_url(task, url_type, **kwargs)
 
     def calc_owner(self, task):

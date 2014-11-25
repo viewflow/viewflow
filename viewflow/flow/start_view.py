@@ -7,7 +7,7 @@ from django.db import transaction
 from django.core.urlresolvers import reverse
 from django.conf.urls import url
 
-from ..activation import Activation, StartViewActivation
+from ..activation import Activation, StartViewActivation, STATUS
 from ..exceptions import FlowRuntimeError
 
 from . import base
@@ -187,15 +187,18 @@ class Start(base.PermissionMixin, BaseStart):
             self._owner = owner_kwargs
         return self
 
-    def get_task_url(self, task, url_type=None, **kwargs):
-        if url_type == 'execute':
-            url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
-            return reverse(url_name)
-        else:
-            super(Start, self).get_task_url(task, url_type=None, **kwargs)
+    def get_task_url(self, task, url_type='guess', **kwargs):
+        if url_type in ['execute', 'guess']:
+            if 'user' in kwargs and self.can_execute(kwargs['user'], task):
+                url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
+                return reverse(url_name)
+
+        if url_type in ['details', 'guess']:
+            return super(Start, self).get_task_url(task, url_type=url_type, **kwargs)
 
     def can_execute(self, user, task=None):
-        # TODO check task status
+        if task and task.status != STATUS.NEW:
+            return False
 
         from django.contrib.auth import get_user_model
 

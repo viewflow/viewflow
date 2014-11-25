@@ -42,7 +42,7 @@ def flowurl(parser, token):
                 kwargs['process_pk'] = ref.pk
             return reverse(url_ref, kwargs=kwargs)
         elif isinstance(ref, AbstractTask):
-            return ref.get_absolute_url(user=user, url_type=url_name)
+            return ref.flow_task.get_task_url(ref, url_type=url_name if url_name else 'guess', user=user)
         else:
             try:
                 app_label, flow_cls_path = ref.split('/')
