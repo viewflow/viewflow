@@ -509,6 +509,16 @@ class EndActivation(Activation):
             signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
             signals.flow_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
+    @Activation.status.super()
+    def undo(self):
+        """
+        Undo the task
+        """
+        self.process.status = STATUS.NEW
+        self.process.finished = None
+        self.process.save()
+        super(EndActivation, self).undo.original()
+
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
         """
