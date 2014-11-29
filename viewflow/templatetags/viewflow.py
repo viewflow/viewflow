@@ -111,6 +111,7 @@ def include_process_data(context, process):
     Shortcut tag for list all data from linked process models
     """
     opts = process.flow_cls._meta
+
     template_names = (
         '{}/{}/process_data.html'.format(opts.app_label, opts.flow_label),
         'viewflow/flow/process_data.html')
@@ -119,6 +120,7 @@ def include_process_data(context, process):
     context.push()
     try:
         context['process_data'] = get_model_display_data(process)
+        context['process'] = process
         return template.render(context)
     finally:
         context.pop()

@@ -1,0 +1,48 @@
+{% with process.shipment as shipment %}
+<div class="row">
+    <div class="col-md-4 col-lg-3">
+        <div class="panel panel-default">
+            <div class="panel-heading"> Shipment {{ shipment.shipment_no }}</div>
+            <div class="panel-body">
+                <table class="table">
+                    <thead>
+                        <th>Item</th>
+                        <th>Count</th>
+                    </thead>
+                    <tbody>
+                        {% for item in shipment.shipmentitem_set.all %}
+                        <tr>
+                            <td> {{ item.name }} </td>
+                            <td> {{ item.quantity }} </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="2">No items in shipment</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 col-lg-2">
+        <div class="panel panel-default">
+            <div class="panel-heading">Address</div>
+            <div class="panel-body">
+                {{ shipment.zipcode }}, {{ shipment.country }}, {{ shipment.city }}, {{ shipment.state }}<br/>
+                {{ shipment.address }} <br/><br/>
+                <strong>Phone:</strong> {{ shipment.phone }}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2 col-xs-2">
+        <div class="panel panel-default">
+            <div class="panel-heading">Delivery</div>
+            <div class="panel-body">
+                <strong>Carrier:</strong> {{ shipment.carrier.name }}<br/>
+                <strong>Insurance:</strong> {{ shipment.insurance.company_name }} {{ shipment.insurance.cost}}<br/>
+            </div>
+        </div>
+    </div>
+</div>
+{% endwith %}
