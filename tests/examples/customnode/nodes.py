@@ -1,12 +1,13 @@
-from viewflow.activation import AbstractGateActivation
+from viewflow.activation import AbstractGateActivation, Activation
 from viewflow.flow import base
 from viewflow.token import Token
 
 
 class DynamicSplitActivation(AbstractGateActivation):
-    def execute(self):
+    def calculate_next(self):
         self._split_count = self.flow_task._task_count_callback(self.process)
 
+    @Activation.status.super()
     def activate_next(self):
         if self._split_count:
             token_source = Token.split_token_source(self.task.token, self.task.pk)
