@@ -18,13 +18,13 @@ class Migration(SchemaMigration):
 
         # Changing field 'Process.status'
         db.alter_column('viewflow_process', 'status', self.gf('django.db.models.fields.CharField')(max_length=50))
+        if not db.dry_run:
+            orm.Process.objects.filter(status='STR').update(status='STARTED')
+            orm.Process.objects.filter(status='FNS').update(status='DONE')
 
-        orm.Process.objects.filter(status='STR').update(status='STARTED')
-        orm.Process.objects.filter(status='FNS').update(status='DONE')
-
-        orm.Task.objects.filter(status='ASN').update(status='ASSIGNED')
-        orm.Task.objects.filter(status='STR').update(status='STARTED')
-        orm.Task.objects.filter(status='FNS').update(status='DONE')
+            orm.Task.objects.filter(status='ASN').update(status='ASSIGNED')
+            orm.Task.objects.filter(status='STR').update(status='STARTED')
+            orm.Task.objects.filter(status='FNS').update(status='DONE')
 
     def backwards(self, orm):
         # Deleting field 'Task.comments'
