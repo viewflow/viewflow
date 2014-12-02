@@ -46,7 +46,34 @@ class TaskAdmin(admin.ModelAdmin):
                     'started', 'finished']
     list_display_links = ['pk', 'created', 'process']
     list_filter = ['status']
-    readonly_fields = ['process', 'flow_task', 'started', 'finished', 'previous', 'token']
+    readonly_fields = ['process', 'status', 'flow_task', 'started', 'finished', 'previous', 'token']
+
+    @property
+    def change_form_template(self):
+        opts = self.model._meta
+
+        return [
+            "admin/%s/%s/change_form.html" % (opts.app_label, opts.model_name),
+            "admin/%s/change_form.html" % opts.app_label,
+            'admin/viewflow/task/change_form.html'
+        ]
+
+    def save_model(self, request, obj, form, change):
+        result = super(TaskAdmin, self).save_model(request, obj, form, change)
+
+        status_action = next((action[len('_change_status_'):]
+                              for action in request.POST.keys()
+                              if action.startswith('_change_status_')), None)
+        if status_action:
+            activation = obj.activate()
+            activation_cls = activation.__class__
+            transition = next((transition for transition in activation_cls.status.get_available_transtions(activation)
+                               if transition.name == status_action), None)
+            if transition:
+                transition(activation)
+                request.POST['_continue'] = True
+
+        return result
 
 
 admin.site.register(Process, ProcessAdmin)

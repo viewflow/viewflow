@@ -1,6 +1,7 @@
 from inspect import getargspec
 
 from django import template
+from django.contrib.admin.templatetags.admin_modify import submit_row
 from django.core.urlresolvers import reverse
 from django.template.base import TemplateSyntaxError, TagHelperNode, parse_bits
 from django.template.loader import select_template
@@ -124,3 +125,17 @@ def include_process_data(context, process):
         return template.render(context)
     finally:
         context.pop()
+
+
+@register.inclusion_tag('admin/viewflow/task/submit_line.html', takes_context=True)
+def viewflow_task_submit_row(context):
+    task = context.get('original', None)
+    activation = task.activate()
+    activation_cls = activation.__class__
+
+    transitions = [(transition.name.replace('_', ' ').capitalize(), transition.name)
+                   for transition in activation_cls.status.get_available_transtions(activation)]
+
+    row_context = submit_row(context)
+    row_context['transitions'] = transitions
+    return row_context

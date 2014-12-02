@@ -83,7 +83,9 @@ class ManagedViewActivation(ViewActivation):
     @Activation.status.super()
     def prepare(self, data=None, user=None):
         super(ManagedViewActivation, self).prepare.original()
-        self.task.owner = user
+
+        if user:
+            self.task.owner = user
 
         management_form_cls = self.get_management_form_cls()
         self.management_form = management_form_cls(data=data, instance=self.task)
