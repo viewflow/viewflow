@@ -2,13 +2,24 @@
 Changelog
 =========
 
+0.8.0 - 2014-12-02
+------------------
+
+* Development of viewform and karenina projects no longer opensourced
+* Refactor fsm from task model to activation classes
+* Generic admin actions for changing tasks state
+* Support for view tasks unassign/reassign
+* Allow tasks undo and cancel
+* Store error information for tasks
+
+
 0.7.0 - 2014-11-06
 ------------------
 
 * Repository moved to https://github.com/viewflow/
-* Form handling moved to separate library - https://github.com/viewflow/viewform
+* Form handling moved to separate library
 * viewflow.site removed. Pro user still could install it with `pip install django-viewflow-site`
-* Fancy ready to use templates available within `Karenina cookiecuter project template <https://github.com/viewflow/karenina>`_
+* Fancy ready to use templates available within Karenina project
 * Tasks and Process list views became part of the viewflow library
 * Flow urls simplified. Application instance namespaces not used anymore
 * Fixed migrations for stable django 1.7

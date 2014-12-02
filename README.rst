@@ -170,24 +170,21 @@ and modifications of Viewflow. You can find the commercial license terms in COMM
 Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for more detail.  
 
 
-Changelog
-=========
+Latest changelog
+================
 
-0.7.0 - 2014-11-06
-----------------------------
+0.8.0 - 2014-12-02
+------------------
 
-* Repository moved to https://github.com/viewflow/
-* Form handling moved to separate library - https://github.com/viewflow/viewform
-* viewflow.site removed. Pro user still could install it with `pip install django-viewflow-site`
-* Fancy ready to use templates available within `Karenina cookiecuter project template <https://github.com/viewflow/karenina>`_
-* Tasks and Process list views became part of the viewflow library
-* Flow urls simplified. Application instance namespaces not used anymore
-* Fixed migrations for stable django 1.7
-* HTTPS pypi server available for pro users.
-
+* Development of viewform and karenina projects no longer opensourced
+* Refactor fsm from task model to activation classes
+* Generic admin actions for changing tasks state
+* Support for view tasks unassign/reassign
+* Allow tasks undo and cancel
+* Store error information for tasks
 
 Roadmap
 =======
 
-* in 0.8.0 at December we going to add support for task undo and reassign
-* 1.0.0 LTS estimated at February 2015 would have lifetime support same as django 1.6
+* in 0.9.0 at January we going to extend documentation and improve task undo behaviour
+* 1.0.0 LTS estimated at March 2015 would have lifetime support same as django 1.6
