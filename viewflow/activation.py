@@ -184,6 +184,16 @@ class StartActivation(Activation):
         """
         self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
+    @Activation.status.super()
+    def undo(self):
+        """
+        Undo the task
+        """
+        self.process.status = STATUS.CANCELED
+        self.process.finished = now()
+        self.process.save()
+        super(StartActivation, self).undo.original()
+
 
 class StartViewActivation(Activation):
     """

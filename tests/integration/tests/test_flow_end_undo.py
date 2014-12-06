@@ -13,12 +13,6 @@ def create_test_flow(activation):
     return activation
 
 
-@flow.flow_func(task_loader=lambda flow_task, process: process.get_task(EndUndoFlow.func_task))
-def function_task(activation, process):
-    activation.prepare()
-    activation.done()
-
-
 def handler(activation):
     pass
 
@@ -30,8 +24,8 @@ class EndUndoFlow(Flow):
 
 
 @integration_test
-class TestFunctionFlow(TestCase):
-    def test_function_flow(self):
+class TestEndUndoFlow(TestCase):
+    def test_end_undo_reactivates_process(self):
         act = EndUndoFlow.start.run()
         process = EndUndoFlow.process_cls.objects.get(pk=act.process.pk)
         self.assertEqual(STATUS.DONE, process.status)
