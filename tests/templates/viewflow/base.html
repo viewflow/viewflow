@@ -80,6 +80,15 @@
       </div>
       <div style="position:absolute;margin-left:300px;width:100%;padding-top:0.5rem;">
           <div class="container-fluid">
+              {% if messages %}
+              <div class="row">
+                  <div class="col-lg-8">
+                      {% for message in messages %}
+                      <div class="alert alert-{{ message.tags }} alert-dismissible">{{ message }}</div>
+                      {% endfor %}
+                  </div>
+              </div>
+              {% endif %}
               {% block content %}
               <h1>Hello, world!</h1>
               {% endblock %}

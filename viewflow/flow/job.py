@@ -38,7 +38,7 @@ def flow_job(**lock_args):
 
             # start
             lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
-            with lock(flow_task, process_pk):
+            with lock(flow_task.flow_cls, process_pk):
                 try:
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
                 except flow_task.flow_cls.task_cls.DoesNotExist:
@@ -58,7 +58,7 @@ def flow_job(**lock_args):
                     result = self.func(activation, **kwargs)
             except Exception as exc:
                 # mark as error
-                with lock(flow_task, process_pk):
+                with lock(flow_task.flow_cls, process_pk):
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
                     activation = self.activation if self.activation else flow_task.activation_cls()
                     activation.initialize(flow_task, task)
@@ -66,7 +66,7 @@ def flow_job(**lock_args):
                 raise
             else:
                 # mark as done
-                with lock(flow_task, process_pk):
+                with lock(flow_task.flow_cls, process_pk):
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
                     activation = self.activation if self.activation else flow_task.activation_cls()
                     activation.initialize(flow_task, task)

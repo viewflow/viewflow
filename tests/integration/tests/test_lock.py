@@ -27,7 +27,7 @@ class TestLocks(unittest.TestCase):
 
     def run_with_lock(self, lock):
         try:
-            with lock(NoTaskFlow.end, self.process.pk):
+            with lock(NoTaskFlow, self.process.pk):
                 while not self.finished:
                     time.sleep(1)
         except FlowLockFailed as e:

@@ -1,6 +1,7 @@
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url
+
 from django.views import generic
 
 from .. import flow, activation

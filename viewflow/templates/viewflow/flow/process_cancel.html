@@ -16,7 +16,7 @@
 
 {% include_process_data process %}
 
-<h2>Tasks</h2>
+<h2>Active Tasks</h2>
 <table class="table">
     <thead>
         <th>#</th>
@@ -27,7 +27,7 @@
         <th>Status</th>
     </thead>
     <tbody>
-        {% for task in task_list %}
+        {% for task in active_tasks %}
         <tr>
             <td>
                 {% flowurl task user=request.user as task_url %}
@@ -43,9 +43,21 @@
             <td>{{ task.created }}</td>
             <td>{{ task.finished|default:"" }}</td>
             <td><a href="{% flowurl task.process 'details' %}">{{ task.process }}</td>
-            <td>{{ task.status }}</td>
+            <td>
+                {{ task.status }}
+                {% if task in uncancelable_tasks %}
+                <div class="alert alert-danger" role="alert">UNCANCELABLE</div>
+                {% endif %}
+            </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+
+
+<form role="form" method="POST">
+    {% csrf_token %}
+    <button type="submit" name="_cancel_process" class="btn btn-primary btn-lg">Cancel</button>
+</form>
 {% endblock %}
+

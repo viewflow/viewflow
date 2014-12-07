@@ -30,7 +30,7 @@ def flow_view(**lock_args):
 
         def __call__(self, request, flow_cls, flow_task, process_pk, task_pk, **kwargs):
             lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
-            with lock(flow_task, process_pk):
+            with lock(flow_task.flow_cls, process_pk):
                 task = get_object_or_404(flow_task.flow_cls.task_cls._default_manager, pk=task_pk)
 
                 if self.activation:

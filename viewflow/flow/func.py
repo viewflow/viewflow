@@ -108,7 +108,7 @@ def flow_func(task_loader=None, **lock_args):
             task = receiver.get_task(flow_task, *func_args, **func_kwargs)
             lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
 
-            with lock(flow_task, task.process_id):
+            with lock(flow_task.flow_cls, task.process_id):
                 task = flow_task.flow_cls.task_cls._default_manager.get(pk=task.pk)
                 if isinstance(receiver, FuncActivation):
                     receiver.initialize(flow_task, task)

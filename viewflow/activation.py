@@ -129,6 +129,7 @@ class Activation(object):
         """
         Cancel existing task
         """
+        self.task.finished = now()
         self.task.save()
 
     @classmethod
