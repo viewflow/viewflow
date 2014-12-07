@@ -38,7 +38,7 @@ class TestLocks(unittest.TestCase):
     @skipUnlessDBFeature('has_select_for_update')
     def test_select_for_update_locks(self):
         lock = select_for_update_lock(NoTaskFlow, attempts=1)
-        with lock(NoTaskFlow.end, self.process.pk):
+        with lock(NoTaskFlow, self.process.pk):
             pass
 
         thread1 = threading.Thread(target=self.run_with_lock, args=[select_for_update_lock(NoTaskFlow, attempts=1)])
