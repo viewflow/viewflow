@@ -36,6 +36,7 @@ class TransitionDescriptor(object):
     def __init__(self, state, func):
         self.state = state
         self.func = func
+        self.__doc__ = func.__doc__
         self.transitions = {}  # source -> transition
 
     @property
