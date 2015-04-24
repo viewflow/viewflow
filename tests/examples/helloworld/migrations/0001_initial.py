@@ -14,7 +14,7 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='HelloWorldProcess',
             fields=[
-                ('process_ptr', models.OneToOneField(auto_created=True, parent_link=True, serialize=False, to='viewflow.Process', primary_key=True)),
+                ('process_ptr', models.OneToOneField(to='viewflow.Process', primary_key=True, parent_link=True, serialize=False, auto_created=True)),
                 ('text', models.CharField(max_length=50)),
                 ('approved', models.BooleanField(default=False)),
             ],

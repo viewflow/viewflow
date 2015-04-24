@@ -1,3 +1,4 @@
+import django
 from django.db import models
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
@@ -19,9 +20,16 @@ def _get_related_path(model, base_model):
                 break
 
     parent = model._meta.get_ancestor_link(base_model)
+
     while parent is not None:
         ancestry.insert(0, parent.related.get_accessor_name())
-        parent = parent.related.parent_model._meta.get_ancestor_link(base_model)
+
+        if django.VERSION < (1, 8):
+            parent_model = parent.related.parent_model
+        else:
+            parent_model = parent.related.model
+
+        parent = parent_model._meta.get_ancestor_link(base_model)
 
     return LOOKUP_SEP.join(ancestry)
 

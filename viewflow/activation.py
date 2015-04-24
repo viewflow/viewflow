@@ -192,7 +192,7 @@ class StartActivation(Activation):
             self.process, self.task = task.process, task
         else:
             self.process = self.flow_cls.process_cls(flow_cls=self.flow_cls)
-            self.task = self.flow_cls.task_cls(process=self.process, flow_task=self.flow_task)
+            self.task = self.flow_cls.task_cls(flow_task=self.flow_task)
 
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.PREPARED)
     def prepare(self):
@@ -264,7 +264,7 @@ class StartViewActivation(Activation):
             self.process, self.task = task.process, task
         else:
             self.process = self.flow_cls.process_cls(flow_cls=self.flow_cls)
-            self.task = self.flow_cls.task_cls(process=self.process, flow_task=self.flow_task)
+            self.task = self.flow_cls.task_cls(flow_task=self.flow_task)
 
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.PREPARED)
     def prepare(self):

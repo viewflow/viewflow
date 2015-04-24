@@ -7,30 +7,24 @@ from django.db import models, migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('viewflow', '0002_fsmchange'),
+        ('viewflow', '0001_initial'),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TestCeleryProcess',
+            name='BrokenGateProcess',
             fields=[
-                ('process_ptr', models.OneToOneField(parent_link=True, serialize=False, primary_key=True,
-                                                     to='viewflow.Process', auto_created=True)),
+                ('process_ptr', models.OneToOneField(primary_key=True, serialize=False, parent_link=True, auto_created=True, to='viewflow.Process')),
                 ('throw_error', models.BooleanField(default=False)),
             ],
-            options={
-            },
             bases=('viewflow.process',),
         ),
         migrations.CreateModel(
-            name='BrokenGateProcess',
+            name='TestCeleryProcess',
             fields=[
-                ('process_ptr', models.OneToOneField(parent_link=True, serialize=False, primary_key=True,
-                                                     to='viewflow.Process', auto_created=True)),
+                ('process_ptr', models.OneToOneField(primary_key=True, serialize=False, parent_link=True, auto_created=True, to='viewflow.Process')),
                 ('throw_error', models.BooleanField(default=False)),
             ],
-            options={
-            },
             bases=('viewflow.process',),
         ),
     ]
