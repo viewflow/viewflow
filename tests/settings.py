@@ -41,6 +41,11 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
+if django.VERSION >= (1, 7):
+    MIDDLEWARE_CLASSES += (
+        'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    )
+
 ROOT_URLCONF = 'tests.urls'
 
 
@@ -54,8 +59,17 @@ if not DATABASES['default']:
     DATABASES['default'] = {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'db{}{}.sqlite3'.format(django.VERSION[0], django.VERSION[1])),
-        'TEST_NAME': os.path.join(BASE_DIR, 'db{}{}_test.sqlite3'.format(django.VERSION[0], django.VERSION[1]))
     }
+
+if django.VERSION >= (1, 7):
+    DATABASES['default']['TEST'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': os.path.join(BASE_DIR, 'db{}{}_test.sqlite3'.format(django.VERSION[0], django.VERSION[1]))
+    }
+else:
+    DATABASES['default']['TEST_NAME'] = \
+        os.path.join(BASE_DIR, 'db{}{}_test.sqlite3'.format(django.VERSION[0], django.VERSION[1]))
+
 
 
 # Internationalization
@@ -118,3 +132,8 @@ try:
     from tests.local_settings import *  # NOQA
 except ImportError:
     pass
+
+
+# import warnings
+# warnings.filterwarnings("ignore",category=DeprecationWarning)
+# warnings.filterwarnings('error')

@@ -1,6 +1,5 @@
 from django.db import models
-from django.utils.module_loading import import_by_path
-from .compat import get_app_package, get_containing_app_data
+from .compat import get_app_package, get_containing_app_data, import_string
 from .token import Token
 
 
@@ -10,7 +9,7 @@ def import_task_by_ref(task_strref):
     """
     app_label, flow_path = task_strref.split('/')
     flow_path, task_name = flow_path.rsplit('.', 1)
-    flow_cls = import_by_path('{}.{}'.format(get_app_package(app_label), flow_path))
+    flow_cls = import_string('{}.{}'.format(get_app_package(app_label), flow_path))
     return getattr(flow_cls, task_name)
 
 
@@ -20,6 +19,15 @@ def get_task_ref(flow_task):
     subpath = module[len(app_package)+1:]
 
     return "{}/{}.{}.{}".format(app_label, subpath, flow_task.flow_cls.__name__, flow_task.name)
+
+
+class ClassValueWrapper(object):
+    """
+    Wrapper to get around of passing cls objects callable to django
+    queryset
+    """
+    def __init__(self, cls):
+        self.cls = cls
 
 
 class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
@@ -34,14 +42,16 @@ class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
     def to_python(self, value):
         if isinstance(value, str) and value:
             app_label, flow_path = value.split('/')
-            return import_by_path('{}.{}'.format(get_app_package(app_label), flow_path))
+            return import_string('{}.{}'.format(get_app_package(app_label), flow_path))
         return value
 
     def get_prep_value(self, value):
         if value is None:
             return None
 
-        if not isinstance(value, type):
+        if isinstance(value, ClassValueWrapper):
+            value = value.cls
+        elif not isinstance(value, type):
             # HACK: Django calls callable due query parameter
             # preparation. So here we can get Flow instance,
             # even if we pass Flow class to query.

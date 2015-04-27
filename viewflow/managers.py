@@ -4,7 +4,9 @@ from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.db.models.constants import LOOKUP_SEP
+
 from .compat import manager_from_queryset
+from .fields import ClassValueWrapper
 
 
 def _get_related_path(model, base_model):
@@ -49,6 +51,13 @@ def _get_sub_obj(obj, query):
 
 
 class ProcessQuerySet(QuerySet):
+    def filter(self, *args, **kwargs):
+        flow_cls = kwargs.pop('flow_cls', None)
+        if flow_cls and not isinstance(flow_cls, ClassValueWrapper):
+            kwargs['flow_cls'] = ClassValueWrapper(flow_cls)
+
+        return super(ProcessQuerySet, self).filter(*args, **kwargs)
+
     def coerce_for(self, flow_classes):
         self._coerced = True
 

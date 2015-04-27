@@ -12,6 +12,7 @@ try:
     from django.apps import apps
     from django.utils.deconstruct import deconstructible  # NOQA
     from django.utils.module_loading import autodiscover_modules  # NOQA
+    from django.utils.module_loading import import_string  # NOQA
 
     def get_app_package(app_label):
         """
@@ -39,6 +40,7 @@ except ImportError:
     import inspect
     from django.db.models import loading
     from django.utils import six
+    from django.utils.module_loading import import_by_path as import_string  # NOQA
 
     def get_app_package(app_label):
         app_config = loading.get_app(app_label)

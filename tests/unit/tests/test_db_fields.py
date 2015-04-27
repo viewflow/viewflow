@@ -1,5 +1,6 @@
 from django.test import TestCase
 from viewflow.token import Token
+from viewflow.fields import ClassValueWrapper
 from ..models import FlowReferencedModel, TokenModel
 from ..flows import SingleTaskFlow, AllTaskFlow
 
@@ -29,7 +30,7 @@ class TestReferenceFields(TestCase):
         first = FlowReferencedModel.objects.create(
             flow_cls=SingleTaskFlow, task=SingleTaskFlow.end)
 
-        second = FlowReferencedModel.objects.get(flow_cls=SingleTaskFlow)
+        second = FlowReferencedModel.objects.get(flow_cls=ClassValueWrapper(SingleTaskFlow))
 
         self.assertEqual(first.pk, second.pk)
 
