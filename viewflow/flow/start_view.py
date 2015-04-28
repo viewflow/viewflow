@@ -63,7 +63,7 @@ class ManagedStartViewActivation(StartViewActivation):
     management_form_cls = None
 
     def __init__(self, **kwargs):
-        super(StartViewActivation, self).__init__(**kwargs)
+        super(ManagedStartViewActivation, self).__init__(**kwargs)
         self.management_form = None
         self.management_form_cls = kwargs.pop('management_form_cls', None)
 
