@@ -41,7 +41,7 @@ based views.
 Installation
 ============
 
-django-viewflow requires Python 3.3 or greater, django 1.6::
+django-viewflow requires Python 3.3 or greater, django 1.6-1.8::
 
     pip install django-viewflow
 
@@ -172,6 +172,14 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 
 Latest changelog
 ================
+
+GIT VERSION
+-----------
+
+* Django 1.8 support
+* Allow to specify custom undo handlers methods
+* Allow to use flow class methods as flow task functions
+
 
 0.8.0 - 2014-12-02
 ------------------
