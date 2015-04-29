@@ -148,8 +148,16 @@ class Activation(object):
     def undo(self):
         """
         Undo the task
+
+        If flow class have `[task_name]_undo(self, activation)` method it would be called
         """
         self.task.save()
+
+        # call custom undo handler
+        handler_name = '{}_undo'.format(self.flow_task.name)
+        handler = getattr(self.flow_cls.instance, handler_name, None)
+        if handler:
+            handler(self)
 
     @status.transition(source=STATUS.NEW, target=STATUS.CANCELED)
     def cancel(self):

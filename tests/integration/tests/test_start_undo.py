@@ -24,6 +24,9 @@ class StartUndoFlow(Flow):
     func_task = flow.Function(function_task).Next(this.end)
     end = flow.End()
 
+    def start_undo(self, activation):
+        self.handler_called = True
+
 
 @integration_test
 class TestStartUndoFlow(TestCase):
@@ -37,6 +40,7 @@ class TestStartUndoFlow(TestCase):
         start_task = act.process.get_task(StartUndoFlow.start, status=STATUS.DONE)
         start_act = start_task.activate()
         start_act.undo()
+        self.assertTrue(getattr(StartUndoFlow.instance, 'handler_called', False))
 
         process = StartUndoFlow.process_cls.objects.get(pk=start_act.process.pk)
         self.assertEqual(STATUS.CANCELED, process.status)
