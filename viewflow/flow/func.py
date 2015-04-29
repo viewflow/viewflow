@@ -6,6 +6,7 @@ from django.db import transaction
 from django.utils.timezone import now
 
 from ..activation import Activation, StartActivation, STATUS, context
+from ..exceptions import FlowRuntimeError
 from . import base
 
 
@@ -24,9 +25,25 @@ class StartFunction(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     task_type = 'START'
     activation_cls = StartActivation
 
-    def __init__(self, func, **kwargs):
-        self.func = func
+    def __init__(self, func=None, **kwargs):
+        self._func = func
         super(StartFunction, self).__init__(**kwargs)
+
+    @property
+    def func(self):
+        if self._func is not None:
+            return self._func
+        else:
+            func_name = '{}_func'.format(self.name)
+            func_impl = getattr(self.flow_cls.instance, func_name, None)
+            if func_impl:
+                return func_impl
+            else:
+                def default_start_func(activation):
+                    activation.prepare()
+                    activation.done()
+                    return activation
+                return default_start_func
 
     def run(self, *args, **kwargs):
         if isinstance(self.func, type) and issubclass(self.func, StartActivation):
@@ -127,9 +144,25 @@ class Function(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     task_type = 'FUNC'
     activation_cls = FuncActivation
 
-    def __init__(self, func, **kwargs):
-        self.func = func
+    def __init__(self, func=None, **kwargs):
+        self._func = func
         super(Function, self).__init__(**kwargs)
+
+    @property
+    def func(self):
+        if self._func is not None:
+            return self._func
+        else:
+            func_name = '{}_func'.format(self.name)
+            func_impl = getattr(self.flow_cls.instance, func_name, None)
+            if func_impl:
+                return func_impl
+            else:
+                def default_start_func(activation):
+                    activation.prepare()
+                    activation.done()
+                    return activation
+                return default_start_func
 
     def run(self, *args, **kwargs):
         self.func(self, *args, **kwargs)
@@ -190,6 +223,17 @@ class Handler(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
     task_type = 'FUNC'
     activation_cls = HandlerActivation
 
-    def __init__(self, handler, **kwargs):
-        self.handler = handler
+    def __init__(self, handler=None, **kwargs):
+        self._handler = handler
         super(Handler, self).__init__(**kwargs)
+
+    @property
+    def handler(self):
+        if self._handler is not None:
+            return self._handler
+        else:
+            handler_name = '{}_handler'.format(self.name)
+            handler_impl = getattr(self.flow_cls.instance, handler_name, None)
+            if handler_impl:
+                return handler_impl
+            raise FlowRuntimeError('Handler for {} not defined'.format(self.name))

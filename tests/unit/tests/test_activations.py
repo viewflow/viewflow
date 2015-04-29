@@ -43,6 +43,7 @@ class NextTaskStub(object):
 class FlowStub(object):
     process_cls = ProcessStub
     task_cls = TaskStub
+    instance = None
 
 
 class TestGateAcitation(activation.AbstractGateActivation):
