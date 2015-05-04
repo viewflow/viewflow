@@ -63,7 +63,8 @@ class ProcessQuerySet(QuerySet):
 
         flow_classes = list(flow_classes)
         related = [_get_related_path(flow_cls.process_cls, self.model)
-                   for flow_cls in flow_classes]
+                   for flow_cls in flow_classes
+                   if self.model != flow_cls.process_cls]
 
         return self.filter(flow_cls__in=flow_classes).select_related(*related)
 
@@ -99,7 +100,8 @@ class TaskQuerySet(QuerySet):
         flow_classes = list(flow_classes)
 
         related = [_get_related_path(flow_cls.task_cls, self.model)
-                   for flow_cls in flow_classes] + ['process']
+                   for flow_cls in flow_classes
+                   if self.model != flow_cls.task_cls] + ['process']
 
         return self.filter(process__flow_cls__in=flow_classes).select_related(*related)
 

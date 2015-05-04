@@ -18,7 +18,7 @@ def do_signal_task(activation, **kwargs):
 
 
 def do_handler_task(activation):
-    activation.done()
+    pass
 
 
 @flow_func(lambda flow_task, process: process.get_task(flow_task))
