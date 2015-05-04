@@ -5,8 +5,19 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.db.models.constants import LOOKUP_SEP
 
+from .activation import STATUS
 from .compat import manager_from_queryset
 from .fields import ClassValueWrapper
+
+
+def _available_flows(flow_classes, user):
+    result = []
+    for flow_cls in flow_classes:
+        opts = flow_cls.process_cls._meta
+        view_perm = "{}.view_{}".format(opts.app_label, opts.model_name)
+        if user.has_perm(view_perm):
+            result.append(flow_cls)
+    return result
 
 
 def _get_related_path(model, base_model):
@@ -62,11 +73,16 @@ class ProcessQuerySet(QuerySet):
         self._coerced = True
 
         flow_classes = list(flow_classes)
-        related = [_get_related_path(flow_cls.process_cls, self.model)
-                   for flow_cls in flow_classes
-                   if self.model != flow_cls.process_cls]
+
+        related = filter(
+            None, map(
+                lambda flow_cls: _get_related_path(flow_cls.process_cls, self.model),
+                flow_classes))
 
         return self.filter(flow_cls__in=flow_classes).select_related(*related)
+
+    def filter_available(self, flow_classes, user):
+        return self.model.objects.coerce_for(_available_flows(flow_classes, user))
 
     def _clone(self, klass=None, setup=False, **kwargs):
         try:
@@ -99,11 +115,12 @@ class TaskQuerySet(QuerySet):
         self._coerced = True
         flow_classes = list(flow_classes)
 
-        related = [_get_related_path(flow_cls.task_cls, self.model)
-                   for flow_cls in flow_classes
-                   if self.model != flow_cls.task_cls] + ['process']
+        related = filter(
+            None, map(
+                lambda flow_cls: _get_related_path(flow_cls.task_cls, self.model),
+                flow_classes))
 
-        return self.filter(process__flow_cls__in=flow_classes).select_related(*related)
+        return self.filter(process__flow_cls__in=flow_classes).select_related('process', *related)
 
     def user_queue(self, user, flow_cls=None):
         """
@@ -122,6 +139,18 @@ class TaskQuerySet(QuerySet):
             queryset = queryset.filter(has_permission)
 
         return queryset
+
+    def filter_available(self, flow_classes, user):
+        return self.model.objects.coerce_for(_available_flows(flow_classes, user))
+
+    def inbox(self, flow_classes, user):
+        return self.filter_available(flow_classes, user) \
+                   .filter(owner=user, status=STATUS.ASSIGNED)
+
+    def queue(self, flow_classes, user):
+        return self.filter_available(flow_classes, user) \
+                   .user_queue(user) \
+                   .filter(status=STATUS.NEW)
 
     def _clone(self, klass=None, setup=False, **kwargs):
         try:

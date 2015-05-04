@@ -6,16 +6,6 @@ from django.utils.decorators import method_decorator
 from .. import activation, flow, models
 
 
-def _available_flows(flow_classes, user):
-    result = []
-    for flow_cls in flow_classes:
-        opts = flow_cls.process_cls._meta
-        view_perm = "{}.view_{}".format(opts.app_label, opts.model_name)
-        if user.has_perm(view_perm):
-            result.append(flow_cls)
-    return result
-
-
 class LoginRequiredMixin(object):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
@@ -48,7 +38,7 @@ class AllProcessListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         return models.Process.objects \
-            .coerce_for(_available_flows(self.flow_classes, self.request.user)) \
+            .filter_available(self.flow_classes, self.request.user) \
             .order_by('-created')
 
 
@@ -66,10 +56,7 @@ class AllTaskListView(LoginRequiredMixin, generic.ListView):
         return 'viewflow/site_tasks.html'
 
     def get_queryset(self):
-        return models.Task.objects \
-            .coerce_for(_available_flows(self.flow_classes, self.request.user)) \
-            .filter(owner=self.request.user, status=activation.STATUS.ASSIGNED) \
-            .order_by('-created')
+        return models.Task.objects.inbox(self.flow_classes, self.request.user).order_by('-created')
 
 
 class AllQueueListView(LoginRequiredMixin, generic.ListView):
@@ -86,13 +73,7 @@ class AllQueueListView(LoginRequiredMixin, generic.ListView):
         return 'viewflow/site_queue.html'
 
     def get_queryset(self):
-        queryset = models.Task.objects \
-            .coerce_for(_available_flows(self.flow_classes, self.request.user)) \
-            .user_queue(self.request.user) \
-            .filter(status=activation.STATUS.NEW) \
-            .order_by('-created')
-
-        return queryset
+        return models.Task.objects.queue(self.flow_classes, self.request.user).order_by('-created')
 
 
 class ProcessListView(FlowPermissionMixin, generic.ListView):
