@@ -196,3 +196,8 @@ Roadmap
 
 * in 0.9.0 at January we going to extend documentation and improve task undo behaviour
 * 1.0.0 LTS estimated at March 2015 would have lifetime support same as django 1.6
+
+
+.. image:: https://badges.gitter.im/Join%20Chat.svg
+   :alt: Join the chat at https://gitter.im/viewflow/viewflow
+   :target: https://gitter.im/viewflow/viewflow?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
