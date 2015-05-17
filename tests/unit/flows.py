@@ -94,3 +94,9 @@ class FunctionFlow(Flow):
         .Next(this.end)
 
     end = flow.End()
+
+
+class DefaultProcessFunctionFlow(Flow):
+    start = flow.StartFunction(tasks.start_process) \
+        .Next(this.end)
+    end = flow.End()
