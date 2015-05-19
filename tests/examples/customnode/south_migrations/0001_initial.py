@@ -11,7 +11,7 @@ class Migration(SchemaMigration):
         # Adding model 'DynamicSplitProcess'
         db.create_table('customnode_dynamicsplitprocess', (
             ('process_ptr', self.gf('django.db.models.fields.related.OneToOneField')(unique=True, primary_key=True, to=orm['viewflow.Process'])),
-            ('question', self.gf('django.db.models.fields.CharField')(max_lentgh=50)),
+            ('question', self.gf('django.db.models.fields.CharField')(max_length=50)),
             ('split_count', self.gf('django.db.models.fields.IntegerField')(default=0)),
         ))
         db.send_create_signal('customnode', ['DynamicSplitProcess'])

@@ -25,7 +25,8 @@ class DynamicSplitFlow(Flow):
     spit_on_decision = DynamicSplit(lambda p: p.split_count) \
         .Next(this.make_decision)
 
-    make_decision = flow.View(views.DecisionView) \
+    make_decision = flow.View(views.DecisionView,
+                              task_description="Decision required") \
         .Next(this.join_on_decision)
 
     join_on_decision = flow.Join() \

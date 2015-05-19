@@ -26,7 +26,8 @@ class ShipmentFlow(Flow):
         .Next(this.shipment_type) \
         .Next(this.package_goods)
 
-    shipment_type = flow.View(views.ShipmentView, fields=["carrier"]) \
+    shipment_type = flow.View(views.ShipmentView, fields=["carrier"],
+                              task_description="Carrier selection") \
         .Next(this.delivery_mode) \
         .Assign(lambda p: p.created_by)
 

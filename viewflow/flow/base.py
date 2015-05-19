@@ -275,12 +275,15 @@ class TaskDescriptionMixin(object):
     """
     task_title = None
     task_description = None
+    task_result_summary = None
 
-    def __init__(self, view_or_cls=None, task_title=None, task_description=None, **kwargs):
+    def __init__(self, view_or_cls=None, task_title=None, task_description=None, task_result_summary=None, **kwargs):
         if task_title:
             self.task_title = task_title
         if task_description:
             self.task_description = task_description
+        if task_result_summary:
+            self.task_result_summary = task_result_summary
 
         if view_or_cls:
             if view_or_cls.__doc__ and (self.task_title is None or self.task_description is None):
@@ -289,6 +292,8 @@ class TaskDescriptionMixin(object):
                     self.task_title = docstring[0].strip()
                 if task_description is None and len(docstring) > 1:
                     self.task_description = docstring[1].strip()
+            if hasattr(view_or_cls, 'task_result_summary') and self.task_result_summary is None:
+                self.task_result_summary = view_or_cls.task_result_summary
 
         super(TaskDescriptionMixin, self).__init__(**kwargs)
 
