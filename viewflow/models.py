@@ -1,3 +1,4 @@
+import django
 from django.conf import settings
 from django.db import models
 
@@ -71,12 +72,16 @@ class AbstractTask(models.Model):
 
     objects = TaskManager()
 
-    def get_process(self):
+    @property
+    def flow_process(self):
+        """
+        Returns process instance of flow_cls type
+        """
         if not self.flow_task:
             return None
 
         flow_process_cls = self.flow_task.flow_cls.process_cls
-        task_process_cls = self._meta.get_field('process').related_model
+        task_process_cls = self._meta.get_field('process').related_field.model
         link = flow_process_cls._meta.get_ancestor_link(task_process_cls)
 
         if link:
