@@ -22,7 +22,7 @@
             <td><a href="{% flowurl task user=request.user %}">{{ task.process.id }}/{{ task.id }}</a></td>
             <td><a href="{% flowurl task.process 'details' %}">{{ task.flow_task.flow_cls.process_title }}</a></td>
             <td>{{ task.flow_task }}</td>
-            <td>{{ task.flow_task.task_description|default:"" }}</td>
+            <td>{{ task.summary }}</td>
             <td>{{ task.flow_process.summary }}</td>
             <td>{{ task.created }}</td>
         </tr>

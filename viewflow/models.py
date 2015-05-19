@@ -98,6 +98,24 @@ class AbstractTask(models.Model):
         else:
             return self.process
 
+    def summary(self):
+        """
+        Quick textual task result representation for end user
+        """
+        if self.flow_task:
+            if self.finished:
+                if hasattr(self.flow_task, 'task_result_summary'):
+                    return Template(self.flow_task.task_result_summary or "").render(Context({
+                        'process': self.flow_process,
+                        'task': self,
+                        'flow_cls': self.flow_task.flow_cls,
+                        'flow_task': self.flow_task}))
+            else:
+                if hasattr(self.flow_task, 'task_description'):
+                    return self.flow_task.task_description or ""
+
+        return ""
+
     def save(self, *args, **kwargs):
         if self.status == STATUS.PREPARED:
             raise FlowRuntimeError("Can't save task with intermediate status - PREPARED")

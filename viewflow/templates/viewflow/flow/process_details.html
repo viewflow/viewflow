@@ -16,14 +16,19 @@
 
 {% include_process_data process %}
 
+<div>
+    {{ process.summary }}
+</div>
+
 <h2>Tasks</h2>
 <table class="table">
     <thead>
         <th>#</th>
         <th>Name</th>
+        <th>Owner</th>
         <th class="span1">Started</th>
         <th class="span1">Finished</th>
-        <th>Process</th>
+        <th class="span1">Description</th>
         <th>Status</th>
     </thead>
     <tbody>
@@ -40,9 +45,10 @@
                 {% endif %}
             </td>
             <td>{{ task.flow_task }}</td>
+            <td>{{ task.owner }}</td>
             <td>{{ task.created }}</td>
             <td>{{ task.finished|default:"" }}</td>
-            <td><a href="{% flowurl task.process 'details' %}">{{ task.process }}</td>
+            <td>{{ task.summary }}</td>
             <td>{{ task.status }}</td>
         </tr>
         {% endfor %}

@@ -18,7 +18,8 @@ class DynamicSplitFlow(Flow):
     {{ process.decision_set.count }}  of {{ process.split_count }} completed
     """
 
-    start = flow.Start(flow_views.StartProcessView, fields=['question', 'split_count']) \
+    start = flow.Start(flow_views.StartProcessView, fields=['question', 'split_count'],
+                       task_result_summary="Asks for {{ process.split_count }} decisions") \
         .Permission(auto_create=True) \
         .Next(this.spit_on_decision)
 
