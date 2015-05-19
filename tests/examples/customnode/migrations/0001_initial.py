@@ -23,7 +23,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='DynamicSplitProcess',
             fields=[
-                ('process_ptr', models.OneToOneField(to='viewflow.Process', primary_key=True, parent_link=True, serialize=False, auto_created=True)),
+                ('process_ptr', models.OneToOneField(to='viewflow.Process', primary_key=True,
+                                                     parent_link=True, serialize=False, auto_created=True)),
+                ('question', models.CharField(max_length=0)),
                 ('split_count', models.IntegerField(default=0)),
             ],
             options={

@@ -4,6 +4,7 @@ from viewflow.models import Process
 
 
 class DynamicSplitProcess(Process):
+    question = models.CharField(max_length=50)
     split_count = models.IntegerField(default=0)
 
 

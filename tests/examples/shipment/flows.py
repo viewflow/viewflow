@@ -12,6 +12,11 @@ class ShipmentFlow(Flow):
     task_cls = ShipmentTask
     lock_impl = select_for_update_lock
 
+    summary_template = """
+        Shipment {{ process.shipment.shipmentitem_set.count }} items
+        to {{ process.shipment.first_name }} {{ process.shipment.last_name }} / {{ process.shipment.city }}
+        """
+
     start = flow.Start(views.StartView) \
         .Permission('shipment.can_start_request') \
         .Next(this.split_clerk_warehouse)

@@ -174,6 +174,8 @@ class Flow(object, metaclass=FlowMetaClass):
     process_title = None
     process_description = None
 
+    summary_template = "{{ flow_cls.process_title }} - {{ process.status }}"
+
     @property
     def namespace(self):
         return "{}/{}".format(self._meta.app_label, self._meta.flow_label)

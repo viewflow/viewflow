@@ -1,6 +1,6 @@
-import django
 from django.conf import settings
 from django.db import models
+from django.template import Template, Context
 
 from .activation import STATUS
 from .exceptions import FlowRuntimeError
@@ -41,6 +41,15 @@ class AbstractProcess(models.Model):
 
         return self.flow_cls.task_cls._default_manager.get(
             process=self, flow_task=flow_task, status__in=status)
+
+    def summary(self):
+        """
+        Quick textual process state representation for end user
+        """
+        if self.flow_cls and self.flow_cls.process_cls == type(self):
+            return Template(self.flow_cls.summary_template).render(Context({'process': self, 'flow_cls': self.flow_cls}))
+
+        return "{} - {}".format(self.flow_cls.process_title, self.status)
 
     def __str__(self):
         if self.flow_cls:

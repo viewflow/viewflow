@@ -9,11 +9,16 @@ class DynamicSplitFlow(Flow):
     """
     Dynamic split
 
-    Depends on initial decision, several instances on make_decision task would be instanciated
+    Depends on initial decision, several instances on make_decision task would be instantiated
     """
     process_cls = models.DynamicSplitProcess
 
-    start = flow.Start(flow_views.StartProcessView, fields=['split_count']) \
+    summary_template = """
+    Decision on: {{ process.question }}<br/>
+    {{ process.decision_set.count }}  of {{ process.split_count }} completed
+    """
+
+    start = flow.Start(flow_views.StartProcessView, fields=['question', 'split_count']) \
         .Permission(auto_create=True) \
         .Next(this.spit_on_decision)
 
