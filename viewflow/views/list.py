@@ -6,6 +6,26 @@ from django.utils.decorators import method_decorator
 from .. import activation, flow, models
 
 
+def flow_start_actions(flow_cls, user=None):
+    """
+    Return list of start flow actions data available
+    """
+    actions = []
+    for node in flow_cls._meta.nodes():
+        if isinstance(node, flow.Start) and (user is None or node.can_execute(user)):
+            node_url = reverse('{}:{}'.format(flow_cls.instance.namespace, node.name))
+            actions.append((node_url, node.name))
+
+    return actions
+
+
+def flows_start_actions(flow_classes, user=None):
+    actions = {}
+    for flow_cls in flow_classes:
+        actions[flow_cls] = flow_start_actions(flow_cls, user)
+    return actions
+
+
 class LoginRequiredMixin(object):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
@@ -36,6 +56,11 @@ class AllProcessListView(LoginRequiredMixin, generic.ListView):
     def get_template_names(self):
         return 'viewflow/site_index.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(AllProcessListView, self).get_context_data(**kwargs)
+        context['start_actions'] = flows_start_actions(self.flow_classes, self.request.user)
+        return context
+
     def get_queryset(self):
         return models.Process.objects \
             .filter_available(self.flow_classes, self.request.user) \
@@ -55,6 +80,11 @@ class AllTaskListView(LoginRequiredMixin, generic.ListView):
     def get_template_names(self):
         return 'viewflow/site_tasks.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(AllTaskListView, self).get_context_data(**kwargs)
+        context['start_actions'] = flows_start_actions(self.flow_classes, self.request.user)
+        return context
+
     def get_queryset(self):
         return models.Task.objects.inbox(self.flow_classes, self.request.user).order_by('-created')
 
@@ -72,8 +102,35 @@ class AllQueueListView(LoginRequiredMixin, generic.ListView):
     def get_template_names(self):
         return 'viewflow/site_queue.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(AllQueueListView, self).get_context_data(**kwargs)
+        context['start_actions'] = flows_start_actions(self.flow_classes, self.request.user)
+        return context
+
     def get_queryset(self):
         return models.Task.objects.queue(self.flow_classes, self.request.user).order_by('-created')
+
+
+class AllArchiveListView(LoginRequiredMixin, generic.ListView):
+    """
+    All tasks from all processes assigned to current user
+    """
+    flow_classes = []
+
+    paginate_by = 15
+    paginate_orphans = 5
+    context_object_name = 'task_list'
+
+    def get_template_names(self):
+        return 'viewflow/site_archive.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AllArchiveListView, self).get_context_data(**kwargs)
+        context['start_actions'] = flows_start_actions(self.flow_classes, self.request.user)
+        return context
+
+    def get_queryset(self):
+        return models.Task.objects.archive(self.flow_classes, self.request.user).order_by('-created')
 
 
 class ProcessListView(FlowPermissionMixin, generic.ListView):
@@ -88,24 +145,9 @@ class ProcessListView(FlowPermissionMixin, generic.ListView):
             '{}/{}/process_list.html'.format(opts.app_label, opts.flow_label),
             'viewflow/flow/process_list.html')
 
-    def available_start_actions(self):
-        """
-        Return list of start flow actions data available for the user
-        """
-
-        actions = []
-        for node in self.flow_cls._meta.nodes():
-            if isinstance(node, flow.Start) and node.can_execute(self.request.user):
-                node_url = reverse(
-                    '{}:{}'.format(self.flow_cls.instance.namespace, node.name))
-
-                actions.append((node_url, node.name))
-
-        return actions
-
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
-        context['start_actions'] = self.available_start_actions()
+        context['start_actions'] = flow_start_actions(self.flow_cls, self.request.user)
         context['flow_cls'] = self.flow_cls
         return context
 
@@ -131,6 +173,7 @@ class ProcessDetailView(FlowPermissionMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessDetailView, self).get_context_data(**kwargs)
+        context['start_actions'] = flow_start_actions(self.flow_cls, self.request.user)
         context['flow_cls'] = self.flow_cls
         context['task_list'] = context['process'].task_set.all().order_by('created')
         return context
@@ -156,6 +199,7 @@ class TaskListView(FlowPermissionMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(TaskListView, self).get_context_data(**kwargs)
+        context['start_actions'] = flow_start_actions(self.flow_cls, self.request.user)
         context['flow_cls'] = self.flow_cls
         return context
 
@@ -184,6 +228,7 @@ class QueueListView(FlowPermissionMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(QueueListView, self).get_context_data(**kwargs)
+        context['start_actions'] = flow_start_actions(self.flow_cls, self.request.user)
         context['flow_cls'] = self.flow_cls
         return context
 

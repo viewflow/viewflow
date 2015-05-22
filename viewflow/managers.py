@@ -144,13 +144,26 @@ class TaskQuerySet(QuerySet):
         return self.model.objects.coerce_for(_available_flows(flow_classes, user))
 
     def inbox(self, flow_classes, user):
+        """
+        Tasks for user execution
+        """
         return self.filter_available(flow_classes, user) \
                    .filter(owner=user, status=STATUS.ASSIGNED)
 
     def queue(self, flow_classes, user):
+        """
+        Unassigned tasks for permitter for the user
+        """
         return self.filter_available(flow_classes, user) \
                    .user_queue(user) \
                    .filter(status=STATUS.NEW)
+
+    def archive(self, flow_classes, user):
+        """
+        Finished by user tasks
+        """
+        return self.filter_available(flow_classes, user) \
+            .filter(owner=user, finished__isnull=False)
 
     def _clone(self, klass=None, setup=False, **kwargs):
         try:
