@@ -1,12 +1,12 @@
 {% extends 'viewflow/flow/start.html' %}
-{% load viewform %}
+{% load material_form %}
 
 {% block content %}
 <h1>{% if activation.flow_task.task_title %}{{ activation.flow_task.task_title }}{% else %}Start {{ activation.flow_cls.process_title|lower }}{% endif %}</h1>
 
 <form role="form" method="POST">
     {% csrf_token %}
-    {% viewform 'viewform/bootstrap3/form.html' form=form layout=view.layout %} {% endviewform %}
+    {% form %} {% endform %}
     {{ activation.management_form }}
     <button type="submit" name="_start" class="btn btn-primary btn-lg">Start</button>
     <button type="submit" name="_continue" class="btn btn-default btn-lg">Start and continue on this process</button>

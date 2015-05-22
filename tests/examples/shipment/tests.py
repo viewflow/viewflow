@@ -1,4 +1,7 @@
+import django
+import unittest
 from django.test import TestCase
+
 from viewflow.models import Task
 from viewflow.test import FlowTest
 
@@ -6,6 +9,7 @@ from .flows import ShipmentFlow
 from .models import Carrier
 
 
+@unittest.skipIf(django.VERSION < (1, 7), reason="No material design on django 1.6")
 class ShipmentFlowTests(TestCase):
     fixtures = ['shipment/default_data.json']
 

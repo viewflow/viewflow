@@ -14,6 +14,7 @@ ALLOWED_HOSTS = ['examples.viewflow.io', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = (
+    'material',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -22,7 +23,6 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     # viewflow
     'viewflow',
-    'viewform',
     # Tests
     'tests.unit',
     'tests.integration',
