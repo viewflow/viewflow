@@ -29,14 +29,14 @@ def get_model_display_data(root_instance):
         for field in root._meta.fields:
             if isinstance(field, models.AutoField):
                 continue
+            elif field.auto_created:
+                continue
             elif isinstance(field, models.ForeignKey) and not field.auto_created:
                 related_id = getattr(root, field.get_attname())
                 if related_id is not None:
                     related = getattr(root, field.name)
                     if expand_required(related):
                         new_objects.append((field.verbose_name.title(), related))
-                    else:
-                        children.append((field.verbose_name.title(), related))
             else:
                 choice_display_attr = "get_{}_display".format(field.get_attname())
                 if hasattr(root, choice_display_attr):
