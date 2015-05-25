@@ -5,6 +5,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views import generic
+from django.utils.http import is_safe_url
 
 from .. import flow
 from .base import get_next_task_url
@@ -169,13 +170,24 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
         return context
 
     def get_success_url(self):
+        """
+        Continue on task or redirect back to task list
+        """
         url = self.flow_task.get_task_url(self.task, url_type='guess', user=self.request.user)
-        if 'back' in self.request.GET:
-            url = "{}?back={}".format(url, urlquote(self.request.GET['back']))
+
+        back = self.request.GET.get('back', None)
+        if back and not is_safe_url(url=back, host=self.request.get_host()):
+            back = '/'
+
+        if '_continue' in self.request.POST and back:
+            url = "{}?back={}".format(url, urlquote(back))
+        elif back:
+            url = back
+
         return url
 
     def post(self, request, *args, **kwargs):
-        if 'assign' in request.POST:
+        if '_assign' or '_continue' in request.POST:
             self.assign(self.request.user)
             return HttpResponseRedirect(self.get_success_url())
         else:
