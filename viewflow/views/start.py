@@ -4,7 +4,7 @@ from django.views import generic
 
 
 from .. import flow
-from .base import get_next_task_url
+from .base import get_next_task_url, process_message_user
 
 
 class StartViewMixin(object):
@@ -43,6 +43,7 @@ class StartViewMixin(object):
         """
         super(StartViewMixin, self).formset_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
+        process_message_user(self.request, self.activation.process, 'started')
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_valid(self, *args, **kwargs):
@@ -51,11 +52,13 @@ class StartViewMixin(object):
         """
         super(StartViewMixin, self).forms_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
+        process_message_user(self.request, self.activation.process, 'started')
         return HttpResponseRedirect(self.get_success_url())
 
     def form_valid(self, *args, **kwargs):
         super(StartViewMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
+        process_message_user(self.request, self.activation.process, 'started')
         return HttpResponseRedirect(self.get_success_url())
 
     @flow.flow_start_view()
@@ -101,6 +104,7 @@ class StartActivationViewMixin(object):
         """
         super(StartActivationViewMixin, self).formset_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
+        process_message_user(self.request, self.process, 'started')
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_valid(self, *args, **kwargs):
@@ -109,6 +113,7 @@ class StartActivationViewMixin(object):
         """
         super(StartActivationViewMixin, self).forms_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
+        process_message_user(self.request, self.process, 'started')
         return HttpResponseRedirect(self.get_success_url())
 
     def form_valid(self, *args, **kwargs):
@@ -117,6 +122,7 @@ class StartActivationViewMixin(object):
         """
         super(StartActivationViewMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
+        process_message_user(self.request, self.process, 'started')
         return HttpResponseRedirect(self.get_success_url())
 
     @flow.flow_start_view()

@@ -1,4 +1,4 @@
-from urllib.parse import quote as urlquote
+from django.utils.six.moves.urllib.parse import quote as urlquote
 
 from django.contrib import messages
 from django.core.exceptions import PermissionDenied
@@ -8,7 +8,7 @@ from django.views import generic
 from django.utils.http import is_safe_url
 
 from .. import flow
-from .base import get_next_task_url
+from .base import get_next_task_url, task_message_user, process_message_user
 
 
 class TaskViewMixin(object):
@@ -38,12 +38,19 @@ class TaskViewMixin(object):
         """
         self.activation.done()
 
+    def message_complete(self):
+        task_message_user(self.request, self.activation.task, 'completed')
+        self.activation.process.refresh_from_db()
+        if self.activation.process.finished:
+            process_message_user(self.request, self.activation.process, 'completed')
+
     def formset_valid(self, *args, **kwargs):
         """
         Called if base class is extra_views.FormsetView
         """
         super(TaskViewMixin, self).formset_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
+        self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_valid(self, *args, **kwargs):
@@ -52,11 +59,13 @@ class TaskViewMixin(object):
         """
         super(TaskViewMixin, self).forms_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
+        self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
     def form_valid(self, *args, **kwargs):
         super(TaskViewMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
+        self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
     @flow.flow_view()
@@ -64,7 +73,7 @@ class TaskViewMixin(object):
         self.activation = activation
 
         if not activation.prepare.can_proceed():
-            messages.info(request, 'Task cannot be executed')
+            task_message_user(request, activation.task, 'cannot be executed', level=messages.ERROR)
             return redirect(activation.flow_task.get_task_url(activation.task, url_type='details', user=request.user))
 
         if not self.activation.has_perm(request.user):
@@ -101,12 +110,19 @@ class TaskActivationViewMixin(object):
         """
         self.done()
 
+    def message_complete(self):
+        task_message_user(self.request, self.task, 'completed')
+        self.process.refresh_from_db()
+        if self.process.finished:
+            process_message_user(self.request, self.process, 'completed')
+
     def formset_valid(self, *args, **kwargs):
         """
         Called if base class is extra_views.FormsetView
         """
         super(TaskActivationViewMixin, self).formset_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
+        self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_valid(self, *args, **kwargs):
@@ -115,11 +131,13 @@ class TaskActivationViewMixin(object):
         """
         super(TaskActivationViewMixin, self).forms_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
+        self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
     def form_valid(self, *args, **kwargs):
         super(TaskActivationViewMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
+        self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
     @flow.flow_view()
@@ -189,6 +207,9 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
     def post(self, request, *args, **kwargs):
         if '_assign' or '_continue' in request.POST:
             self.assign(self.request.user)
+            task_message_user(
+                request, self.task,
+                'assigned to {}'.format(request.user.get_full_name() or request.user.username))
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.get(request, *args, **kwargs)
@@ -196,7 +217,7 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
     @flow.flow_view()
     def dispatch(self, request, *args, **kwargs):
         if not self.assign.can_proceed():
-            messages.info(request, 'Task cannot be assigned')
+            task_message_user(request, self.task, 'cannot be assigned', level=messages.ERROR)
             return redirect(self.flow_task.get_task_url(self.task, url_type='details', user=request.user))
 
         if not self.flow_task.can_assign(request.user, self.task):

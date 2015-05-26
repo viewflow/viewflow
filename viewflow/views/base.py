@@ -1,6 +1,8 @@
+from django.contrib import messages
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url
+from django.utils.safestring import mark_safe
 
 from django.views import generic
 
@@ -41,6 +43,24 @@ def get_next_task_url(request, process):
                        kwargs={'process_pk': process.pk})
     else:
         return reverse('{}:index'.format(process.flow_cls.instance.namespace))
+
+
+def process_message_user(request, process, message, level=messages.SUCCESS):
+    """
+    Message to the user prefixed with process link
+    """
+    process_url = reverse('{}:details'.format(process.flow_cls.instance.namespace), kwargs={'process_pk': process.pk})
+    message = 'Process <a href="{}">{}</a> {}'.format(process_url, process.pk, message)
+    messages.add_message(request, level, mark_safe(message))
+
+
+def task_message_user(request, task, message, level=messages.SUCCESS):
+    """
+    Message to the user prefixed with task link
+    """
+    task_url = task.flow_task.get_task_url(task, url_type='details', user=request.user)
+    message = 'Task <a href="{}">{}</a> {}'.format(task_url, task.pk, message)
+    messages.add_message(request, level, mark_safe(message))
 
 
 class DetailsView(generic.TemplateView):
