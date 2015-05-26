@@ -18,5 +18,6 @@ class DecisionView(task.TaskViewMixin, generic.CreateView):
         self.object.save()
 
         self.activation.done()
+        self.message_complete()
 
         return HttpResponseRedirect(self.get_success_url())
