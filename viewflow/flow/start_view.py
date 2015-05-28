@@ -203,10 +203,11 @@ class Start(base.PermissionMixin, BaseStart):
         from django.contrib.auth import get_user_model
 
         if self._owner:
-            if callable(self._owner) and self._owner(user):
-                return True
-            owner = get_user_model()._default_manager.get(**self._owner)
-            return owner == user
+            if callable(self._owner):
+                return self._owner(user)
+            else:
+                owner = get_user_model()._default_manager.get(**self._owner)
+                return owner == user
 
         elif self._owner_permission:
             if callable(self._owner_permission) and self._owner_permission(user):
