@@ -45,6 +45,17 @@ class TestReferenceFields(TestCase):
         self.assertEqual(instance.flow_cls, SingleTaskFlow)
         self.assertEqual(instance.task, SingleTaskFlow.start)
 
+    def test_get_by_flow_task_ref_succeed(self):
+        FlowReferencedModel.objects.create(
+            flow_cls=SingleTaskFlow, task=SingleTaskFlow.start)
+        FlowReferencedModel.objects.create(
+            flow_cls=AllTaskFlow, task=AllTaskFlow.start)
+
+        instance = FlowReferencedModel.objects.get(task='unit/flows.SingleTaskFlow.start')
+
+        self.assertEqual(instance.flow_cls, SingleTaskFlow)
+        self.assertEqual(instance.task, SingleTaskFlow.start)
+
 
 class TestTokenField(TestCase):
     def test_crud_succeed(self):

@@ -82,7 +82,7 @@ class TaskReferenceField(models.CharField, metaclass=models.SubfieldBase):
             return None
         elif not isinstance(value, str):
             return get_task_ref(value)
-        return super(TaskReferenceField, self).get_prep_value(value)
+        return value
 
     def value_to_string(self, obj):
         value = self._get_val_from_obj(obj)
