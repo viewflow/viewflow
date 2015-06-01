@@ -28,6 +28,7 @@ setup(
         'Django>=1.6',
         'singledispatch>=3.0',
         'django-fsm>=2.0',
+        'django-filter>=0.10.0'
         'mock',
         # viewflow.test
         'django-webtest',

@@ -53,7 +53,7 @@ class AbstractProcess(models.Model):
 
     def __str__(self):
         if self.flow_cls:
-            return "<{}/{}> - {}".format(self.flow_cls._meta.namespace, self.pk, self.status)
+            return '{} #{}'.format(self.flow_cls.process_title, self.pk)
         return "<Process {}> - {}".format(self.pk, self.status)
 
     def refresh_from_db(self, using=None, fields=None, **kwargs):

@@ -2,8 +2,10 @@ from django.views import generic
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required, permission_required
 from django.utils.decorators import method_decorator
+from django_filters import FilterSet, ChoiceFilter, DateRangeFilter
 
 from .. import activation, flow, models
+from ..fields import import_task_by_ref
 
 
 def flow_start_actions(flow_cls, user=None):
@@ -43,6 +45,29 @@ class FlowPermissionMixin(object):
         return permission_required(view_perm)(super(FlowPermissionMixin, self).dispatch)(*args, **kwargs)
 
 
+class TaskFilter(FilterSet):
+    flow_task = ChoiceFilter()
+    created = DateRangeFilter()
+
+    def __init__(self, data=None, queryset=None, prefix=None, strict=None):
+        super(TaskFilter, self).__init__(data=data, queryset=queryset, prefix=prefix, strict=strict)
+        self.filters['process'].field.queryset = \
+            models.Process.objects.filter(id__in=queryset.values_list('process', flat=True))
+
+        def task_name(task_ref):
+            flow_task = import_task_by_ref(task_ref)
+            return "{}/{}".format(flow_task.flow_cls.process_title, flow_task.name.title())
+
+        tasks = [(task_ref, task_name(task_ref))
+                 for task_ref in queryset.order_by('flow_task').distinct().values_list('flow_task', flat=True)]
+
+        self.filters['flow_task'].field.choices = [(None, 'All')] + tasks
+
+    class Meta:
+        fields = ['process', 'flow_task', 'created']
+        model = models.Task
+
+
 class AllProcessListView(LoginRequiredMixin, generic.ListView):
     """
     All process instances list available for current user
@@ -67,7 +92,7 @@ class AllProcessListView(LoginRequiredMixin, generic.ListView):
             .order_by('-created')
 
 
-class AllTaskListView(LoginRequiredMixin, generic.ListView):
+class AllTaskListView(generic.ListView):
     """
     All tasks from all processes assigned to current user
     """
@@ -83,13 +108,22 @@ class AllTaskListView(LoginRequiredMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(AllTaskListView, self).get_context_data(**kwargs)
         context['start_actions'] = flows_start_actions(self.flow_classes, self.request.user)
+        context['filter'] = self.filter
         return context
 
     def get_queryset(self):
-        return models.Task.objects.inbox(self.flow_classes, self.request.user).order_by('-created')
+        return self.filter.qs
+
+    def get_base_queryset(self, user):
+        return models.Task.objects.inbox(self.flow_classes, user).order_by('-created')
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.filter = TaskFilter(request.GET, self.get_base_queryset(request.user))
+        return super(AllTaskListView, self).dispatch(request, *args, **kwargs)
 
 
-class AllQueueListView(LoginRequiredMixin, generic.ListView):
+class AllQueueListView(generic.ListView):
     """
     All unassigned tasks available for current user
     """
@@ -105,10 +139,19 @@ class AllQueueListView(LoginRequiredMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(AllQueueListView, self).get_context_data(**kwargs)
         context['start_actions'] = flows_start_actions(self.flow_classes, self.request.user)
+        context['filter'] = self.filter
         return context
 
     def get_queryset(self):
-        return models.Task.objects.queue(self.flow_classes, self.request.user).order_by('-created')
+        return self.filter.qs
+
+    def get_base_queryset(self, user):
+        return models.Task.objects.queue(self.flow_classes, user).order_by('-created')
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.filter = TaskFilter(request.GET, self.get_base_queryset(request.user))
+        return super(AllQueueListView, self).dispatch(request, *args, **kwargs)
 
 
 class AllArchiveListView(LoginRequiredMixin, generic.ListView):
