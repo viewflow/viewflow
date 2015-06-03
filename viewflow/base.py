@@ -195,5 +195,15 @@ class Flow(object, metaclass=FlowMetaClass):
 
         return url('^', include(node_urls))
 
+    @property
+    def view_permission_name(self):
+        opts = self.process_cls._meta
+        return "{}.view_{}".format(opts.app_label, opts.model_name)
+
+    @property
+    def manage_permission_name(self):
+        opts = self.process_cls._meta
+        return "{}.view_{}".format(opts.app_label, opts.model_name)
+
     def __str__(self):
         return self.process_title

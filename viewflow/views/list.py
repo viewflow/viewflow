@@ -39,10 +39,8 @@ class FlowPermissionMixin(object):
 
     def dispatch(self, *args, **kwargs):
         self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
-        opts = self.flow_cls.process_cls._meta
-        view_perm = "{}.view_{}".format(opts.app_label, opts.model_name)
-
-        return permission_required(view_perm)(super(FlowPermissionMixin, self).dispatch)(*args, **kwargs)
+        return permission_required(self.flow_cls.instance.view_permission_name)(
+            super(FlowPermissionMixin, self).dispatch)(*args, **kwargs)
 
 
 class TaskFilter(FilterSet):
