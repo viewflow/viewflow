@@ -1,11 +1,12 @@
 from django.views import generic
 from django.core.urlresolvers import reverse
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django_filters import FilterSet, ChoiceFilter, DateRangeFilter
 
 from .. import activation, flow, models
 from ..fields import import_task_by_ref
+from .base import FlowViewPermissionMixin
 
 
 def flow_start_actions(flow_cls, user=None):
@@ -32,15 +33,6 @@ class LoginRequiredMixin(object):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
-
-
-class FlowPermissionMixin(object):
-    flow_cls = None
-
-    def dispatch(self, *args, **kwargs):
-        self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
-        return permission_required(self.flow_cls.instance.view_permission_name)(
-            super(FlowPermissionMixin, self).dispatch)(*args, **kwargs)
 
 
 class TaskFilter(FilterSet):
@@ -174,7 +166,7 @@ class AllArchiveListView(LoginRequiredMixin, generic.ListView):
         return models.Task.objects.archive(self.flow_classes, self.request.user).order_by('-created')
 
 
-class ProcessListView(FlowPermissionMixin, generic.ListView):
+class ProcessListView(FlowViewPermissionMixin, generic.ListView):
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'process_list'
@@ -198,7 +190,7 @@ class ProcessListView(FlowPermissionMixin, generic.ListView):
             .order_by('-created')
 
 
-class ProcessDetailView(FlowPermissionMixin, generic.DetailView):
+class ProcessDetailView(FlowViewPermissionMixin, generic.DetailView):
     """
     Details for process
     """
@@ -223,7 +215,7 @@ class ProcessDetailView(FlowPermissionMixin, generic.DetailView):
         return self.flow_cls.process_cls._default_manager.all()
 
 
-class TaskListView(FlowPermissionMixin, generic.ListView):
+class TaskListView(FlowViewPermissionMixin, generic.ListView):
     """
     List of specific Flow tasks assigned to current user
     """
@@ -252,7 +244,7 @@ class TaskListView(FlowPermissionMixin, generic.ListView):
             .order_by('-created')
 
 
-class QueueListView(FlowPermissionMixin, generic.ListView):
+class QueueListView(FlowViewPermissionMixin, generic.ListView):
     """
     List of specific Flow unassigned tasks available for current user
     """

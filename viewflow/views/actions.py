@@ -1,4 +1,3 @@
-from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.timezone import now
@@ -7,9 +6,10 @@ from django.views import generic
 
 from ..activation import STATUS
 from ..exceptions import FlowRuntimeError
+from .base import FlowManagePermissionMixin, process_message_user
 
 
-class ProcessCancelView(generic.DetailView):
+class ProcessCancelView(FlowManagePermissionMixin, generic.DetailView):
     flow_cls = None
     context_object_name = 'process'
     pk_url_kwarg = 'process_pk'
@@ -37,12 +37,12 @@ class ProcessCancelView(generic.DetailView):
         self.object = self.get_object()
 
         if self.object.status in [STATUS.DONE, STATUS.CANCELED]:
-            messages.info(request, "Process can't be cancelled")
+            process_message_user(self.request, self.object, "can't be canceled")
             return HttpResponseRedirect(self.get_success_url())
         elif '_cancel_process' in request.POST:
             self._cancel_active_tasks()
             self._cancel_process()
-            messages.info(request, 'Process cancelled')
+            process_message_user(self.request, self.object, "canceled")
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.get(request, *args, **kwargs)
@@ -57,6 +57,7 @@ class ProcessCancelView(generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(ProcessCancelView, self).get_context_data(**kwargs)
         context['active_tasks'] = self._get_task_list()
+        context['flow_cls'] = self.flow_cls
         context['uncancelable_tasks'] = self._get_uncancelable_tasks(context['active_tasks'])
         return context
 

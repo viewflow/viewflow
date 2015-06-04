@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url
@@ -90,3 +91,22 @@ class DetailsView(generic.TemplateView):
         if not self.activation.flow_task.can_view(request.user, self.activation.task):
             raise PermissionDenied
         return super(DetailsView, self).dispatch(request, *args, **kwargs)
+
+
+class FlowViewPermissionMixin(object):
+    flow_cls = None
+
+    def dispatch(self, *args, **kwargs):
+        self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
+        return permission_required(self.flow_cls.instance.view_permission_name)(
+            super(FlowViewPermissionMixin, self).dispatch)(*args, **kwargs)
+
+
+class FlowManagePermissionMixin(object):
+    flow_cls = None
+
+    def dispatch(self, *args, **kwargs):
+        self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
+        return permission_required(self.flow_cls.instance.manage_permission_name)(
+            super(FlowManagePermissionMixin, self).dispatch)(*args, **kwargs)
+
