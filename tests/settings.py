@@ -14,6 +14,9 @@ ALLOWED_HOSTS = ['examples.viewflow.io', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = (
+    # development
+    'template_debug',
+    # django apps
     'material',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -127,6 +130,9 @@ JENKINS_TASKS = (
     'django_jenkins.tasks.run_sloccount',
 )
 
+# shortcut for development
+from django.template.base import add_to_builtins
+add_to_builtins('template_debug.templatetags.debug_tags')
 
 try:
     from tests.local_settings import *  # NOQA
