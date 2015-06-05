@@ -18,6 +18,8 @@ class Transition(object):
 
 
 class TransitionMethod(object):
+    do_not_call_in_templates = True
+
     def __init__(self, descriptor, instance):
         self.descriptor = descriptor
         self.instance = instance
@@ -33,6 +35,8 @@ class TransitionMethod(object):
 
 
 class TransitionDescriptor(object):
+    do_not_call_in_templates = True
+
     def __init__(self, state, func):
         self.state = state
         self.func = func

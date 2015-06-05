@@ -124,6 +124,9 @@ class Activation(object):
             return self.task.status
         return STATUS.UNRIPE
 
+    def get_available_transtions(self):
+        return self.__class__.status.get_available_transtions(self)
+
     @status.transition(source=STATUS.UNRIPE)
     def initialize(self, flow_task, task):
         """
