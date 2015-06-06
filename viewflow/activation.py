@@ -200,7 +200,7 @@ class StartActivation(Activation):
         self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
 
         if task:
-            self.process, self.task = task.process, task
+            self.process, self.task = task.flow_process, task
         else:
             self.process = self.flow_cls.process_cls(flow_cls=self.flow_cls)
             self.task = self.flow_cls.task_cls(flow_task=self.flow_task)
@@ -272,7 +272,7 @@ class StartViewActivation(Activation):
         self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
 
         if task:
-            self.process, self.task = task.process, task
+            self.process, self.task = task.flow_process, task
         else:
             self.process = self.flow_cls.process_cls(flow_cls=self.flow_cls)
             self.task = self.flow_cls.task_cls(flow_task=self.flow_task)
