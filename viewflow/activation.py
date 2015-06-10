@@ -154,6 +154,7 @@ class Activation(object):
 
         If flow class have `[task_name]_undo(self, activation)` method it would be called
         """
+        self.task.finished = None
         self.task.save()
 
         # call custom undo handler
@@ -395,6 +396,14 @@ class ViewActivation(Activation):
         signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
         self.activate_next()
+
+    @Activation.status.super()
+    def undo(self):
+        """
+        Undo the task
+        """
+        self.task.owner = None
+        super(ViewActivation, self).undo.original()
 
     @Activation.status.super()
     def activate_next(self):

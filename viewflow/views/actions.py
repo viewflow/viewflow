@@ -1,12 +1,15 @@
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.timezone import now
 from django.utils.http import is_safe_url
+from django.shortcuts import redirect
 from django.views import generic
 
+from .. import flow
 from ..activation import STATUS
 from ..exceptions import FlowRuntimeError
-from .base import FlowManagePermissionMixin, process_message_user
+from .base import FlowManagePermissionMixin, BaseTaskActionView, process_message_user, task_message_user
 
 
 class ProcessCancelView(FlowManagePermissionMixin, generic.DetailView):
@@ -97,3 +100,41 @@ class ProcessCancelView(FlowManagePermissionMixin, generic.DetailView):
         self.object.status = STATUS.CANCELED
         self.object.finished = now()
         self.object.save()
+
+
+class TaskUndoView(BaseTaskActionView):
+    action_name = 'undo'
+
+    def can_proceed(self):
+        return self.activation.undo.can_proceed()
+
+    def perform(self):
+        self.activation.undo()
+        task_message_user(self.request, self.activation.task, "undone")
+
+
+class TaskCancelView(BaseTaskActionView):
+    action_name = 'cancel'
+
+    def can_proceed(self):
+        return self.activation.cancel.can_proceed()
+
+    def perform(self):
+        self.activation.cancel()
+        task_message_user(self.request, self.activation.task, "canceled")
+
+
+class TaskPerformView(BaseTaskActionView):
+    """
+    Non-interactive task that cancelled and need to be started manually
+    """
+
+    action_name = 'execute'
+
+    def can_proceed(self):
+        return self.activation.perform.can_proceed()
+
+    def perform(self):
+        self.activation.perform()
+        task_message_user(self.request, self.activation.task, "executed")
+

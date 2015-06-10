@@ -2,6 +2,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import permission_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.utils.http import is_safe_url
 from django.utils.safestring import mark_safe
 
@@ -64,6 +66,24 @@ def task_message_user(request, task, message, level=messages.SUCCESS):
     messages.add_message(request, level, mark_safe(message))
 
 
+class FlowViewPermissionMixin(object):
+    flow_cls = None
+
+    def dispatch(self, *args, **kwargs):
+        self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
+        return permission_required(self.flow_cls.instance.view_permission_name)(
+            super(FlowViewPermissionMixin, self).dispatch)(*args, **kwargs)
+
+
+class FlowManagePermissionMixin(object):
+    flow_cls = None
+
+    def dispatch(self, *args, **kwargs):
+        self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
+        return permission_required(self.flow_cls.instance.manage_permission_name)(
+            super(FlowManagePermissionMixin, self).dispatch)(*args, **kwargs)
+
+
 class DetailsView(generic.TemplateView):
     """
     Default details view for flow task
@@ -93,20 +113,51 @@ class DetailsView(generic.TemplateView):
         return super(DetailsView, self).dispatch(request, *args, **kwargs)
 
 
-class FlowViewPermissionMixin(object):
+class BaseTaskActionView(FlowManagePermissionMixin, generic.TemplateView):
     flow_cls = None
+    action_name = None
 
-    def dispatch(self, *args, **kwargs):
-        self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
-        return permission_required(self.flow_cls.instance.view_permission_name)(
-            super(FlowViewPermissionMixin, self).dispatch)(*args, **kwargs)
+    def can_proceed(self):
+        raise NotImplementedError
 
+    def perform(self):
+        raise NotImplementedError
 
-class FlowManagePermissionMixin(object):
-    flow_cls = None
+    def get_template_names(self):
+        flow_task = self.activation.flow_task
+        opts = self.activation.flow_task.flow_cls._meta
 
-    def dispatch(self, *args, **kwargs):
-        self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
-        return permission_required(self.flow_cls.instance.manage_permission_name)(
-            super(FlowManagePermissionMixin, self).dispatch)(*args, **kwargs)
+        return (
+            '{}/{}/{}_{}.html'.format(opts.app_label, opts.flow_label, flow_task.name, self.action_name),
+            '{}/{}/task_{}.html'.format(opts.app_label, opts.flow_label, self.action_name),
+            'viewflow/flow/task_{}.html'.format(self.action_name),
+            'viewflow/flow/task_action.html')
 
+    def get_success_url(self):
+        return self.activation.flow_task.get_task_url(self.activation.task, 'details', user=self.request.user)
+
+    def get_context_data(self, **kwargs):
+        context = super(BaseTaskActionView, self).get_context_data(**kwargs)
+        context['activation'] = self.activation
+        context['flow_cls'] = self.flow_cls
+        return context
+
+    def post(self, request, *args, **kwargs):
+        if 'run_action' in request.POST:
+            self.perform()
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            return self.get(request, *args, **kwargs)
+
+    @flow.flow_view()
+    def dispatch(self, request, activation, **kwargs):
+        self.flow_cls = activation.flow_cls
+        self.activation = activation
+
+        if not self.can_proceed():
+            task_message_user(
+                request, activation.task, "Can't execute action {}".format(self.action_name.title),
+                level=messages.ERROR)
+            return redirect(activation.flow_task.get_task_url(activation.task, url_type='details', user=request.user))
+
+        return super(BaseTaskActionView, self).dispatch(request, **kwargs)

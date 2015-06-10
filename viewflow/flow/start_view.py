@@ -93,6 +93,8 @@ class ManagedStartViewActivation(StartViewActivation):
 class BaseStart(base.TaskDescriptionMixin,
                 base.NextNodeMixin,
                 base.DetailsViewMixin,
+                base.UndoViewMixin,
+                base.CancelViewMixin,
                 base.Event,
                 base.ViewArgsMixin):
     """
@@ -193,8 +195,7 @@ class Start(base.PermissionMixin, BaseStart):
                 url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
                 return reverse(url_name)
 
-        if url_type in ['details', 'guess']:
-            return super(Start, self).get_task_url(task, url_type=url_type, **kwargs)
+        return super(Start, self).get_task_url(task, url_type=url_type, **kwargs)
 
     def can_execute(self, user, task=None):
         if task and task.status != STATUS.NEW:

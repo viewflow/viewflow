@@ -154,7 +154,11 @@ class BaseView(base.TaskDescriptionMixin,
                     self.view, {'flow_task': self}, name=self.name)]
 
 
-class View(base.PermissionMixin, base.DetailsViewMixin, BaseView):
+class View(base.PermissionMixin,
+           base.UndoViewMixin,
+           base.CancelViewMixin,
+           base.DetailsViewMixin,
+           BaseView):
     """
     View task
 
@@ -235,9 +239,7 @@ class View(base.PermissionMixin, base.DetailsViewMixin, BaseView):
                 url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
                 return reverse(url_name, kwargs={'process_pk': task.process_id, 'task_pk': task.pk})
 
-        # details
-        if url_type in ['details', 'guess']:
-            return super(View, self).get_task_url(task, url_type, **kwargs)
+        return super(View, self).get_task_url(task, url_type, **kwargs)
 
     def calc_owner(self, task):
         from django.contrib.auth import get_user_model
