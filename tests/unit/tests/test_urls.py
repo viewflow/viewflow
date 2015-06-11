@@ -18,7 +18,7 @@ class TestURLPatterns(TestCase):
 
         self.assertIsNotNone(patterns)
 
-        self.assertEqual(13, len(patterns.url_patterns))
+        self.assertEqual(15, len(patterns.url_patterns))
 
 
 class TestURLReverse(TestCase):
