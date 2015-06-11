@@ -17,7 +17,6 @@ class IfActivation(AbstractGateActivation):
     def calculate_next(self):
         self.condition_result = self.flow_task.condition(self.process)
 
-    @Activation.status.super()
     def activate_next(self):
         if self.condition_result:
             self.flow_task._on_true.activate(prev_activation=self, token=self.task.token)
@@ -86,7 +85,6 @@ class SwitchActivation(AbstractGateActivation):
         if not self.next_task:
             raise FlowRuntimeError('No next task available for {}'.format(self.flow_task.name))
 
-    @Activation.status.super()
     def activate_next(self):
         self.next_task.activate(prev_activation=self, token=self.task.token)
 
@@ -293,7 +291,6 @@ class SplitActivation(AbstractGateActivation):
         if not self.next_tasks:
             raise FlowRuntimeError('No next task available for {}'.format(self.flow_task.name))
 
-    @Activation.status.super()
     def activate_next(self):
         token_source = Token.split_token_source(self.task.token, self.task.pk)
 

@@ -90,7 +90,6 @@ class TestActivations(TestCase):
         act.prepare()
         act.done()
         act.undo()
-        act.cancel()
 
     def test_startviewactivation_lifecycle(self):
         act = activation.StartViewActivation()
@@ -99,7 +98,6 @@ class TestActivations(TestCase):
         act.prepare()
         act.done()
         act.undo()
-        act.cancel()
 
     def test_viewactivation_lifecycle(self):
         flow_task = self.init(flow.View(lambda _: None))

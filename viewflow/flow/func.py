@@ -68,7 +68,7 @@ class FuncActivation(Activation):
 
         self.activate_next()
 
-    @Activation.status.super()
+    @Activation.status.transition(source=STATUS.DONE)
     def activate_next(self):
         """
         Activate all outgoing edges.
@@ -192,7 +192,7 @@ class HandlerActivation(Activation):
             else:
                 raise
 
-    @Activation.status.super()
+    @Activation.status.transition(source=STATUS.DONE)
     def activate_next(self):
         """
         Activate all outgoing edges.
