@@ -243,6 +243,7 @@ class JoinActivation(Activation):
             activation.initialize(flow_task, task)
             activation.start()
         else:
+            task.previous.add(prev_activation.task)
             activation.initialize(flow_task, task)
 
         if activation.is_done():
