@@ -276,6 +276,29 @@ class PerformViewMixin(object):
         return super(PerformViewMixin, self).get_task_url(task, url_type, **kwargs)
 
 
+class ActivateNextMixin(object):
+    def __init__(self, *args, **kwargs):
+        self._activate_next_view = kwargs.pop('activate_next_view', None)
+        super(ActivateNextMixin, self).__init__(*args, **kwargs)
+
+    @property
+    def activate_next_view(self):
+        from viewflow.views import TaskActivateNextView
+        return self._activate_next_view if self._activate_next_view else TaskActivateNextView.as_view()
+
+    def urls(self):
+        urls = super(ActivateNextMixin, self).urls()
+        urls.append(url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/activate_next/$'.format(self.name),
+                    self.activate_next_view, {'flow_task': self}, name="{}__activate_next".format(self.name)))
+        return urls
+
+    def get_task_url(self, task, url_type, **kwargs):
+        if url_type in ['activate_next']:
+            url_name = '{}:{}__activate_next'.format(self.flow_cls.instance.namespace, self.name)
+            return reverse(url_name, args=[task.process_id, task.pk])
+        return super(ActivateNextMixin, self).get_task_url(task, url_type, **kwargs)
+
+
 class PermissionMixin(object):
     """
     Node mixing with permission restricted access

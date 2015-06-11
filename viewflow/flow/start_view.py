@@ -138,7 +138,9 @@ class BaseStart(base.TaskDescriptionMixin,
         return urls
 
 
-class Start(base.PermissionMixin, BaseStart):
+class Start(base.PermissionMixin,
+            base.ActivateNextMixin,
+            BaseStart):
     """
     Start process event
 

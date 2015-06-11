@@ -158,6 +158,7 @@ class View(base.PermissionMixin,
            base.UndoViewMixin,
            base.CancelViewMixin,
            base.DetailsViewMixin,
+           base.ActivateNextMixin,
            BaseView):
     """
     View task

@@ -232,6 +232,13 @@ class StartActivation(Activation):
         signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
         signals.flow_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
+        self.activate_next()
+
+    @Activation.status.transition(source=STATUS.DONE)
+    def activate_next(self):
+        """
+        Activate all outgoing edges.
+        """
         self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @Activation.status.transition(source=STATUS.DONE, target=STATUS.CANCELED, conditions=[all_leading_canceled])
@@ -297,6 +304,13 @@ class StartViewActivation(Activation):
         signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
         signals.flow_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
+        self.activate_next()
+
+    @Activation.status.transition(source=STATUS.DONE)
+    def activate_next(self):
+        """
+        Activate all outgoing edges.
+        """
         self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @Activation.status.transition(source=STATUS.DONE, target=STATUS.CANCELED, conditions=[all_leading_canceled])

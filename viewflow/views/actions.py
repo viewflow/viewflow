@@ -1,12 +1,9 @@
-from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.timezone import now
 from django.utils.http import is_safe_url
-from django.shortcuts import redirect
 from django.views import generic
 
-from .. import flow
 from ..activation import STATUS
 from ..exceptions import FlowRuntimeError
 from .base import FlowManagePermissionMixin, BaseTaskActionView, process_message_user, task_message_user
@@ -138,3 +135,17 @@ class TaskPerformView(BaseTaskActionView):
         self.activation.perform()
         task_message_user(self.request, self.activation.task, "executed")
 
+
+class TaskActivateNextView(BaseTaskActionView):
+    """
+    Activate next task without interactove task redone
+    """
+
+    action_name = 'activate_next'
+
+    def can_proceed(self):
+        return self.activation.activate_next.can_proceed()
+
+    def perform(self):
+        self.activation.activate_next()
+        task_message_user(self.request, self.activation.task, "next tasks activated")
