@@ -18,8 +18,9 @@ class StartView(LayoutMixin,
     model = Shipment
     layout = Layout(
         Row('shipment_no'),
-        Row('first_name', 'last_name', 'email'),
-        Row('phone'),
+        Fieldset('Customer Details',
+                 Row('first_name', 'last_name', 'email'),
+                 Row('phone')),
         Fieldset('Address',
                  Row(Span7('address'), Span5('zipcode')),
                  Row(Span5('city'), Span2('state'), Span5('country'))),

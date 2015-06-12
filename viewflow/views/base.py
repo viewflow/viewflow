@@ -66,6 +66,19 @@ def task_message_user(request, task, message, level=messages.SUCCESS):
     messages.add_message(request, level, mark_safe(message))
 
 
+def tasks_message_user(request, tasks, message, level=messages.SUCCESS):
+    """
+    Message to the user prefixed with task link
+    """
+    tasks_message = []
+    for task in tasks:
+        task_url = task.flow_task.get_task_url(task, url_type='details', user=request.user)
+        tasks_message.append('<a href="{}">{}</a>'.format(task_url, task.pk))
+
+    message = "Tasks {} {}".format(' '.join(tasks_message), message)
+    messages.add_message(request, level, mark_safe(message))
+
+
 class FlowViewPermissionMixin(object):
     flow_cls = None
 
