@@ -2,6 +2,17 @@
 Changelog
 =========
 
+0.9.0 - 2015-06-15
+------------------
+
+* Django 1.8 support
+* Better inbox/queue views
+* Improve undo/cancel tasks behaviour
+* Allow to specify custom undo handlers methods
+* Allow to use flow class methods as flow task functions
+* Allow to list task state change handles in template
+* *PRO ONLY* New Material Designed Frontend for the Flow
+
 0.8.0 - 2014-12-02
 ------------------
 
