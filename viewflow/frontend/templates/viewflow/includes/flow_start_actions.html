@@ -1,0 +1,22 @@
+{% load viewflow viewflow_frontend %}
+{% flow_start_actions view.flow_class request.user as start_actions %}
+{% if start_actions %}
+<div class="fixed-action-btn">
+    <a class="btn-floating btn-large waves-effect waves-light red z-depth-2 modal-trigger" href="#start_actions">
+        <i class="large material-icons">add</i>
+    </a>
+</div>
+
+<div class="fixed-action-btn">
+    <a class="btn-floating btn-large red" {% if start_actions|length == 1 %}href="{% flowurl view.flow_class start_actions.0.name  %}?{{ request|query_back:'here' }}"{% endif %}>
+        <i class="large material-icons">add</i>
+    </a>
+    {% if start_actions|length > 1 %}
+    <ul>
+        {% for action in start_actions %}
+        <li><a class="btn-floating {% cycle yellow green blue red %}" style="transform: scaleY(0.4) scaleX(0.4) translateY(40px); opacity: 0;" href="{% flowurl view.flow_class action.name %}?{{ request|query_back:'here' }}"><i class="large material-icons">add</i></a></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+{% endif %}

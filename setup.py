@@ -42,6 +42,8 @@ setup(
               'viewflow.migrations',
               'viewflow.nodes',
               'viewflow.south_migrations',
-              'viewflow.templatetags'],
+              'viewflow.templatetags',
+              'viewflow.frontend',
+              'viewflow.frontend.templatetags'],
     include_package_data=True,
     zip_safe=False)

@@ -1,36 +1,48 @@
 import django
-
 from django.conf.urls import include, url
 from django.contrib import admin
 from django.contrib.auth import views as auth
-from viewflow.flow import views as viewflow
+from django.views import generic
 
-from .helloworld.flows import HelloWorldFlow
-from .shipment.flows import ShipmentFlow
-from .customnode.flows import DynamicSplitFlow
+from material import frontend
+from material.frontend.apps import ModuleMixin
+from material.frontend.registry import modules
+
+
+class Demo(ModuleMixin):
+    """
+    Home page module
+    """
+    order = 1
+    label = 'Introduction'
+    icon = '<i class="material-icons">account_balance</i>'
+
+    @property
+    def urls(self):
+        index_view = generic.TemplateView.as_view(template_name='demo/index.html')
+
+        return frontend.ModuleURLResolver(
+            '^$', [url('^$', index_view, name="index")],
+            module=self, app_name='demo', namespace='demo')
+
+    def index_url(self):
+        return '/'
+
+    def installed(self):
+        return True
+
+modules.register(Demo())
 
 
 if django.VERSION < (1, 7):
     admin.autodiscover()
 
-flows = {
-    'helloworld': HelloWorldFlow,
-    'shipment': ShipmentFlow,
-    'split': DynamicSplitFlow
-}
 
+from material.frontend import urls as frontend_urls  # NOQA
 
 urlpatterns = [
-    url(r'^$', viewflow.AllProcessListView.as_view(ns_map=flows), name="index"),
-    url(r'^tasks/$', viewflow.AllTaskListView.as_view(ns_map=flows), name="tasks"),
-    url(r'^queue/$', viewflow.AllQueueListView.as_view(ns_map=flows), name="queue"),
-
-    url(r'^helloworld/', include('demo.helloworld.urls', namespace='helloworld')),
-    url(r'^shipment/', include('demo.shipment.urls', namespace='shipment')),
-    url(r'^split/', include('demo.customnode.urls', namespace='split')),
-
-    url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/login/$', auth.login, name='login'),
     url(r'^accounts/logout/$', auth.logout, name='logout'),
     url(r'^', include('demo.website')),
+    url(r'', include(frontend_urls)),
 ]

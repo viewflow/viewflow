@@ -1,0 +1,32 @@
+{% extends 'viewflow/base.html' %}
+{% load viewflow %}
+
+{% block title %}{{ block.super}} | {{ flow_class.process_title }}{% endblock %}
+
+{% block content %}
+<h1>{{ flow_class.process_title }} queue</h1>
+
+<table class="table bordered">
+    <thead>
+        <th>#</th>
+        <th>Name</th>
+        <th class="span1">Started</th>
+        <th class="span1">Finished</th>
+        <th>Process</th>
+        <th>Status</th>
+    </thead>
+    <tbody>
+        {% for task in queue %}
+        <tr>
+            <td><a href="{% flowurl task user=request.user %}?back={{ request.get_full_path|urlencode }}">{{ task.process.id }}/{{ task.id }}</a></td>
+            <td>{{ task.flow_task }}</td>
+            <td>{{ task.created }}</td>
+            <td>{{ task.finished|default:"" }}</td>
+            <td><a href="{% flowurl task.process 'detail' %}">{{ task.process }}</td>
+            <td>{{ task.get_status_display }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
+

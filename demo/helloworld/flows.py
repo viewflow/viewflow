@@ -1,4 +1,4 @@
-from viewflow import flow, lock
+from viewflow import flow, frontend, lock
 from viewflow.base import this, Flow
 from viewflow.contrib import celery
 from viewflow.flow import views as flow_views
@@ -45,3 +45,6 @@ class HelloWorldFlow(Flow):
     send = celery.Job(send_hello_world_request).Next(this.end)
 
     end = flow.End()
+
+
+frontend.register(HelloWorldFlow)

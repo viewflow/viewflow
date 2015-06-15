@@ -1,0 +1,34 @@
+{% extends 'viewflow/base_module.html' %}
+{% load viewflow material_form %}
+
+{% block breadcrumbs_items %}
+{% include 'viewflow/includes/breadcrumb_category.html' %}
+<a href="{% flowurl activation.flow_class 'index' %}{% if request.GET.category %}?category={{ request.GET.category }}{% endif %}">{{ activation.flow_class.process_title }}</a>  &rang;
+<a class="active">Start</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col s12 m6 l8">
+        <form role="form" method="POST">
+            <div class="card form-card">
+                <div class="card-content">                   
+                    <div class="card-title black-text">{{ activation.flow_class.process_title }} - {{ activation.flow_task.task_title|default:activation.task.flow_task.name|title }}</div>
+                    {% csrf_token %}
+                    {% form form=form layout=view.layout %} {% endform %}
+                    {{ activation.management_form }}
+                </div>
+                <div class="card-action row">
+                    <div class="col s12 right-align">
+                        <button type="submit" name="_continue" class="btn btn-flat">Start and continue on this process</button>
+                        <button type="submit" name="_start" class="btn teal white-text btn-flat">Start</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col s12 m6 l4">
+        {% include_process_data activation.process %}
+    </div>
+</div>
+{% endblock %}

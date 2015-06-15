@@ -1,0 +1,50 @@
+{% load viewflow viewflow_frontend %}
+<div class="row">
+    {% for root, fields, root_url in process_data %}
+    <div class="col s12">
+        <div class="card">
+            <div class="card-content" style="padding-top:5px">
+                <div class="card-title black-text">{{ root }} #{{ process.pk }}</div>
+                {% if root_url %}
+                <a href="{{ root_url }}" class="card-edit no-pjax" target="_blank">(edit)</a>
+                {% endif %}
+                <dl class="dl-horizontal">
+                    {% for name, value in fields %}
+                    <dt>{{ name }}:</dt> 
+                    <dd>{{ value }}</dd>
+                    {% endfor %}
+                </dl>
+            </div>
+        </div>
+    </div>
+    {% if not hide_active_tasks and forloop.counter == 1 and process.active_tasks %}
+    <div class="col s12">
+        <div class="card data-card">
+            <div class="card-content">
+                <div class="card-title black-text">Active tasks</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Task</th>
+                            <th>Owner</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for task in process.active_tasks %}
+                        {% if task.flow_task.task_type == 'HUMAN' or task.flow_task.task_type == 'JOB' %}
+                        <tr>
+                            <td>
+                                <a href="{% flowurl task user=request.user %}?{{ request|query_back:'copy' }}">{{ task.flow_task }}/#{{ task.pk}}</a>
+                            </td>
+                            <td>{{ task.owner|default:"" }}</td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+    {% endfor %}
+</div>

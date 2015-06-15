@@ -1,0 +1,41 @@
+{% load viewflow viewflow_frontend %}
+{% flows_start_actions view.flows request.user as start_actions %}
+
+{% if start_actions %}
+<div class="fixed-action-btn">
+    <a class="btn-floating btn-large waves-effect waves-light red z-depth-2 modal-trigger" href="#start_actions">
+        <i class="large material-icons">add</i>
+    </a>
+</div>
+
+<div id="start_actions" class="modal">
+    <div class="modal-content">
+        <h4>New Process</h4>
+
+        <table class="bordered">
+            <tbody>
+                {% for flow_class, actions in start_actions.items %}
+                {% if actions %}
+                <tr>
+                    <td>
+                        <h5>{{ flow_class.process_title }}</h5>
+                        {{ flow_class.process_description|default:"" }}
+                    </td>
+                    <td>
+                        {% for action in actions %}
+                        <a class="btn waves-effect waves-light" onclick="$('#start_actions').closeModal();" href="{% flowurl flow_class action.name ns=request.resolver_match.namespace ns_map=view.ns_map %}?{{ request|query_back:'here' }}">
+                            <i class="left material-icons">add</i>{{ action.task_title|default:action.name|title }}
+                        </a><br/>
+                        {% endfor %}
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat">Cancel</a>
+    </div>
+</div>
+{% endif %}

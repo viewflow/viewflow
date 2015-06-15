@@ -50,7 +50,7 @@ def flowurl(parser, token):
         elif isinstance(ref, AbstractProcess):
             namespace = get_flow_namespace(ref.flow_class, ns, ns_map)
             kwargs, url_ref = {}, '{}:{}'.format(namespace, url_name if url_name else 'index')
-            if url_name in ['detail', 'cancel']:
+            if url_name in ['detail', 'action_cancel']:
                 kwargs['process_pk'] = ref.pk
             return reverse(url_ref, kwargs=kwargs)
         elif isinstance(ref, AbstractTask):

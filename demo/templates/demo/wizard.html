@@ -1,59 +1,5 @@
-{% extends 'viewflow/base.html' %}
-{% load static viewflow %}
-
-{% block css %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static 'shepherd-theme-arrows.css' %}">
-<style type="text/css">
-  .glyphicon{
-      min-width: 15px;
-  }
-  .z-index-1000 {
-      z-index: 10000;
-  }
-</style>
-<script>
-    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    
-    ga('create', 'UA-1602364-9', 'auto');
-    ga('require', 'linkid', 'linkid.js');
-    ga('require', 'displayfeatures');
-    ga('send', 'pageview');
-</script>
-{% endblock %}
-
-
-{% block navright %}
-<ul class="nav navbar-nav">
-    <li class="dropdown">
-        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ request.user.username|title|default:"Anonymous" }} <b class="caret"></b></a>
-        <ul class="dropdown-menu">
-            <li><a href="{% url 'login_as' %}"><i class="glyphicon {% if request.user.is_anonymous %}glyphicon-ok{% endif %}"></i> Anonymous</a></li>
-            {% for user in users %}
-            <li><a href="{% url 'login_as' %}?user_pk={{ user.pk }}"><i class="glyphicon {% if request.user == user %}glyphicon-ok{% endif %}"></i> {{ user.username|title }}</a></li>
-            {% endfor %}
-        </ul>
-    </li>
-</ul>
-{% endblock %}
-
-{% block sidebar %}
-{{ block.super }}
-{% if user.is_staff %}
-<ul class="nav">
-    <li><a href="/admin">Administration</a></li>
-</ul>
-{% endif %}
-{% endblock %}
-
-{% block js %}
-{{ block.super }}
-<script src="{% static 'shepherd.js' %}"></script>
-<script src="{% static 'jquery.cookie.js' %}"></script>
-<script>
+{% load static %}
+<script type="text/javascript">
 var tour;
 
 tour = new Shepherd.Tour({
@@ -64,20 +10,21 @@ tour = new Shepherd.Tour({
 
 if($.cookie('examples.first_login') === undefined) {
     tour.addStep('welcome', {
-       text: ['Welcome to Viewflow Demo',
-              'Start with "admin" for get<br/> access to all flows'],
+       text: ['Welcome to the Viewflow Demo',
+              'Start with "Admin" user to get<br/> access to all flows'],
        classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-       attachTo: 'nav bottom'
+       attachTo: '.nav-wrapper bottom'
     });
     $.cookie('examples.first_login', true);
 }
+
 
 {% if user.is_anonymous %}
 tour.addStep('login', {
   text: ['Use dropdown to login under any demo user'],
   classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-  attachTo: {element: 'nav ul', on: 'left'},
-  tetherOptions: {offset: '-20px 0px'},
+  attachTo: {element: '#login_as_menu', on: 'left'},
+  tetherOptions: {offset: '-10px 30px'},
   classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
   buttons: []
 });
@@ -90,9 +37,10 @@ if($.cookie('examples.shipment/worker') === undefined) {
       text: ['You have access to Shipment Process',
              'You can work on <b>"Package goods"</b> and <b>"Move package"</b> tasks'],
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-      attachTo: {element: 'a[href="/flows/shipment/"]', on: 'right'},
+      attachTo: {element: 'li a[href="/viewflow/"]', on: 'right'},
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
-      buttons: [{ text: 'OK', action: tour.next }]
+      buttons: [{ text: 'OK', action: tour.next }],
+      tetherOptions: {offset: '0px -20px 0px 0px'}
     });
     $.cookie('examples.shipment/worker', true);
 }
@@ -105,9 +53,10 @@ if($.cookie('examples.shipment/manager') === undefined) {
       text: ['You have access to Shipment Process',
              'You can work on <b>"Take extra insurance"</b> tasks'],
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-      attachTo: {element: 'a[href="/flows/shipment/"]', on: 'right'},
+      attachTo: {element: 'li a[href="/viewflow/"]', on: 'right'},
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
-      buttons: [{ text: 'OK', action: tour.next }]
+      buttons: [{ text: 'OK', action: tour.next }],
+      tetherOptions: {offset: '0px -20px 0px 0px'}
     });
     $.cookie('examples.shipment/manager', true);
 }
@@ -118,13 +67,14 @@ if($.cookie('examples.shipment/clerk') === undefined) {
     tour.addStep('shipment/clerk', {
       title: 'Welcome, Shipment/Clerk',
       text: ['You have access to Shipment Process',
-             'You can <b>start</b> the Shipment process, work on <b>"Decide shipment type"</b>', 
+             'You can <b>start</b> the Shipment process, work on <b>"Decide shipment type"</b>',.
              '<b>"Set delivery mode"</b>, <b>"Request quotes"</b>, <b>"Check insurance"</b>,',
              'and <b>"Fill post label"</b> tasks'],
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-      attachTo: {element: 'a[href="/flows/shipment/"]', on: 'right'},
+      attachTo: {element: 'li a[href="/viewflow/"]', on: 'right'},
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
-      buttons: [{ text: 'OK', action: tour.next }]
+      buttons: [{ text: 'OK', action: tour.next }],
+      tetherOptions: {offset: '0px -20px 0px 0px'}
     });
     $.cookie('examples.shipment/clerk', true);
 }
@@ -137,9 +87,10 @@ if($.cookie('examples.helloworld/manager') === undefined) {
       text: ['You have access to "Hello, world" Process',
              'You can <b>"Approve"</b> "Hello, world" requests'],
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-      attachTo: {element: 'a[href="/flows/helloworld/"]', on: 'right'},
+      attachTo: {element: 'li a[href="/viewflow/"]', on: 'right'},
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
-      buttons: [{ text: 'OK', action: tour.next }]
+      buttons: [{ text: 'OK', action: tour.next }],
+      tetherOptions: {offset: '0px -20px 0px 0px'}
     });
     $.cookie('examples.helloworld/manager', true);
 }
@@ -152,9 +103,10 @@ if($.cookie('examples.helloworld/employee') === undefined) {
       text: ['You have access to "Hello, world" Process',
              'You can <b>start</b> "Hello, world" requests process'],
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-      attachTo: {element: 'a[href="/flows/helloworld/"]', on: 'right'},
+      attachTo: {element: 'li a[href="/viewflow/"]', on: 'right'},
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
-      buttons: [{ text: 'OK', action: tour.next }]
+      buttons: [{ text: 'OK', action: tour.next }],
+      tetherOptions: {offset: '0px -20px 0px 0px'}
     });
     $.cookie('examples.helloworld/employee', true);
 }
@@ -167,9 +119,10 @@ if($.cookie('examples.admin') === undefined) {
       text: ['You have access to any process and tasks',
              'Also you have rights to <a href="/admin/">data administration interface</a>'],
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-      attachTo: {element: 'a[href="/flows/helloworld/"]', on: 'right'},
+      attachTo: {element: 'li a[href="/viewflow/"]', on: 'right'},
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
-      buttons: [{ text: 'OK', action: tour.next }]
+      buttons: [{ text: 'OK', action: tour.next }],
+      tetherOptions: {offset: '0px -20px 0px 0px'},
     });
     $.cookie('examples.admin', true);
 }
@@ -178,4 +131,23 @@ if($.cookie('examples.admin') === undefined) {
 tour.start();
 
 </script>
-{% endblock %}
+<script type="text/javascript" src="//assets.zendesk.com/external/zenbox/v2.6/zenbox.js"></script>
+<style type="text/css" media="screen, projection">
+  @import url(//assets.zendesk.com/external/zenbox/v2.6/zenbox.css);
+</style>
+<script type="text/javascript">
+  if (typeof(Zenbox) !== "undefined") {
+    Zenbox.init({
+      dropboxID:   "20305382",
+      url:         "https://viewflow.zendesk.com",
+      tabTooltip:  "Ask Us",
+      tabImageURL: "https://p3.zdassets.com/external/zenbox/images/tab_ask_us_right.png",
+      tabColor:    "black",
+      tabPosition: "Right",
+      hide_tab: true,
+    });
+  }
+</script>
+<!--div class="hidden-xs hidden-sm" style="position:fixed;bottom:0;right:120px;background:#222;color:white;padding:15px;text-transform:uppercase">
+    <a style="color:white" href="#" onclick="javascript:Zenbox.show();">Having questions?</a>
+</div-->

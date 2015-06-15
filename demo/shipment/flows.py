@@ -1,4 +1,4 @@
-from viewflow import flow
+from viewflow import flow, frontend
 from viewflow.base import this, Flow
 from viewflow.flow.views import UpdateProcessView
 from viewflow.lock import select_for_update_lock
@@ -7,7 +7,13 @@ from . import views
 from .models import ShipmentProcess, ShipmentTask
 
 
+@frontend.register
 class ShipmentFlow(Flow):
+    """
+    Shipment
+
+    Shipment workflow for e-commerce store back-office automation
+    """
     process_class = ShipmentProcess
     task_class = ShipmentTask
     lock_impl = select_for_update_lock
@@ -18,7 +24,7 @@ class ShipmentFlow(Flow):
         """
 
     start = (
-        flow.Start(views.start_view)
+        flow.Start(views.StartView)
         .Permission('shipment.can_start_request')
         .Next(this.split_clerk_warehouse)
     )

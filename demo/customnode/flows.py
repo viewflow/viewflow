@@ -1,6 +1,6 @@
-from viewflow import flow
-from viewflow.flow.views import CreateProcessView
+from viewflow import flow, frontend
 from viewflow.base import this, Flow
+from viewflow.flow.views import CreateProcessView
 
 from . import models, views
 from .nodes import DynamicSplit
@@ -44,3 +44,5 @@ class DynamicSplitFlow(Flow):
     join_on_decision = flow.Join().Next(this.end)
 
     end = flow.End()
+
+frontend.register(DynamicSplitFlow)

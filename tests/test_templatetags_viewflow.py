@@ -62,8 +62,9 @@ class Test(TestCase):
         act = TestTemplateTagsFlow.start.run()
         user = User.objects.create(username="test")
         request = type('Request', (object,), {'user': user, 'GET': QueryDict(query_string=None)})
+        request.resolver_match = resolve('/test/')
         process_data = Template("{% load viewflow %}{% include_process_data process %}").render(
-            Context({'request': self.request, 'process': act.process, 'request': request}))
+            Context({'process': act.process, 'request': request}))
         self.assertIn('Test Template Tags', process_data)
 
 

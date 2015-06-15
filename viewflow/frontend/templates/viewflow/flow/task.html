@@ -1,0 +1,50 @@
+{% extends 'viewflow/base_module.html' %}
+{% load viewflow  viewflow_frontend material_form %}
+
+{% block breadcrumbs_items %}
+{% include 'viewflow/includes/breadcrumb_category.html' %}
+<a href="{% flowurl activation.flow_class 'index' %}?{{ request|query_back:'copy' }}">{{ activation.flow_class.process_title }}</a>  &rang;
+<a href="{% flowurl activation.process 'detail' %}?{{ request|query_back:'copy' }}">#{{ activation.process.pk }}</a>  &rang;
+<a href="{% flowurl activation.task 'detail' %}?{{ request|query_back:'copy' }}">{{ activation.flow_task }} / #{{ activation.task.pk }}</a>
+{% endblock %}
+
+
+{% block content %}
+<div class="row">
+    <div class="col s12 m6 l8">
+        <form role="form" method="POST">
+            <div class="card form-card">
+                <div class="card-bend center-align">
+                    <h5>{{ activation.flow_class.process_title }}</h5>
+                    <h6>{{ activation.flow_task }} #{{ activation.task.process.id }}/{{ activation.task.id }}</h6>
+                </div>
+                <div class="card-content">
+                    <div class="card-title black-text">
+                        {{ activation.task.summary|default:activation.task.flow_task }}
+                        <h6>{{ activation.process.summary }}</h6>
+                    </div>
+                    {% block task_form %}
+                    {% csrf_token %}
+                    {% form form=form layout=view.layout %}{% endform %}
+                    {{ activation.management_form }}
+                    {% endblock %}
+                </div>
+                <div class="card-action row">
+                    {% block task_actions %}
+                    <div class="col s3">
+                        <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back:'copy' }}">detail</a>
+                    </div>
+                    <div class="col s9 right-align">
+                        <button type="submit" name="_continue" class="btn btn-flat">Done and continue on this process</button>
+                        <button type="submit" name="_done" class="btn green white-text btn-flat">Done</button>
+                    </div>
+                    {% endblock %}
+                </div>
+            </div>
+        </form>
+    </div>
+    <div class="col s12 m6 l4">
+        {% include_process_data activation.process %}
+    </div>
+</div>
+{% endblock %}

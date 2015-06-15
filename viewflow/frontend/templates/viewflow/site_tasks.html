@@ -1,0 +1,106 @@
+{% extends 'viewflow/base_module.html' %}
+{% load viewflow viewflow_frontend material_form %}
+
+{% block breadcrumbs_items %}
+<a href="{% url 'viewflow:index' %}">Inbox</a> &rang;
+<a class="active">All</a>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col s12 m8 l9">
+        <div class="card data-card">
+            <div class="card-content">
+                <table class="table selectable bordered">
+                    <thead>
+                        <th width="50px">
+                            <p>
+                                <input type="checkbox" id="_select_all" data-select-all />
+                                <label for="_select_all">&nbsp;</label>
+                            </p>
+                        </th>
+                        <th>#</th>
+                        <th>Description</th>
+                        <th>Summary</th>
+                        <th>Task Type</th>
+                        <th>Process</th>
+                        <th>Assigned</th>
+                    </thead>
+                    <tbody>
+                        {% for task in task_list %}
+                        <tr data-row-id="{{ task.pk }}">
+                            <td>
+                                <p>
+                                    <input type="checkbox" id="_row_{{ forloop.counter }}" />
+                                    <label for="_row_{{ forloop.counter }}">&nbsp;</label>
+                                </p>
+                            </td>
+                            <td><a href="{% flowurl task user=request.user ns=request.resolver_match.namespace ns_map=view.ns_map %}?{{ request|query_back:'here' }}">{{ task.process.id }}/{{ task.id }}</a></td>
+                            <td><a href="{% flowurl task user=request.user ns=request.resolver_match.namespace ns_map=view.ns_map %}?{{ request|query_back:'here' }}">{{ task.summary }}</a></td>
+                            <td>{{ task.flow_process.summary }}</td>
+                            <td>{{ task.flow_task }}</td>
+                            <td><a href="{% flowurl task.process 'detail' ns=request.resolver_match.namespace ns_map=view.ns_map %}?{{ request|query_back:'here' }}">{{ task.process.flow_class.process_title }} #{{task.process.pk}}</a></td>
+                            <td>{{ task.created }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6">No tasks are assigned to you</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% if page_obj.has_previous or page_obj.has_next %}
+                <div class="row pagination">
+                    <div class="col s12 right-align">
+                        {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ paginator.count }}
+                        <span style="padding-left:30px" class="right">
+                        {% if page_obj.has_previous %}
+                        <a href="?page={{ page_obj.previous_page_number }}"><i class="material-icons small">navigate_before</i></a>
+                        {% else %}
+                        <i class="material-icons small grey-text">navigate_before</i>
+                        {% endif %}
+                        &nbsp;
+                        {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}"><i class="material-icons small">navigate_next</i></a>
+                        {% else %}
+                        <i class="material-icons small grey-text">navigate_next</i>
+                        {% endif %}
+                        </span>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-action row">
+                <div class="col s3">&nbsp;</div>
+                <div class="col s9 right-align">
+                    <a href="{% url 'viewflow:unassign'%}?{{ request|query_back:'here' }}" class="btn-flat grey black-text lighten-4 disabled selectable-action">Un-Assign</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col s12 m4 l3">
+        <form action="/workflow/" method="get" data-pjax-get>
+            <div class="card filters">
+                <div class="card-content">
+                    <span class="card-title black-text" style="margin-bottom:20px">Filters</span>
+                    <div id="changelist-filter row">
+                        {% with form_select_empty_label='All' %}
+                        {% form form=view.filter.form %}
+                            {% part form.process label %} <label for="id_process">By Process</label> {% endpart %}
+                            {% part form.flow_task label %} <label for="id_flow_task">By Task</label> {% endpart %}
+                            {% part form.created label %} <label for="id_created">By create date</label> {% endpart %}
+                        {% endform %}
+                        {% endwith %}
+                    </div>
+                    <div class="s12 right-align">
+                        <button  type="submit" class="btn btn-default">Filter</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% include 'viewflow/includes/flows_start_actions.html' %}
+
+{% endblock %}

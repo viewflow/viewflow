@@ -1,0 +1,30 @@
+{% extends 'material/frontend/base.html' %}
+{% load static %}
+
+{% block title %}Viewflow - business process autmation with python and django{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link href="{% static 'demo/css/shepherd-theme-arrows.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block js %}
+{{ block.super }}
+<script src="{% static 'demo/js/shepherd.js' %}" type="text/javascript"></script>
+<script src="{% static 'demo/js/jquery.cookie.js' %}" type="text/javascript"></script>
+{% endblock %}
+
+{% block top_menu_extra %}
+<li id="login_as_menu"><a class="dropdown-button" href="#!" data-activates="user-login-as-menu"><i class="mdi-navigation-arrow-drop-down right"></i>Login As</a></li>
+<ul id="user-login-as-menu" class="dropdown-content"  style="min-width:200px">
+    {% for user in users %}
+    <li><a class="no-pjax" href="{% url 'login_as' %}?user_pk={{ user.pk }}">{{ user }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock %}
+
+
+{% block main %}
+{{ block.super }}
+{% include 'demo/wizard.html' %}
+{% endblock %}

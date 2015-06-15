@@ -1,0 +1,19 @@
+{% extends 'viewflow/flow/base_task.html' %}
+{% load viewflow viewflow_frontend %}
+
+{% block breadcrumbs_items_extra %}
+&rang; <a>{{ view.action_name }}</a>
+{% endblock %}
+
+
+{% block task_actions %}
+<div class="col s3">
+    <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back:'copy' }}">detail</a>
+</div>
+<div class="col s9 right-align">
+    <form role="form" method="POST" style="display:inline-block">
+        {% csrf_token %}
+        <button type="submit" name="run_action" class="btn btn-flat">Confirm {{ view.action_name }}</button>
+    </form>
+</div>
+{% endblock %}
