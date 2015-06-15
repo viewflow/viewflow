@@ -1,5 +1,8 @@
+from __future__ import unicode_literals
+
 from django.db import models
 from django.conf import settings
+from django.utils.encoding import python_2_unicode_compatible
 from viewflow.models import Process, Task
 
 
@@ -16,6 +19,7 @@ class Carrier(models.Model):
         return self.name
 
 
+@python_2_unicode_compatible
 class Insurance(models.Model):
     company_name = models.CharField(max_length=50)
     cost = models.IntegerField()

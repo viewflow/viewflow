@@ -27,7 +27,7 @@ class ProcessAdmin(admin.ModelAdmin):
     list_display_links = ['pk', 'created', 'flow_cls']
     list_filter = ['status']
     readonly_fields = ['flow_cls', 'status', 'finished']
-    inlines = [TaskInline]
+    # inlines = [TaskInline]
 
     def participants(self, obj):
         user_ids = obj.task_set.exclude(owner__isnull=True).values('owner')

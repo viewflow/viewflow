@@ -173,7 +173,7 @@ class JoinActivation(Activation):
 
         active = self.flow_cls.task_cls._default_manager \
             .filter(process=self.process, token__startswith=join_token_prefix) \
-            .exclude(status=STATUS.DONE)
+            .exclude(status__in=[STATUS.DONE, STATUS.CANCELED])
 
         return not active.exists()
 

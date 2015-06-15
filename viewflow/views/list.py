@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.views import generic
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
@@ -23,8 +25,9 @@ def flow_start_actions(flow_cls, user=None):
 
 
 def flows_start_actions(flow_classes, user=None):
-    actions = {}
-    for flow_cls in flow_classes:
+    actions = OrderedDict()
+
+    for flow_cls in sorted(flow_classes, key=lambda flow_cls: flow_cls.process_title):
         actions[flow_cls] = flow_start_actions(flow_cls, user)
     return actions
 

@@ -39,7 +39,7 @@ def flowurl(parser, token):
             return reverse(url_ref)
         elif isinstance(ref, AbstractProcess):
             kwargs, url_ref = {}, '{}:{}'.format(ref.flow_cls.instance.namespace, url_name if url_name else 'index')
-            if url_name == 'details':
+            if url_name in ['details', 'cancel']:
                 kwargs['process_pk'] = ref.pk
             return reverse(url_ref, kwargs=kwargs)
         elif isinstance(ref, AbstractTask):
@@ -120,7 +120,7 @@ def include_process_data(context, process):
 
     context.push()
     try:
-        context['process_data'] = get_model_display_data(process)
+        context['process_data'] = get_model_display_data(process, context['request'].user)
         context['process'] = process
         return template.render(context)
     finally:

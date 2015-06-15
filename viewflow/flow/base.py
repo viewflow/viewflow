@@ -21,7 +21,6 @@ class ThisObject(object):
         """
         def get_task_owner(process):
             flow_cls = process.flow_cls
-
             task_node = flow_cls._meta.node(self.name)
             task = flow_cls.task_cls.objects.get(
                 process=process,
