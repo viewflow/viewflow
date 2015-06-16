@@ -188,8 +188,3 @@ Latest changelog
 * Allow to list task state change handles in template
 * *PRO ONLY* New Material Designed Frontend for the Flow
 
-Roadmap
-=======
-
-* in 0.9.0 at January we going to extend documentation and improve task undo behaviour
-* 1.0.0 LTS estimated at March 2015 would have lifetime support same as django 1.6
