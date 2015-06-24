@@ -97,9 +97,10 @@ class TransitionDescriptor(object):
 class SuperTransitionDescriptor(TransitionDescriptor):
     def get_descriptor(self, instance):
         for cls in instance.__class__.__mro__:
-            super_descriptor = getattr(cls, self.name)
-            if not isinstance(super_descriptor, SuperTransitionDescriptor):
-                break
+            if hasattr(cls, self.name):
+                super_descriptor = getattr(cls, self.name)
+                if not isinstance(super_descriptor, SuperTransitionDescriptor):
+                    break
         else:
             raise ValueError('Base transition not found for {}'.format(self.name))
 

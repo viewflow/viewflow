@@ -36,6 +36,14 @@ class SubChild(Child):
     pass
 
 
+class Mixin(object):
+   pass
+
+
+class SubChildWithMixin(Mixin, Child):
+    pass
+
+
 class StateSetter(object):
     state = State()
 
@@ -115,6 +123,14 @@ class TestFsm(unittest.TestCase):
 
         sub_child.shutdown()
         self.assertEqual('done', sub_child.state)
+
+    def test_subchild_withmixin_transitions(self):
+        sub_child = SubChildWithMixin()
+        self.assertTrue(sub_child.prepare.can_proceed())
+        self.assertEqual([SubChildWithMixin.prepare], SubChildWithMixin.state.get_available_transtions(sub_child))
+        sub_child.prepare()
+        self.assertEqual('prepared', sub_child.state)
+
 
     def test_state_setter(self):
         state_setter = StateSetter()
