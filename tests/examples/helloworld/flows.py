@@ -17,7 +17,7 @@ class HelloWorldFlow(Flow):
     lock_impl = lock.select_for_update_lock
 
     summary_template = "'{{ process.text }}' message to the world"
-    
+
     start = flow.Start(flow_views.StartProcessView, fields=['text']) \
         .Permission(auto_create=True) \
         .Next(this.approve)

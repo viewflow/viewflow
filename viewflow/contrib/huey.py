@@ -25,7 +25,6 @@ def flow_do(flow_node, test_task, **post_kwargs):
     """
     Eager run of delayed job call
     """
-    import ipdb; ipdb.set_trace()
     args, kwargs = flow_node._job.schedule.call_args
     flow_node._job.apply(*args, **kwargs).get()
 

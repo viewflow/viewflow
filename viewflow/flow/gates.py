@@ -261,12 +261,13 @@ class Join(base.NextNodeMixin,
     """
     Waits for one or all incoming links and activates next path.
 
-    Join should be connected to one split task only
+    Join should be connected to one split task only.
 
     Example::
 
-        join_on_warehouse = self.Join() \\
+        join_on_warehouse = flow.Join() \\
             .Next(this.next_task)
+
     """
     task_type = 'JOIN'
     activation_cls = JoinActivation

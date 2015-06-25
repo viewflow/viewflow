@@ -122,9 +122,8 @@ class TaskCancelView(BaseTaskActionView):
 
 
 class TaskPerformView(BaseTaskActionView):
-    """
-    Non-interactive task that cancelled and need to be started manually
-    """
+
+    """Non-interactive task that cancelled and need to be started manually."""
 
     action_name = 'execute'
 
@@ -137,9 +136,8 @@ class TaskPerformView(BaseTaskActionView):
 
 
 class TaskActivateNextView(BaseTaskActionView):
-    """
-    Activate next task without interactove task redone
-    """
+
+    """Activate next task without interactive task redone."""
 
     action_name = 'activate_next'
 

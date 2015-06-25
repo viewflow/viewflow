@@ -1,11 +1,29 @@
-"""
-django signals as part of flow
-"""
+"""Django signals as part of flow."""
 from ..activation import StartActivation
 from . import base, func
 
 
 class StartSignal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
+
+    """
+    StartNode that connects to a django signal.
+
+    Example::
+
+        def my_start_receiver(activation, **signal_kwargs):
+            activation.prepare()
+            # You custom code
+            activation.done()
+
+        class MyFlow(Flow):
+            start = flow.StartSignal(post_save, my_start_receiver, sender=MyModelCls)
+
+    .. note::
+
+        The first argument of your receiver will be the activation.
+
+    """
+
     task_type = 'START'
     activation_cls = StartActivation
 
@@ -34,6 +52,30 @@ class StartSignal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
 
 
 class Receiver(object):
+
+    """
+    Flow signal receiver that gets the signaled task form the kwargs.
+
+    Subclasses must implement :method:`.get_task` and :method:`.__call__`.
+
+    Example::
+
+        @flow_signal()
+        class MyReceiver(Receiver):
+            def get_task(self, flow_task, **signal_kwargs):
+                return kwargs['process'].get_task(flow_task)
+
+            def __call__(self, activation, **signal_kwargs):
+                activation.prepare()
+                activation.done()
+
+    .. note::
+
+        In this example your signal will need to be send
+        with ``process`` as a kwarg.
+
+    """
+
     def get_task(self, flow_task, **signal_kwargs):
         raise NotImplementedError
 
@@ -43,7 +85,37 @@ class Receiver(object):
 
 def flow_signal(task_loader=None, **lock_args):
     """
-    Decorator for flow signal receivers
+    Decorator providing a flow signal receiver with the activation.
+
+    Args:
+        task_loader (callable): callable that returns the signaled flow_task
+
+    The decorator can be used ether with a callable defining a `task_loader`
+    or with a :class:`.Receiver` subclass and no `task_loader`.
+
+    Example::
+
+        @flow_signal(task_loader=lambda flow_task, **kwargs: kwargs['process'].get_task(flow_task))
+        def my_receiver(activation, **kwargs):
+            activation.prepare()
+            activation.done()
+
+    or::
+
+        @flow_signal()
+        class MyReceiver(Receiver):
+            def get_task(self, flow_task, **signal_kwargs):
+                return kwargs['process'].get_task(flow_task)
+
+            def __call__(self, activation, **signal_kwargs):
+                activation.prepare()
+                activation.done()
+
+    .. note::
+
+        In both examples your signal will need to be send
+        with ``process`` as a kwarg.
+
     """
     def decorator(func_or_cls):
         def wrapper(flow_task, **signal_kwargs):
@@ -79,14 +151,22 @@ def flow_signal(task_loader=None, **lock_args):
 
 
 class Signal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
-    """
-    Executes code on django signal
 
-    Example:
+    """
+    Node that connects to a django signal.
+
+    Example::
 
         create_model = flow.Signal(post_create, my_receiver, sender=MyModelCls)
 
+    .. note::
+
+        Other than the :class:`.StartSignal` you will need to provide activation
+        for your receiver yourself. This can be done using the :func:`.flow_signal`
+        decorator.
+
     """
+
     task_type = 'FUNC'
     activation_cls = func.FuncActivation
 

@@ -20,18 +20,21 @@ register = template.Library()
 @register.tag
 def flowurl(parser, token):
     """
-        Returns flow url::
+    Return flow url.
 
-            {% flowurl ref [urlname] [user=]  [as varname]%}
+    Usage::
 
-        Usage examples::
+        {% flowurl ref [urlname] [user=]  [as varname]%}
 
-           {% flowurl 'app_label/FlowCls' 'viewflow:index' %}
-           {% flowurl flow_cls 'index' as index_url %}
-           {% flowurl process 'index' %}
-           {% flowurl process 'details' %}
-           {% flowurl task 'assign' user=request.user %}
-           {% flowurl task user=request.user %}
+    Examples::
+
+        {% flowurl 'app_label/FlowCls' 'viewflow:index' %}
+        {% flowurl flow_cls 'index' as index_url %}
+        {% flowurl process 'index' %}
+        {% flowurl process 'details' %}
+        {% flowurl task 'assign' user=request.user %}
+        {% flowurl task user=request.user %}
+
     """
     def geturl(ref, url_name=None, user=None):
         if isinstance(ref, Flow):
@@ -90,9 +93,12 @@ def flowurl(parser, token):
 @register.assignment_tag
 def flow_perms(user, task):
     """
-    Assigns list of permissions
+    Assign list of permissions.
 
-    {% flow_perms request.user task as task_perms  %}
+    Example::
+
+        {% flow_perms request.user task as task_perms  %}
+
     """
     result = []
 
@@ -108,9 +114,7 @@ def flow_perms(user, task):
 
 @register.simple_tag(takes_context=True)
 def include_process_data(context, process):
-    """
-    Shortcut tag for list all data from linked process models
-    """
+    """Shortcut tag for list all data from linked process models."""
     opts = process.flow_cls._meta
 
     template_names = (

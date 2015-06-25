@@ -60,12 +60,12 @@ class AbstractProcess(models.Model):
         if hasattr(models.Model, 'refresh_from_db'):
             super(AbstractProcess, self).refresh_from_db(using=using, fields=fields, **kwargs)
         else:
-           """
-           django 1.6, only basic fallback
-           """
-           db_instance = self.__class__._default_manager.filter(pk=self.pk).get()
-           for field in self._meta.concrete_fields:
-               setattr(self, field.attname, getattr(db_instance, field.attname))
+            """
+            django 1.6, only basic fallback
+            """
+            db_instance = self.__class__._default_manager.filter(pk=self.pk).get()
+            for field in self._meta.concrete_fields:
+                setattr(self, field.attname, getattr(db_instance, field.attname))
 
     class Meta:
         abstract = True

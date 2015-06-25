@@ -13,9 +13,7 @@ from .. import flow, activation
 
 
 def get_next_task_url(request, process):
-    """
-    Heruistic for user on complete task redirect
-    """
+    """Heuristic for user on complete task redirect."""
     if '_continue' in request.POST:
         # Try to find next task available for the user
         task_cls = process.flow_cls.task_cls
@@ -49,27 +47,21 @@ def get_next_task_url(request, process):
 
 
 def process_message_user(request, process, message, level=messages.SUCCESS):
-    """
-    Message to the user prefixed with process link
-    """
+    """Message to the user prefixed with process link."""
     process_url = reverse('{}:details'.format(process.flow_cls.instance.namespace), kwargs={'process_pk': process.pk})
     message = 'Process <a href="{}">{}</a> {}'.format(process_url, process.pk, message)
     messages.add_message(request, level, mark_safe(message))
 
 
 def task_message_user(request, task, message, level=messages.SUCCESS):
-    """
-    Message to the user prefixed with task link
-    """
+    """Message to the user prefixed with task link."""
     task_url = task.flow_task.get_task_url(task, url_type='details', user=request.user)
     message = 'Task <a href="{}">{}</a> {}'.format(task_url, task.pk, message)
     messages.add_message(request, level, mark_safe(message))
 
 
 def tasks_message_user(request, tasks, message, level=messages.SUCCESS):
-    """
-    Message to the user prefixed with task link
-    """
+    """Message to the user prefixed with task link."""
     tasks_message = []
     for task in tasks:
         task_url = task.flow_task.get_task_url(task, url_type='details', user=request.user)
@@ -98,11 +90,13 @@ class FlowManagePermissionMixin(object):
 
 
 class DetailsView(generic.TemplateView):
-    """
-    Default details view for flow task
 
-    Get confirmation from user, assigns task and redirects to task pages
     """
+    Default details view for flow task.
+
+    Get confirmation from user, assigns task and redirects to task pages.
+    """
+
     def get_template_names(self):
         flow_task = self.activation.flow_task
         opts = self.activation.flow_task.flow_cls._meta

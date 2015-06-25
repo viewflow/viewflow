@@ -36,7 +36,7 @@ failed for activation task would be created in `error` state.
 
 
 If
-===
+====
 .. autoclass:: viewflow.flow.If
 
 Switch
@@ -51,6 +51,19 @@ Split
 Join
 ====
 .. autoclass:: viewflow.flow.Join
+
+Function
+========
+.. autoclass:: viewflow.flow.Function
+
+Handler
+=======
+.. autoclass:: viewflow.flow.Handler
+
+Signal
+======
+.. autoclass:: viewflow.flow.Signal
+
 
 End
 ====

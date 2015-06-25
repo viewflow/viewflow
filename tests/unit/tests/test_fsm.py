@@ -37,7 +37,7 @@ class SubChild(Child):
 
 
 class Mixin(object):
-   pass
+    pass
 
 
 class SubChildWithMixin(Mixin, Child):
@@ -130,7 +130,6 @@ class TestFsm(unittest.TestCase):
         self.assertEqual([SubChildWithMixin.prepare], SubChildWithMixin.state.get_available_transtions(sub_child))
         sub_child.prepare()
         self.assertEqual('prepared', sub_child.state)
-
 
     def test_state_setter(self):
         state_setter = StateSetter()

@@ -1,6 +1,4 @@
-"""
-Function handlers as part of flow
-"""
+"""Functions and handlers as part of flow."""
 import traceback
 from django.db import transaction
 from django.utils.timezone import now
@@ -11,15 +9,26 @@ from . import base
 
 
 class StartFunction(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
+
     """
-    def create_requst(activation):
-        activation.prepare()
-        activation.done()
+    StartNode that can be executed within you code.
 
-    class MyFlow(Flow):
-        start_request = flow.StartFunction(create_request)
+    Example::
 
-    MyFlow.create_request.run()
+        def create_request(activation, **kwargs):
+            activation.prepare()
+            # Your custom code
+            activation.done()
+
+        class MyFlow(Flow):
+            start = flow.StartFunction(create_request)
+
+        MyFlow.create_request.run(**kwargs)
+
+    .. note::
+
+        Any kwarg you pass of the run call will be passed to the function.
+
     """
 
     task_type = 'START'
@@ -70,16 +79,12 @@ class FuncActivation(Activation):
 
     @Activation.status.transition(source=STATUS.DONE)
     def activate_next(self):
-        """
-        Activate all outgoing edges.
-        """
+        """Activate all outgoing edges."""
         self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
-        """
-        Instantiate new task
-        """
+        """Instantiate new task."""
         task = flow_task.flow_cls.task_cls(
             process=prev_activation.process,
             flow_task=flow_task,
@@ -103,9 +108,7 @@ class FlowFunc(object):
 
 
 def flow_func(task_loader=None, **lock_args):
-    """
-    Decorator for flow functions
-    """
+    """Decorator for flow functions."""
     def decorator(func_or_cls):
         def wrapper(flow_task, *func_args, **func_kwargs):
             if isinstance(func_or_cls, type) and issubclass(func_or_cls, FlowFunc):
@@ -141,6 +144,28 @@ def flow_func(task_loader=None, **lock_args):
 
 
 class Function(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
+
+    """
+    Node that can be executed within you code.
+
+    Example::
+
+        def my_function(activation, **kwargs):
+            activation.prepare()
+            # Your custom code
+            activation.done()
+
+        class MyFlow(Flow):
+            my_task = flow.Function(my_function)
+
+        MyFlow.my_task.run(**kwargs)
+
+    .. note::
+
+        Any kwarg you pass of the run call will be passed to the function.
+
+    """
+
     task_type = 'FUNC'
     activation_cls = FuncActivation
 
@@ -194,16 +219,12 @@ class HandlerActivation(Activation):
 
     @Activation.status.transition(source=STATUS.DONE)
     def activate_next(self):
-        """
-        Activate all outgoing edges.
-        """
+        """Activate all outgoing edges."""
         self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
-        """
-        Instantiate new task
-        """
+        """Instantiate new task."""
         task = flow_task.flow_cls.task_cls(
             process=prev_activation.process,
             flow_task=flow_task,
@@ -220,6 +241,35 @@ class HandlerActivation(Activation):
 
 
 class Handler(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
+
+    """
+    Node that can be executed automatically after task was created.
+
+    In difference to :class:`.Function` a :class:`.Handler` is not explicitly called
+    in code, but executes automatically.
+
+    Example::
+
+        def my_handler(activation):
+            # Your custom code
+            pass
+
+        class MyFlow(Flow):
+            previous_task = flow.View(ProcessView) \
+                .Next(this.my_task)
+
+            my_task = flow.Function(my_handler) \
+                .Next(this.End)
+
+            end = flow.End()
+
+    .. note::
+
+        You don't need to call ``prepare()`` or ``done()`` on the
+        activation in you handler callback.
+
+    """
+
     task_type = 'FUNC'
     activation_cls = HandlerActivation
 
