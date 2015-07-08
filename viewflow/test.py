@@ -146,8 +146,26 @@ class FlowTaskTest(object):
 
         return self
 
-    def Assert(self, assertion):
-        fail_message = "Flow task {} post condition fails".format(self.flow_task.name)
+    def Assert(self, assertion, fail_message=None):
+        """
+        Assert task or process.
+
+        It is possible to assert ether the task or related process by choosing
+        a different arg name for the assertion function.
+
+        Example::
+
+            Assert(lambda t: t.finished)  # tests task
+            Assert(lambda p: p.is_shipped)  # tests process
+
+        :param assertion: assertion callable
+        :type assertion: function
+        :param fail_message: assertion fail message
+        :return: self
+        :rtype: FlowTaskTest
+        """
+        if not fail_message:
+            fail_message = "Flow task {} post condition fails".format(self.flow_task.name)
 
         if callable(assertion):
             args = inspect.getargspec(assertion).args
