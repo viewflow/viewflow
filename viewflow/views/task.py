@@ -6,9 +6,10 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views import generic
 from django.utils.http import is_safe_url
+from django.utils.translation import ugettext_lazy as _
 
 from .. import flow
-from .base import get_next_task_url, task_message_user, process_message_user
+from .base import get_next_task_url, get_task_hyperlink, get_process_hyperlink
 
 
 class TaskViewMixin(object):
@@ -39,10 +40,14 @@ class TaskViewMixin(object):
         self.activation.done()
 
     def message_complete(self):
-        task_message_user(self.request, self.activation.task, 'completed')
+        hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
+        msg = _('Task {hyperlink} has been completed.').format(hyperlink=hyperlink)
+        messages.success(self.request, msg)
         self.activation.process.refresh_from_db()
         if self.activation.process.finished:
-            process_message_user(self.request, self.activation.process, 'completed')
+            hyperlink = get_process_hyperlink(self.activation.process)
+            msg = _('Process {hyperlink} has been completed.').format(hyperlink=hyperlink)
+            messages.info(self.request, msg)
 
     def formset_valid(self, *args, **kwargs):
         """
@@ -73,7 +78,9 @@ class TaskViewMixin(object):
         self.activation = activation
 
         if not activation.prepare.can_proceed():
-            task_message_user(request, activation.task, 'cannot be executed', level=messages.ERROR)
+            hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
+            msg = _('Task {hyperlink} cannot be executed.').format(hyperlink=hyperlink)
+            messages.error(self.request, msg)
             return redirect(activation.flow_task.get_task_url(activation.task, url_type='details', user=request.user))
 
         if not self.activation.has_perm(request.user):
@@ -111,10 +118,14 @@ class TaskActivationViewMixin(object):
         self.done()
 
     def message_complete(self):
-        task_message_user(self.request, self.task, 'completed')
+        hyperlink = get_task_hyperlink(self.task, self.request.user)
+        msg = _('Task {hyperlink} has been completed.').format(hyperlink=hyperlink)
+        messages.success(self.request, msg)
         self.process.refresh_from_db()
         if self.process.finished:
-            process_message_user(self.request, self.process, 'completed')
+            hyperlink = get_process_hyperlink(self.process)
+            msg = _('Process {hyperlink} has been completed.').format(hyperlink=hyperlink)
+            messages.info(self.request, msg)
 
     def formset_valid(self, *args, **kwargs):
         """
@@ -207,9 +218,10 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
     def post(self, request, *args, **kwargs):
         if '_assign' or '_continue' in request.POST:
             self.assign(self.request.user)
-            task_message_user(
-                request, self.task,
-                'assigned to {}'.format(request.user.get_full_name() or request.user.username))
+            hyperlink = get_task_hyperlink(self.task, request.user)
+            msg = _('Task {hyperlink} has been assigned to {user}.').format(
+                hyperlink=hyperlink, user=request.user.get_full_name())
+            messages.info(request, msg)
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.get(request, *args, **kwargs)
@@ -217,7 +229,10 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
     @flow.flow_view()
     def dispatch(self, request, *args, **kwargs):
         if not self.assign.can_proceed():
-            task_message_user(request, self.task, 'cannot be assigned', level=messages.ERROR)
+            hyperlink = get_task_hyperlink(self.task, request.user)
+            msg = _('Task {hyperlink} cannot be assigned to {user}.').format(
+                hyperlink=hyperlink, user=request.user.get_full_name())
+            messages.error(request, msg)
             return redirect(self.flow_task.get_task_url(self.task, url_type='details', user=request.user))
 
         if not self.flow_task.can_assign(request.user, self.task):

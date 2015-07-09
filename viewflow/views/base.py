@@ -5,7 +5,6 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.http import is_safe_url
-from django.utils.safestring import mark_safe
 
 from django.views import generic
 
@@ -48,35 +47,32 @@ def get_next_task_url(request, process):
         return reverse('{}:index'.format(process.flow_cls.instance.namespace))
 
 
-def process_message_user(request, process, message, level=messages.SUCCESS):
+def get_process_hyperlink(process):
     """
-    Message to the user prefixed with process link
+    Return process url wrapped in a html hyperlink tag.
+
+    :param process: Process
+    :type process: viewflow.models.AbstractProcess
+    :rtype: str
     """
-    process_url = reverse('{}:details'.format(process.flow_cls.instance.namespace), kwargs={'process_pk': process.pk})
-    message = 'Process <a href="{}">{}</a> {}'.format(process_url, process.pk, message)
-    messages.add_message(request, level, mark_safe(message))
+    return '<a href="{process_url}">#{process_pk}</a>'.format(
+        process_url=process.get_absolute_url(),
+        process_pk=process.pk
+    )
 
 
-def task_message_user(request, task, message, level=messages.SUCCESS):
+def get_task_hyperlink(task, user=None):
     """
-    Message to the user prefixed with task link
-    """
-    task_url = task.flow_task.get_task_url(task, url_type='details', user=request.user)
-    message = 'Task <a href="{}">{}</a> {}'.format(task_url, task.pk, message)
-    messages.add_message(request, level, mark_safe(message))
+    Return task url wrapped in a html hyperlink tag.
 
-
-def tasks_message_user(request, tasks, message, level=messages.SUCCESS):
+    :param task: Task
+    :type task: viewflow.models.AbstractTask
+    :rtype: str
     """
-    Message to the user prefixed with task link
-    """
-    tasks_message = []
-    for task in tasks:
-        task_url = task.flow_task.get_task_url(task, url_type='details', user=request.user)
-        tasks_message.append('<a href="{}">{}</a>'.format(task_url, task.pk))
-
-    message = "Tasks {} {}".format(' '.join(tasks_message), message)
-    messages.add_message(request, level, mark_safe(message))
+    return '<a href="{task_url}">#{task_pk}</a>'.format(
+        task_url=task.get_absolute_url(user),
+        task_pk=task.pk
+    )
 
 
 class FlowViewPermissionMixin(object):
@@ -169,7 +165,7 @@ class BaseTaskActionView(FlowManagePermissionMixin, generic.TemplateView):
 
         if not self.can_proceed():
             task_message_user(
-                request, activation.task, "Can't execute action {}".format(self.action_name.title),
+                request, activation.task, _("Can't execute action {}").format(self.action_name.title),
                 level=messages.ERROR)
             return redirect(activation.flow_task.get_task_url(activation.task, url_type='details', user=request.user))
 
