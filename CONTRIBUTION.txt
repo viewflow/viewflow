@@ -1,0 +1,9 @@
+CONTRIBUTION SUBMISSION POLICY:
+
+By intentionally submitting any modifications, corrections or
+derivatives to this work, or any other work intended for use with
+Viewflow you confirm that you are the copyright holder for those contributions 
+and you grant to Mikhail Podgurskiy a nonexclusive, worldwide, irrevocable,
+royalty-free, perpetual, license to use, copy, create derivative
+works based on those contributions, and sublicense and distribute
+those contributions and any derivatives thereof.
