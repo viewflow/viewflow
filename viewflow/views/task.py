@@ -30,6 +30,8 @@ class TaskViewMixin(object):
         return (
             '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
             '{}/{}/task.html'.format(opts.app_label, opts.flow_label),
+            '{}/flow/{}.html'.format(opts.app_label, flow_task.name),
+            '{}/flow/task.html'.format(opts.app_label),
             'viewflow/flow/task.html')
 
     def activation_done(self, *args, **kwargs):
@@ -99,6 +101,8 @@ class TaskActivationViewMixin(object):
         return (
             '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
             '{}/{}/task.html'.format(opts.app_label, opts.flow_label),
+            '{}/flow/{}.html'.format(opts.app_label, flow_task.name),
+            '{}/flow/task.html'.format(opts.app_label),
             'viewflow/flow/task.html')
 
     def get_success_url(self):
@@ -180,6 +184,8 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
         return (
             '{}/{}/{}_assign.html'.format(opts.app_label, opts.flow_label, flow_task.name),
             '{}/{}/task_assign.html'.format(opts.app_label, opts.flow_label),
+            '{}/flow/{}_assign.html'.format(opts.app_label, flow_task.name),
+            '{}/flow/task_assign.html'.format(opts.app_label),
             'viewflow/flow/task_assign.html')
 
     def get_context_data(self, **kwargs):

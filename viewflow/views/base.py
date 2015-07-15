@@ -110,6 +110,8 @@ class DetailsView(generic.TemplateView):
         return (
             '{}/{}/{}_details.html'.format(opts.app_label, opts.flow_label, flow_task.name),
             '{}/{}/task_details.html'.format(opts.app_label, opts.flow_label),
+            '{}/flow/{}_details.html'.format(opts.app_label, flow_task.name),
+            '{}/flow/task_details.html'.format(opts.app_label),
             'viewflow/flow/task_details.html')
 
     def get_context_data(self, **kwargs):
@@ -143,6 +145,8 @@ class BaseTaskActionView(FlowManagePermissionMixin, generic.TemplateView):
         return (
             '{}/{}/{}_{}.html'.format(opts.app_label, opts.flow_label, flow_task.name, self.action_name),
             '{}/{}/task_{}.html'.format(opts.app_label, opts.flow_label, self.action_name),
+            '{}/flow/{}_{}.html'.format(opts.app_label, flow_task.name, self.action_name),
+            '{}/flow/task_{}.html'.format(opts.app_label, self.action_name),
             'viewflow/flow/task_{}.html'.format(self.action_name),
             'viewflow/flow/task_action.html')
 

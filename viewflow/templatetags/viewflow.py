@@ -115,6 +115,7 @@ def include_process_data(context, process):
 
     template_names = (
         '{}/{}/process_data.html'.format(opts.app_label, opts.flow_label),
+        '{}/flow/process_data.html'.format(opts.app_label),
         'viewflow/flow/process_data.html')
     template = select_template(template_names)
 

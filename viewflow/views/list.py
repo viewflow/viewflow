@@ -72,7 +72,11 @@ class AllProcessListView(LoginRequiredMixin, generic.ListView):
     context_object_name = 'process_list'
 
     def get_template_names(self):
-        return 'viewflow/site_index.html'
+        opts = self.flow_classes[0]._meta
+
+        return (
+            '{}/site_index.html'.format(opts.app_label),
+            'viewflow/site_index.html')
 
     def get_context_data(self, **kwargs):
         context = super(AllProcessListView, self).get_context_data(**kwargs)
@@ -96,7 +100,11 @@ class AllTaskListView(generic.ListView):
     context_object_name = 'task_list'
 
     def get_template_names(self):
-        return 'viewflow/site_tasks.html'
+        opts = self.flow_classes[0]._meta
+
+        return (
+            '{}/site_tasks.html'.format(opts.app_label),
+            'viewflow/site_tasks.html')
 
     def get_context_data(self, **kwargs):
         context = super(AllTaskListView, self).get_context_data(**kwargs)
@@ -127,7 +135,11 @@ class AllQueueListView(generic.ListView):
     context_object_name = 'queue'
 
     def get_template_names(self):
-        return 'viewflow/site_queue.html'
+        opts = self.flow_classes[0]._meta
+
+        return (
+            '{}/site_queue.html'.format(opts.app_label),
+            'viewflow/site_queue.html')
 
     def get_context_data(self, **kwargs):
         context = super(AllQueueListView, self).get_context_data(**kwargs)
@@ -158,7 +170,11 @@ class AllArchiveListView(LoginRequiredMixin, generic.ListView):
     context_object_name = 'task_list'
 
     def get_template_names(self):
-        return 'viewflow/site_archive.html'
+        opts = self.flow_classes[0]._meta
+
+        return (
+            '{}/site_archive.html'.format(opts.app_label),
+            'viewflow/site_archive.html')
 
     def get_context_data(self, **kwargs):
         context = super(AllArchiveListView, self).get_context_data(**kwargs)
@@ -179,6 +195,7 @@ class ProcessListView(FlowViewPermissionMixin, generic.ListView):
 
         return (
             '{}/{}/process_list.html'.format(opts.app_label, opts.flow_label),
+            '{}/flow/process_list.html'.format(opts.app_label),
             'viewflow/flow/process_list.html')
 
     def get_context_data(self, **kwargs):
@@ -205,6 +222,7 @@ class ProcessDetailView(FlowViewPermissionMixin, generic.DetailView):
 
         return (
             '{}/{}/process_details.html'.format(opts.app_label, opts.flow_label),
+            '{}/flow/process_details.html'.format(opts.app_label),
             'viewflow/flow/process_details.html')
 
     def get_context_data(self, **kwargs):
@@ -231,6 +249,7 @@ class TaskListView(FlowViewPermissionMixin, generic.ListView):
 
         return (
             '{}/{}/task_list.html'.format(opts.app_label, opts.flow_label),
+            '{}/flow/task_list.html'.format(opts.app_label),
             'viewflow/flow/task_list.html')
 
     def get_context_data(self, **kwargs):
@@ -260,6 +279,7 @@ class QueueListView(FlowViewPermissionMixin, generic.ListView):
 
         return (
             '{}/{}/queue.html'.format(opts.app_label, opts.flow_label),
+            '{}/flow/queue.html'.format(opts.app_label),
             'viewflow/flow/queue.html')
 
     def get_context_data(self, **kwargs):
