@@ -29,6 +29,8 @@ class StartViewMixin(object):
         return (
             '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
             '{}/{}/start.html'.format(opts.app_label, opts.flow_label),
+            '{}/flow/{}.html'.format(opts.app_label, flow_task.name),
+            '{}/flow/start.html'.format(opts.app_label),
             'viewflow/flow/start.html')
 
     def activation_done(self, *args, **kwargs):
@@ -88,6 +90,8 @@ class StartActivationViewMixin(object):
         return (
             '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
             '{}/{}/start.html'.format(opts.app_label, opts.flow_label),
+            '{}/flow/{}.html'.format(opts.app_label, flow_task.name),
+            '{}/flow/start.html'.format(opts.app_label),
             'viewflow/flow/start.html')
 
     def get_success_url(self):

@@ -22,6 +22,7 @@ class ProcessCancelView(FlowManagePermissionMixin, generic.DetailView):
 
         return (
             '{}/{}/process_cancel.html'.format(opts.app_label, opts.flow_label),
+            '{}/flow/process_cancel.html'.format(opts.app_label),
             'viewflow/flow/process_cancel.html')
 
     def get_queryset(self):
