@@ -1,12 +1,15 @@
+from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.timezone import now
 from django.utils.http import is_safe_url
 from django.views import generic
+from django.utils.translation import ugettext_lazy as _
 
 from ..activation import STATUS
 from ..exceptions import FlowRuntimeError
-from .base import FlowManagePermissionMixin, BaseTaskActionView, process_message_user, task_message_user
+from .base import FlowManagePermissionMixin, BaseTaskActionView, \
+    get_task_hyperlink, get_process_hyperlink
 
 
 class ProcessCancelView(FlowManagePermissionMixin, generic.DetailView):
@@ -37,12 +40,16 @@ class ProcessCancelView(FlowManagePermissionMixin, generic.DetailView):
         self.object = self.get_object()
 
         if self.object.status in [STATUS.DONE, STATUS.CANCELED]:
-            process_message_user(self.request, self.object, "can't be canceled")
+            hyperlink = get_process_hyperlink(self.object)
+            msg = _('Process {hyperlink} can not be canceled.').format(hyperlink=hyperlink)
+            messages.error(self.request, msg)
             return HttpResponseRedirect(self.get_success_url())
         elif '_cancel_process' in request.POST:
             self._cancel_active_tasks()
             self._cancel_process()
-            process_message_user(self.request, self.object, "canceled")
+            hyperlink = get_process_hyperlink(self.object)
+            msg = _('Process {hyperlink} has been canceled.').format(hyperlink=hyperlink)
+            messages.info(self.request, msg)
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.get(request, *args, **kwargs)
@@ -107,7 +114,9 @@ class TaskUndoView(BaseTaskActionView):
 
     def perform(self):
         self.activation.undo()
-        task_message_user(self.request, self.activation.task, "undone")
+        hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
+        msg = _('Task {hyperlink} has been undone.').format(hyperlink=hyperlink)
+        messages.info(self.request, msg)
 
 
 class TaskCancelView(BaseTaskActionView):
@@ -118,11 +127,12 @@ class TaskCancelView(BaseTaskActionView):
 
     def perform(self):
         self.activation.cancel()
-        task_message_user(self.request, self.activation.task, "canceled")
+        hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
+        msg = _('Task {hyperlink} has been canceled.').format(hyperlink=hyperlink)
+        messages.info(self.request, msg)
 
 
 class TaskPerformView(BaseTaskActionView):
-
     """Non-interactive task that cancelled and need to be started manually."""
 
     action_name = 'execute'
@@ -132,11 +142,12 @@ class TaskPerformView(BaseTaskActionView):
 
     def perform(self):
         self.activation.perform()
-        task_message_user(self.request, self.activation.task, "executed")
+        hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
+        msg = _('Task {hyperlink} has been executed.').format(hyperlink=hyperlink)
+        messages.success(self.request, msg)
 
 
 class TaskActivateNextView(BaseTaskActionView):
-
     """Activate next task without interactive task redone."""
 
     action_name = 'activate_next'
@@ -146,4 +157,3 @@ class TaskActivateNextView(BaseTaskActionView):
 
     def perform(self):
         self.activation.activate_next()
-        task_message_user(self.request, self.activation.task, "next tasks activated")

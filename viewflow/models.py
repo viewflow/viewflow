@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.template import Template, Context
 
@@ -69,6 +70,12 @@ class AbstractProcess(models.Model):
 
     class Meta:
         abstract = True
+
+    def get_absolute_url(self):
+        return reverse(
+            '{}:details'.format(self.flow_cls.instance.namespace),
+            kwargs={'process_pk': self.pk}
+        )
 
 
 class AbstractTask(models.Model):
@@ -155,6 +162,11 @@ class AbstractTask(models.Model):
 
     class Meta:
         abstract = True
+
+    def get_absolute_url(self, user=None):
+        if user:
+            return self.flow_task.get_task_url(self, url_type='details', user=user)
+        return self.flow_task.get_task_url(self, url_type='details')
 
 
 class Process(AbstractProcess):
