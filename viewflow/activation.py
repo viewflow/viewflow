@@ -137,7 +137,7 @@ class Activation(object):
         self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
 
         self.process = self.flow_cls.process_cls._default_manager.get(flow_cls=self.flow_cls, pk=task.process_id)
-        self.task = task    
+        self.task = task
 
     @status.transition(source=STATUS.DONE, target=STATUS.NEW, conditions=[all_leading_canceled])
     def undo(self):

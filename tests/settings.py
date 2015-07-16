@@ -74,7 +74,6 @@ else:
         os.path.join(BASE_DIR, 'db{}{}_test.sqlite3'.format(django.VERSION[0], django.VERSION[1]))
 
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/dev/topics/i18n/
 LANGUAGE_CODE = 'en-us'

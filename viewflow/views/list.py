@@ -12,9 +12,7 @@ from .base import FlowViewPermissionMixin
 
 
 def flow_start_actions(flow_cls, user=None):
-    """
-    Return list of start flow actions data available
-    """
+    """Return list of start flow actions data available."""
     actions = []
     for node in flow_cls._meta.nodes():
         if isinstance(node, flow.Start) and (user is None or node.can_execute(user)):
@@ -62,9 +60,9 @@ class TaskFilter(FilterSet):
 
 
 class AllProcessListView(LoginRequiredMixin, generic.ListView):
-    """
-    All process instances list available for current user
-    """
+
+    """All process instances list available for current user."""
+
     flow_classes = []
 
     paginate_by = 15
@@ -86,9 +84,9 @@ class AllProcessListView(LoginRequiredMixin, generic.ListView):
 
 
 class AllTaskListView(generic.ListView):
-    """
-    All tasks from all processes assigned to current user
-    """
+
+    """All tasks from all processes assigned to current user."""
+
     flow_classes = []
 
     paginate_by = 15
@@ -117,9 +115,9 @@ class AllTaskListView(generic.ListView):
 
 
 class AllQueueListView(generic.ListView):
-    """
-    All unassigned tasks available for current user
-    """
+
+    """All unassigned tasks available for current user."""
+
     flow_classes = []
 
     paginate_by = 15
@@ -148,9 +146,9 @@ class AllQueueListView(generic.ListView):
 
 
 class AllArchiveListView(LoginRequiredMixin, generic.ListView):
-    """
-    All tasks from all processes assigned to current user
-    """
+
+    """All tasks from all processes assigned to current user."""
+
     flow_classes = []
 
     paginate_by = 15
@@ -194,9 +192,9 @@ class ProcessListView(FlowViewPermissionMixin, generic.ListView):
 
 
 class ProcessDetailView(FlowViewPermissionMixin, generic.DetailView):
-    """
-    Details for process
-    """
+
+    """Details for process."""
+
     context_object_name = 'process'
     pk_url_kwarg = 'process_pk'
 
@@ -219,9 +217,9 @@ class ProcessDetailView(FlowViewPermissionMixin, generic.DetailView):
 
 
 class TaskListView(FlowViewPermissionMixin, generic.ListView):
-    """
-    List of specific Flow tasks assigned to current user
-    """
+
+    """List of specific Flow tasks assigned to current user."""
+
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'task_list'
@@ -248,9 +246,9 @@ class TaskListView(FlowViewPermissionMixin, generic.ListView):
 
 
 class QueueListView(FlowViewPermissionMixin, generic.ListView):
-    """
-    List of specific Flow unassigned tasks available for current user
-    """
+
+    """List of specific Flow unassigned tasks available for current user."""
+
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'queue'

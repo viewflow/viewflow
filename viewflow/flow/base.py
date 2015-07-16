@@ -8,17 +8,15 @@ from ..activation import STATUS
 
 
 class ThisObject(object):
-    """
-    Helper for forward referencies on flow tasks
-    """
+
+    """Helper for forward references on flow tasks."""
+
     def __init__(self, name):
         self.name = name
 
     @property
     def owner(self):
-        """
-        Returns same process finished task owner
-        """
+        """Return same process finished task owner."""
         def get_task_owner(process):
             flow_cls = process.flow_cls
             task_node = flow_cls._meta.node(self.name)
@@ -31,9 +29,7 @@ class ThisObject(object):
 
 
 class This(object):
-    """
-    Helper for building forward referenced flow task
-    """
+    """Helper for building forward referenced flow task."""
     def __getattr__(self, name):
         return ThisObject(name)
 
@@ -72,7 +68,7 @@ class Edge(object):
 
 class Node(object):
     """
-    Base class for flow task
+    Base class for flow task.
 
     :keyword task_type: Human readable task type
     :keyword activation_cls: Activation implementation specific for this node
@@ -92,21 +88,15 @@ class Node(object):
         super(Node, self).__init__(**kwargs)
 
     def _outgoing(self):
-        """
-        Outgoing edge iterator
-        """
+        """Outgoing edge iterator."""
         raise NotImplementedError
 
     def _incoming(self):
-        """
-        Incoming edge iterator
-        """
+        """Incoming edge iterator."""
         return iter(self._incoming_edges)
 
     def _resolve(self, resolver):
-        """
-        Resolve and store outgoing links
-        """
+        """Resolve and store outgoing links."""
 
     def __str__(self):
         if self.name:
@@ -115,39 +105,31 @@ class Node(object):
 
     def ready(self):
         """
-        Called when flow class setup finished
+        Called when flow class setup finished.
 
-        Subclasses could perform additional initialisation here
+        Subclasses could perform additional initialisation here.
         """
 
     def urls(self):
-        """
-        List of urls for flow node views
-        """
+        """List of urls for flow node views."""
         return []
 
     def get_task_url(self, task, url_type, **kwargs):
-        """
-        Return url for the task
-        """
+        """Return url for the task."""
 
     def activate(self, prev_activation, token):
-        """
-        Creates task activation
-        """
+        """Creates task activation."""
         return self.activation_cls.activate(self, prev_activation, token)
 
 
 class Event(Node):
-    """
-    Base class for event-based tasks
-    """
+
+    """Base class for event-based tasks."""
 
 
 class Task(Node):
-    """
-    Base class for tasks
-    """
+
+    """Base class for tasks."""
 
 
 class Gateway(Node):

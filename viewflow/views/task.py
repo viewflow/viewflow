@@ -12,9 +12,9 @@ from .base import get_next_task_url, task_message_user, process_message_user
 
 
 class TaskViewMixin(object):
-    """
-    Mixin for task views, that do not implement activation interface
-    """
+
+    """Mixin for task views, that do not implement activation interface."""
+
     def get_context_data(self, **kwargs):
         context = super(TaskViewMixin, self).get_context_data(**kwargs)
         context['activation'] = self.activation
@@ -33,9 +33,7 @@ class TaskViewMixin(object):
             'viewflow/flow/task.html')
 
     def activation_done(self, *args, **kwargs):
-        """
-        Finish activation. Subclasses could override this
-        """
+        """Finish activation."""
         self.activation.done()
 
     def message_complete(self):
@@ -45,18 +43,14 @@ class TaskViewMixin(object):
             process_message_user(self.request, self.activation.process, 'completed')
 
     def formset_valid(self, *args, **kwargs):
-        """
-        Called if base class is extra_views.FormsetView
-        """
+        """Called if base class is :class:`extra_views.FormsetView`."""
         super(TaskViewMixin, self).formset_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_valid(self, *args, **kwargs):
-        """
-        Called if base class is extra_views.InlinesView
-        """
+        """Called if base class is :class:`extra_views.InlinesView`."""
         super(TaskViewMixin, self).forms_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         self.message_complete()
@@ -84,9 +78,9 @@ class TaskViewMixin(object):
 
 
 class TaskActivationViewMixin(object):
-    """
-    Mixin for views that implements activation interface
-    """
+
+    """Mixin for views that implements activation interface."""
+
     def get_context_data(self, **kwargs):
         context = super(TaskActivationViewMixin, self).get_context_data(**kwargs)
         context['activation'] = self
@@ -105,9 +99,7 @@ class TaskActivationViewMixin(object):
         return get_next_task_url(self.request, self.process)
 
     def activation_done(self, *args, **kwargs):
-        """
-        Finish activation. Subclasses could override this
-        """
+        """Finish activation."""
         self.done()
 
     def message_complete(self):
@@ -117,18 +109,14 @@ class TaskActivationViewMixin(object):
             process_message_user(self.request, self.process, 'completed')
 
     def formset_valid(self, *args, **kwargs):
-        """
-        Called if base class is extra_views.FormsetView
-        """
+        """Called if base class is :class:`extra_views.FormsetView`."""
         super(TaskActivationViewMixin, self).formset_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_valid(self, *args, **kwargs):
-        """
-        Called if base class is extra_views.InlinesView
-        """
+        """Called if base class is :class:`extra_views.InlineView`."""
         super(TaskActivationViewMixin, self).forms_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         self.message_complete()
@@ -154,9 +142,9 @@ class TaskActivationViewMixin(object):
 
 
 class ProcessView(flow.ManagedViewActivation, TaskActivationViewMixin, generic.UpdateView):
-    """
-    Shortcut view for task that updates subset of Process model fields
-    """
+
+    """Shortcut view for task that updates subset of Process model fields."""
+
     fields = []
 
     @property
@@ -168,11 +156,13 @@ class ProcessView(flow.ManagedViewActivation, TaskActivationViewMixin, generic.U
 
 
 class AssignView(flow.ManagedViewActivation, generic.TemplateView):
+
     """
-    Default assign view for flow task
+    Default assign view for flow task.
 
     Get confirmation from user, assigns task and redirects to task pages
     """
+
     def get_template_names(self):
         flow_task = self.flow_task
         opts = self.flow_task.flow_cls._meta
@@ -188,9 +178,7 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
         return context
 
     def get_success_url(self):
-        """
-        Continue on task or redirect back to task list
-        """
+        """Continue on task or redirect back to task list."""
         url = self.flow_task.get_task_url(self.task, url_type='guess', user=self.request.user)
 
         back = self.request.GET.get('back', None)

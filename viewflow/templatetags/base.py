@@ -5,8 +5,12 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 
 def get_model_display_data(root_instance, user):
     """
-    Returns structure with model fields and related from same app
-    [(Title, [(Field Title, Value), ... ]), ...]
+    Return structure with model fields and related from same app.
+
+    Example:
+
+        [(Title, [(Field Title, Value), ... ]), ...]
+
     """
     result = []
     new_objects = [(root_instance._meta.verbose_name.title(), root_instance)]
