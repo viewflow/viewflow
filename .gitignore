@@ -1,4 +1,5 @@
 *.pyc
+*.po
 .tox
 .coveralls.yml
 dist
