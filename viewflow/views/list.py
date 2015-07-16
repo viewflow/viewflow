@@ -61,7 +61,26 @@ class TaskFilter(FilterSet):
         model = models.Task
 
 
-class AllProcessListView(LoginRequiredMixin, generic.ListView):
+class AllListViewTemplateResponseMixin(object):
+    def get_template_names(self):
+        opts = self.flow_classes[0]._meta
+
+        return (
+            '{}/{}'.format(opts.app_label, self.template_name),
+            'viewflow/{}'.format(self.template_name))
+
+
+class ListViewTemplateResponseMixin(object):
+    def get_template_names(self):
+        opts = self.flow_cls._meta
+
+        return (
+            '{}/{}/{}'.format(opts.app_label, opts.flow_label, self.template_name),
+            '{}/flow/{}'.format(opts.app_label, self.template_name),
+            'viewflow/flow/{}'.format(self.template_name))
+
+
+class AllProcessListView(AllListViewTemplateResponseMixin, LoginRequiredMixin, generic.ListView):
     """
     All process instances list available for current user
     """
@@ -71,12 +90,7 @@ class AllProcessListView(LoginRequiredMixin, generic.ListView):
     paginate_orphans = 5
     context_object_name = 'process_list'
 
-    def get_template_names(self):
-        opts = self.flow_classes[0]._meta
-
-        return (
-            '{}/site_index.html'.format(opts.app_label),
-            'viewflow/site_index.html')
+    template_name = 'site_index.html'
 
     def get_context_data(self, **kwargs):
         context = super(AllProcessListView, self).get_context_data(**kwargs)
@@ -89,7 +103,7 @@ class AllProcessListView(LoginRequiredMixin, generic.ListView):
             .order_by('-created')
 
 
-class AllTaskListView(generic.ListView):
+class AllTaskListView(AllListViewTemplateResponseMixin, generic.ListView):
     """
     All tasks from all processes assigned to current user
     """
@@ -99,12 +113,7 @@ class AllTaskListView(generic.ListView):
     paginate_orphans = 5
     context_object_name = 'task_list'
 
-    def get_template_names(self):
-        opts = self.flow_classes[0]._meta
-
-        return (
-            '{}/site_tasks.html'.format(opts.app_label),
-            'viewflow/site_tasks.html')
+    template_name = 'site_tasks.html'
 
     def get_context_data(self, **kwargs):
         context = super(AllTaskListView, self).get_context_data(**kwargs)
@@ -124,7 +133,7 @@ class AllTaskListView(generic.ListView):
         return super(AllTaskListView, self).dispatch(request, *args, **kwargs)
 
 
-class AllQueueListView(generic.ListView):
+class AllQueueListView(AllListViewTemplateResponseMixin, generic.ListView):
     """
     All unassigned tasks available for current user
     """
@@ -134,12 +143,7 @@ class AllQueueListView(generic.ListView):
     paginate_orphans = 5
     context_object_name = 'queue'
 
-    def get_template_names(self):
-        opts = self.flow_classes[0]._meta
-
-        return (
-            '{}/site_queue.html'.format(opts.app_label),
-            'viewflow/site_queue.html')
+    template_name = 'site_queue.html'
 
     def get_context_data(self, **kwargs):
         context = super(AllQueueListView, self).get_context_data(**kwargs)
@@ -159,7 +163,7 @@ class AllQueueListView(generic.ListView):
         return super(AllQueueListView, self).dispatch(request, *args, **kwargs)
 
 
-class AllArchiveListView(LoginRequiredMixin, generic.ListView):
+class AllArchiveListView(AllListViewTemplateResponseMixin, LoginRequiredMixin, generic.ListView):
     """
     All tasks from all processes assigned to current user
     """
@@ -169,12 +173,7 @@ class AllArchiveListView(LoginRequiredMixin, generic.ListView):
     paginate_orphans = 5
     context_object_name = 'task_list'
 
-    def get_template_names(self):
-        opts = self.flow_classes[0]._meta
-
-        return (
-            '{}/site_archive.html'.format(opts.app_label),
-            'viewflow/site_archive.html')
+    template_name = 'site_archive.html'
 
     def get_context_data(self, **kwargs):
         context = super(AllArchiveListView, self).get_context_data(**kwargs)
@@ -185,18 +184,12 @@ class AllArchiveListView(LoginRequiredMixin, generic.ListView):
         return models.Task.objects.archive(self.flow_classes, self.request.user).order_by('-created')
 
 
-class ProcessListView(FlowViewPermissionMixin, generic.ListView):
+class ProcessListView(ListViewTemplateResponseMixin, FlowViewPermissionMixin, generic.ListView):
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'process_list'
 
-    def get_template_names(self):
-        opts = self.flow_cls._meta
-
-        return (
-            '{}/{}/process_list.html'.format(opts.app_label, opts.flow_label),
-            '{}/flow/process_list.html'.format(opts.app_label),
-            'viewflow/flow/process_list.html')
+    template_name = 'process_list.html'
 
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
@@ -210,20 +203,14 @@ class ProcessListView(FlowViewPermissionMixin, generic.ListView):
             .order_by('-created')
 
 
-class ProcessDetailView(FlowViewPermissionMixin, generic.DetailView):
+class ProcessDetailView(ListViewTemplateResponseMixin, FlowViewPermissionMixin, generic.DetailView):
     """
     Details for process
     """
     context_object_name = 'process'
     pk_url_kwarg = 'process_pk'
 
-    def get_template_names(self):
-        opts = self.flow_cls._meta
-
-        return (
-            '{}/{}/process_details.html'.format(opts.app_label, opts.flow_label),
-            '{}/flow/process_details.html'.format(opts.app_label),
-            'viewflow/flow/process_details.html')
+    template_name = 'process_details.html'
 
     def get_context_data(self, **kwargs):
         context = super(ProcessDetailView, self).get_context_data(**kwargs)
@@ -236,7 +223,7 @@ class ProcessDetailView(FlowViewPermissionMixin, generic.DetailView):
         return self.flow_cls.process_cls._default_manager.all()
 
 
-class TaskListView(FlowViewPermissionMixin, generic.ListView):
+class TaskListView(ListViewTemplateResponseMixin, FlowViewPermissionMixin, generic.ListView):
     """
     List of specific Flow tasks assigned to current user
     """
@@ -244,13 +231,7 @@ class TaskListView(FlowViewPermissionMixin, generic.ListView):
     paginate_orphans = 5
     context_object_name = 'task_list'
 
-    def get_template_names(self):
-        opts = self.flow_cls._meta
-
-        return (
-            '{}/{}/task_list.html'.format(opts.app_label, opts.flow_label),
-            '{}/flow/task_list.html'.format(opts.app_label),
-            'viewflow/flow/task_list.html')
+    template_name = 'task_list.html'
 
     def get_context_data(self, **kwargs):
         context = super(TaskListView, self).get_context_data(**kwargs)
@@ -266,7 +247,7 @@ class TaskListView(FlowViewPermissionMixin, generic.ListView):
             .order_by('-created')
 
 
-class QueueListView(FlowViewPermissionMixin, generic.ListView):
+class QueueListView(ListViewTemplateResponseMixin, FlowViewPermissionMixin, generic.ListView):
     """
     List of specific Flow unassigned tasks available for current user
     """
@@ -274,13 +255,7 @@ class QueueListView(FlowViewPermissionMixin, generic.ListView):
     paginate_orphans = 5
     context_object_name = 'queue'
 
-    def get_template_names(self):
-        opts = self.flow_cls._meta
-
-        return (
-            '{}/{}/queue.html'.format(opts.app_label, opts.flow_label),
-            '{}/flow/queue.html'.format(opts.app_label),
-            'viewflow/flow/queue.html')
+    template_name = 'queue.html'
 
     def get_context_data(self, **kwargs):
         context = super(QueueListView, self).get_context_data(**kwargs)
