@@ -62,12 +62,15 @@ class TaskFilter(FilterSet):
 
 
 class AllListViewTemplateResponseMixin(object):
-    def get_template_names(self):
-        opts = self.flow_classes[0]._meta
+    app_label = None
 
-        return (
-            '{}/{}'.format(opts.app_label, self.template_name),
-            'viewflow/{}'.format(self.template_name))
+    def get_template_names(self):
+        if self.app_label is None:
+            return 'viewflow/{}'.format(self.template_name)
+        else:
+            return (
+                '{}/{}'.format(self.app_label, self.template_name),
+                'viewflow/{}'.format(self.template_name))
 
 
 class ListViewTemplateResponseMixin(object):
