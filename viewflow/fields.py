@@ -13,7 +13,7 @@ def import_task_by_ref(task_strref):
     app_label, flow_path = task_strref.split('/')
     flow_path, task_name = flow_path.rsplit('.', 1)
     flow_cls = import_string('{}.{}'.format(get_app_package(app_label), flow_path))
-    return getattr(flow_cls, task_name)
+    return flow_cls._meta.node(task_name)
 
 
 def get_task_ref(flow_task):
