@@ -1,5 +1,8 @@
+from __future__ import unicode_literals
+
 from django.db import models
 from .compat import get_app_package, get_containing_app_data, import_string
+from .exceptions import FlowRuntimeError
 from .token import Token
 
 
@@ -16,6 +19,9 @@ def import_task_by_ref(task_strref):
 def get_task_ref(flow_task):
     module = flow_task.flow_cls.__module__
     app_label, app_package = get_containing_app_data(module)
+    if app_label is None:
+        raise FlowRuntimeError('No application found for {}. Check your INSTALLED_APPS setting'.format(module))
+
     subpath = module[len(app_package)+1:]
 
     return "{}/{}.{}.{}".format(app_label, subpath, flow_task.flow_cls.__name__, flow_task.name)
@@ -46,8 +52,8 @@ class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
         return value
 
     def get_prep_value(self, value):
-        if value is None:
-            return None
+        if value is None or value == '':
+            return value
 
         if isinstance(value, ClassValueWrapper):
             value = value.cls
@@ -59,10 +65,14 @@ class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
 
         module = "{}.{}".format(value.__module__, value.__name__)
         app_label, app_package = get_containing_app_data(module)
+        if app_label is None:
+            raise FlowRuntimeError('No application found for {}. Check your INSTALLED_APPS setting'.format(module))
+
         subpath = module[len(app_package)+1:]
         return "{}/{}".format(app_label, subpath)
 
     def value_to_string(self, obj):
+        import ipdb; ipdb.set_trace()
         value = self._get_val_from_obj(obj)
         return self.get_prep_value(value)
 
@@ -78,8 +88,8 @@ class TaskReferenceField(models.CharField, metaclass=models.SubfieldBase):
         return value
 
     def get_prep_value(self, value):
-        if value is None:
-            return None
+        if value is None or value == '':
+            return value
         elif not isinstance(value, str):
             return get_task_ref(value)
         return value
