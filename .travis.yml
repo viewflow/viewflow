@@ -1,7 +1,15 @@
 language: python
+sudo: false
 
-python:
-  - 3.3
+env:
+  - TOXENV=travis_33
+  - TOXENV=travis_34
+  - TOXENV=qa
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: TOXENV=qa
 
 services: postgresql
 
@@ -12,8 +20,9 @@ before_install:
   - export DATABASE_URL=postgres://postgres@localhost/viewflow
 
 install:
+  - pip install -U pip
   - pip install tox
   - pip install psycopg2
 
 script: 
-  - tox -r -e travis
+  - tox
