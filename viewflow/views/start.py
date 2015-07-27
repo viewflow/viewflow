@@ -3,7 +3,7 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.views import generic
 from django.utils.translation import ugettext_lazy as _
-
+from django.utils.safestring import mark_safe
 
 from .. import flow
 from .base import get_next_task_url, get_process_hyperlink
@@ -41,7 +41,7 @@ class StartViewMixin(object):
         self.activation_done(*args, **kwargs)
         hyperlink = get_process_hyperlink(self.activation.process)
         msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.error(self.request, msg)
+        messages.error(self.request, mark_safe(msg))
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_valid(self, *args, **kwargs):
@@ -50,7 +50,7 @@ class StartViewMixin(object):
         self.activation_done(*args, **kwargs)
         hyperlink = get_process_hyperlink(self.activation.process)
         msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.error(self.request, msg)
+        messages.error(self.request, mark_safe(msg))
         return HttpResponseRedirect(self.get_success_url())
 
     def form_valid(self, *args, **kwargs):
@@ -58,7 +58,7 @@ class StartViewMixin(object):
         self.activation_done(*args, **kwargs)
         hyperlink = get_process_hyperlink(self.activation.process)
         msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.error(self.request, msg)
+        messages.error(self.request, mark_safe(msg))
         return HttpResponseRedirect(self.get_success_url())
 
     @flow.flow_start_view()
@@ -102,7 +102,7 @@ class StartActivationViewMixin(object):
         self.activation_done(*args, **kwargs)
         hyperlink = get_process_hyperlink(self.process)
         msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.error(self.request, msg)
+        messages.error(self.request, mark_safe(msg))
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_valid(self, *args, **kwargs):
@@ -111,7 +111,7 @@ class StartActivationViewMixin(object):
         self.activation_done(*args, **kwargs)
         hyperlink = get_process_hyperlink(self.process)
         msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.error(self.request, msg)
+        messages.error(self.request, mark_safe(msg))
         return HttpResponseRedirect(self.get_success_url())
 
     def form_valid(self, *args, **kwargs):
@@ -120,7 +120,7 @@ class StartActivationViewMixin(object):
         self.activation_done(*args, **kwargs)
         hyperlink = get_process_hyperlink(self.process)
         msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.error(self.request, msg)
+        messages.error(self.request, mark_safe(msg))
         return HttpResponseRedirect(self.get_success_url())
 
     @flow.flow_start_view()
