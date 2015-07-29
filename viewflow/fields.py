@@ -6,6 +6,21 @@ from .exceptions import FlowRuntimeError
 from .token import Token
 
 
+def import_flow_by_ref(flow_strref):
+    app_label, flow_path = flow_strref.split('/')
+    return import_string('{}.{}'.format(get_app_package(app_label), flow_path))
+
+
+def get_flow_ref(flow_cls):
+    module = "{}.{}".format(flow_cls.__module__, flow_cls.__name__)
+    app_label, app_package = get_containing_app_data(module)
+    if app_label is None:
+        raise FlowRuntimeError('No application found for {}. Check your INSTALLED_APPS setting'.format(module))
+
+    subpath = module[len(app_package)+1:]
+    return "{}/{}".format(app_label, subpath)
+
+
 def import_task_by_ref(task_strref):
     """
     Return flow task by reference like `app_label/path.to.Flowcls.task_name`
@@ -47,15 +62,15 @@ class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
 
     def to_python(self, value):
         if isinstance(value, str) and value:
-            app_label, flow_path = value.split('/')
-            return import_string('{}.{}'.format(get_app_package(app_label), flow_path))
+            return import_flow_by_ref(value)
         return value
 
     def get_prep_value(self, value):
         if value is None or value == '':
             return value
-
-        if isinstance(value, ClassValueWrapper):
+        elif isinstance(value, str):
+            return value
+        elif isinstance(value, ClassValueWrapper):
             value = value.cls
         elif not isinstance(value, type):
             # HACK: Django calls callable due query parameter
@@ -63,16 +78,9 @@ class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
             # even if we pass Flow class to query.
             value = value.__class__
 
-        module = "{}.{}".format(value.__module__, value.__name__)
-        app_label, app_package = get_containing_app_data(module)
-        if app_label is None:
-            raise FlowRuntimeError('No application found for {}. Check your INSTALLED_APPS setting'.format(module))
-
-        subpath = module[len(app_package)+1:]
-        return "{}/{}".format(app_label, subpath)
+        return get_flow_ref(value)
 
     def value_to_string(self, obj):
-        import ipdb; ipdb.set_trace()
         value = self._get_val_from_obj(obj)
         return self.get_prep_value(value)
 
