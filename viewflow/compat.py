@@ -46,25 +46,32 @@ except ImportError:
         app_config = loading.get_app(app_label)
         if not app_config:
             return None
+        if app_config.__package__.endswith('.models'):
+            return app_config.__package__[0:-len('.models')]
         return app_config.__package__
 
-    def _get_containing_app(object_name):
+    def _get_containing_app_package(object_name):
         candidates = []
         for app_config in loading.get_apps():
             if app_config.__package__ is None:
                 app_config.__package__ = app_config.__name__.rpartition('.')[0]
 
-            if object_name.startswith(app_config.__package__):
-                subpath = object_name[len(app_config.__package__):]
+            if app_config.__package__.endswith('.models'):
+                package = app_config.__package__[0:-len('.models')]
+            else:
+                package = app_config.__package__
+
+            if object_name.startswith(package):
+                subpath = object_name[len(package):]
                 if subpath == '' or subpath[0] == '.':
-                    candidates.append(app_config)
+                    candidates.append(package)
         if candidates:
-            return sorted(candidates, key=lambda ac: -len(ac.__package__))[0]
+            return sorted(candidates, key=lambda ac: -len(ac))[0]
 
     def get_containing_app_data(object_name):
-        app = _get_containing_app(object_name)
-        if app:
-            return app.__package__.rsplit('.', 1)[-1], app.__package__
+        package = _get_containing_app_package(object_name)
+        if package:
+            return package.rsplit('.', 1)[-1], package
         return None, None
 
     def deconstructible(cls):
