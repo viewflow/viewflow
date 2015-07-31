@@ -1,5 +1,5 @@
 *.pyc
-*.po
+*.mo
 .tox
 .coverage
 dist
