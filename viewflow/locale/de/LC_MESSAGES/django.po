@@ -1,0 +1,99 @@
+# Viewflow.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Johannes Hoppe <info@johanneshoppe.com>, 2015.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-07-09 09:27+0200\n"
+"PO-Revision-Date: 2015-07-09 09:30+0100\n"
+"Last-Translator: Johannes Hoppe <info@johanneshoppe.com>\n"
+"Language-Team: \n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.7.4\n"
+
+#: templates/admin/viewflow/task/submit_line.html:3
+msgid "Save"
+msgstr "Speichern"
+
+#: templates/admin/viewflow/task/submit_line.html:6
+msgid "Delete"
+msgstr "Löschen"
+
+#: templates/admin/viewflow/task/submit_line.html:8
+msgid "Save as new"
+msgstr "Speichern als neue"
+
+#: templates/admin/viewflow/task/submit_line.html:9
+msgid "Save and add another"
+msgstr "Speichern und neuen Hinzufügen"
+
+#: templates/admin/viewflow/task/submit_line.html:10
+msgid "Save and continue editing"
+msgstr "Speichern und weiter bearbeiten"
+
+#: views/actions.py:44
+#, python-brace-format
+msgid "Process {hyperlink} can not be canceled."
+msgstr "Prozess {hyperlink} konnte nicht abgebrochen werden."
+
+#: views/actions.py:51
+#, python-brace-format
+msgid "Process {hyperlink} has been canceled."
+msgstr "Prozess {hyperlink} wurde abgebrochen."
+
+#: views/actions.py:118
+#, python-brace-format
+msgid "Task {hyperlink} has been undone."
+msgstr "Aufgabe {hyperlink} wurde rückgängig gemacht."
+
+#: views/actions.py:131
+#, python-brace-format
+msgid "Task {hyperlink} has been canceled."
+msgstr "Aufgabe {hyperlink} wurde abgebrochen."
+
+#: views/actions.py:146
+#, python-brace-format
+msgid "Task {hyperlink} has been executed."
+msgstr "Aufgabe {hyperlink} wurde ausgeführt."
+
+#: views/base.py:154
+msgid "Can't execute action {}"
+msgstr "Kann Aktion {} nicht ausführen"
+
+#: views/start.py:49 views/start.py:60 views/start.py:68 views/start.py:116
+#: views/start.py:127 views/start.py:138
+#, python-brace-format
+msgid "Process {hyperlink} has been started."
+msgstr "Prozess {hyperlink} wurde gestartet."
+
+#: views/task.py:44 views/task.py:122
+#, python-brace-format
+msgid "Task {hyperlink} has been completed."
+msgstr "Aufgabe {hyperlink} wurde beendet."
+
+#: views/task.py:49 views/task.py:127
+#, python-brace-format
+msgid "Process {hyperlink} has been completed."
+msgstr "Prozess {hyperlink} wurde beendet."
+
+#: views/task.py:82
+#, python-brace-format
+msgid "Task {hyperlink} cannot be executed."
+msgstr "Aufgabe {hyperlink} konnte nicht ausgeführt werden."
+
+#: views/task.py:222
+#, python-brace-format
+msgid "Task {hyperlink} has been assigned to {user}."
+msgstr "Aufgabe {hyperlink} wurde {user} zugewiesen."
+
+#: views/task.py:233
+#, python-brace-format
+msgid "Task {hyperlink} cannot be assigned to {user}."
+msgstr "Aufgabe {hyperlink} konnte nicht {user} zugewiesen werden."
