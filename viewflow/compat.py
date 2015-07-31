@@ -46,6 +46,8 @@ except ImportError:
         app_config = loading.get_app(app_label)
         if not app_config:
             return None
+        if app_config.__package__ is None:
+            app_config.__package__ = app_config.__name__.rpartition('.')[0]
         if app_config.__package__.endswith('.models'):
             return app_config.__package__[0:-len('.models')]
         return app_config.__package__
