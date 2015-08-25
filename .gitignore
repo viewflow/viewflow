@@ -1,7 +1,7 @@
 *.pyc
 *.po
 .tox
-.coveralls.yml
+.coverage
 dist
 reports
 django_viewflow.egg-info
