@@ -80,7 +80,8 @@ class FuncActivation(Activation):
     @Activation.status.transition(source=STATUS.DONE)
     def activate_next(self):
         """Activate all outgoing edges."""
-        self.flow_task._next.activate(prev_activation=self, token=self.task.token)
+        if self.flow_task._next:
+            self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
@@ -132,11 +133,11 @@ def flow_func(task_loader=None, **lock_args):
                 task = flow_task.flow_cls.task_cls._default_manager.get(pk=task.pk)
                 if isinstance(receiver, FuncActivation):
                     receiver.initialize(flow_task, task)
-                    receiver(*func_args, **func_kwargs)
+                    return receiver(*func_args, **func_kwargs)
                 else:
                     activation = flow_task.activation_cls()
                     activation.initialize(flow_task, task)
-                    receiver(activation, *func_args, **func_kwargs)
+                    return receiver(activation, *func_args, **func_kwargs)
 
         return wrapper
 
@@ -182,15 +183,9 @@ class Function(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
             func_impl = getattr(self.flow_cls.instance, func_name, None)
             if func_impl:
                 return func_impl
-            else:
-                def default_start_func(activation):
-                    activation.prepare()
-                    activation.done()
-                    return activation
-                return default_start_func
 
     def run(self, *args, **kwargs):
-        self.func(self, *args, **kwargs)
+        return self.func(self, *args, **kwargs)
 
 
 class HandlerActivation(Activation):
@@ -217,10 +212,25 @@ class HandlerActivation(Activation):
             else:
                 raise
 
+    @Activation.status.transition(source=STATUS.ERROR)
+    def retry(self):
+        """
+        Retry the next node calculation and activation
+        """
+        self.perform.original()
+
+    @Activation.status.transition(source=[STATUS.ERROR, STATUS.DONE], target=STATUS.NEW)
+    def undo(self):
+        """
+        Undo the task
+        """
+        super(HandlerActivation, self).undo.original()
+
     @Activation.status.transition(source=STATUS.DONE)
     def activate_next(self):
         """Activate all outgoing edges."""
-        self.flow_task._next.activate(prev_activation=self, token=self.task.token)
+        if self.flow_task._next:
+            self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):

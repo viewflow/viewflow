@@ -1,38 +1,37 @@
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import django
-
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
-SECRET_KEY = 'zrfxckyu67_26vav-c(utux0+f*lnt*e6ob9u+3mew_00x+gkb'
-DEBUG = not os.path.exists(os.path.join(BASE_DIR, 'deploy'))
-TEMPLATE_DEBUG = DEBUG
+# Quick-start development settings - unsuitable for production
+# See https://docs.djangoproject.com/en/1.6/howto/deployment/checklist/
 
-ALLOWED_HOSTS = ['examples.viewflow.io', '127.0.0.1']
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = 'ratn!684yf7ewt-%j%afwf7et9c=!oan$=w6#)fn#4u$ie4!as'
+
+# SECURITY WARNING: don't run with debug turned on in production!
+DEBUG = True
+
+TEMPLATE_DEBUG = True
+
+ALLOWED_HOSTS = []
 
 
 # Application definition
+
 INSTALLED_APPS = (
-    # development
-    'template_debug',
-    # django apps
-    'material',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # viewflow
     'viewflow',
-    # Tests
-    'tests.unit',
-    'tests.integration',
-    # Examples
-    'tests.examples.shipment',
-    'tests.examples.helloworld',
-    'tests.examples.customnode',
+    'tests',
+    'examples.customnode',
+    'examples.helloworld',
+    'examples.shipment',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -44,66 +43,63 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-if django.VERSION >= (1, 7):
-    MIDDLEWARE_CLASSES += (
-        'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
-    )
-
 ROOT_URLCONF = 'tests.urls'
 
+WSGI_APPLICATION = 'bug112.wsgi.application'
 
-# Databases
 
+# Database
+# https://docs.djangoproject.com/en/1.6/ref/settings/#databases
 import dj_database_url
-DATABASES = {}
 
-DATABASES['default'] = dj_database_url.config()
-if not DATABASES['default']:
-    DATABASES['default'] = {
+DATABASES = {
+    'default': dj_database_url.config() or {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db{}{}.sqlite3'.format(django.VERSION[0], django.VERSION[1])),
+        'NAME': os.path.join(BASE_DIR, 'db{}{}.sqlite3'.format(*django.VERSION[:2])),
     }
-
-if django.VERSION >= (1, 7):
-    DATABASES['default']['TEST'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db{}{}_test.sqlite3'.format(django.VERSION[0], django.VERSION[1]))
-    }
-else:
-    DATABASES['default']['TEST_NAME'] = \
-        os.path.join(BASE_DIR, 'db{}{}_test.sqlite3'.format(django.VERSION[0], django.VERSION[1]))
+}
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/dev/topics/i18n/
-LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-USE_I18N = True
-USE_L10N = True
-USE_TZ = False
+class DisableMigrations(object):
+
+    def __contains__(self, item):
+        return True
+
+    def __getitem__(self, item):
+        return "notmigrations"
+
+MIGRATION_MODULES = DisableMigrations()
 
 
-# Static files (CSS, JavaScript, Images)
-STATIC_URL = '/static/'
-
-STATICFILES_DIRS = (
-    os.path.join(BASE_DIR, 'tests/static'),
-)
-
-STATIC_ROOT = os.path.join(BASE_DIR, 'deploy/static')
-
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'tests/templates'),
-)
+# Templates
 
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + (
-    'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.request',
-    'tests.examples.website.users',
 )
 
+# Internationalization
+# https://docs.djangoproject.com/en/1.6/topics/i18n/
+
+LANGUAGE_CODE = 'en-us'
+
+TIME_ZONE = 'UTC'
+
+USE_I18N = True
+
+USE_L10N = True
+
+USE_TZ = True
+
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.6/howto/static-files/
+
+STATIC_URL = '/static/'
+
+
 # Celery
+
 INSTALLED_APPS += ('kombu.transport.django', )
 BROKER_URL = 'django://'
 
@@ -116,29 +112,17 @@ CELERY_IMPORTS = [
     for filename in files
     if filename.startswith('test_') and filename.endswith('.py')]
 
-
-# South
-if django.VERSION < (1, 7):
-    INSTALLED_APPS += ('south', )
+DJKOMBU_POLLING_INTERVAL = 0.05
 
 
 # Jenkins
-INSTALLED_APPS += ('django_jenkins',)
+
+INSTALLED_APPS = ('django_jenkins',) + INSTALLED_APPS
+
 JENKINS_TASKS = (
     'django_jenkins.tasks.run_flake8',
-    'django_jenkins.tasks.run_sloccount',
 )
 
-# shortcut for development
-from django.template.base import add_to_builtins
-add_to_builtins('template_debug.templatetags.debug_tags')
+PROJECT_APPS = ('viewflow', )
 
-try:
-    from tests.local_settings import *  # NOQA
-except ImportError:
-    pass
-
-
-# import warnings
-# warnings.filterwarnings("ignore",category=DeprecationWarning)
-# warnings.filterwarnings('error')
+COVERAGE_EXCLUDES = ['tests']

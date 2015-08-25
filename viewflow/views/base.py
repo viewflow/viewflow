@@ -5,7 +5,8 @@ from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.utils.http import is_safe_url
-
+from django.utils.safestring import mark_safe
+from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
 from .. import flow, activation
@@ -164,9 +165,11 @@ class BaseTaskActionView(FlowManagePermissionMixin, generic.TemplateView):
         self.activation = activation
 
         if not self.can_proceed():
-            task_message_user(
-                request, activation.task, _("Can't execute action {}").format(self.action_name.title),
-                level=messages.ERROR)
+            hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
+            msg = _("Task {hyperlink} Can't execute action {action}.") \
+                .format(hyperlink=hyperlink, action=self.action_name.title)
+            messages.error(request, mark_safe(msg), fail_silently=True)
+
             return redirect(activation.flow_task.get_task_url(activation.task, url_type='details', user=request.user))
 
         return super(BaseTaskActionView, self).dispatch(request, **kwargs)

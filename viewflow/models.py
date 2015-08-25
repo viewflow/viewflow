@@ -158,15 +158,26 @@ class AbstractTask(models.Model):
                 self.flow_task,
                 self.pk,
                 self.status)
-        return "<Task {}> - {}".format(self.pk, self.get_status_display())
+        return "<Task {}> - {}".format(self.pk, self.status)
 
-    class Meta:
-        abstract = True
+    def refresh_from_db(self, using=None, fields=None, **kwargs):
+        if hasattr(models.Model, 'refresh_from_db'):
+            super(AbstractTask, self).refresh_from_db(using=using, fields=fields, **kwargs)
+        else:
+            """
+            django 1.6, only basic fallback
+            """
+            db_instance = self.__class__._default_manager.filter(pk=self.pk).get()
+            for field in self._meta.concrete_fields:
+                setattr(self, field.attname, getattr(db_instance, field.attname))
 
     def get_absolute_url(self, user=None):
         if user:
             return self.flow_task.get_task_url(self, url_type='details', user=user)
         return self.flow_task.get_task_url(self, url_type='details')
+
+    class Meta:
+        abstract = True
 
 
 class Process(AbstractProcess):

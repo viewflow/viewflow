@@ -39,26 +39,20 @@ class StartViewMixin(object):
         """Called if base class is :class:`extra_views.FormsetView`."""
         super(StartViewMixin, self).formset_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
-        hyperlink = get_process_hyperlink(self.activation.process)
-        msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.error(self.request, mark_safe(msg))
+        self._message_process_started()
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_valid(self, *args, **kwargs):
         """Called if base class is :class:`extra_views.InlineView`."""
         super(StartViewMixin, self).forms_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
-        hyperlink = get_process_hyperlink(self.activation.process)
-        msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.error(self.request, mark_safe(msg))
+        self._message_process_started()
         return HttpResponseRedirect(self.get_success_url())
 
     def form_valid(self, *args, **kwargs):
         super(StartViewMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
-        hyperlink = get_process_hyperlink(self.activation.process)
-        msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.error(self.request, mark_safe(msg))
+        self._message_process_started()
         return HttpResponseRedirect(self.get_success_url())
 
     @flow.flow_start_view()
@@ -70,6 +64,11 @@ class StartViewMixin(object):
 
         self.activation.prepare(request.POST or None, user=request.user)
         return super(StartViewMixin, self).dispatch(request, **kwargs)
+
+    def _message_process_started(self):
+        hyperlink = get_process_hyperlink(self.activation.process)
+        msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
+        messages.info(self.request, mark_safe(msg), fail_silently=True)
 
 
 class StartActivationViewMixin(object):
@@ -100,27 +99,21 @@ class StartActivationViewMixin(object):
         """Called if base class is :class:`extra_views.FormsetView`."""
         super(StartActivationViewMixin, self).formset_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
-        hyperlink = get_process_hyperlink(self.process)
-        msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.error(self.request, mark_safe(msg))
+        self._message_process_started()
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_valid(self, *args, **kwargs):
         """Called if base class is :class:`extra_views.InlineView`."""
         super(StartActivationViewMixin, self).forms_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
-        hyperlink = get_process_hyperlink(self.process)
-        msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.error(self.request, mark_safe(msg))
+        self._message_process_started()
         return HttpResponseRedirect(self.get_success_url())
 
     def form_valid(self, *args, **kwargs):
         """Called if bass class is :class:`.generic.FormView`."""
         super(StartActivationViewMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
-        hyperlink = get_process_hyperlink(self.process)
-        msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.error(self.request, mark_safe(msg))
+        self._message_process_started()
         return HttpResponseRedirect(self.get_success_url())
 
     @flow.flow_start_view()
@@ -131,6 +124,11 @@ class StartActivationViewMixin(object):
 
         self.prepare(request.POST or None, user=request.user)
         return super(StartActivationViewMixin, self).dispatch(request, *args, **kwargs)
+
+    def _message_process_started(self):
+        hyperlink = get_process_hyperlink(self.process)
+        msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
+        messages.info(self.request, mark_safe(msg), fail_silently=True)
 
 
 class StartProcessView(flow.ManagedStartViewActivation, StartActivationViewMixin, generic.UpdateView):

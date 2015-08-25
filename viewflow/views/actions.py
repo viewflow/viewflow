@@ -43,14 +43,14 @@ class ProcessCancelView(FlowManagePermissionMixin, generic.DetailView):
         if self.object.status in [STATUS.DONE, STATUS.CANCELED]:
             hyperlink = get_process_hyperlink(self.object)
             msg = _('Process {hyperlink} can not be canceled.').format(hyperlink=hyperlink)
-            messages.error(self.request, mark_safe(msg))
+            messages.error(self.request, mark_safe(msg), fail_silently=True)
             return HttpResponseRedirect(self.get_success_url())
         elif '_cancel_process' in request.POST:
             self._cancel_active_tasks()
             self._cancel_process()
             hyperlink = get_process_hyperlink(self.object)
             msg = _('Process {hyperlink} has been canceled.').format(hyperlink=hyperlink)
-            messages.info(self.request, mark_safe(msg))
+            messages.info(self.request, mark_safe(msg), fail_silently=True)
             return HttpResponseRedirect(self.get_success_url())
         else:
             return self.get(request, *args, **kwargs)
@@ -117,7 +117,7 @@ class TaskUndoView(BaseTaskActionView):
         self.activation.undo()
         hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
         msg = _('Task {hyperlink} has been undone.').format(hyperlink=hyperlink)
-        messages.info(self.request, mark_safe(msg))
+        messages.info(self.request, mark_safe(msg), fail_silently=True)
 
 
 class TaskCancelView(BaseTaskActionView):
@@ -130,7 +130,7 @@ class TaskCancelView(BaseTaskActionView):
         self.activation.cancel()
         hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
         msg = _('Task {hyperlink} has been canceled.').format(hyperlink=hyperlink)
-        messages.info(self.request, mark_safe(msg))
+        messages.info(self.request, mark_safe(msg), fail_silently=True)
 
 
 class TaskPerformView(BaseTaskActionView):
@@ -145,7 +145,7 @@ class TaskPerformView(BaseTaskActionView):
         self.activation.perform()
         hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
         msg = _('Task {hyperlink} has been executed.').format(hyperlink=hyperlink)
-        messages.success(self.request, mark_safe(msg))
+        messages.success(self.request, mark_safe(msg), fail_silently=True)
 
 
 class TaskActivateNextView(BaseTaskActionView):

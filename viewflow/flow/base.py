@@ -1,6 +1,7 @@
 """
 Base definitions for flow task declaration
 """
+from textwrap import dedent
 from django.conf.urls import url
 from django.core.urlresolvers import reverse
 
@@ -366,7 +367,7 @@ class TaskDescriptionMixin(object):
                 if task_title is None and len(docstring) > 0:
                     self.task_title = docstring[0].strip()
                 if task_description is None and len(docstring) > 1:
-                    self.task_description = docstring[1].strip()
+                    self.task_description = dedent(docstring[1]).strip()
             if hasattr(view_or_cls, 'task_result_summary') and self.task_result_summary is None:
                 self.task_result_summary = view_or_cls.task_result_summary
 

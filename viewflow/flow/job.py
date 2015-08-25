@@ -104,8 +104,8 @@ class AbstractJob(base.NextNodeMixin,
     """
     task_type = 'JOB'
 
-    def __init__(self, job):
-        super(AbstractJob, self).__init__()
+    def __init__(self, job, **kwargs):
+        super(AbstractJob, self).__init__(**kwargs)
         self._job = job
 
     @property

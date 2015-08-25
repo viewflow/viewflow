@@ -5,7 +5,7 @@ from .compat import deconstructible
 @deconstructible
 class Token(object):
     """
-    Hellper for tree-like flow token management
+    Helper for tree-like flow token management
 
     We follow basic strategy for flow split/join
 

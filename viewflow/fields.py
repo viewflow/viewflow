@@ -122,7 +122,7 @@ class TokenField(models.CharField, metaclass=models.SubfieldBase):
         return value
 
     def get_prep_value(self, value):
-        if not isinstance(value, str):
+        if not isinstance(value, str) and value:
             return value.token
         return super(TokenField, self).get_prep_value(value)
 

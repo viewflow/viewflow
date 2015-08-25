@@ -239,7 +239,8 @@ class StartActivation(Activation):
         """
         Activate all outgoing edges.
         """
-        self.flow_task._next.activate(prev_activation=self, token=self.task.token)
+        if self.flow_task._next:
+            self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @Activation.status.transition(source=STATUS.DONE, target=STATUS.CANCELED, conditions=[all_leading_canceled])
     def undo(self):
@@ -249,7 +250,15 @@ class StartActivation(Activation):
         self.process.status = STATUS.CANCELED
         self.process.finished = now()
         self.process.save()
-        super(StartActivation, self).undo.original()
+
+        self.task.finished = now()
+        self.task.save()
+
+        # call custom undo handler
+        handler_name = '{}_undo'.format(self.flow_task.name)
+        handler = getattr(self.flow_cls.instance, handler_name, None)
+        if handler:
+            handler(self)
 
 
 class StartViewActivation(Activation):
@@ -311,7 +320,8 @@ class StartViewActivation(Activation):
         """
         Activate all outgoing edges.
         """
-        self.flow_task._next.activate(prev_activation=self, token=self.task.token)
+        if self.flow_task._next:
+            self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @Activation.status.transition(source=STATUS.DONE, target=STATUS.CANCELED, conditions=[all_leading_canceled])
     def undo(self):
@@ -321,7 +331,15 @@ class StartViewActivation(Activation):
         self.process.status = STATUS.CANCELED
         self.process.finished = now()
         self.process.save()
-        super(StartViewActivation, self).undo.original()
+
+        self.task.finished = now()
+        self.task.save()
+
+        # call custom undo handler
+        handler_name = '{}_undo'.format(self.flow_task.name)
+        handler = getattr(self.flow_cls.instance, handler_name, None)
+        if handler:
+            handler(self)
 
 
 class ViewActivation(Activation):
@@ -411,7 +429,8 @@ class ViewActivation(Activation):
         """
         Activate all outgoing edges.
         """
-        self.flow_task._next.activate(prev_activation=self, token=self.task.token)
+        if self.flow_task._next:
+            self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @classmethod
     def create_task(cls, flow_task, prev_activation, token):
@@ -516,7 +535,10 @@ class AbstractGateActivation(Activation):
         """
         self.perform.original()
 
-    @Activation.status.transition(source=[STATUS.ERROR, STATUS.DONE], target=STATUS.NEW)
+    @Activation.status.transition(
+        source=[STATUS.ERROR, STATUS.DONE],
+        target=STATUS.NEW,
+        conditions=[all_leading_canceled])
     def undo(self):
         """
         Undo the task

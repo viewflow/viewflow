@@ -1,0 +1,30 @@
+from django.test import TestCase
+
+from viewflow import flow
+from viewflow.base import this, Flow
+
+
+class Test(TestCase):
+    def test_join_usecase(self):
+        act = JoinTestFlow.start.run()
+        JoinTestFlow.task1.run(act.process.get_task(JoinTestFlow.task1))
+        JoinTestFlow.task2.run(act.process.get_task(JoinTestFlow.task2))
+
+        tasks = act.process.task_set.all()
+        self.assertEqual(6, tasks.count())
+        self.assertTrue(all(task.finished is not None for task in tasks))
+
+
+@flow.flow_func(task_loader=lambda flow_task, task: task)
+def func(activation, task):
+    activation.prepare()
+    activation.done()
+
+
+class JoinTestFlow(Flow):
+    start = flow.StartFunction().Next(this.split)
+    split = flow.Split().Next(this.task1).Next(this.task2)
+    task1 = flow.Function(func).Next(this.join)
+    task2 = flow.Function(func).Next(this.join)
+    join = flow.Join().Next(this.end)
+    end = flow.End()

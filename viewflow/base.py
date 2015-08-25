@@ -3,6 +3,7 @@ Flow definition
 """
 import re
 from collections import defaultdict
+from textwrap import dedent
 
 from django.conf.urls import include, url
 
@@ -128,7 +129,7 @@ class FlowMetaClass(type):
             if 'process_title' not in attrs and len(docstring) > 0:
                 new_class.process_title = docstring[0].strip()
             if 'process_description' not in attrs and len(docstring) > 1:
-                new_class.process_description = docstring[1].strip()
+                new_class.process_description = dedent(docstring[1]).strip()
         else:
             # convert camel case to separate words
             new_class.process_title = re.sub('([a-z0-9])([A-Z])', r'\1 \2',

@@ -19,6 +19,7 @@ def flow_start_actions(flow_cls, user=None):
             node_url = reverse('{}:{}'.format(flow_cls.instance.namespace, node.name))
             actions.append((node_url, node.name))
 
+    actions.sort(key=lambda action: action[0])
     return actions
 
 

@@ -2,6 +2,7 @@ from inspect import getargspec
 
 from django import template
 from django.contrib.admin.templatetags.admin_modify import submit_row
+from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.template.base import TemplateSyntaxError, TagHelperNode, parse_bits
 from django.template.loader import select_template
@@ -115,6 +116,11 @@ def flow_perms(user, task):
 @register.simple_tag(takes_context=True)
 def include_process_data(context, process):
     """Shortcut tag for list all data from linked process models."""
+    if 'request' not in context:
+        raise ImproperlyConfigured(
+            "include_process_data template tag requires 'django.core.context_processors.request'"
+            " context processor installed.")
+
     opts = process.flow_cls._meta
 
     template_names = (

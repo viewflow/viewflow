@@ -111,6 +111,13 @@ class ProcessQuerySet(QuerySet):
 
 
 class TaskQuerySet(QuerySet):
+    def filter(self, *args, **kwargs):
+        flow_cls = kwargs.pop('process__flow_cls', None)
+        if flow_cls and not isinstance(flow_cls, ClassValueWrapper):
+            kwargs['process__flow_cls'] = ClassValueWrapper(flow_cls)
+
+        return super(TaskQuerySet, self).filter(*args, **kwargs)
+
     def coerce_for(self, flow_classes):
         self._coerced = True
         flow_classes = list(flow_classes)
@@ -129,6 +136,9 @@ class TaskQuerySet(QuerySet):
         queryset = self.filter(flow_task_type='HUMAN')
 
         if flow_cls is not None:
+            if not isinstance(flow_cls, ClassValueWrapper):
+                flow_cls = ClassValueWrapper(flow_cls)
+
             queryset = queryset.filter(process__flow_cls=flow_cls)
 
         if not user.is_superuser:
@@ -179,12 +189,12 @@ class TaskQuerySet(QuerySet):
         base_itererator = super(TaskQuerySet, self).iterator()
         if getattr(self, '_coerced', False):
             for task in base_itererator:
-                related = _get_related_path(task.process.flow_cls.task_cls, self.model)
+                related = _get_related_path(task.flow_task.flow_cls.task_cls, self.model)
                 if related:
                     task = _get_sub_obj(task, related)
-                if task and not isinstance(task, task.process.flow_cls.task_cls):
+                if task and not isinstance(task, task.flow_task.flow_cls.task_cls):
                     # Cource proxy classes
-                    task.__class__ = task.process.flow_cls.task_cls
+                    task.__class__ = task.flow_task.flow_cls.task_cls
                 yield task
         else:
             for task in base_itererator:
