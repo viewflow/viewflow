@@ -204,7 +204,7 @@ class Flow(object, metaclass=FlowMetaClass):
     @property
     def manage_permission_name(self):
         opts = self.process_cls._meta
-        return "{}.view_{}".format(opts.app_label, opts.model_name)
+        return "{}.manage_{}".format(opts.app_label, opts.model_name)
 
     def __str__(self):
         return self.process_title
