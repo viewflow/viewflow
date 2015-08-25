@@ -17,8 +17,8 @@ class End(base.DetailsViewMixin,
     task_type = 'END'
     activation_cls = EndActivation
 
-    def __init__(self):
-        super(End, self).__init__()
+    def __init__(self, **kwargs):
+        super(End, self).__init__(**kwargs)
 
     def _outgoing(self):
         return iter([])

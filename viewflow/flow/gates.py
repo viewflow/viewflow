@@ -41,8 +41,8 @@ class If(base.DetailsViewMixin,
     task_type = 'IF'
     activation_cls = IfActivation
 
-    def __init__(self, cond):
-        super(If, self).__init__()
+    def __init__(self, cond, **kwargs):
+        super(If, self).__init__(**kwargs)
         self._condition = cond
         self._on_true = None
         self._on_false = None
@@ -100,8 +100,8 @@ class Switch(base.DetailsViewMixin,
     task_type = 'SWITCH'
     activation_cls = SwitchActivation
 
-    def __init__(self):
-        super(Switch, self).__init__()
+    def __init__(self, **kwargs):
+        super(Switch, self).__init__(**kwargs)
         self._activate_next = []
 
     def _outgoing(self):
@@ -272,8 +272,8 @@ class Join(base.NextNodeMixin,
     task_type = 'JOIN'
     activation_cls = JoinActivation
 
-    def __init__(self, wait_all=True):
-        super(Join, self).__init__()
+    def __init__(self, wait_all=True, **kwargs):
+        super(Join, self).__init__(**kwargs)
         self._wait_all = wait_all
 
 
@@ -317,8 +317,8 @@ class Split(base.DetailsViewMixin,
     task_type = 'SPLIT'
     activation_cls = SplitActivation
 
-    def __init__(self):
-        super(Split, self).__init__()
+    def __init__(self, **kwargs):
+        super(Split, self).__init__(**kwargs)
         self._activate_next = []
 
     def _outgoing(self):
@@ -350,8 +350,8 @@ class First(base.DetailsViewMixin, base.Gateway):
     """
     task_type = 'FIRST_OF'
 
-    def __init__(self):
-        super(First, self).__init__()
+    def __init__(self, **kwargs):
+        super(First, self).__init__(**kwargs)
         self._activate_list = []
 
     def _outgoing(self):
