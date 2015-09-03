@@ -1,16 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import os
 from setuptools import setup
-import sys
 
-if 'sdist' in sys.argv or 'develop' in sys.argv:
-    try:
-        os.chdir('viewflow')
-        from django.core import management
-        management.call_command('compilemessages')
-    finally:
-        os.chdir('..')
 
 setup(
     name='django-viewflow',
