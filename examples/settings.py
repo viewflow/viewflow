@@ -1,4 +1,3 @@
-# Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
 import django
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -28,7 +27,6 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'viewflow',
-    'tests',
     'examples.customnode',
     'examples.helloworld',
     'examples.shipment',
@@ -43,7 +41,8 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'tests.urls'
+ROOT_URLCONF = 'examples.urls'
+
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
@@ -56,24 +55,18 @@ DATABASES = {
     }
 }
 
-
-class DisableMigrations(object):
-
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        return "notmigrations"
-
-MIGRATION_MODULES = DisableMigrations()
-
-
 # Templates
 
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + (
     'django.core.context_processors.request',
+    'examples.website.users',
 )
+
+TEMPLATE_DIRS = (
+    os.path.join(BASE_DIR, 'examples/templates'),
+)
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -102,24 +95,3 @@ BROKER_URL = 'django://'
 
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
-
-CELERY_IMPORTS = [
-    os.path.join(root, filename)[len(BASE_DIR)+1: -3].replace('/', '.')
-    for root, dirs, files in os.walk(os.path.join(BASE_DIR, 'tests'))
-    for filename in files
-    if filename.startswith('test_') and filename.endswith('.py')]
-
-DJKOMBU_POLLING_INTERVAL = 0.05
-
-
-# Jenkins
-
-INSTALLED_APPS = ('django_jenkins',) + INSTALLED_APPS
-
-JENKINS_TASKS = (
-    'django_jenkins.tasks.run_flake8',
-)
-
-PROJECT_APPS = ('viewflow', )
-
-COVERAGE_EXCLUDES = ['tests']

@@ -1,0 +1,33 @@
+{% extends 'viewflow/base_site.html' %}
+{% block title %}Viewflow - Easy to use, programmable workflow framework on top of Django{% endblock %}
+
+{% block content %}
+<div class="jumbotron">
+    <h1>Django-Viewflow</h1>
+    <p>Easy to use, programmable workflow framework on top of Django</p>
+</div>
+<div class="row">
+    <div class="col-lg-offset-2 col-lg-8">
+        <article class="markdown-body entry-content" itemprop="mainContentOfPage">
+            <h1>Viewflow examples</h1>
+            <a href="https://github.com/kmmbvnr/django-viewflow/tree/master/tests/examples"><i class="glyphicon glyphicon-edit"></i> Source code Github:</a>
+            <br/><br/>
+            <ul>
+                <li>
+                    <a href="https://github.com/kmmbvnr/django-viewflow/blob/master/tests/examples/helloworld">HelloWorld</a>  - Viewflow introduction sample</li>
+                <li>
+                    <a href="https://github.com/kmmbvnr/django-viewflow/blob/master/tests/examples/shipment">Shipment</a> - Automate shipment process for ecommerce website</li>
+                <li>
+                    <a href="https://github.com/kmmbvnr/django-viewflow/blob/master/tests/examples/customnode">Dynamic split</a> -  Custom flow node example</li>
+            </ul>
+            <h2>Standalone demo projects</h2>
+            <ul>
+                <li>
+                    <a href="https://github.com/kmmbvnr/viewflow-demo/tree/master/ecommerce">Ecommerce</a> - Delivery department automation with viewflow and Django Cartridge Ecommerce</li>
+                <li>
+                    <a href="https://github.com/kmmbvnr/viewflow-demo/tree/master/customauth">Customization</a> - Custom auth model and django-guardian for object level permissions, no viewsite</li>
+        </ul></article>
+    </div>
+</div>
+{% endblock %}
+

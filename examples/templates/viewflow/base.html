@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Viewflow Demo{% endblock %}</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap-theme.min.css">
+    <style type="text/css">
+      .glyphicon{
+          min-width: 15px;
+      }
+    </style>
+    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+      <nav class="navbar navbar-default" role="navigation" style="margin-bottom: 0">
+          <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#viewflow-navlinks">
+                  <span class="sr-only">Toggle navigation</span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+                  <span class="icon-bar"></span>
+              </button>
+              <a href="/" class="navbar-brand">{% block branding %}Viewflow{% endblock %}</a>
+          </div>
+          <div class="collapse navbar-collapse navbar-right" id="viewflow-navlinks">
+              {% block navright %}
+              <ul class="nav navbar-nav">
+                  {% if request.user.is_anonymous %}
+                  <li>
+                      <a href="{% url 'login' %}">Login</a>
+                  </li>
+                  {% else %}
+                  <li>
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ request.user|title }} <b class="caret"></b></a>
+                      <ul class="dropdown-menu">
+                          {% for user in users %}
+                          <li><a href="{% url 'login_as' %}?user_pk={{ user.pk }}"><i class="glyphicon {% if request.user == user %}glyphicon-ok{% endif %}"></i> {{ user.username|title }}</a></li>
+                          {% endfor %}
+                          <li><a href="{% url 'login_as' %}"><i class="glyphicon {% if request.user.is_anonymous %}glyphicon-ok{% endif %}"></i> Logout</a></li>
+                      </ul>
+                  </li>
+                  {% endif %}
+                  {% endblock %}
+          </div>
+      </nav>
+      <div style="width:300px;position:absolute; padding-top:2rem;">
+          <div class="container-fluid">
+              <div class="col-lg-12">
+                  <ul class="nav nav-pills nav-stacked" id="sidenav">
+                      <li><ul class="nav nav-pills nav-stacked">
+                              <li><a href="{% url 'index' %}">All Process</a>
+                                  <ul class="nav nav-pills nav-stacked">
+                                      {% if perms.helloworld.view_helloworldprocess %}
+                                      <li><a href="{% url 'helloworld/helloworld:index' %}">&nbsp;&nbsp;&nbsp;&nbsp;Hello World</a></li>
+                                      {% endif %}
+                                      {% if perms.shipment.view_shipmentprocess %}
+                                      <li><a href="{% url 'shipment/shipment:index' %}">&nbsp;&nbsp;&nbsp;&nbsp;Shipment</a></li>
+                                      {% endif %}
+                                      {% if perms.customnode.view_dynamicsplitprocess %}
+                                      <li><a href="{% url 'customnode/dynamicsplit:index' %}">&nbsp;&nbsp;&nbsp;&nbsp;Dynamic split</a></li>
+                                      {% endif %}
+                                  </ul>
+                              </li>
+                              <li><a href="{% url 'tasks' %}">My tasks</a> </li>
+                              <li><a href="{% url 'queue' %}">Available tasks</a> </li>
+                          </ul>
+                      </li>
+                  </ul>
+              </div>
+          </div>
+      </div>
+      <div style="position:absolute;margin-left:300px;width:calc(100% - 300px);padding-top:0.5rem;">
+          <div class="container-fluid">
+              {% if messages %}
+              <div class="row">
+                  <div class="col-lg-8">
+                      {% for message in messages %}
+                      <div class="alert alert-{{ message.tags }} alert-dismissible">{{ message }}</div>
+                      {% endfor %}
+                  </div>
+              </div>
+              {% endif %}
+              {% block content %}
+              <h1>Hello, world!</h1>
+              {% endblock %}
+          </div>
+      </div>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>
+      <script type="text/javascript">
+        (function( $ ) {
+          $.fn.activeNavigation = function(selector) {
+            var pathname = window.location.pathname
+            var hrefs = []
+            $(selector).find("a").each(function() {
+              if (pathname.indexOf($(this).attr("href")) > -1) 
+                hrefs.push($(this))
+            })
+            if (hrefs.length) {
+              hrefs.sort(function(a,b){
+                return b.attr("href").length - a.attr("href").length
+              })
+              hrefs[0].closest('li').addClass("active")
+            }
+          };
+        })(jQuery);
+        $(document).activeNavigation("#sidenav");
+      </script>
+  </body>
+</html>
