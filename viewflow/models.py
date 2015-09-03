@@ -190,6 +190,6 @@ class Task(AbstractTask):
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, db_index=True)
     external_task_id = models.CharField(max_length=50, blank=True, null=True, db_index=True)
-    owner_permission = models.CharField(max_length=50, blank=True, null=True)
+    owner_permission = models.CharField(max_length=150, blank=True, null=True)
 
     comments = models.TextField(blank=True, null=True)
