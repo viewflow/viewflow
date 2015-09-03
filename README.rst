@@ -21,11 +21,11 @@ Features:
 
 Demo: http://examples.viewflow.io
 
-.. image:: tests/examples/shipment/doc/ShipmentProcess.png
+.. image:: examples/shipment/doc/ShipmentProcess.png
    :width: 400px
 
 About hundred lines of code required to make this process `life
-<tests/examples/shipment/>`_ with django-viewflow and django class
+<examples/shipment/>`_ with django-viewflow and django class
 based views.
 
 .. image:: https://travis-ci.org/viewflow/viewflow.svg
@@ -161,7 +161,7 @@ locally, go to http://localhost:8000/helloworld/ and step through the workflow.
 Next, you can see how to define custom views, and meet other concepts of django-viewflow at
 http://kmmbvnr.github.io/django-viewflow/
 
-More examples are available in the `tests/examples` directory.
+More examples are available in the `examples` directory.
 
 
 License
