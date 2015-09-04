@@ -145,7 +145,6 @@ class Test(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(if_gate.status, STATUS.DONE)
         self.assertIsNotNone(if_gate.finished)
-        self.assertEqual(if_gate.process.status, STATUS.DONE)
 
     def test_task_activate_next_view(self):
         act = ActionsTestFlow.start.run()

@@ -70,6 +70,7 @@ class Test(TestCase):
         self.assertEqual(flow_task.task_description, 'Task Description')
         self.assertEqual(flow_task.task_result_summary, 'Summary for the completed task')
 
+
 class TestFlowBaseProcess(Process):
     pass
 

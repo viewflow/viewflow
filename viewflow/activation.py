@@ -771,13 +771,13 @@ class EndActivation(Activation):
 
             signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-            self.process.status = STATUS.DONE
-            self.process.finished = now()
-            self.process.save()
-
             for task in self.process.active_tasks():
                 if task != self.task:
-                    task.activate().cancel()
+                    break
+            else:
+                self.process.status = STATUS.DONE
+                self.process.finished = now()
+                self.process.save()
 
             self.task.finished = now()
             self.task.save()
