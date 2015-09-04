@@ -14,6 +14,20 @@ class Test(TestCase):
         self.assertEqual(6, tasks.count())
         self.assertTrue(all(task.finished is not None for task in tasks))
 
+    def test_join_with_canceled_tasks(self):
+        act = JoinTestFlow.start.run()
+        
+        # cancel first task
+        task1 = act.process.get_task(JoinTestFlow.task1)
+        task1.activate().cancel()
+
+        # execute second
+        JoinTestFlow.task2.run(act.process.get_task(JoinTestFlow.task2))
+
+        tasks = act.process.task_set.all()
+        self.assertEqual(6, tasks.count())
+        self.assertTrue(all(task.finished is not None for task in tasks))
+
 
 @flow.flow_func(task_loader=lambda flow_task, task: task)
 def func(activation, task):

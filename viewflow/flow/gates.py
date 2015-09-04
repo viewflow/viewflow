@@ -166,7 +166,9 @@ class JoinActivation(Activation):
         if not self.flow_task._wait_all:
             return True
 
-        join_prefixes = set(prev.token.get_common_split_prefix() for prev in self.task.previous.all())
+        join_prefixes = set(
+            prev.token.get_common_split_prefix()
+            for prev in self.task.previous.exclude(status=STATUS.CANCELED).all())
 
         if len(join_prefixes) > 1:
             raise FlowRuntimeError('Multiple tokens {} cames to join {}'.format(join_prefixes, self.flow_task.name))
