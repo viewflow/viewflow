@@ -1,6 +1,7 @@
 *.pyc
 .tox
 .coverage
+build
 dist
 reports
 django_viewflow.egg-info
