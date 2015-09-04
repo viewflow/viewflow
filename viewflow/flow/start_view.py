@@ -90,7 +90,7 @@ class ManagedStartViewActivation(StartViewActivation):
         return self.flow_task.can_execute(user)
 
 
-class BaseStart(base.TaskDescriptionMixin,
+class BaseStart(base.TaskDescriptionViewMixin,
                 base.NextNodeMixin,
                 base.DetailsViewMixin,
                 base.UndoViewMixin,

@@ -50,7 +50,7 @@ class Test(TestCase):
             """
             task_result_summary = "Summary for the completed task"
 
-        class TestNode(base.TaskDescriptionMixin, base.Node):
+        class TestNode(base.TaskDescriptionViewMixin, base.Node):
             pass
 
         flow_task = TestNode(TestView)
@@ -60,6 +60,15 @@ class Test(TestCase):
             for the task node''').strip())
         self.assertEqual(flow_task.task_result_summary, 'Summary for the completed task')
 
+    def test_task_description_mixin_kwargs(self):
+        flow_task = flow.End(
+            task_title='Test Task',
+            task_description='Task Description',
+            task_result_summary='Summary for the completed task')
+
+        self.assertEqual(flow_task.task_title, 'Test Task')
+        self.assertEqual(flow_task.task_description, 'Task Description')
+        self.assertEqual(flow_task.task_result_summary, 'Summary for the completed task')
 
 class TestFlowBaseProcess(Process):
     pass

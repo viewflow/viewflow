@@ -89,7 +89,8 @@ def flow_job(**lock_args):
     return flow_task_decorator
 
 
-class AbstractJob(base.NextNodeMixin,
+class AbstractJob(base.TaskDescriptionMixin,
+                  base.NextNodeMixin,
                   base.UndoViewMixin,
                   base.CancelViewMixin,
                   base.DetailsViewMixin,

@@ -3,7 +3,10 @@ from ..activation import StartActivation
 from . import base, func
 
 
-class StartSignal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
+class StartSignal(base.TaskDescriptionMixin,
+                  base.NextNodeMixin,
+                  base.DetailsViewMixin,
+                  base.Event):
 
     """
     StartNode that connects to a django signal.
@@ -150,7 +153,10 @@ def flow_signal(task_loader=None, **lock_args):
     return decorator
 
 
-class Signal(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
+class Signal(base.TaskDescriptionMixin,
+             base.NextNodeMixin,
+             base.DetailsViewMixin,
+             base.Event):
 
     """
     Node that connects to a django signal.

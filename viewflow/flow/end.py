@@ -6,7 +6,8 @@ from ..activation import EndActivation
 from . import base
 
 
-class End(base.DetailsViewMixin,
+class End(base.TaskDescriptionMixin,
+          base.DetailsViewMixin,
           base.UndoViewMixin,
           base.CancelViewMixin,
           base.PerformViewMixin,

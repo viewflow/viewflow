@@ -346,9 +346,6 @@ class PermissionMixin(object):
 
 
 class TaskDescriptionMixin(object):
-    """
-    Extract task desctiption from view docstring
-    """
     task_title = None
     task_description = None
     task_result_summary = None
@@ -361,17 +358,26 @@ class TaskDescriptionMixin(object):
         if task_result_summary:
             self.task_result_summary = task_result_summary
 
+        super(TaskDescriptionMixin, self).__init__(**kwargs)
+
+
+class TaskDescriptionViewMixin(TaskDescriptionMixin):
+    """
+    Extract task desctiption from view docstring
+    """
+
+    def __init__(self, view_or_cls=None, **kwargs):
+        super(TaskDescriptionViewMixin, self).__init__(**kwargs)
+
         if view_or_cls:
             if view_or_cls.__doc__ and (self.task_title is None or self.task_description is None):
                 docstring = view_or_cls.__doc__.split('\n\n', 1)
-                if task_title is None and len(docstring) > 0:
+                if self.task_title is None and len(docstring) > 0:
                     self.task_title = docstring[0].strip()
-                if task_description is None and len(docstring) > 1:
+                if self.task_description is None and len(docstring) > 1:
                     self.task_description = dedent(docstring[1]).strip()
             if hasattr(view_or_cls, 'task_result_summary') and self.task_result_summary is None:
                 self.task_result_summary = view_or_cls.task_result_summary
-
-        super(TaskDescriptionMixin, self).__init__(**kwargs)
 
 
 class ViewArgsMixin(object):

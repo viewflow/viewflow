@@ -24,7 +24,8 @@ class IfActivation(AbstractGateActivation):
             self.flow_task._on_false.activate(prev_activation=self, token=self.task.token)
 
 
-class If(base.DetailsViewMixin,
+class If(base.TaskDescriptionMixin,
+         base.DetailsViewMixin,
          base.UndoViewMixin,
          base.CancelViewMixin,
          base.PerformViewMixin,
@@ -89,7 +90,8 @@ class SwitchActivation(AbstractGateActivation):
         self.next_task.activate(prev_activation=self, token=self.task.token)
 
 
-class Switch(base.DetailsViewMixin,
+class Switch(base.TaskDescriptionMixin,
+             base.DetailsViewMixin,
              base.UndoViewMixin,
              base.CancelViewMixin,
              base.PerformViewMixin,
@@ -252,7 +254,8 @@ class JoinActivation(Activation):
         return activation
 
 
-class Join(base.NextNodeMixin,
+class Join(base.TaskDescriptionMixin,
+           base.NextNodeMixin,
            base.DetailsViewMixin,
            base.UndoViewMixin,
            base.CancelViewMixin,
@@ -300,7 +303,8 @@ class SplitActivation(AbstractGateActivation):
             next_task.activate(prev_activation=self, token=next(token_source))
 
 
-class Split(base.DetailsViewMixin,
+class Split(base.TaskDescriptionMixin,
+            base.DetailsViewMixin,
             base.UndoViewMixin,
             base.CancelViewMixin,
             base.PerformViewMixin,

@@ -8,7 +8,10 @@ from ..exceptions import FlowRuntimeError
 from . import base
 
 
-class StartFunction(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
+class StartFunction(base.TaskDescriptionMixin,
+                    base.NextNodeMixin,
+                    base.DetailsViewMixin,
+                    base.Event):
 
     """
     StartNode that can be executed within you code.
@@ -144,7 +147,10 @@ def flow_func(task_loader=None, **lock_args):
     return decorator
 
 
-class Function(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
+class Function(base.TaskDescriptionMixin,
+               base.NextNodeMixin,
+               base.DetailsViewMixin,
+               base.Event):
 
     """
     Node that can be executed within you code.
@@ -250,7 +256,10 @@ class HandlerActivation(Activation):
         return activation
 
 
-class Handler(base.NextNodeMixin, base.DetailsViewMixin, base.Event):
+class Handler(base.TaskDescriptionMixin,
+              base.NextNodeMixin,
+              base.DetailsViewMixin,
+              base.Event):
 
     """
     Node that can be executed automatically after task was created.

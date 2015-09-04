@@ -116,7 +116,7 @@ class ManagedViewActivation(ViewActivation):
         return task
 
 
-class BaseView(base.TaskDescriptionMixin,
+class BaseView(base.TaskDescriptionViewMixin,
                base.NextNodeMixin,
                base.Task,
                base.ViewArgsMixin):
