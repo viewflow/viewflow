@@ -136,6 +136,9 @@ def flow_signal(task_loader=None, **lock_args):
 
             receiver = receiver_cls()
             task = receiver.get_task(flow_task, **signal_kwargs)
+            if task is None:
+                return
+
             lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
 
             with lock(flow_task.flow_cls, task.process_id):
