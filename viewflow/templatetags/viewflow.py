@@ -4,9 +4,14 @@ from django import template
 from django.contrib.admin.templatetags.admin_modify import submit_row
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
-from django.template.base import TemplateSyntaxError, TagHelperNode, parse_bits
 from django.template.loader import select_template
-from django.utils.module_loading import import_by_path
+try:
+    from django.template.library import TemplateSyntaxError, TagHelperNode, parse_bits
+    from django.utils.module_loading import import_string
+except ImportError:
+    from django.template.base import TemplateSyntaxError, TagHelperNode, parse_bits
+    from django.utils.module_loading import import_by_path as import_string
+
 
 from ..base import Flow
 from ..compat import get_app_package
@@ -58,13 +63,17 @@ def flowurl(parser, token):
             if app_package is None:
                 raise TemplateSyntaxError("{} app not found".format(app_label))
 
-            flow_cls = import_by_path('{}.flows.{}'.format(app_package, flow_cls_path))
+            flow_cls = import_string('{}.flows.{}'.format(app_package, flow_cls_path))
             url_ref = '{}:{}'.format(flow_cls.instance.namespace, url_name if url_name else 'index')
             return reverse(url_ref)
 
     class URLNode(TagHelperNode):
         def __init__(self, args, kwargs, target_var):
-            super(URLNode, self).__init__(takes_context=False, args=args, kwargs=kwargs)
+            try:
+                super(URLNode, self).__init__(func=None, takes_context=False, args=args, kwargs=kwargs)
+            except TypeError:
+                super(URLNode, self).__init__(takes_context=False, args=args, kwargs=kwargs)
+
             self.target_var = target_var
 
         def render(self, context):
