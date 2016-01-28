@@ -2,6 +2,8 @@ import threading
 import traceback
 import uuid
 
+from contextlib import contextmanager
+
 from django.db import transaction
 from django.utils.timezone import now
 
@@ -125,6 +127,27 @@ class Activation(object):
 
     def get_available_transtions(self):
         return self.__class__.status.get_available_transtions(self)
+
+    def exception_guard(self):
+        """
+        Perform activation action inside a transaction.
+        Handle and propagate exception depends on actvation context state
+        """
+        @contextmanager
+        def guard():
+            try:
+                with transaction.atomic(savepoint=True):
+                    yield
+            except Exception as exc:
+                if not context.propagate_exception:
+                    self.task.comments = "{}\n{}".format(exc, traceback.format_exc())
+                    self.task.finished = now()
+                    self.set_status(STATUS.ERROR)
+                    self.task.save()
+                    signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task)
+                else:
+                    raise
+        return guard()
 
     @status.transition(source=STATUS.UNRIPE)
     def initialize(self, flow_task, task):
@@ -501,32 +524,22 @@ class AbstractGateActivation(Activation):
         .. seealso::
             :data:`viewflow.signals.task_finished`
 
-        """
-        try:
-            with transaction.atomic(savepoint=True):
-                self.task.started = now()
-                self.task.save()
+        """        
+        with self.exception_guard():
+            self.task.started = now()
+            self.task.save()
 
-                signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+            signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-                self.calculate_next()
+            self.calculate_next()
 
-                self.task.finished = now()
-                self.set_status(STATUS.DONE)
-                self.task.save()
+            self.task.finished = now()
+            self.set_status(STATUS.DONE)
+            self.task.save()
 
-                signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+            signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
-                self.activate_next()
-        except Exception as exc:
-            if not context.propagate_exception:
-                self.task.comments = "{}\n{}".format(exc, traceback.format_exc())
-                self.task.finished = now()
-                self.set_status(STATUS.ERROR)
-                self.task.save()
-                signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task)
-            else:
-                raise
+            self.activate_next()
 
     @Activation.status.transition(source=STATUS.ERROR)
     def retry(self):
@@ -624,19 +637,10 @@ class AbstractJobActivation(Activation):
         """
         Schedule task for execution
         """
-        try:
-            with transaction.atomic(savepoint=True):
-                self.async()
-                self.set_status(STATUS.SCHEDULED)
-                self.task.save()
-        except Exception as exc:
-            if not context.propagate_exception:
-                self.task.comments = "{}\n{}".format(exc, traceback.format_exc())
-                self.task.finished = now()
-                self.set_status(STATUS.ERROR)
-                self.task.save()
-            else:
-                raise
+        with self.exception_guard():
+            self.async()
+            self.set_status(STATUS.SCHEDULED)
+            self.task.save()
 
     @Activation.status.transition(source=STATUS.SCHEDULED, target=STATUS.STARTED)
     def start(self):

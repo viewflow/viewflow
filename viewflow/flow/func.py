@@ -200,23 +200,16 @@ class HandlerActivation(Activation):
 
     @Activation.status.transition(source=STATUS.NEW)
     def perform(self):
-        try:
+        with self.exception_guard():
             self.task.started = now()
 
-            with transaction.atomic(savepoint=True):
-                self.execute()
-                self.task.finished = now()
-                self.set_status(STATUS.DONE)
-                self.task.save()
-                self.activate_next()
-        except Exception as exc:
-            if not context.propagate_exception:
-                self.task.comments = "{}\n{}".format(exc, traceback.format_exc())
-                self.task.finished = now()
-                self.set_status(STATUS.ERROR)
-                self.task.save()
-            else:
-                raise
+            self.execute()
+
+            self.task.finished = now()
+            self.set_status(STATUS.DONE)
+            self.task.save()
+
+            self.activate_next()
 
     @Activation.status.transition(source=STATUS.ERROR)
     def retry(self):
