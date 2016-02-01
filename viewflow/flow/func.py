@@ -1,9 +1,7 @@
 """Functions and handlers as part of flow."""
-import traceback
-from django.db import transaction
 from django.utils.timezone import now
 
-from ..activation import Activation, StartActivation, STATUS, context
+from ..activation import Activation, StartActivation, STATUS
 from ..exceptions import FlowRuntimeError
 from . import base
 
@@ -41,6 +39,11 @@ class StartFunction(base.TaskDescriptionMixin,
         self._func = func
         super(StartFunction, self).__init__(**kwargs)
 
+    def start_func_default(self, activation):
+        activation.prepare()
+        activation.done()
+        return activation
+
     @property
     def func(self):
         if self._func is not None:
@@ -51,11 +54,7 @@ class StartFunction(base.TaskDescriptionMixin,
             if func_impl:
                 return func_impl
             else:
-                def default_start_func(activation):
-                    activation.prepare()
-                    activation.done()
-                    return activation
-                return default_start_func
+                return self.start_func_default
 
     def run(self, *args, **kwargs):
         if isinstance(self.func, type) and issubclass(self.func, StartActivation):
