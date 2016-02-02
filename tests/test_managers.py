@@ -20,13 +20,22 @@ class Test(TestCase):
     def test_process_queryset_cource_for_query(self):
         queryset = managers.ProcessQuerySet(model=Process).coerce_for([ChildFlow])
 
-        self.assertEqual(str(queryset.query),
-                         'SELECT "viewflow_process"."id", "viewflow_process"."flow_cls", "viewflow_process"."status",'
-                         ' "viewflow_process"."created", "viewflow_process"."finished",'
-                         ' "tests_childprocess"."process_ptr_id", "tests_childprocess"."comment"'
-                         ' FROM "viewflow_process" LEFT OUTER JOIN "tests_childprocess"'
-                         ' ON ( "viewflow_process"."id" = "tests_childprocess"."process_ptr_id" )'
-                         ' WHERE "viewflow_process"."flow_cls" IN (tests/test_managers.ChildFlow)')
+        if django.VERSION >= (1, 9):
+            self.assertEqual(str(queryset.query),
+                             'SELECT "viewflow_process"."id", "viewflow_process"."flow_cls", "viewflow_process"."status",'
+                             ' "viewflow_process"."created", "viewflow_process"."finished",'
+                             ' "tests_childprocess"."process_ptr_id", "tests_childprocess"."comment"'
+                             ' FROM "viewflow_process" LEFT OUTER JOIN "tests_childprocess"'
+                             ' ON ("viewflow_process"."id" = "tests_childprocess"."process_ptr_id")'
+                             ' WHERE "viewflow_process"."flow_cls" IN (tests/test_managers.ChildFlow)')
+        else:
+            self.assertEqual(str(queryset.query),
+                             'SELECT "viewflow_process"."id", "viewflow_process"."flow_cls", "viewflow_process"."status",'
+                             ' "viewflow_process"."created", "viewflow_process"."finished",'
+                             ' "tests_childprocess"."process_ptr_id", "tests_childprocess"."comment"'
+                             ' FROM "viewflow_process" LEFT OUTER JOIN "tests_childprocess"'
+                             ' ON ( "viewflow_process"."id" = "tests_childprocess"."process_ptr_id" )'
+                             ' WHERE "viewflow_process"."flow_cls" IN (tests/test_managers.ChildFlow)')
 
     def test_process_queryset_coerce_classes(self):
         process1 = Process.objects.create(flow_cls=Flow)

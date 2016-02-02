@@ -108,7 +108,12 @@ class AbstractTask(models.Model):
             return None
 
         flow_process_cls = self.flow_task.flow_cls.process_cls
-        task_process_cls = self._meta.get_field('process').related_field.model
+        try:
+            # Django 1.9
+            task_process_cls = self._meta.get_field('process').remote_field.model
+        except AttributeError:
+            task_process_cls = self._meta.get_field('process').related_field.model
+
         link = flow_process_cls._meta.get_ancestor_link(task_process_cls)
 
         if link:

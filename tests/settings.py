@@ -71,9 +71,15 @@ MIGRATION_MODULES = DisableMigrations()
 # Templates
 
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
-TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + (
-    'django.core.context_processors.request',
-)
+try:
+    # Django 1.9
+    TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + [
+        'django.core.context_processors.request',
+    ]
+except TypeError:
+    TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + (
+        'django.core.context_processors.request',
+    )
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
