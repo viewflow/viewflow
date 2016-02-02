@@ -29,6 +29,9 @@ class ProcessAdmin(admin.ModelAdmin):
     readonly_fields = ['flow_cls', 'status', 'finished']
     # inlines = [TaskInline]
 
+    def has_add_permission(self, request):
+        return False
+
     def participants(self, obj):
         user_ids = obj.task_set.exclude(owner__isnull=True).values('owner')
         users = auth.get_user_model()._default_manager.filter(pk__in=user_ids).values_list('username')
@@ -47,6 +50,9 @@ class TaskAdmin(admin.ModelAdmin):
     list_display_links = ['pk', 'created', 'process']
     list_filter = ['status']
     readonly_fields = ['process', 'status', 'flow_task', 'started', 'finished', 'previous', 'token']
+
+    def has_add_permission(self, request):
+        return False
 
     @property
     def change_form_template(self):
