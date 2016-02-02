@@ -6,13 +6,36 @@ try:
 except ImportError:
     import mock  # NOQA
 
+try:
+    from django.utils.module_loading import import_string  # NOQA
+except:
+    # django 1.6/1.7
+    from django.utils.module_loading import import_by_path as import_string  # NOQA
+
+try:
+    from django.template.library import TemplateSyntaxError, TagHelperNode, parse_bits  # NOQA
+except:
+    from django.template.base import TemplateSyntaxError, Node, parse_bits  # NOQA
+
+    class TagHelperNode(Node):
+        def __init__(self, func, takes_context, args, kwargs):
+            self.func = func
+            self.takes_context = takes_context
+            self.args = args
+            self.kwargs = kwargs
+
+        def get_resolved_arguments(self, context):
+            resolved_args = [var.resolve(context) for var in self.args]
+            if self.takes_context:
+                resolved_args = [context] + resolved_args
+            resolved_kwargs = {k: v.resolve(context) for k, v in self.kwargs.items()}
+            return resolved_args, resolved_kwargs
 
 try:
     # djagno 1.7
     from django.apps import apps
     from django.utils.deconstruct import deconstructible  # NOQA
     from django.utils.module_loading import autodiscover_modules  # NOQA
-    from django.utils.module_loading import import_string  # NOQA
 
     def get_app_package(app_label):
         """
@@ -40,7 +63,6 @@ except ImportError:
     import inspect
     from django.db.models import loading
     from django.utils import six
-    from django.utils.module_loading import import_by_path as import_string  # NOQA
 
     def get_app_package(app_label):
         app_config = loading.get_app(app_label)

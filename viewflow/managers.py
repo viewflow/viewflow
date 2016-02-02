@@ -84,12 +84,12 @@ class ProcessQuerySet(QuerySet):
     def filter_available(self, flow_classes, user):
         return self.model.objects.coerce_for(_available_flows(flow_classes, user))
 
-    def _clone(self, klass=None, setup=False, **kwargs):
+    def _clone(self, *args, **kwargs):
         try:
             kwargs.update({'_coerced': self._coerced})
         except AttributeError:
             pass
-        return super(ProcessQuerySet, self)._clone(klass, setup, **kwargs)
+        return super(ProcessQuerySet, self)._clone(*args, **kwargs)
 
     def iterator(self):
         """
@@ -175,12 +175,12 @@ class TaskQuerySet(QuerySet):
         return self.filter_available(flow_classes, user) \
             .filter(owner=user, finished__isnull=False)
 
-    def _clone(self, klass=None, setup=False, **kwargs):
+    def _clone(self, *args, **kwargs):
         try:
             kwargs.update({'_coerced': self._coerced})
         except AttributeError:
             pass
-        return super(TaskQuerySet, self)._clone(klass, setup, **kwargs)
+        return super(TaskQuerySet, self)._clone(*args, **kwargs)
 
     def iterator(self):
         """

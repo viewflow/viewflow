@@ -1,3 +1,5 @@
+import django
+
 from django.db import models
 from django.conf.urls import include, url
 from django.contrib import admin
@@ -22,23 +24,43 @@ class Test(TestCase):
         self.superuser = User.objects.create(username='superuser', is_superuser=True)
         data = base.get_model_display_data(self.child_process, self.superuser)
 
-        self.assertEqual(data, [
-            ('Child Template Tag Process', [
-                ('Content', 'child_process'),
-                ('Child Content', 'child process content')],
-             '/admin/tests/childtemplatetagprocess/1/'),
-            ('Related', [
-                ('Related Content', 'related')],
-             '/admin/tests/templatetagprocessrelated/1/'),
-            ('Template Tag Process Entity', [
-                ('Content', 'entity1')],
-             '/admin/tests/templatetagprocessentity/1/'),
-            ('Template Tag Process Entity',
-             [('Content', 'entity2')],
-             '/admin/tests/templatetagprocessentity/2/'),
-            ('Template Tag Process',
-             [('Content', 'child_process')],
-             None)])
+        if django.VERSION >= (1, 9):
+            self.assertEqual(data, [
+                ('Child Template Tag Process', [
+                    ('Content', 'child_process'),
+                    ('Child Content', 'child process content')],
+                 '/admin/tests/childtemplatetagprocess/1/change/'),
+                ('Related', [
+                    ('Related Content', 'related')],
+                 '/admin/tests/templatetagprocessrelated/1/change/'),
+                ('Template Tag Process Entity', [
+                    ('Content', 'entity1')],
+                 '/admin/tests/templatetagprocessentity/1/change/'),
+                ('Template Tag Process Entity',
+                 [('Content', 'entity2')],
+                 '/admin/tests/templatetagprocessentity/2/change/'),
+                ('Template Tag Process',
+                 [('Content', 'child_process')],
+                 None)])
+        else:
+            # older django has different andmin change page urls
+            self.assertEqual(data, [
+                ('Child Template Tag Process', [
+                    ('Content', 'child_process'),
+                    ('Child Content', 'child process content')],
+                 '/admin/tests/childtemplatetagprocess/1/'),
+                ('Related', [
+                    ('Related Content', 'related')],
+                 '/admin/tests/templatetagprocessrelated/1/'),
+                ('Template Tag Process Entity', [
+                    ('Content', 'entity1')],
+                 '/admin/tests/templatetagprocessentity/1/'),
+                ('Template Tag Process Entity',
+                 [('Content', 'entity2')],
+                 '/admin/tests/templatetagprocessentity/2/'),
+                ('Template Tag Process',
+                 [('Content', 'child_process')],
+                 None)])
 
     def test_get_model_display_data_for_unpriviledged_ser(self):
         self.user = User.objects.create(username='ruser', is_superuser=False)

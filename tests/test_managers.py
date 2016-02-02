@@ -1,4 +1,5 @@
-import django
+import sqlparse
+
 from django.db import models
 from django.test import TestCase
 from viewflow import flow, managers
@@ -20,13 +21,18 @@ class Test(TestCase):
     def test_process_queryset_cource_for_query(self):
         queryset = managers.ProcessQuerySet(model=Process).coerce_for([ChildFlow])
 
-        self.assertEqual(str(queryset.query),
-                         'SELECT "viewflow_process"."id", "viewflow_process"."flow_cls", "viewflow_process"."status",'
-                         ' "viewflow_process"."created", "viewflow_process"."finished",'
-                         ' "tests_childprocess"."process_ptr_id", "tests_childprocess"."comment"'
-                         ' FROM "viewflow_process" LEFT OUTER JOIN "tests_childprocess"'
-                         ' ON ( "viewflow_process"."id" = "tests_childprocess"."process_ptr_id" )'
-                         ' WHERE "viewflow_process"."flow_cls" IN (tests/test_managers.ChildFlow)')
+        self.assertEqual(
+            sqlparse.format(str(queryset.query), reindent=True),
+            'SELECT "viewflow_process"."id",\n'
+            '       "viewflow_process"."flow_cls",\n'
+            '       "viewflow_process"."status",\n'
+            '       "viewflow_process"."created",\n'
+            '       "viewflow_process"."finished",\n'
+            '       "tests_childprocess"."process_ptr_id",\n'
+            '       "tests_childprocess"."comment"\n'
+            'FROM "viewflow_process"\n'
+            'LEFT OUTER JOIN "tests_childprocess" ON ("viewflow_process"."id" = "tests_childprocess"."process_ptr_id")\n'
+            'WHERE "viewflow_process"."flow_cls" IN (tests/test_managers.ChildFlow)')
 
     def test_process_queryset_coerce_classes(self):
         process1 = Process.objects.create(flow_cls=Flow)
