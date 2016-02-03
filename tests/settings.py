@@ -103,7 +103,9 @@ STATIC_URL = '/static/'
 INSTALLED_APPS += ('kombu.transport.django', )
 BROKER_URL = 'django://'
 
+CELERYD_CONCURRENCY = 1
 CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 
 CELERY_IMPORTS = [
