@@ -1,5 +1,6 @@
 """Django signals as part of flow."""
 from ..activation import StartActivation
+from ..exceptions import FlowRuntimeError
 from . import base, func
 
 
@@ -86,7 +87,7 @@ class Receiver(object):
         raise NotImplementedError
 
 
-def flow_signal(task_loader=None, **lock_args):
+def flow_signal(task_loader=None, allow_skip_signals=False, **lock_args):
     """
     Decorator providing a flow signal receiver with the activation.
 
@@ -95,6 +96,9 @@ def flow_signal(task_loader=None, **lock_args):
 
     The decorator can be used ether with a callable defining a `task_loader`
     or with a :class:`.Receiver` subclass and no `task_loader`.
+
+    if `allow_skip_signals` is True, flow_task will not be proceed if task_loader
+    returns None.
 
     Example::
 
@@ -136,8 +140,15 @@ def flow_signal(task_loader=None, **lock_args):
 
             receiver = receiver_cls()
             task = receiver.get_task(flow_task, **signal_kwargs)
-            lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
+            if task is None:
+                if allow_skip_signals:
+                    return
+                else:
+                    raise FlowRuntimeError(
+                        "The task_loader didn't return any task for {}\n{}".format(
+                            flow_task.name, signal_kwargs))
 
+            lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
             with lock(flow_task.flow_cls, task.process_id):
                 task = flow_task.flow_cls.task_cls._default_manager.get(pk=task.pk)
                 if isinstance(receiver, func.FuncActivation):
