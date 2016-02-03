@@ -10,8 +10,6 @@ from viewflow.templatetags import base
 
 
 class Test(TestCase):
-    urls = __name__
-
     def setUp(self):
         self.related = TemplateTagProcessRelated.objects.create(related_content='related')
         self.child_process = ChildTemplateTagProcess.objects.create(
@@ -112,3 +110,12 @@ admin.site.register(TemplateTagProcessEntity)
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls))
 ]
+
+try:
+    from django.test import override_settings
+    Test = override_settings(ROOT_URLCONF=__name__)(Test)
+except ImportError:
+    """
+    django 1.6
+    """
+    Test.urls = __name__

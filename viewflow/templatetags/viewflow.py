@@ -129,7 +129,7 @@ def include_process_data(context, process):
     try:
         context['process_data'] = get_model_display_data(process, context['request'].user)
         context['process'] = process
-        return template.render(context)
+        return template.render(context.flatten() if hasattr(context, 'flatten') else context)
     finally:
         context.pop()
 

@@ -9,8 +9,6 @@ from viewflow.views import base
 
 
 class Test(TestCase):
-    urls = __name__
-
     def test_get_next_task_url_flow_index(self):
         request = RequestFactory().get('/test/')
         request.user = User(username='test')
@@ -25,7 +23,7 @@ class Test(TestCase):
 
         next_url = base.get_next_task_url(request, process)
         self.assertEqual(next_url, '/test/details/{}/'.format(process.pk))
-            
+
     def test_get_next_task_url_back(self):
         request = RequestFactory().get('/test/', {'back': '/test_back_url/'})
         request.user = User(username='test')
@@ -99,3 +97,12 @@ urlpatterns = [
         url('^details/(?P<process_pk>\d+)/$', views.ProcessDetailView.as_view(), name='details'),
     ], namespace=BaseViewTestFlow.instance.namespace), {'flow_cls': BaseViewTestFlow})
 ]
+
+try:
+    from django.test import override_settings
+    Test = override_settings(ROOT_URLCONF=__name__)(Test)
+except ImportError:
+    """
+    django 1.6
+    """
+    Test.urls = __name__

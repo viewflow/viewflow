@@ -35,12 +35,14 @@ def _get_related_path(model, base_model):
     parent = model._meta.get_ancestor_link(base_model)
 
     while parent is not None:
-        ancestry.insert(0, parent.related.get_accessor_name())
+        related = parent.remote_field if hasattr(parent, 'remote_field') else parent.related
+
+        ancestry.insert(0, related.get_accessor_name())
 
         if django.VERSION < (1, 8):
-            parent_model = parent.related.parent_model
+            parent_model = related.parent_model
         else:
-            parent_model = parent.related.model
+            parent_model = related.model
 
         parent = parent_model._meta.get_ancestor_link(base_model)
 

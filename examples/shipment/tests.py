@@ -9,8 +9,7 @@ from .flows import ShipmentFlow
 from .models import Carrier
 
 
-class ShipmentFlowTests(TestCase):
-    urls = __name__
+class Test(TestCase):
     fixtures = ['shipment/default_data.json']
 
     sample_shipment = {
@@ -107,3 +106,13 @@ urlpatterns = [
         url('^details/(?P<process_pk>\d+)/$', viewflow.ProcessDetailView.as_view(), name='details'),
     ], namespace=ShipmentFlow.instance.namespace), {'flow_cls': ShipmentFlow}),
 ]
+
+
+try:
+    from django.test import override_settings
+    Test = override_settings(ROOT_URLCONF=__name__)(Test)
+except ImportError:
+    """
+    django 1.6
+    """
+    Test.urls = __name__
