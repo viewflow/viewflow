@@ -129,6 +129,11 @@ def flow_func(task_loader=None, **lock_args):
             receiver = receiver_cls()
 
             task = receiver.get_task(flow_task, *func_args, **func_kwargs)
+            if task is None:
+                raise FlowRuntimeError(
+                    "The task_loader didn't return any task for {}\n{}\n{}".format(
+                        flow_task.name, func_args, func_kwargs))
+
             lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
 
             with lock(flow_task.flow_cls, task.process_id):
