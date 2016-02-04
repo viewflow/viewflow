@@ -43,7 +43,13 @@ class Test(TestCase):
             queryset = managers.ProcessQuerySet(model=Process).coerce_for([GrandChildFlow, ChildFlow, Flow])
             self.assertEqual(set(queryset), set([process1, process2, process3]))
 
-    def _test_task_queryset_filter_by_flowcls_succeed(self):
+    def test_process_queryset_cource_values_list(self):
+        process = ChildProcess.objects.create(flow_cls=ChildFlow)
+
+        queryset = managers.ProcessQuerySet(model=Process).coerce_for([ChildFlow]).values_list('id')
+        self.assertEqual([(process.pk,)], list(queryset))
+
+    def test_task_queryset_filter_by_flowcls_succeed(self):
         queryset = managers.ProcessQuerySet(model=Task).filter(flow_task=ChildFlow.start)
 
         self.assertEqual(str(queryset.query).strip(),
@@ -86,6 +92,13 @@ class Test(TestCase):
         with self.assertNumQueries(1):
             queryset = managers.TaskQuerySet(model=Task).coerce_for([GrandChildFlow, ChildFlow])
             self.assertEqual(set(queryset), set([task1, task2]))
+
+    def test_task_queryset_cource_values_list(self):
+        process = ChildProcess.objects.create(flow_cls=ChildFlow)
+        task = ChildTask.objects.create(process=process, flow_task=ChildFlow.start)
+
+        queryset = managers.TaskQuerySet(model=Task).coerce_for([ChildFlow]).values_list('id')
+        self.assertEqual([(task.pk,)], list(queryset))
 
 
 class ChildProcess(Process):
