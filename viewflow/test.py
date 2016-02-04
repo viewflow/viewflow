@@ -14,7 +14,10 @@ with FlowTest(RestrictedUserFlow) as flow_test:
 
 """
 import inspect
-from singledispatch import singledispatch
+try:
+    from functools import singledispatch
+except ImportError:
+    from singledispatch import singledispatch
 
 from django.contrib import auth
 from django.utils.functional import cached_property

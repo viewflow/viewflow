@@ -146,21 +146,12 @@ class JoinActivation(Activation):
 
     @Activation.status.transition(source=STATUS.STARTED)
     def done(self):
-        try:
-            with transaction.atomic(savepoint=True):
-                self.task.finished = now()
-                self.set_status(STATUS.DONE)
-                self.task.save()
+        with self.exception_guard():
+            self.task.finished = now()
+            self.set_status(STATUS.DONE)
+            self.task.save()
 
-                self.activate_next()
-        except Exception as exc:
-            if not context.propagate_exception:
-                self.task.comments = "{}\n{}".format(exc, traceback.format_exc())
-                self.task.finished = now()
-                self.set_status(STATUS.ERROR)
-                self.task.save()
-            else:
-                raise
+            self.activate_next()
 
     def is_done(self):
         if not self.flow_task._wait_all:

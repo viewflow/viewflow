@@ -10,8 +10,6 @@ from viewflow.views import list
 
 
 class Test(TestCase):
-    urls = __name__
-
     def test_flow_start_actions(self):
         user = User.objects.create(username='superuser', is_superuser=True)
         actions = list.flow_start_actions(ListViewTestFlow, user)
@@ -149,3 +147,12 @@ urlpatterns = [
         url('^details/(?P<process_pk>\d+)/$', views.ProcessDetailView.as_view(), name='details'),
     ], namespace=ListViewTestFlow.instance.namespace), {'flow_cls': ListViewTestFlow})
 ]
+
+try:
+    from django.test import override_settings
+    Test = override_settings(ROOT_URLCONF=__name__)(Test)
+except ImportError:
+    """
+    django 1.6
+    """
+    Test.urls = __name__

@@ -4,7 +4,7 @@ Background job executed by celery
 import functools
 import traceback
 
-from ..activation import AbstractJobActivation
+from ..activation import AbstractJobActivation, STATUS
 from ..fields import import_task_by_ref
 from . import base
 
@@ -41,6 +41,8 @@ def flow_job(**lock_args):
             with lock(flow_task.flow_cls, process_pk):
                 try:
                     task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
+                    if task.status == STATUS.CANCELED:
+                        return
                 except flow_task.flow_cls.task_cls.DoesNotExist:
                     # There was rollback on job task created transaction,
                     # we don't need to do the job

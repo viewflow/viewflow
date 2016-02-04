@@ -71,15 +71,27 @@ MIGRATION_MODULES = DisableMigrations()
 # Templates
 
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
-try:
-    # Django 1.9
-    TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + [
-        'django.core.context_processors.request',
-    ]
-except TypeError:
-    TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + (
-        'django.core.context_processors.request',
-    )
+TEMPLATE_CONTEXT_PROCESSORS = list(TEMPLATE_CONTEXT_PROCESSORS) + [
+    'django.core.context_processors.request',
+]
+
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.request',
+            ],
+            'debug': True,
+        },
+    },
+]
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.6/topics/i18n/
@@ -109,7 +121,9 @@ STATIC_URL = '/static/'
 INSTALLED_APPS += ('kombu.transport.django', )
 BROKER_URL = 'django://'
 
+CELERYD_CONCURRENCY = 1
 CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
 
 CELERY_IMPORTS = [

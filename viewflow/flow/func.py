@@ -1,9 +1,7 @@
 """Functions and handlers as part of flow."""
-import traceback
-from django.db import transaction
 from django.utils.timezone import now
 
-from ..activation import Activation, StartActivation, STATUS, context
+from ..activation import Activation, StartActivation, STATUS
 from ..exceptions import FlowRuntimeError
 from . import base
 
@@ -41,6 +39,11 @@ class StartFunction(base.TaskDescriptionMixin,
         self._func = func
         super(StartFunction, self).__init__(**kwargs)
 
+    def start_func_default(self, activation):
+        activation.prepare()
+        activation.done()
+        return activation
+
     @property
     def func(self):
         if self._func is not None:
@@ -51,11 +54,7 @@ class StartFunction(base.TaskDescriptionMixin,
             if func_impl:
                 return func_impl
             else:
-                def default_start_func(activation):
-                    activation.prepare()
-                    activation.done()
-                    return activation
-                return default_start_func
+                return self.start_func_default
 
     def run(self, *args, **kwargs):
         if isinstance(self.func, type) and issubclass(self.func, StartActivation):
@@ -130,6 +129,11 @@ def flow_func(task_loader=None, **lock_args):
             receiver = receiver_cls()
 
             task = receiver.get_task(flow_task, *func_args, **func_kwargs)
+            if task is None:
+                raise FlowRuntimeError(
+                    "The task_loader didn't return any task for {}\n{}\n{}".format(
+                        flow_task.name, func_args, func_kwargs))
+
             lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
 
             with lock(flow_task.flow_cls, task.process_id):
@@ -200,23 +204,16 @@ class HandlerActivation(Activation):
 
     @Activation.status.transition(source=STATUS.NEW)
     def perform(self):
-        try:
+        with self.exception_guard():
             self.task.started = now()
 
-            with transaction.atomic(savepoint=True):
-                self.execute()
-                self.task.finished = now()
-                self.set_status(STATUS.DONE)
-                self.task.save()
-                self.activate_next()
-        except Exception as exc:
-            if not context.propagate_exception:
-                self.task.comments = "{}\n{}".format(exc, traceback.format_exc())
-                self.task.finished = now()
-                self.set_status(STATUS.ERROR)
-                self.task.save()
-            else:
-                raise
+            self.execute()
+
+            self.task.finished = now()
+            self.set_status(STATUS.DONE)
+            self.task.save()
+
+            self.activate_next()
 
     @Activation.status.transition(source=STATUS.ERROR)
     def retry(self):

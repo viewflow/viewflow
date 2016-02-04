@@ -4,7 +4,7 @@ from django.views import generic
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django_filters import FilterSet, ChoiceFilter, DateRangeFilter
+from django_filters import FilterSet, ChoiceFilter, DateRangeFilter, ModelChoiceFilter
 
 from .. import activation, flow, models
 from ..fields import import_task_by_ref
@@ -38,8 +38,9 @@ class LoginRequiredMixin(object):
 
 
 class TaskFilter(FilterSet):
-    flow_task = ChoiceFilter()
-    created = DateRangeFilter()
+    flow_task = ChoiceFilter(help_text='')
+    created = DateRangeFilter(help_text='')
+    process = ModelChoiceFilter(queryset=models.Process.objects.all(), help_text='')
 
     def __init__(self, data=None, queryset=None, prefix=None, strict=None):
         super(TaskFilter, self).__init__(data=data, queryset=queryset, prefix=prefix, strict=strict)

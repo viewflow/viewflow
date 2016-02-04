@@ -262,7 +262,7 @@ class View(base.PermissionMixin,
         if task.owner_id:
             return False
 
-        if user.is_anonymous():
+        if user is None or user.is_anonymous():
             return False
 
         if not task.owner_permission:

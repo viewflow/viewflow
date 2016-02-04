@@ -11,8 +11,6 @@ from viewflow.views import start
 
 
 class Test(TestCase):
-    urls = __name__
-
     def test_startview_mixin_with_create_view(self):
         class StartView(start.StartViewMixin, generic.CreateView):
             model = StartViewFlowEntity
@@ -109,3 +107,12 @@ urlpatterns = [
         url('^details/(?P<process_pk>\d+)/$', views.ProcessDetailView.as_view(), name='details'),
     ], namespace=StartViewTestFlow.instance.namespace), {'flow_cls': StartViewTestFlow})
 ]
+
+try:
+    from django.test import override_settings
+    Test = override_settings(ROOT_URLCONF=__name__)(Test)
+except ImportError:
+    """
+    django 1.6
+    """
+    Test.urls = __name__

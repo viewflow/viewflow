@@ -4,13 +4,10 @@ from django import template
 from django.contrib.admin.templatetags.admin_modify import submit_row
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
-from django.template.library import TemplateSyntaxError, TagHelperNode, parse_bits
 from django.template.loader import select_template
-from django.utils.module_loading import import_string
-from django_fsm import can_proceed
 
 from ..base import Flow
-from ..compat import get_app_package
+from ..compat import get_app_package, import_string, TemplateSyntaxError, TagHelperNode, parse_bits
 from ..models import AbstractProcess, AbstractTask
 from .base import get_model_display_data
 
@@ -29,7 +26,7 @@ def flowurl(parser, token):
 
     Examples::
 
-        {% flowurl 'app_label/FlowCls' 'viewflow:index' %}
+        {% flowurl 'app_label/FlowCls' 'index' %}
         {% flowurl flow_cls 'index' as index_url %}
         {% flowurl process 'index' %}
         {% flowurl process 'details' %}
@@ -103,11 +100,11 @@ def flow_perms(user, task):
     """
     result = []
 
-    if can_proceed(task.prepare) and hasattr(task.flow_task, 'can_execute') and task.flow_task.can_execute(user, task):
+    if hasattr(task.flow_task, 'can_execute') and task.flow_task.can_execute(user, task):
         result.append('can_execute')
-    elif can_proceed(task.assign) and hasattr(task.flow_task, 'can_assign') and task.flow_task.can_assign(user, task):
+    if hasattr(task.flow_task, 'can_assign') and task.flow_task.can_assign(user, task):
         result.append('can_assign')
-    elif hasattr(task.flow_task, 'can_view') and task.flow_task.can_view(user, task):
+    if hasattr(task.flow_task, 'can_view') and task.flow_task.can_view(user, task):
         result.append('can_view')
 
     return result
@@ -132,7 +129,7 @@ def include_process_data(context, process):
     try:
         context['process_data'] = get_model_display_data(process, context['request'].user)
         context['process'] = process
-        return template.render(context)
+        return template.render(context.flatten() if hasattr(context, 'flatten') else context)
     finally:
         context.pop()
 

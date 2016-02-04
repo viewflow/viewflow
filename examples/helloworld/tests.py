@@ -7,8 +7,7 @@ from viewflow.test import FlowTest
 from .flows import HelloWorldFlow
 
 
-class HelloWorldFlowTests(TestCase):
-    urls = __name__
+class Test(TestCase):
     fixtures = ['helloworld/default_data.json']
 
     def test_normal_flow_succeed(self):
@@ -39,3 +38,12 @@ urlpatterns = [
         url('^action/cancel/(?P<process_pk>\d+)/$', viewflow.ProcessCancelView.as_view(), name='action_cancel'),
     ], namespace=HelloWorldFlow.instance.namespace), {'flow_cls': HelloWorldFlow}),
 ]
+
+try:
+    from django.test import override_settings
+    Test = override_settings(ROOT_URLCONF=__name__)(Test)
+except ImportError:
+    """
+    django 1.6
+    """
+    Test.urls = __name__

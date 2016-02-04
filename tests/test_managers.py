@@ -1,4 +1,5 @@
-import django
+import sqlparse
+
 from django.db import models
 from django.test import TestCase
 from viewflow import flow, managers
@@ -20,22 +21,18 @@ class Test(TestCase):
     def test_process_queryset_cource_for_query(self):
         queryset = managers.ProcessQuerySet(model=Process).coerce_for([ChildFlow])
 
-        if django.VERSION >= (1, 9):
-            self.assertEqual(str(queryset.query),
-                             'SELECT "viewflow_process"."id", "viewflow_process"."flow_cls", "viewflow_process"."status",'
-                             ' "viewflow_process"."created", "viewflow_process"."finished",'
-                             ' "tests_childprocess"."process_ptr_id", "tests_childprocess"."comment"'
-                             ' FROM "viewflow_process" LEFT OUTER JOIN "tests_childprocess"'
-                             ' ON ("viewflow_process"."id" = "tests_childprocess"."process_ptr_id")'
-                             ' WHERE "viewflow_process"."flow_cls" IN (tests/test_managers.ChildFlow)')
-        else:
-            self.assertEqual(str(queryset.query),
-                             'SELECT "viewflow_process"."id", "viewflow_process"."flow_cls", "viewflow_process"."status",'
-                             ' "viewflow_process"."created", "viewflow_process"."finished",'
-                             ' "tests_childprocess"."process_ptr_id", "tests_childprocess"."comment"'
-                             ' FROM "viewflow_process" LEFT OUTER JOIN "tests_childprocess"'
-                             ' ON ( "viewflow_process"."id" = "tests_childprocess"."process_ptr_id" )'
-                             ' WHERE "viewflow_process"."flow_cls" IN (tests/test_managers.ChildFlow)')
+        self.assertEqual(
+            sqlparse.format(str(queryset.query), reindent=True),
+            'SELECT "viewflow_process"."id",\n'
+            '       "viewflow_process"."flow_cls",\n'
+            '       "viewflow_process"."status",\n'
+            '       "viewflow_process"."created",\n'
+            '       "viewflow_process"."finished",\n'
+            '       "tests_childprocess"."process_ptr_id",\n'
+            '       "tests_childprocess"."comment"\n'
+            'FROM "viewflow_process"\n'
+            'LEFT OUTER JOIN "tests_childprocess" ON ("viewflow_process"."id" = "tests_childprocess"."process_ptr_id")\n'
+            'WHERE "viewflow_process"."flow_cls" IN (tests/test_managers.ChildFlow)')
 
     def test_process_queryset_coerce_classes(self):
         process1 = Process.objects.create(flow_cls=Flow)
@@ -46,7 +43,13 @@ class Test(TestCase):
             queryset = managers.ProcessQuerySet(model=Process).coerce_for([GrandChildFlow, ChildFlow, Flow])
             self.assertEqual(set(queryset), set([process1, process2, process3]))
 
-    def _test_task_queryset_filter_by_flowcls_succeed(self):
+    def test_process_queryset_cource_values_list(self):
+        process = ChildProcess.objects.create(flow_cls=ChildFlow)
+
+        queryset = managers.ProcessQuerySet(model=Process).coerce_for([ChildFlow]).values_list('id')
+        self.assertEqual([(process.pk,)], list(queryset))
+
+    def test_task_queryset_filter_by_flowcls_succeed(self):
         queryset = managers.ProcessQuerySet(model=Task).filter(flow_task=ChildFlow.start)
 
         self.assertEqual(str(queryset.query).strip(),
@@ -89,6 +92,13 @@ class Test(TestCase):
         with self.assertNumQueries(1):
             queryset = managers.TaskQuerySet(model=Task).coerce_for([GrandChildFlow, ChildFlow])
             self.assertEqual(set(queryset), set([task1, task2]))
+
+    def test_task_queryset_cource_values_list(self):
+        process = ChildProcess.objects.create(flow_cls=ChildFlow)
+        task = ChildTask.objects.create(process=process, flow_task=ChildFlow.start)
+
+        queryset = managers.TaskQuerySet(model=Task).coerce_for([ChildFlow]).values_list('id')
+        self.assertEqual([(task.pk,)], list(queryset))
 
 
 class ChildProcess(Process):

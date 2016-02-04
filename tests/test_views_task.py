@@ -11,8 +11,6 @@ from viewflow.views import task as task_views
 
 
 class Test(TestCase):
-    urls = __name__
-
     def test_taskview_mixin_with_create_view(self):
         class StartView(task_views.TaskViewMixin, generic.CreateView):
             model = TaskViewFlowEntity
@@ -185,3 +183,12 @@ urlpatterns = [
         url('^details/(?P<process_pk>\d+)/$', views.ProcessDetailView.as_view(), name='details'),
     ], namespace=TaskViewTestFlow.instance.namespace), {'flow_cls': TaskViewTestFlow})
 ]
+
+try:
+    from django.test import override_settings
+    Test = override_settings(ROOT_URLCONF=__name__)(Test)
+except ImportError:
+    """
+    django 1.6
+    """
+    Test.urls = __name__

@@ -51,7 +51,42 @@ class ClassValueWrapper(object):
         self.cls = cls
 
 
-class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
+class _SubfieldBase(type):
+    """backpoort from django 1.8"""
+    def __new__(cls, name, bases, attrs):
+        new_class = super(_SubfieldBase, cls).__new__(cls, name, bases, attrs)
+        new_class.contribute_to_class = _make_contrib(
+            new_class, attrs.get('contribute_to_class')
+        )
+        return new_class
+
+
+class _Creator(object):
+    """backpoort from django 1.8"""
+    def __init__(self, field):
+        self.field = field
+
+    def __get__(self, obj, type=None):
+        if obj is None:
+            return self
+        return obj.__dict__[self.field.name]
+
+    def __set__(self, obj, value):
+        obj.__dict__[self.field.name] = self.field.to_python(value)
+
+
+def _make_contrib(superclass, func=None):
+    """backport from django 1.8"""
+    def contribute_to_class(self, cls, name, **kwargs):
+        if func:
+            func(self, cls, name, **kwargs)
+        else:
+            super(superclass, self).contribute_to_class(cls, name, **kwargs)
+        setattr(cls, self.name, _Creator(self))
+    return contribute_to_class
+
+
+class FlowReferenceField(models.CharField, metaclass=_SubfieldBase):
     description = """Flow class reference field,
     stores flow as app_label/flows.FlowName> to
     avoid possible collisions with app name changes"""
@@ -85,7 +120,7 @@ class FlowReferenceField(models.CharField, metaclass=models.SubfieldBase):
         return self.get_prep_value(value)
 
 
-class TaskReferenceField(models.CharField, metaclass=models.SubfieldBase):
+class TaskReferenceField(models.CharField, metaclass=_SubfieldBase):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('max_length', 150)
         super(TaskReferenceField, self).__init__(*args, **kwargs)
@@ -107,7 +142,7 @@ class TaskReferenceField(models.CharField, metaclass=models.SubfieldBase):
         return self.get_prep_value(value)
 
 
-class TokenField(models.CharField, metaclass=models.SubfieldBase):
+class TokenField(models.CharField, metaclass=_SubfieldBase):
     def __init__(self, *args, **kwargs):
         kwargs.setdefault('max_length', 150)
         if 'default' in kwargs:

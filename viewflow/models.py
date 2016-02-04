@@ -108,16 +108,12 @@ class AbstractTask(models.Model):
             return None
 
         flow_process_cls = self.flow_task.flow_cls.process_cls
-        try:
-            # Django 1.9
-            task_process_cls = self._meta.get_field('process').remote_field.model
-        except AttributeError:
-            task_process_cls = self._meta.get_field('process').related_field.model
-
+        task_process_cls = self._meta.get_field('process').rel.field.rel.to  # django 1.6/1.9 compatible
         link = flow_process_cls._meta.get_ancestor_link(task_process_cls)
 
         if link:
-            return getattr(self.process, link.related.get_accessor_name())
+            related = link.remote_field if hasattr(link, 'remote_field') else link.related
+            return getattr(self.process, related.get_accessor_name())
         else:
             return self.process
 

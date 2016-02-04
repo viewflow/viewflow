@@ -35,12 +35,14 @@ def _get_related_path(model, base_model):
     parent = model._meta.get_ancestor_link(base_model)
 
     while parent is not None:
-        ancestry.insert(0, parent.related.get_accessor_name())
+        related = parent.remote_field if hasattr(parent, 'remote_field') else parent.related
+
+        ancestry.insert(0, related.get_accessor_name())
 
         if django.VERSION < (1, 8):
-            parent_model = parent.related.parent_model
+            parent_model = related.parent_model
         else:
-            parent_model = parent.related.model
+            parent_model = related.model
 
         parent = parent_model._meta.get_ancestor_link(base_model)
 
@@ -89,7 +91,6 @@ class ProcessQuerySet(QuerySet):
             kwargs.update({'_coerced': self._coerced})
         except AttributeError:
             pass
-
         return super(ProcessQuerySet, self)._clone(*args, **kwargs)
 
     def iterator(self):
@@ -99,12 +100,13 @@ class ProcessQuerySet(QuerySet):
         base_itererator = super(ProcessQuerySet, self).iterator()
         if getattr(self, '_coerced', False):
             for process in base_itererator:
-                related = _get_related_path(process.flow_cls.process_cls, self.model)
-                if related:
-                    process = _get_sub_obj(process, related)
-                if process and not isinstance(process, process.flow_cls.process_cls):
-                    # Cource proxy classes
-                    process.__class__ = process.flow_cls.process_cls
+                if isinstance(process, self.model):
+                    related = _get_related_path(process.flow_cls.process_cls, self.model)
+                    if related:
+                        process = _get_sub_obj(process, related)
+                    if process and not isinstance(process, process.flow_cls.process_cls):
+                        # Cource proxy classes
+                        process.__class__ = process.flow_cls.process_cls
                 yield process
         else:
             for process in base_itererator:
@@ -190,12 +192,13 @@ class TaskQuerySet(QuerySet):
         base_itererator = super(TaskQuerySet, self).iterator()
         if getattr(self, '_coerced', False):
             for task in base_itererator:
-                related = _get_related_path(task.flow_task.flow_cls.task_cls, self.model)
-                if related:
-                    task = _get_sub_obj(task, related)
-                if task and not isinstance(task, task.flow_task.flow_cls.task_cls):
-                    # Cource proxy classes
-                    task.__class__ = task.flow_task.flow_cls.task_cls
+                if isinstance(task, self.model):
+                    related = _get_related_path(task.flow_task.flow_cls.task_cls, self.model)
+                    if related:
+                        task = _get_sub_obj(task, related)
+                    if task and not isinstance(task, task.flow_task.flow_cls.task_cls):
+                        # Cource proxy classes
+                        task.__class__ = task.flow_task.flow_cls.task_cls
                 yield task
         else:
             for task in base_itererator:
