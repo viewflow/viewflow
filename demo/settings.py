@@ -115,3 +115,9 @@ BROKER_URL = 'django://'
 
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
+
+try:
+    from demo.local_settings import *  # NOQA
+except ImportError:
+    pass
