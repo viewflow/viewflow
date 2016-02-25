@@ -4,9 +4,9 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from viewflow import views as viewflow
 
-from examples.helloworld.flows import HelloWorldFlow
-from examples.shipment.flows import ShipmentFlow
-from examples.customnode.flows import DynamicSplitFlow
+from .helloworld.flows import HelloWorldFlow
+from .shipment.flows import ShipmentFlow
+from .customnode.flows import DynamicSplitFlow
 
 
 if django.VERSION < (1, 7):
@@ -51,5 +51,5 @@ urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^accounts/login/$', 'django.contrib.auth.views.login', name='login'),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', name='logout'),
-    url(r'^', include('examples.website')),
+    url(r'^', include('demo.website')),
 ]
