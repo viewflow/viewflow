@@ -29,9 +29,9 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'viewflow',
     'tests',
-    'examples.customnode',
-    'examples.helloworld',
-    'examples.shipment',
+    'demo.customnode',
+    'demo.helloworld',
+    'demo.shipment',
 )
 
 MIDDLEWARE_CLASSES = (
