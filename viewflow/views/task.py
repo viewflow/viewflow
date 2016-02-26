@@ -157,9 +157,6 @@ class TaskActivationViewMixin(object):
 
 
 class ProcessView(flow.ManagedViewActivation, TaskActivationViewMixin, generic.UpdateView):
-
-    """Shortcut view for task that updates subset of Process model fields."""
-
     fields = []
 
     @property
