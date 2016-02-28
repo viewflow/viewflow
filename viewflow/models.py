@@ -6,7 +6,7 @@ from django.template import Template, Context
 from .activation import STATUS
 from .exceptions import FlowRuntimeError
 from .fields import FlowReferenceField, TaskReferenceField, TokenField
-from .managers import ProcessManager, TaskManager
+from .managers import ProcessManager, TaskManager, coerce_to_related_instance
 
 
 class AbstractProcess(models.Model):
@@ -104,18 +104,8 @@ class AbstractTask(models.Model):
         """
         Returns process instance of flow_cls type
         """
-        if not self.flow_task:
-            return None
-
-        flow_process_cls = self.flow_task.flow_cls.process_cls
-        task_process_cls = self._meta.get_field('process').rel.field.rel.to  # django 1.6/1.9 compatible
-        link = flow_process_cls._meta.get_ancestor_link(task_process_cls)
-
-        if link:
-            related = link.remote_field if hasattr(link, 'remote_field') else link.related
-            return getattr(self.process, related.get_accessor_name())
-        else:
-            return self.process
+        if self.flow_task is not None:
+            return coerce_to_related_instance(self.process, self.flow_task.flow_cls.process_cls)
 
     def summary(self):
         """

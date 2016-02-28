@@ -63,6 +63,16 @@ def _get_sub_obj(obj, query):
         return node
 
 
+def coerce_to_related_instance(instance, target_model):
+    related = _get_related_path(target_model, instance.__class__)
+    if related:
+        instance = _get_sub_obj(instance, related)
+    if instance and not isinstance(instance, target_model):
+        # Coerce proxy classes
+        instance.__class__ = target_model
+    return instance
+
+
 class ProcessQuerySet(QuerySet):
     def filter(self, *args, **kwargs):
         flow_cls = kwargs.pop('flow_cls', None)
@@ -101,12 +111,7 @@ class ProcessQuerySet(QuerySet):
         if getattr(self, '_coerced', False):
             for process in base_itererator:
                 if isinstance(process, self.model):
-                    related = _get_related_path(process.flow_cls.process_cls, self.model)
-                    if related:
-                        process = _get_sub_obj(process, related)
-                    if process and not isinstance(process, process.flow_cls.process_cls):
-                        # Cource proxy classes
-                        process.__class__ = process.flow_cls.process_cls
+                    process = coerce_to_related_instance(process, process.flow_cls.process_cls)
                 yield process
         else:
             for process in base_itererator:

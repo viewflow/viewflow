@@ -27,6 +27,9 @@ class Test(TestCase):
         process = TestModelsGrandChildProcess.objects.create(flow_cls=GrandChildFlow)
         task = Task.objects.create(process=process, flow_task=GrandChildFlow.start)
 
+        # can't user refresh_from_db() here, task.process is not updated to correct base class
+        task = Task.objects.get(pk=task.pk)
+
         self.assertIsInstance(task.flow_process, TestModelsGrandChildProcess)
         self.assertEqual(task.flow_process, process)
 
