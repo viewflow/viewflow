@@ -198,12 +198,7 @@ class TaskQuerySet(QuerySet):
         if getattr(self, '_coerced', False):
             for task in base_itererator:
                 if isinstance(task, self.model):
-                    related = _get_related_path(task.flow_task.flow_cls.task_cls, self.model)
-                    if related:
-                        task = _get_sub_obj(task, related)
-                    if task and not isinstance(task, task.flow_task.flow_cls.task_cls):
-                        # Cource proxy classes
-                        task.__class__ = task.flow_task.flow_cls.task_cls
+                    task = coerce_to_related_instance(task, task.flow_task.flow_cls.task_cls)
                 yield task
         else:
             for task in base_itererator:
