@@ -1,14 +1,32 @@
 """
-Prevents unconsistent db updates for flow.
+Prevents inconsistent db updates for flow.
 """
 import time
 import random
 from contextlib import contextmanager
 
-from django.core.cache import cache
+from django.core.cache import DEFAULT_CACHE_ALIAS
 from django.db import transaction, DatabaseError
+from django.conf import settings
 
 from viewflow.exceptions import FlowLockFailed
+
+
+CACHE_BACKEND = getattr(settings, 'VIEWFLOW_LOCK_CACHE_BACKEND', DEFAULT_CACHE_ALIAS)
+"""
+Setting to change the cache backend for the cache based locks.
+
+You may change the backend by defining ``VIEWFLOW_LOCK_CACHE_BACKEND``
+in your settings.
+The default cache backend is ``default``.
+"""
+
+try:
+    from django.core.cache import caches
+    cache = caches[CACHE_BACKEND]
+except ImportError:  # Django 1.6
+    from django.core.cache import get_cache
+    cache = get_cache(CACHE_BACKEND)
 
 
 def no_lock(flow):
@@ -75,5 +93,31 @@ def cache_lock(flow, attempts=5, expires=120):
                 yield
         finally:
             cache.delete(key)
+
+    return lock
+
+
+def redis_lock(flow, attempts=5, expires=120):
+    """Task lock based redis locks implemented in ``django-redis``."""
+    @contextmanager
+    def lock(flow_cls, process_pk):
+        key = 'django-viewflow-lock-{}/{}'.format(flow_cls._meta.namespace, process_pk)
+
+        for i in range(attempts):
+            lock = cache.lock(key, timeout=expires)
+            stored = lock.acquire(blocking=False)
+            if stored:
+                break
+            if i != attempts - 1:
+                sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
+                time.sleep(sleep_time)
+        else:
+            raise FlowLockFailed('Lock failed for {}'.format(flow_cls))
+
+        try:
+            with transaction.atomic():
+                yield
+        finally:
+            lock.release()
 
     return lock

@@ -5,7 +5,9 @@ cache: pip
 python:
   - 3.5.1
 
-services: postgresql
+services:
+  - postgresql
+  - redis-server
 
 before_script:
   - psql -c "CREATE DATABASE viewflow;" -U postgres
