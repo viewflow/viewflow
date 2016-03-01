@@ -66,4 +66,21 @@ class Test(unittest.TestCase):
         thread1.join()
         thread2.join()
 
+    def test_redis_lock(self):
+        thread1 = threading.Thread(target=self.run_with_lock, args=[lock.redis_lock(Test.TestFlow, attempts=1)])
+        thread2 = threading.Thread(target=self.run_with_lock, args=[lock.redis_lock(Test.TestFlow, attempts=1)])
+
+        thread1.start()
+        thread2.start()
+
+        try:
+            self.exception_queue.get(True, 10)
+        except queue.Empty:
+            self.fail('No thread was blocked')
+        finally:
+            self.finished = True
+
+        thread1.join()
+        thread2.join()
+
 
