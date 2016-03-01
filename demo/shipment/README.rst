@@ -2,7 +2,7 @@
 Ecommerce site automation
 =========================
 
-http://examples.viewflow.io/workflow/shipment/
+http://demo.viewflow.io/workflow/shipment/
 
 Automate ecommerce workers with viewflow example.
 

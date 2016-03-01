@@ -17,12 +17,12 @@ def get_model_display_data(root_instance, user):
 
     processed_models, processed_objects = [], []
 
-    def expand_required(instance, check_app_label=True):
+    def expand_required(instance):
         if instance in processed_objects:
             return False
         if instance.__class__ in processed_models:
             return False
-        return (root_instance._meta.app_label == instance._meta.app_label) if check_app_label else True
+        return (root_instance._meta.app_label == instance._meta.app_label)
 
     while new_objects:
         root_title, root = new_objects.pop(0)
@@ -42,8 +42,13 @@ def get_model_display_data(root_instance, user):
                 related_id = getattr(root, field.get_attname())
                 if related_id is not None:
                     related = getattr(root, field.name)
-                    if expand_required(related, False):
-                        new_objects.append((field.verbose_name.title(), related))
+                    if expand_required(related):
+                        if root_instance._meta.app_label == related._meta.app_label:
+                            new_objects.append((field.verbose_name.title(), related))
+                        else:
+                            value = getattr(root, field.name)
+                            if value is not None:
+                                children.append((field.verbose_name.title(), value))
             else:
                 choice_display_attr = "get_{}_display".format(field.get_attname())
                 if hasattr(root, choice_display_attr):

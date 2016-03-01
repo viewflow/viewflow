@@ -1,8 +1,8 @@
-=================
-Viewflow Examples
-=================
+=============
+Viewflow Demo
+=============
 
-See live at: http://examples.viewflow.io or checkout and run:
+See live at: http://demo.viewflow.io or checkout and run:
 
 .. code-block:: shell
 

@@ -27,9 +27,9 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'viewflow',
-    'examples.customnode',
-    'examples.helloworld',
-    'examples.shipment',
+    'demo.customnode',
+    'demo.helloworld',
+    'demo.shipment',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -41,7 +41,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-ROOT_URLCONF = 'examples.urls'
+ROOT_URLCONF = 'demo.urls'
 
 
 # Database
@@ -60,18 +60,18 @@ DATABASES = {
 from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
 TEMPLATE_CONTEXT_PROCESSORS = list(TEMPLATE_CONTEXT_PROCESSORS) + [
     'django.core.context_processors.request',
-    'examples.website.users',
+    'demo.website.users',
 ]
 
 TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'examples/templates'),
+    os.path.join(BASE_DIR, 'demo/templates'),
 )
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [
-            os.path.join(BASE_DIR, 'examples/templates'),
+            os.path.join(BASE_DIR, 'demo/templates'),
         ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -81,7 +81,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.request',
-                'examples.website.users',
+                'demo.website.users',
             ],
             'debug': True,
         },
@@ -115,3 +115,9 @@ BROKER_URL = 'django://'
 
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
+
+
+try:
+    from demo.local_settings import *  # NOQA
+except ImportError:
+    pass

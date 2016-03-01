@@ -21,7 +21,7 @@ Features:
 
 Demo: http://examples.viewflow.io
 
-.. image:: examples/shipment/doc/ShipmentProcess.png
+.. image:: https://raw.githubusercontent.com/viewflow/viewflow/master/demo/shipment/doc/ShipmentProcess.png
    :width: 400px
 
 About hundred lines of code required to make this process `life

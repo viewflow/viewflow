@@ -132,13 +132,6 @@ class StartActivationViewMixin(object):
 
 
 class StartProcessView(flow.ManagedStartViewActivation, StartActivationViewMixin, generic.UpdateView):
-
-    """
-    Generic start view, allows to modify subset of process fields.
-
-    Implements :class:`.viewflow.activation.StartActivation` interface.
-    """
-
     fields = []
 
     def get_object(self):
