@@ -70,10 +70,10 @@ def cache_lock(flow, attempts=5, expires=120):
                 time.sleep(sleep_time)
         else:
             raise FlowLockFailed('Lock failed for {}'.format(flow_cls))
-
-        with transaction.atomic():
-            yield
-
-        cache.delete(key)
+        try:
+            with transaction.atomic():
+                yield
+        finally:
+            cache.delete(key)
 
     return lock
