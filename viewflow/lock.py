@@ -1,5 +1,5 @@
 """
-Prevents unconsistent db updates for flow.
+Prevents inconsistent db updates for flow.
 """
 import time
 import random
@@ -71,9 +71,10 @@ def cache_lock(flow, attempts=5, expires=120):
         else:
             raise FlowLockFailed('Lock failed for {}'.format(flow_cls))
 
-        with transaction.atomic():
-            yield
-
-        cache.delete(key)
+        try:
+            with transaction.atomic():
+                yield
+        finally:
+            cache.delete(key)
 
     return lock

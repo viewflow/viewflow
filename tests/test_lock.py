@@ -65,5 +65,3 @@ class Test(unittest.TestCase):
 
         thread1.join()
         thread2.join()
-
-
