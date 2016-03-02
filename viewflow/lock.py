@@ -5,7 +5,7 @@ import time
 import random
 from contextlib import contextmanager
 
-from django.core.cache import cache
+from django.core.cache import cache as default_cache
 from django.db import transaction, DatabaseError
 
 from viewflow.exceptions import FlowLockFailed
@@ -52,29 +52,50 @@ def select_for_update_lock(flow, nowait=True, attempts=5):
     return lock
 
 
-def cache_lock(flow, attempts=5, expires=120):
+class CacheLock:
     """
-    Use it if primary cache backend has transactional `add` functionality,
-    like `memcached`.
+    Task lock based on Django's cache.
+
+    Example::
+
+        class MyFlow(Flow):
+            lock_impl = RedisLock(cache=caches['locks'])
+
+    The example uses a different cache. The default cache
+    is Django's ``default`` cache configuration.
     """
-    @contextmanager
-    def lock(flow_cls, process_pk):
-        key = 'django-viewflow-lock-{}/{}'.format(flow_cls._meta.namespace, process_pk)
 
-        for i in range(attempts):
-            stored = cache.add(key, 1, expires)
-            if stored:
-                break
-            if i != attempts-1:
-                sleep_time = (((i+1)*random.random()) + 2**i) / 2.5
-                time.sleep(sleep_time)
-        else:
-            raise FlowLockFailed('Lock failed for {}'.format(flow_cls))
+    def __init__(self, *, cache=default_cache):
+        self.cache = cache
 
-        try:
-            with transaction.atomic():
-                yield
-        finally:
-            cache.delete(key)
+    def __call__(self, flow, attempts=5, expires=120):
+        cache = self.cache
 
-    return lock
+        @contextmanager
+        def lock(flow_cls, process_pk):
+            key = 'django-viewflow-lock-{}/{}'.format(flow_cls._meta.namespace, process_pk)
+
+            for i in range(attempts):
+                stored = cache.add(key, 1, expires)
+                if stored:
+                    break
+                if i != attempts-1:
+                    sleep_time = (((i+1)*random.random()) + 2**i) / 2.5
+                    time.sleep(sleep_time)
+            else:
+                raise FlowLockFailed('Lock failed for {}'.format(flow_cls))
+
+            try:
+                with transaction.atomic():
+                    yield
+            finally:
+                cache.delete(key)
+
+        return lock
+
+
+cache_lock = CacheLock()
+"""
+Use it if primary cache backend has transactional `add` functionality,
+like `memcached`.
+"""
