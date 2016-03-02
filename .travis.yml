@@ -5,17 +5,19 @@ cache: pip
 python:
   - 3.4
 
-services: postgresql
+services:
+  - postgresql
+  - redis-server
 
 before_script:
   - psql -c "CREATE DATABASE viewflow;" -U postgres
 
 before_install:
   - export DATABASE_URL=postgres://postgres@localhost/viewflow
+  - export REDIS_CACHE_URL=redis://127.0.0.1:6379/1
 
 install:
   - pip install tox
-  - pip install psycopg2
 
 script: 
   - tox -r -e travis
