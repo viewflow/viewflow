@@ -6,6 +6,7 @@ import threading
 import time
 import unittest
 
+import django
 from django.db import connection
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -17,6 +18,7 @@ from viewflow.exceptions import FlowLockFailed
 
 
 @unittest.skipUnless('REDIS_CACHE_URL' in os.environ, 'Celery test requires redis server url')
+@unittest.skipUnless(django.VERSION >= (1, 7), 'django>=1.7 required')
 @override_settings(
     CACHES={
         "default": {
