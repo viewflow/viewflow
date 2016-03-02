@@ -4,20 +4,39 @@ cache: pip
 
 python:
   - 3.4
+  - 3.5
 
 services:
   - postgresql
   - redis-server
 
+env:
+  global:
+    - DATABASE_URL=postgres://postgres@localhost/viewflow
+    - REDIS_CACHE_URL=redis://127.0.0.1:6379/1
+  matrix:
+    - DJANGO="Django<1.7,>=1.6 django-filter==0.11.0 south==1.0.2"
+    - DJANGO="Django<1.9,>=1.8"
+    - DJANGO="Django<1.10,>=1.9"
+    - DJANGO="-e git+https://github.com/django/django.git@master#egg=Django"
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - env: DJANGO="-e git+https://github.com/django/django.git@master#egg=Django"
+  exclude:
+    - env: DJANGO="Django<1.7,>=1.6 django-filter==0.11.0 south==1.0.2"
+      python: 3.5
+
 before_script:
   - psql -c "CREATE DATABASE viewflow;" -U postgres
 
-before_install:
-  - export DATABASE_URL=postgres://postgres@localhost/viewflow
-  - export REDIS_CACHE_URL=redis://127.0.0.1:6379/1
-
 install:
-  - pip install tox
+  - pip install -r requirements-dev.txt
+  - pip install $DJANGO
 
 script: 
-  - tox -r -e travis
+  - coverage run --source=viewflow manage.py test viewflow tests
+
+after_success:
+  - coveralls
