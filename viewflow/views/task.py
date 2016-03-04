@@ -217,7 +217,7 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
 
     @flow.flow_view()
     def dispatch(self, request, *args, **kwargs):
-        if not self.flow_task.can_assign(request.user, self.task):
+        if request.user is None or request.user.is_anonymous():
             raise PermissionDenied
 
         if not self.assign.can_proceed():
@@ -226,5 +226,8 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
                 hyperlink=hyperlink, user=request.user.get_full_name())
             messages.error(request, mark_safe(msg), fail_silently=True)
             return redirect(self.flow_task.get_task_url(self.task, url_type='details', user=request.user))
+
+        if not self.flow_task.can_assign(request.user, self.task):
+            raise PermissionDenied
 
         return super(AssignView, self).dispatch(request, *args, **kwargs)
