@@ -14,7 +14,7 @@ except ImportError:
     raise ImportError('django-redis required')
 
 
-class RedisLock:
+class RedisLock(object):
     """
     Task lock based on redis' cache capabilities.
 
@@ -31,7 +31,7 @@ class RedisLock:
 
     """
 
-    def __init__(self, *, cache=default_cache):
+    def __init__(self, cache=default_cache):
         self.cache = cache
 
     def __call__(self, flow, attempts=5, expires=120):

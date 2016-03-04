@@ -52,7 +52,7 @@ def select_for_update_lock(flow, nowait=True, attempts=5):
     return lock
 
 
-class CacheLock:
+class CacheLock(object):
     """
     Task lock based on Django's cache.
 
@@ -65,7 +65,7 @@ class CacheLock:
     is Django's ``default`` cache configuration.
     """
 
-    def __init__(self, *, cache=default_cache):
+    def __init__(self, cache=default_cache):
         self.cache = cache
 
     def __call__(self, flow, attempts=5, expires=120):
