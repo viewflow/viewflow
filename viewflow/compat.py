@@ -167,3 +167,12 @@ except ImportError:
         }
         class_dict.update(_get_queryset_methods(manager_cls, queryset_class))
         return type(class_name, (manager_cls,), class_dict)
+
+
+def get_all_related_objects(obj):
+    if hasattr(obj._meta, 'get_fields'):
+        from django.db.models.fields.related import ForeignObjectRel
+        return [field for field in obj._meta.get_fields() if isinstance(field, ForeignObjectRel)]
+    else:
+        # depricated in django 1.9
+        return obj._meta.get_all_related_objects()

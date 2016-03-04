@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth import get_permission_codename
 from django.core.urlresolvers import reverse, NoReverseMatch
 
+from ..compat import get_all_related_objects
+
 
 def get_model_display_data(root_instance, user):
     """
@@ -60,7 +62,7 @@ def get_model_display_data(root_instance, user):
                     children.append((field.verbose_name.title(), value))
 
         # backward relations
-        for relation in root._meta.get_all_related_objects():
+        for relation in get_all_related_objects(root):
             if not isinstance(relation.field, models.OneToOneField):
                 for related in getattr(root, relation.get_accessor_name()).all():
                     if expand_required(related):
