@@ -2,6 +2,13 @@ language: python
 sudo: false
 cache: pip
 
+addons:
+  apt:
+    sources:
+    - deadsnakes
+    packages:
+    - python3.5-dev
+
 python:
   - 3.4
 
@@ -18,6 +25,8 @@ before_install:
 
 install:
   - pip install tox
+  - pip install coveralls
 
-script: 
-  - tox -r -e travis
+script:
+  - tox -- coverage run --append --branch --source=viewflow manage.py test
+  - coveralls
