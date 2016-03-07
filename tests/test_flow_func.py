@@ -3,6 +3,7 @@ from django.utils.decorators import method_decorator
 
 from viewflow import flow, lock
 from viewflow.activation import STATUS, StartActivation, Activation, Context
+from viewflow.base import this
 from viewflow.compat import mock
 from viewflow.flow import func
 
@@ -11,6 +12,7 @@ class Test(TestCase):
     def init_node(self, node, flow_cls=None, name='test_node'):
         node.flow_cls = flow_cls or FlowStub
         node.name = name
+        node.ready()
         return node
 
     def setUp(self):
@@ -54,7 +56,7 @@ class Test(TestCase):
 
     def test_start_function_from_flow_method(self):
         class Flow(FlowStub):
-            start = flow.StartFunction()
+            start = flow.StartFunction(this.start_task_func)
 
             def start_task_func(self, activation):
                 activation.prepare()
@@ -70,7 +72,7 @@ class Test(TestCase):
         self.assertTrue(FlowStub.method_called)
 
     def test_function_activation_lifecycle(self):
-        flow_task = self.init_node(flow.Function())
+        flow_task = self.init_node(flow.Function(lambda t: None))
 
         act = func.FuncActivation()
         act.initialize(flow_task, TaskStub())
@@ -116,7 +118,7 @@ class Test(TestCase):
 
     def test_function_from_flow_method(self):
         class Flow(FlowStub):
-            func_task = flow.Function()
+            func_task = flow.Function(this.task_func)
             method_called = False
 
             @method_decorator(flow.flow_func(task_loader=lambda flow_task: TaskStub()))
@@ -180,7 +182,7 @@ class Test(TestCase):
 
     def test_handler_from_flow_method(self):
         class Flow(FlowStub):
-            handler_task = flow.Handler()
+            handler_task = flow.Handler(this.task_handler)
             method_called = False
 
             def task_handler(self, activation):

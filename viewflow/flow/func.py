@@ -16,13 +16,12 @@ class StartFunction(base.TaskDescriptionMixin,
 
     Example::
 
-        def create_request(activation, **kwargs):
-            activation.prepare()
-            # Your custom code
-            activation.done()
-
         class MyFlow(Flow):
-            start = flow.StartFunction(create_request)
+            start = flow.StartFunction(this.create_request)
+
+            def create_request(self, activation, **kwargs):
+                activation.prepare()
+                activation.done()
 
         MyFlow.create_request.run(**kwargs)
 
@@ -36,7 +35,7 @@ class StartFunction(base.TaskDescriptionMixin,
     activation_cls = StartActivation
 
     def __init__(self, func=None, **kwargs):
-        self._func = func
+        self.func = func if func is not None else self.start_func_default
         super(StartFunction, self).__init__(**kwargs)
 
     def start_func_default(self, activation):
@@ -44,17 +43,9 @@ class StartFunction(base.TaskDescriptionMixin,
         activation.done()
         return activation
 
-    @property
-    def func(self):
-        if self._func is not None:
-            return self._func
-        else:
-            func_name = '{}_func'.format(self.name)
-            func_impl = getattr(self.flow_cls.instance, func_name, None)
-            if func_impl:
-                return func_impl
-            else:
-                return self.start_func_default
+    def ready(self):
+        if isinstance(self.func, base.ThisObject):
+            self.func = getattr(self.flow_cls.instance, self.func.name)
 
     def run(self, *args, **kwargs):
         if isinstance(self.func, type) and issubclass(self.func, StartActivation):
@@ -161,13 +152,13 @@ class Function(base.TaskDescriptionMixin,
 
     Example::
 
-        def my_function(activation, **kwargs):
-            activation.prepare()
-            # Your custom code
-            activation.done()
-
         class MyFlow(Flow):
-            my_task = flow.Function(my_function)
+            my_task = flow.Function(this.perform_my_task)
+
+            @method_decorator(flow.flow_func(task_loader=lambda flow_task, **kwargs: ... ))
+            def perform_my_task(self, activation, **kwargs):
+                activation.prepare()
+                activation.done()
 
         MyFlow.my_task.run(**kwargs)
 
@@ -180,19 +171,13 @@ class Function(base.TaskDescriptionMixin,
     task_type = 'FUNC'
     activation_cls = FuncActivation
 
-    def __init__(self, func=None, **kwargs):
-        self._func = func
+    def __init__(self, func, **kwargs):
+        self.func = func
         super(Function, self).__init__(**kwargs)
 
-    @property
-    def func(self):
-        if self._func is not None:
-            return self._func
-        else:
-            func_name = '{}_func'.format(self.name)
-            func_impl = getattr(self.flow_cls.instance, func_name, None)
-            if func_impl:
-                return func_impl
+    def ready(self):
+        if isinstance(self.func, base.ThisObject):
+            self.func = getattr(self.flow_cls.instance, self.func.name)
 
     def run(self, *args, **kwargs):
         return self.func(self, *args, **kwargs)
@@ -289,17 +274,10 @@ class Handler(base.TaskDescriptionMixin,
     task_type = 'FUNC'
     activation_cls = HandlerActivation
 
-    def __init__(self, handler=None, **kwargs):
-        self._handler = handler
+    def __init__(self, handler, **kwargs):
+        self.handler = handler
         super(Handler, self).__init__(**kwargs)
 
-    @property
-    def handler(self):
-        if self._handler is not None:
-            return self._handler
-        else:
-            handler_name = '{}_handler'.format(self.name)
-            handler_impl = getattr(self.flow_cls.instance, handler_name, None)
-            if handler_impl:
-                return handler_impl
-            raise FlowRuntimeError('Handler for {} not defined'.format(self.name))
+    def ready(self):
+        if isinstance(self.handler, base.ThisObject):
+            self.handler = getattr(self.flow_cls.instance, self.handler.name)

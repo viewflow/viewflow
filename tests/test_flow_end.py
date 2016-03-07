@@ -32,5 +32,5 @@ class Test(TestCase):
 
 class FlowEndTestFlow(Flow):
     start = flow.StartFunction().Next(this.task)
-    task = flow.Function().Next(this.end)
+    task = flow.Function(lambda t: None).Next(this.end)
     end = flow.End()
