@@ -180,6 +180,43 @@ class Test(TestCase):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(task.process.status, STATUS.DONE)
 
+    def test_task_unassign_view(self):
+        # prepare assigned task
+        user = User.objects.create(username='test', is_superuser=True)
+        view = actions.TaskUnAssignView.as_view()
+
+        act = ActionsTestFlow.start.run()
+        task = act.process.get_task(ActionsTestFlow.task, status=[STATUS.NEW])
+        task.activate().assign(user)
+
+        # get
+        request = RequestFactory().get('/unassign/')
+        request.user = user
+        response = view(
+            request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.task,
+            process_pk=act.process.pk, task_pk=task.pk)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(response.template_name,
+                         ('tests/test_views_actions/actionstest/task_unassign.html',
+                          'tests/test_views_actions/actionstest/task_unassign.html',
+                          'viewflow/flow/task_unassign.html',
+                          'viewflow/flow/task_action.html'))
+        self.assertEqual(response.context_data['activation'].process, act.process)
+
+        # post
+        request = RequestFactory().post('/unassign/', {'run_action': 1})
+        request.user = user
+        response = view(
+            request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.task,
+            process_pk=act.process.pk, task_pk=task.pk)
+        task.refresh_from_db()
+        task.process.refresh_from_db()
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(task.process.status, STATUS.NEW)
+
 
 class ActionsTestFlow(Flow):
     start = flow.StartFunction().Next(this.task)

@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.utils.timezone import now
@@ -107,7 +108,7 @@ class ProcessCancelView(FlowManagePermissionMixin, generic.DetailView):
         self.object.save()
 
 
-class TaskUndoView(BaseTaskActionView):
+class TaskUndoView(FlowManagePermissionMixin, BaseTaskActionView):
     action_name = 'undo'
 
     def can_proceed(self):
@@ -120,7 +121,7 @@ class TaskUndoView(BaseTaskActionView):
         messages.info(self.request, mark_safe(msg), fail_silently=True)
 
 
-class TaskCancelView(BaseTaskActionView):
+class TaskCancelView(FlowManagePermissionMixin, BaseTaskActionView):
     action_name = 'cancel'
 
     def can_proceed(self):
@@ -133,7 +134,7 @@ class TaskCancelView(BaseTaskActionView):
         messages.info(self.request, mark_safe(msg), fail_silently=True)
 
 
-class TaskPerformView(BaseTaskActionView):
+class TaskPerformView(FlowManagePermissionMixin, BaseTaskActionView):
     """Non-interactive task that cancelled and need to be started manually."""
 
     action_name = 'execute'
@@ -148,7 +149,7 @@ class TaskPerformView(BaseTaskActionView):
         messages.success(self.request, mark_safe(msg), fail_silently=True)
 
 
-class TaskActivateNextView(BaseTaskActionView):
+class TaskActivateNextView(FlowManagePermissionMixin, BaseTaskActionView):
     """Activate next task without interactive task redone."""
 
     action_name = 'activate_next'
@@ -158,3 +159,18 @@ class TaskActivateNextView(BaseTaskActionView):
 
     def perform(self):
         self.activation.activate_next()
+
+
+class TaskUnAssignView(BaseTaskActionView):
+    action_name = 'unassign'
+
+    def can_proceed(self):
+        if self.activation.unassign.can_proceed():
+            return self.activation.flow_task.can_unassign(self.request.user, self.activation.task)
+        return False
+
+    def perform(self):
+        self.activation.unassign()
+        hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
+        msg = _('Task {hyperlink} has been unassigned.').format(hyperlink=hyperlink)
+        messages.info(self.request, mark_safe(msg), fail_silently=True)

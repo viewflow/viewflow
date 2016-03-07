@@ -198,6 +198,7 @@ class View(base.PermissionMixin,
     """
     def __init__(self, *args, **kwargs):
         self._assign_view = kwargs.pop('assign_view', None)
+        self._unassign_view = kwargs.pop('unassign_view', None)
         super(View, self).__init__(*args, **kwargs)
 
     def Assign(self, owner=None, **owner_kwargs):
@@ -219,10 +220,17 @@ class View(base.PermissionMixin,
         from viewflow.views import AssignView
         return self._assign_view if self._assign_view else AssignView.as_view()
 
+    @property
+    def unassign_view(self):
+        from viewflow.views import TaskUnAssignView
+        return self._unassign_view if self._unassign_view else TaskUnAssignView.as_view()
+
     def urls(self):
         urls = super(View, self).urls()
         urls.append(url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/assign/$'.format(self.name),
                     self.assign_view, {'flow_task': self}, name="{}__assign".format(self.name)))
+        urls.append(url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/unassign/$'.format(self.name),
+                    self.unassign_view, {'flow_task': self}, name="{}__unassign".format(self.name)))
         return urls
 
     def get_task_url(self, task, url_type, **kwargs):
@@ -238,6 +246,12 @@ class View(base.PermissionMixin,
         if url_type in ['execute', 'guess']:
             if task.status == STATUS.ASSIGNED and self.can_execute(user, task):
                 url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
+                return reverse(url_name, kwargs={'process_pk': task.process_id, 'task_pk': task.pk})
+
+        # unassign
+        if url_type in ['unassign']:
+            if task.status == STATUS.ASSIGNED and self.can_unassign(user, task):
+                url_name = '{}:{}__unassign'.format(self.flow_cls.instance.namespace, self.name)
                 return reverse(url_name, kwargs={'process_pk': task.process_id, 'task_pk': task.pk})
 
         return super(View, self).get_task_url(task, url_type, **kwargs)
@@ -259,18 +273,19 @@ class View(base.PermissionMixin,
         return owner_permission
 
     def can_assign(self, user, task):
+        # already assigned
         if task.owner_id:
             return False
 
+        # user not logged in
         if user is None or user.is_anonymous():
             return False
 
+        # available for everyone
         if not task.owner_permission:
-            """
-            Available for everyone
-            """
             return True
 
+        # User have the permission
         obj = None
         if self._owner_permission_obj:
             if callable(self._owner_permission_obj):
@@ -279,6 +294,22 @@ class View(base.PermissionMixin,
                 obj = self._owner_permission_obj
 
         return user.has_perm(task.owner_permission, obj=obj)
+
+    def can_unassign(self, user, task):
+        # not assigned
+        if task.owner_id is None:
+            return False
+
+        # user not logged in
+        if user is None or user.is_anonymous():
+            return False
+
+        # Assigned to the same user
+        if task.owner_id == user.pk:
+            return True
+
+        # User have flow management permissions
+        return user.has_perm(self.flow_cls.instance.manage_permission_name)
 
     def can_execute(self, user, task):
         if task.owner_permission is None and task.owner is None:

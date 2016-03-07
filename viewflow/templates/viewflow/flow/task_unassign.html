@@ -1,0 +1,14 @@
+{% extends 'viewflow/base.html' %}
+{% load viewflow %}
+
+{% block content %}
+<h1>{{ activation.flow_task }}</h1>
+
+{% include_process_data activation.process %}
+
+<form role="form" method="POST">
+    {% csrf_token %}
+    <button type="submit" name="_assign" class="btn btn-primary btn-lg">Unassign</button>
+</form>
+{% endblock %}
+

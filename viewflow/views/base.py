@@ -123,7 +123,7 @@ class DetailsView(generic.TemplateView):
         return super(DetailsView, self).dispatch(request, *args, **kwargs)
 
 
-class BaseTaskActionView(FlowManagePermissionMixin, generic.TemplateView):
+class BaseTaskActionView(generic.TemplateView):
     flow_cls = None
     action_name = None
 
