@@ -8,7 +8,7 @@ with FlowTest(RestrictedUserFlow) as flow_test:
         .Assert(p: p.owner='yyy')
 
     with patch('web.service'):
-        flow_test.Task(Flow.job),Execute()
+        flow_test.Task(Flow.job).Execute()
 
     flow_test.User('aaa').Task(Flow.confirm).Execute({'confirm': 1})
 
@@ -104,13 +104,12 @@ class FlowTaskTest(object):
         self._task = None
 
     def task_finished(self, sender, **kwargs):
+        """
+        First finished task is ours
+        """
         if self._task is None:
-            """
-            First finished task is ours
-            """
-            assert self.flow_task == kwargs['task'].flow_task
-
-            self._task = kwargs['task']
+            if self.flow_task == kwargs['task'].flow_task:
+                self._task = kwargs['task']
 
     @cached_property
     def process(self):
@@ -153,7 +152,7 @@ class FlowTaskTest(object):
         """
         Assert task or process.
 
-        It is possible to assert ether the task or related process by choosing
+        It is possible to assert either the task or related process by choosing
         a different arg name for the assertion function.
 
         Example::
