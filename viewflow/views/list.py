@@ -4,6 +4,7 @@ from django.views import generic
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.utils.translation import ugettext_lazy as _
 from django_filters import FilterSet, ChoiceFilter, DateRangeFilter, ModelChoiceFilter
 
 from .. import activation, flow, models
@@ -169,6 +170,16 @@ class AllArchiveListView(LoginRequiredMixin, generic.ListView):
         return models.Task.objects.archive(self.flow_classes, self.request.user).order_by('-created')
 
 
+class ProcessFilter(FilterSet):
+    status = ChoiceFilter(help_text='', choices=(
+        (activation.STATUS.STARTED, _('Started')),
+        (activation.STATUS.CANCELED, _('Canceled')),
+        (activation.STATUS.DONE, _('Completed')),
+    ))
+    created = DateRangeFilter(help_text='')
+    finished = DateRangeFilter(help_text='')
+
+
 class ProcessListView(FlowViewPermissionMixin, generic.ListView):
     paginate_by = 15
     paginate_orphans = 5
@@ -188,9 +199,18 @@ class ProcessListView(FlowViewPermissionMixin, generic.ListView):
         return context
 
     def get_queryset(self):
+        return self.filter.qs
+
+    def get_base_queryset(self, user):
         return self.flow_cls.process_cls.objects \
             .filter(flow_cls=self.flow_cls) \
             .order_by('-created')
+
+    @method_decorator(login_required)
+    def dispatch(self, request, *args, **kwargs):
+        self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
+        self.filter = ProcessFilter(request.GET, self.get_base_queryset(request.user))
+        return super(ProcessListView, self).dispatch(request, *args, **kwargs)
 
 
 class ProcessDetailView(FlowViewPermissionMixin, generic.DetailView):
