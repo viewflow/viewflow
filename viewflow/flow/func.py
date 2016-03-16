@@ -1,6 +1,7 @@
 """Functions and handlers as part of flow."""
 from django.utils.timezone import now
 
+from .. import signals
 from ..activation import Activation, StartActivation, STATUS
 from ..exceptions import FlowRuntimeError
 from . import base
@@ -62,11 +63,14 @@ class FuncActivation(Activation):
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.PREPARED)
     def prepare(self):
         self.task.started = now()
+        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
     def done(self):
         self.task.finished = now()
         self.task.save()
+
+        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
         self.activate_next()
 
@@ -192,11 +196,15 @@ class HandlerActivation(Activation):
         with self.exception_guard():
             self.task.started = now()
 
+            signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+
             self.execute()
 
             self.task.finished = now()
             self.set_status(STATUS.DONE)
             self.task.save()
+
+            signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
             self.activate_next()
 

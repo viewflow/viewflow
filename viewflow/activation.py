@@ -524,7 +524,7 @@ class AbstractGateActivation(Activation):
         .. seealso::
             :data:`viewflow.signals.task_finished`
 
-        """        
+        """
         with self.exception_guard():
             self.task.started = now()
             self.task.save()

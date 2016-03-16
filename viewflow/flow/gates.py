@@ -1,9 +1,7 @@
-import traceback
-
-from django.db import transaction
 from django.utils.timezone import now
 
-from ..activation import context, all_leading_canceled, Activation, AbstractGateActivation, STATUS
+from .. import signals
+from ..activation import all_leading_canceled, Activation, AbstractGateActivation, STATUS
 from ..exceptions import FlowRuntimeError
 from ..token import Token
 from . import base
@@ -143,6 +141,7 @@ class JoinActivation(Activation):
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.STARTED)
     def start(self):
         self.task.save()
+        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     @Activation.status.transition(source=STATUS.STARTED)
     def done(self):
@@ -150,6 +149,8 @@ class JoinActivation(Activation):
             self.task.finished = now()
             self.set_status(STATUS.DONE)
             self.task.save()
+
+            signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
 
             self.activate_next()
 
