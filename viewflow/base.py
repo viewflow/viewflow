@@ -56,7 +56,7 @@ class FlowMeta(object):
         module = "{}.{}".format(self.flow_cls.__module__, self.flow_cls.__name__)
         app_label, app_package = get_containing_app_data(module)
 
-        subpath = module[len(app_package)+1:]
+        subpath = module[len(app_package) + 1:]
         if subpath.startswith('flows.'):
             subpath = subpath[len('flows.'):]
         if subpath.endswith('Flow'):

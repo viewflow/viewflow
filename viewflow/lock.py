@@ -41,8 +41,8 @@ def select_for_update_lock(flow, nowait=True, attempts=5):
                         .exists()
                     break
                 except DatabaseError:
-                    if i != attempts-1:
-                        sleep_time = (((i+1)*random.random()) + 2**i) / 2.5
+                    if i != attempts - 1:
+                        sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
                         time.sleep(sleep_time)
                     else:
                         raise FlowLockFailed('Lock failed for {}'.format(flow_cls))
@@ -79,8 +79,8 @@ class CacheLock(object):
                 stored = cache.add(key, 1, expires)
                 if stored:
                     break
-                if i != attempts-1:
-                    sleep_time = (((i+1)*random.random()) + 2**i) / 2.5
+                if i != attempts - 1:
+                    sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
                     time.sleep(sleep_time)
             else:
                 raise FlowLockFailed('Lock failed for {}'.format(flow_cls))

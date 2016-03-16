@@ -17,7 +17,7 @@ def get_flow_ref(flow_cls):
     if app_label is None:
         raise FlowRuntimeError('No application found for {}. Check your INSTALLED_APPS setting'.format(module))
 
-    subpath = module[len(app_package)+1:]
+    subpath = module[len(app_package) + 1:]
     return "{}/{}".format(app_label, subpath)
 
 
@@ -37,7 +37,7 @@ def get_task_ref(flow_task):
     if app_label is None:
         raise FlowRuntimeError('No application found for {}. Check your INSTALLED_APPS setting'.format(module))
 
-    subpath = module[len(app_package)+1:]
+    subpath = module[len(app_package) + 1:]
 
     return "{}/{}.{}.{}".format(app_label, subpath, flow_task.flow_cls.__name__, flow_task.name)
 
