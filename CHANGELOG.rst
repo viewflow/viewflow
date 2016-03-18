@@ -2,6 +2,27 @@
 Changelog
 =========
 
+0.10.0 - 2016-03-18
+-------------------
+
+* Django 1.9 support
+* Admin can unassign view tasks
+* Function and Handler nodes can use model methods via `this.method_name` references
+* Added permission check on `viewflow.views.task.AssignView`
+* Filter added to the `viewflow.view.ProcessListView`
+* Fixed missing signals on Function/Signal task finished
+* flow.lock is released if view code throws an exception
+* Task.flow_process fixed in case of deep model inheritance
+* flow.Signal now can skip signals without creating activation
+* flow.Join now ignores incoming cancelled tasks tokens
+* flow.End according to BPMN standard now doesn't cancel other active tasks
+* {% include_process_data %} template tag now outputs a string repesention of FK to models from other apps
+* All nodes now could have custom `task_description`
+* Task.owner_permission column extended up to 150 characters
+* *PRO ONLY* Obsolete nodes support, allows to delete a node from existing flows.
+* *PRO ONLY* flow.Subprocess and flow.NSubprocess new nodes
+
+
 0.9.0 - 2015-06-15
 ------------------
 
@@ -102,4 +123,3 @@ Changelog
 
 * Initial public prototype
 * Basic set of tasks support (View, Job, If/Switch, Split/Join)
-

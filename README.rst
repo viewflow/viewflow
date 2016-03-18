@@ -50,8 +50,8 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-0.10.0 - Git version
---------------------
+0.10.0 - 2016-03-18
+-------------------
 
 * Django 1.9 support
 * Admin can unassign view tasks
@@ -59,11 +59,11 @@ Latest changelog
 * Added permission check on `viewflow.views.task.AssignView`
 * Filter added to the `viewflow.view.ProcessListView`
 * Fixed missing signals on Function/Signal task finished
-* flow.lock are released if view code throws an exception
+* flow.lock is released if view code throws an exception
 * Task.flow_process fixed in case of deep model inheritance
 * flow.Signal now can skip signals without creating activation
-* flow.Join now ignores incoming canced tasks tokens
-* flow.End according to BPMN standard now don't cancels other active tasks
+* flow.Join now ignores incoming cancelled tasks tokens
+* flow.End according to BPMN standard now doesn't cancel other active tasks
 * {% include_process_data %} template tag now outputs a string repesention of FK to models from other apps
 * All nodes now could have custom `task_description`
 * Task.owner_permission column extended up to 150 characters
