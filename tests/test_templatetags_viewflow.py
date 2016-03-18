@@ -1,5 +1,6 @@
 from django.conf.urls import include, url
 from django.contrib.auth.models import User
+from django.http.request import QueryDict
 from django.template import Template, Context
 from django.test import TestCase
 
@@ -53,7 +54,7 @@ class Test(TestCase):
     def test_include_process_data(self):
         act = TestTemplateTagsFlow.start.run()
         user = User.objects.create(username="test")
-        request = type('Request', (object,), {'user': user})
+        request = type('Request', (object,), {'user': user, 'GET': QueryDict(query_string=None)})
         process_data = Template("{% load viewflow %}{% include_process_data process %}").render(
             Context({'process': act.process, 'request': request}))
         self.assertIn('Test Template Tags', process_data)
