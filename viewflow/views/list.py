@@ -172,7 +172,8 @@ class AllArchiveListView(LoginRequiredMixin, generic.ListView):
 
 class ProcessFilter(FilterSet):
     status = ChoiceFilter(help_text='', choices=(
-        (activation.STATUS.STARTED, _('Started')),
+        (None, _('All')),
+        (activation.STATUS.NEW, _('Active')),
         (activation.STATUS.CANCELED, _('Canceled')),
         (activation.STATUS.DONE, _('Completed')),
     ))
