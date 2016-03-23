@@ -213,9 +213,6 @@ class Start(base.PermissionMixin,
                 return owner == user
 
         elif self._owner_permission:
-            if callable(self._owner_permission) and self._owner_permission(user):
-                return True
-
             obj = None
             if self._owner_permission_obj:
                 if callable(self._owner_permission_obj):
