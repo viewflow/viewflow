@@ -2,6 +2,13 @@
 Changelog
 =========
 
+0.10.1 - 2016-03-24
+-------------------
+
+* flow.Start().Permission no longer supports callable (there is Start.Available for that)
+* Task.flow_task and Task.owner_permission fields length extended up to 255 to match django Permission.name
+
+
 0.10.0 - 2016-03-18
 -------------------
 
