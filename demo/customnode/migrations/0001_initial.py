@@ -25,7 +25,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('process_ptr', models.OneToOneField(to='viewflow.Process', primary_key=True,
                                                      parent_link=True, serialize=False, auto_created=True)),
-                ('question', models.CharField(max_length=0)),
+                ('question', models.CharField(max_length=50)),
                 ('split_count', models.IntegerField(default=0)),
             ],
             options={

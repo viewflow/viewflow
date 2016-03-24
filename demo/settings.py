@@ -101,12 +101,14 @@ USE_L10N = True
 
 USE_TZ = True
 
+# South
+if django.VERSION < (1, 7):
+    INSTALLED_APPS += ('south', )
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
-
 
 # Celery
 

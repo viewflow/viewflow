@@ -122,7 +122,7 @@ class FlowReferenceField(models.CharField, metaclass=_SubfieldBase):
 
 class TaskReferenceField(models.CharField, metaclass=_SubfieldBase):
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault('max_length', 150)
+        kwargs.setdefault('max_length', 255)
         super(TaskReferenceField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):
