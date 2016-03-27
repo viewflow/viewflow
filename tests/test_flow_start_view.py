@@ -8,7 +8,8 @@ from django.test import TestCase
 from viewflow import flow
 from viewflow.base import Flow
 from viewflow.activation import STATUS
-from viewflow.flow import start_view
+from viewflow.decorators import flow_start_view
+from viewflow.flow.activation import ManagedStartViewActivation
 
 
 class Test(TestCase):
@@ -18,7 +19,7 @@ class Test(TestCase):
         return node
 
     def test_flow_start_view_decorator(self):
-        @start_view.flow_start_view()
+        @flow_start_view()
         def start_test_view(request, activation):
             activation.prepare()
             activation.done()
@@ -28,7 +29,7 @@ class Test(TestCase):
         self.assertEqual(act.task.status, STATUS.DONE)
 
     def test_managed_start_view_activation_prepare(self):
-        act = start_view.ManagedStartViewActivation()
+        act = ManagedStartViewActivation()
         act.initialize(self.init_node(flow.Start()), None)
 
         act.prepare(data={'_viewflow_activation-started': '1970-01-01'})

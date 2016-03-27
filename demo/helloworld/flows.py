@@ -1,6 +1,7 @@
-from viewflow import flow, lock, views as flow_views
+from viewflow import flow, lock
 from viewflow.base import this, Flow
 from viewflow.contrib import celery
+from viewflow.flow import views as flow_views
 
 
 from .models import HelloWorldProcess

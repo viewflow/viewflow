@@ -9,7 +9,8 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
-from .. import flow, activation
+from ... import activation
+from ...decorators import flow_view
 
 
 def get_next_task_url(request, process):
@@ -114,7 +115,7 @@ class DetailsView(generic.TemplateView):
         context['activation'] = self.activation
         return context
 
-    @flow.flow_view()
+    @flow_view()
     def dispatch(self, request, activation, *args, **kwargs):
         self.activation = activation
 
@@ -159,7 +160,7 @@ class BaseTaskActionView(generic.TemplateView):
         else:
             return self.get(request, *args, **kwargs)
 
-    @flow.flow_view()
+    @flow_view()
     def dispatch(self, request, activation, **kwargs):
         self.flow_cls = activation.flow_cls
         self.activation = activation

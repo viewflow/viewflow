@@ -5,7 +5,7 @@ from django.test import TestCase, RequestFactory
 
 from viewflow import flow, views
 from viewflow.base import Flow, this
-from viewflow.views import base
+from viewflow.flow.views import base
 
 
 class Test(TestCase):

@@ -5,7 +5,9 @@ from viewflow import flow, lock
 from viewflow.activation import STATUS, StartActivation, Activation, Context
 from viewflow.base import this
 from viewflow.compat import mock
-from viewflow.flow import func
+from viewflow.activation import FuncActivation
+from viewflow.nodes.handler import HandlerActivation
+from viewflow.types import FlowFunc
 
 
 class Test(TestCase):
@@ -74,7 +76,7 @@ class Test(TestCase):
     def test_function_activation_lifecycle(self):
         flow_task = self.init_node(flow.Function(lambda t: None))
 
-        act = func.FuncActivation()
+        act = FuncActivation()
         act.initialize(flow_task, TaskStub())
 
         # execute
@@ -89,7 +91,7 @@ class Test(TestCase):
         self.assertEqual(act.task.status, STATUS.CANCELED)
 
     def test_function_inline_activation(self):
-        class Func(func.FuncActivation, func.FlowFunc):
+        class Func(FuncActivation, FlowFunc):
             inline_called = False
 
             def get_task(self, flow_task, *func_args, **func_kwars):
@@ -141,7 +143,7 @@ class Test(TestCase):
 
         flow_task = self.init_node(flow.Handler(handler))
 
-        act = func.HandlerActivation()
+        act = HandlerActivation()
         act.initialize(flow_task, TaskStub())
 
         # execute
@@ -160,7 +162,7 @@ class Test(TestCase):
 
         flow_task = self.init_node(flow.Handler(handler))
 
-        act = func.HandlerActivation()
+        act = HandlerActivation()
         act.initialize(flow_task, TaskStub())
 
         # by default errors are propogated
@@ -191,7 +193,7 @@ class Test(TestCase):
         Flow.instance = Flow()
         flow_task = self.init_node(Flow.handler_task, flow_cls=Flow, name='task')
 
-        act = func.HandlerActivation()
+        act = HandlerActivation()
         act.initialize(flow_task, TaskStub())
 
         # execute

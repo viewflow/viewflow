@@ -5,7 +5,8 @@ from django.views import generic
 from django.utils.translation import ugettext_lazy as _
 from django.utils.safestring import mark_safe
 
-from .. import flow
+from ...decorators import flow_start_view
+from ..activation import ManagedStartViewActivation
 from .base import get_next_task_url, get_process_hyperlink
 
 
@@ -55,7 +56,7 @@ class StartViewMixin(object):
         self._message_process_started()
         return HttpResponseRedirect(self.get_success_url())
 
-    @flow.flow_start_view()
+    @flow_start_view()
     def dispatch(self, request, activation, **kwargs):
         """Check user permissions, and prepare flow to execution."""
         self.activation = activation
@@ -116,7 +117,7 @@ class StartActivationViewMixin(object):
         self._message_process_started()
         return HttpResponseRedirect(self.get_success_url())
 
-    @flow.flow_start_view()
+    @flow_start_view()
     def dispatch(self, request, *args, **kwargs):
         """Check user permissions, and prepare flow to execution."""
         if not self.has_perm(request.user):
@@ -131,7 +132,7 @@ class StartActivationViewMixin(object):
         messages.info(self.request, mark_safe(msg), fail_silently=True)
 
 
-class StartProcessView(flow.ManagedStartViewActivation, StartActivationViewMixin, generic.UpdateView):
+class StartProcessView(ManagedStartViewActivation, StartActivationViewMixin, generic.UpdateView):
     fields = []
 
     def get_object(self):

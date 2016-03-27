@@ -3,7 +3,9 @@ from django.test import TestCase
 from viewflow import lock
 from viewflow.compat import mock
 from viewflow.activation import STATUS
-from viewflow.flow import gates
+from viewflow.flow import If, Switch
+from viewflow.nodes.ifgate import IfActivation
+from viewflow.nodes.switch import SwitchActivation
 
 
 class Test(TestCase):
@@ -20,9 +22,9 @@ class Test(TestCase):
 
     def test_if_activation_activate_true(self):
         next_task = FlowTaskStub()
-        flow_task = self.init_node(gates.If(lambda process: True).OnTrue(next_task))
+        flow_task = self.init_node(If(lambda process: True).OnTrue(next_task))
 
-        act = gates.IfActivation()
+        act = IfActivation()
         act.initialize(flow_task, TaskStub())
         act.perform()
 
@@ -30,9 +32,9 @@ class Test(TestCase):
 
     def test_if_activation_activate_false(self):
         next_task = FlowTaskStub()
-        flow_task = self.init_node(gates.If(lambda process: False).OnFalse(next_task))
+        flow_task = self.init_node(If(lambda process: False).OnFalse(next_task))
 
-        act = gates.IfActivation()
+        act = IfActivation()
         act.initialize(flow_task, TaskStub())
         act.perform()
 
@@ -40,9 +42,9 @@ class Test(TestCase):
 
     def test_switch_activation_case(self):
         next_task = FlowTaskStub()
-        flow_task = self.init_node(gates.Switch().Case(next_task, cond=lambda process: True))
+        flow_task = self.init_node(Switch().Case(next_task, cond=lambda process: True))
 
-        act = gates.SwitchActivation()
+        act = SwitchActivation()
         act.initialize(flow_task, TaskStub())
         act.perform()
 
@@ -50,9 +52,9 @@ class Test(TestCase):
 
     def test_switch_activation_default(self):
         next_task = FlowTaskStub()
-        flow_task = self.init_node(gates.Switch().Default(next_task))
+        flow_task = self.init_node(Switch().Default(next_task))
 
-        act = gates.SwitchActivation()
+        act = SwitchActivation()
         act.initialize(flow_task, TaskStub())
         act.perform()
 

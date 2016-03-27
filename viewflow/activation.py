@@ -284,87 +284,6 @@ class StartActivation(Activation):
             handler(self)
 
 
-class StartViewActivation(Activation):
-    """
-    Start process from user request
-
-    # TODO Delete?
-    """
-
-    @Activation.status.super()
-    def initialize(self, flow_task, task):
-        self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
-
-        if task:
-            self.process, self.task = task.flow_process, task
-        else:
-            self.process = self.flow_cls.process_cls(flow_cls=self.flow_cls)
-            self.task = self.flow_cls.task_cls(flow_task=self.flow_task)
-
-    @Activation.status.transition(source=STATUS.NEW, target=STATUS.PREPARED)
-    def prepare(self):
-        """
-        Initialize start task for execution.
-
-        No db changes performed. It is safe to call it on GET requests.
-        """
-        self.task.started = now()
-
-    @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
-    def done(self):
-        """
-        Creates and starts new process instance.
-
-        .. seealso::
-            :data:`viewflow.signals.task_started`
-
-        .. seealso::
-            :data:`viewflow.signals.task_finished`
-
-        .. seealso::
-            :data:`viewflow.signals.flow_started`
-
-        """
-        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
-
-        self.process.save()
-
-        self.task.process = self.process
-        self.task.finished = now()
-        self.task.save()
-
-        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
-        signals.flow_started.send(sender=self.flow_cls, process=self.process, task=self.task)
-
-        self.activate_next()
-
-    @Activation.status.transition(source=STATUS.DONE)
-    def activate_next(self):
-        """
-        Activate all outgoing edges.
-        """
-        if self.flow_task._next:
-            self.flow_task._next.activate(prev_activation=self, token=self.task.token)
-
-    @Activation.status.transition(source=STATUS.DONE, target=STATUS.CANCELED, conditions=[all_leading_canceled])
-    def undo(self):
-        """
-        Undo the task
-        """
-        self.process.status = STATUS.CANCELED
-        self.process.finished = now()
-        self.process.save()
-
-        self.task.finished = now()
-        self.task.save()
-
-        # call custom undo handler
-        handler_name = '{}_undo'.format(self.flow_task.name)
-        handler = getattr(self.flow_cls.instance, handler_name, None)
-        if handler:
-            handler(self)
-
-
 class ViewActivation(Activation):
     """
     Base class for activations for django views tasks
@@ -468,6 +387,44 @@ class ViewActivation(Activation):
         Instantiate new task
         """
         task = cls.create_task(flow_task, prev_activation, token)
+
+        task.save()
+        task.previous.add(prev_activation.task)
+
+        activation = cls()
+        activation.initialize(flow_task, task)
+
+        return activation
+
+
+class FuncActivation(Activation):
+    @Activation.status.transition(source=STATUS.NEW, target=STATUS.PREPARED)
+    def prepare(self):
+        self.task.started = now()
+        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+
+    @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
+    def done(self):
+        self.task.finished = now()
+        self.task.save()
+
+        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+
+        self.activate_next()
+
+    @Activation.status.transition(source=STATUS.DONE)
+    def activate_next(self):
+        """Activate all outgoing edges."""
+        if self.flow_task._next:
+            self.flow_task._next.activate(prev_activation=self, token=self.task.token)
+
+    @classmethod
+    def activate(cls, flow_task, prev_activation, token):
+        """Instantiate new task."""
+        task = flow_task.flow_cls.task_cls(
+            process=prev_activation.process,
+            flow_task=flow_task,
+            token=token)
 
         task.save()
         task.previous.add(prev_activation.task)

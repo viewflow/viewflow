@@ -8,7 +8,8 @@ from django.test import TestCase
 from viewflow import flow
 from viewflow.base import Flow
 from viewflow.activation import STATUS
-from viewflow.flow import task_view
+from viewflow.decorators import flow_view
+from viewflow.flow.activation import ManagedViewActivation
 from viewflow.models import Process, Task
 
 
@@ -17,7 +18,7 @@ class Test(TestCase):
         process = Process.objects.create(flow_cls=TaskTestFlow)
         task = Task.objects.create(process=process, flow_task=TaskTestFlow.task)
 
-        @task_view.flow_view()
+        @flow_view()
         def test_view(request, activation):
             activation.assign()
             activation.prepare()
@@ -31,7 +32,7 @@ class Test(TestCase):
         process = Process.objects.create(flow_cls=TaskTestFlow)
         task = Task.objects.create(process=process, flow_task=TaskTestFlow.task)
 
-        act = task_view.ManagedViewActivation()
+        act = ManagedViewActivation()
         act.initialize(TaskTestFlow.task, task)
 
         act.assign()

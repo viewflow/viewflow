@@ -7,13 +7,13 @@ from viewflow import flow, views
 from viewflow.base import Flow, this
 from viewflow.activation import STATUS
 from viewflow.models import Task
-from viewflow.views import actions, ProcessView
+from viewflow.flow.views import actions, process, ProcessView, UnassignView
 
 
 class Test(TestCase):
     def test_process_cancel_view(self):
         act = ActionsTestFlow.start.run()
-        view = actions.ProcessCancelView.as_view()
+        view = process.CancelView.as_view()
 
         # get
         request = RequestFactory().get('/cancel/')
@@ -41,7 +41,7 @@ class Test(TestCase):
 
     def test_task_undo_view(self):
         act = ActionsTestFlow.start.run()
-        view = actions.TaskUndoView.as_view()
+        view = actions.UndoView.as_view()
 
         # prepare the process with cancelable start action
         task = act.process.get_task(ActionsTestFlow.task, status=[STATUS.NEW])
@@ -80,7 +80,7 @@ class Test(TestCase):
 
     def test_task_cancel_view(self):
         act = ActionsTestFlow.start.run()
-        view = actions.TaskCancelView.as_view()
+        view = actions.CancelView.as_view()
         task = act.process.get_task(ActionsTestFlow.task, status=[STATUS.NEW])
 
         # get
@@ -112,7 +112,7 @@ class Test(TestCase):
 
     def test_task_perform_view(self):
         act = ActionsTestFlow.start.run()
-        view = actions.TaskPerformView.as_view()
+        view = actions.PerformView.as_view()
         if_gate = Task.objects.create(process=act.process, flow_task=ActionsTestFlow.if_gate)
 
         # get
@@ -146,7 +146,7 @@ class Test(TestCase):
 
     def test_task_activate_next_view(self):
         act = ActionsTestFlow.start.run()
-        view = actions.TaskActivateNextView.as_view()
+        view = actions.ActivateNextView.as_view()
         task = act.process.get_task(ActionsTestFlow.task, status=[STATUS.NEW])
         task.finished = timezone.now()
         task.status = STATUS.DONE
@@ -183,7 +183,7 @@ class Test(TestCase):
     def test_task_unassign_view(self):
         # prepare assigned task
         user = User.objects.create(username='test', is_superuser=True)
-        view = actions.TaskUnAssignView.as_view()
+        view = UnassignView.as_view()
 
         act = ActionsTestFlow.start.run()
         task = act.process.get_task(ActionsTestFlow.task, status=[STATUS.NEW])

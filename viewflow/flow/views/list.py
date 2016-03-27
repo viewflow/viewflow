@@ -7,8 +7,8 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django_filters import FilterSet, ChoiceFilter, DateRangeFilter, ModelChoiceFilter
 
-from .. import activation, flow, models
-from ..fields import import_task_by_ref
+from ... import activation, flow, models
+from ...fields import import_task_by_ref
 from .base import FlowViewPermissionMixin
 
 

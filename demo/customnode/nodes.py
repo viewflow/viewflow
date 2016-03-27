@@ -1,6 +1,7 @@
 from viewflow.activation import AbstractGateActivation
-from viewflow.flow import base
+from viewflow import base, mixins
 from viewflow.token import Token
+from viewflow.flow import views
 
 
 class DynamicSplitActivation(AbstractGateActivation):
@@ -14,11 +15,11 @@ class DynamicSplitActivation(AbstractGateActivation):
                 self.flow_task._next.activate(prev_activation=self, token=next(token_source))
 
 
-class DynamicSplit(base.NextNodeMixin,
-                   base.UndoViewMixin,
-                   base.CancelViewMixin,
-                   base.PerformViewMixin,
-                   base.DetailsViewMixin,
+class DynamicSplit(mixins.NextNodeMixin,
+                   mixins.UndoViewMixin,
+                   mixins.CancelViewMixin,
+                   mixins.PerformViewMixin,
+                   mixins.DetailsViewMixin,
                    base.Gateway):
     """
     Activates several outgoing task instances depends on callback value
@@ -35,6 +36,12 @@ class DynamicSplit(base.NextNodeMixin,
             .Next(this.end)
     """
     task_type = 'SPLIT'
+
+    cancel_view_class = views.CancelView
+    details_view_class = views.DetailsView
+    perform_view_class = views.PerformView
+    undo_view_class = views.UndoView
+
     activation_cls = DynamicSplitActivation
 
     def __init__(self, callback):

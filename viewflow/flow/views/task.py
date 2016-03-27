@@ -9,16 +9,21 @@ from django.utils.http import is_safe_url
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
-from .. import flow
-from .base import get_next_task_url, get_task_hyperlink, get_process_hyperlink
+from ...decorators import flow_view
+from ..activation import ManagedViewActivation
+from .base import (
+    BaseTaskActionView, get_next_task_url, get_task_hyperlink,
+    get_process_hyperlink
+)
 
 
-class TaskViewMixin(object):
-
-    """Mixin for task views, that do not implement activation interface."""
+class ViewMixin(object):
+    """
+    Mixin for task views, that do not implement activation interface.
+    """
 
     def get_context_data(self, **kwargs):
-        context = super(TaskViewMixin, self).get_context_data(**kwargs)
+        context = super(ViewMixin, self).get_context_data(**kwargs)
         context['activation'] = self.activation
         return context
 
@@ -51,25 +56,25 @@ class TaskViewMixin(object):
 
     def formset_valid(self, *args, **kwargs):
         """Called if base class is :class:`extra_views.FormsetView`."""
-        super(TaskViewMixin, self).formset_valid(*args, **kwargs)
+        super(ViewMixin, self).formset_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_valid(self, *args, **kwargs):
         """Called if base class is :class:`extra_views.InlinesView`."""
-        super(TaskViewMixin, self).forms_valid(*args, **kwargs)
+        super(ViewMixin, self).forms_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
     def form_valid(self, *args, **kwargs):
-        super(TaskViewMixin, self).form_valid(*args, **kwargs)
+        super(ViewMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
-    @flow.flow_view()
+    @flow_view()
     def dispatch(self, request, activation, **kwargs):
         self.activation = activation
 
@@ -83,15 +88,16 @@ class TaskViewMixin(object):
             raise PermissionDenied
 
         self.activation.prepare(request.POST or None)
-        return super(TaskViewMixin, self).dispatch(request, **kwargs)
+        return super(ViewMixin, self).dispatch(request, **kwargs)
 
 
-class TaskActivationViewMixin(object):
-
-    """Mixin for views that implements activation interface."""
+class ActivationViewMixin(object):
+    """
+    Mixin for views that implements activation interface.
+    """
 
     def get_context_data(self, **kwargs):
-        context = super(TaskActivationViewMixin, self).get_context_data(**kwargs)
+        context = super(ActivationViewMixin, self).get_context_data(**kwargs)
         context['activation'] = self
         return context
 
@@ -123,25 +129,25 @@ class TaskActivationViewMixin(object):
 
     def formset_valid(self, *args, **kwargs):
         """Called if base class is :class:`extra_views.FormsetView`."""
-        super(TaskActivationViewMixin, self).formset_valid(*args, **kwargs)
+        super(ActivationViewMixin, self).formset_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
     def forms_valid(self, *args, **kwargs):
         """Called if base class is :class:`extra_views.InlineView`."""
-        super(TaskActivationViewMixin, self).forms_valid(*args, **kwargs)
+        super(ActivationViewMixin, self).forms_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
     def form_valid(self, *args, **kwargs):
-        super(TaskActivationViewMixin, self).form_valid(*args, **kwargs)
+        super(ActivationViewMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         self.message_complete()
         return HttpResponseRedirect(self.get_success_url())
 
-    @flow.flow_view()
+    @flow_view()
     def dispatch(self, request, *args, **kwargs):
         if not self.prepare.can_proceed():
             hyperlink = get_task_hyperlink(self.task, self.request.user)
@@ -153,10 +159,10 @@ class TaskActivationViewMixin(object):
             raise PermissionDenied
 
         self.prepare(request.POST or None)
-        return super(TaskActivationViewMixin, self).dispatch(request, *args, **kwargs)
+        return super(ActivationViewMixin, self).dispatch(request, *args, **kwargs)
 
 
-class ProcessView(flow.ManagedViewActivation, TaskActivationViewMixin, generic.UpdateView):
+class ProcessView(ManagedViewActivation, ActivationViewMixin, generic.UpdateView):
     fields = []
 
     @property
@@ -167,8 +173,7 @@ class ProcessView(flow.ManagedViewActivation, TaskActivationViewMixin, generic.U
         return self.process
 
 
-class AssignView(flow.ManagedViewActivation, generic.TemplateView):
-
+class AssignView(ManagedViewActivation, generic.TemplateView):
     """
     Default assign view for flow task.
 
@@ -215,7 +220,7 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
         else:
             return self.get(request, *args, **kwargs)
 
-    @flow.flow_view()
+    @flow_view()
     def dispatch(self, request, *args, **kwargs):
         if request.user is None or request.user.is_anonymous():
             raise PermissionDenied
@@ -231,3 +236,18 @@ class AssignView(flow.ManagedViewActivation, generic.TemplateView):
             raise PermissionDenied
 
         return super(AssignView, self).dispatch(request, *args, **kwargs)
+
+
+class UnassignView(BaseTaskActionView):
+    action_name = 'unassign'
+
+    def can_proceed(self):
+        if self.activation.unassign.can_proceed():
+            return self.activation.flow_task.can_unassign(self.request.user, self.activation.task)
+        return False
+
+    def perform(self):
+        self.activation.unassign()
+        hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
+        msg = _('Task {hyperlink} has been unassigned.').format(hyperlink=hyperlink)
+        messages.info(self.request, mark_safe(msg), fail_silently=True)

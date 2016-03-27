@@ -7,11 +7,140 @@ from textwrap import dedent
 
 from django.conf.urls import include, url
 
-from . import flow, lock, models, forms
+from . import lock, models, forms
+from .activation import STATUS
 from .compat import get_containing_app_data
-from .flow.base import ThisObject
 
-this = flow.This()
+
+class ThisObject(object):
+
+    """Helper for forward references on flow tasks."""
+
+    def __init__(self, name):
+        self.name = name
+
+    @property
+    def owner(self):
+        """Return same process finished task owner."""
+        def get_task_owner(process):
+            flow_cls = process.flow_cls
+            task_node = flow_cls._meta.node(self.name)
+            task = flow_cls.task_cls.objects.get(
+                process=process,
+                flow_task=task_node,
+                status=STATUS.DONE)
+            return task.owner
+        return get_task_owner
+
+
+class This(object):
+    """Helper for building forward referenced flow task."""
+    def __getattr__(self, name):
+        return ThisObject(name)
+
+
+class Edge(object):
+    __slots__ = ('_src', '_dst', '_edge_class', '_label')
+
+    def __init__(self, src, dst, edge_class, label=None):
+        self._src = src
+        self._dst = dst
+        self._edge_class = edge_class
+        self._label = label
+
+    @property
+    def src(self):
+        return self._src
+
+    @property
+    def dst(self):
+        return self._dst
+
+    @property
+    def edge_class(self):
+        return self._edge_class
+
+    @property
+    def label(self):
+        return self._label
+
+    def __str__(self):
+        edge = "[%s] %s ---> %s" % (self._edge_class, self._src, self._dst)
+        if self._label:
+            edge += " (%s)" % self._label
+        return edge
+
+
+class Node(object):
+    """
+    Base class for flow task.
+
+    :keyword task_type: Human readable task type
+    :keyword activation_cls: Activation implementation specific for this node
+    """
+    task_type = None
+    activation_cls = None
+
+    def __init__(self, activation_cls=None, **kwargs):
+        self._incoming_edges = []
+
+        self.flow_cls = None
+        self.name = None
+
+        if activation_cls:
+            self.activation_cls = activation_cls
+
+        super(Node, self).__init__(**kwargs)
+
+    def _outgoing(self):
+        """Outgoing edge iterator."""
+        raise NotImplementedError
+
+    def _incoming(self):
+        """Incoming edge iterator."""
+        return iter(self._incoming_edges)
+
+    def _resolve(self, resolver):
+        """Resolve and store outgoing links."""
+
+    def __str__(self):
+        if self.name:
+            return self.name.title().replace('_', ' ')
+        return super(Node, self).__str__()
+
+    def ready(self):
+        """
+        Called when flow class setup finished.
+
+        Subclasses could perform additional initialisation here.
+        """
+
+    def urls(self):
+        """List of urls for flow node views."""
+        return []
+
+    def get_task_url(self, task, url_type, **kwargs):
+        """Return url for the task."""
+
+    def activate(self, prev_activation, token):
+        """Creates task activation."""
+        return self.activation_cls.activate(self, prev_activation, token)
+
+
+class Event(Node):
+
+    """Base class for event-based tasks."""
+
+
+class Task(Node):
+
+    """Base class for tasks."""
+
+
+class Gateway(Node):
+    """
+    Base class for task gateways
+    """
 
 
 class _Resolver(object):
@@ -22,7 +151,7 @@ class _Resolver(object):
         self.nodes = nodes  # map name -> node instance
 
     def get_implementation(self, link):
-        if isinstance(link, flow.Node):
+        if isinstance(link, Node):
             return link
         elif isinstance(link, ThisObject):
             node = self.nodes.get(link.name)
@@ -95,7 +224,7 @@ class FlowMetaClass(type):
         new_class.instance = FlowInstanceDescriptor()
 
         # set up flow tasks
-        nodes = {name: attr for name, attr in attrs.items() if isinstance(attr, flow.Node)}
+        nodes = {name: attr for name, attr in attrs.items() if isinstance(attr, Node)}
 
         for name, node in nodes.items():
             node.name = name
@@ -208,3 +337,6 @@ class Flow(object, metaclass=FlowMetaClass):
 
     def __str__(self):
         return self.process_title
+
+
+this = This()

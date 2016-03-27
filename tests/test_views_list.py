@@ -6,7 +6,7 @@ from django.utils import timezone
 from viewflow import flow, views
 from viewflow.base import Flow, this
 from viewflow.models import Task, Process
-from viewflow.views import list
+from viewflow.flow.views import list
 
 
 class Test(TestCase):

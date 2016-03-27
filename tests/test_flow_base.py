@@ -6,19 +6,20 @@ from django.contrib.auth.models import User
 from viewflow import flow
 from viewflow.base import Flow
 from viewflow.activation import STATUS
-from viewflow.flow import base
+from viewflow.base import This, Node
 from viewflow.models import Process
+from viewflow.mixins import PermissionMixin, TaskDescriptionViewMixin
 
 
 class Test(TestCase):
     def test_this_refs(self):
-        this = base.This()
+        this = This()
 
         self.assertEqual(this.some_name.name, 'some_name')
         self.assertEqual(this.another_some_name.name, 'another_some_name')
 
     def test_this_owner(self):
-        this = base.This()
+        this = This()
         user = User.objects.create(username='testowner')
         process = TestFlowBaseFlow.process_cls.objects.create(flow_cls=TestFlowBaseFlow)
 
@@ -29,7 +30,7 @@ class Test(TestCase):
         self.assertEqual(this.start.owner(process), user)
 
     def test_permission_mixin_creation(self):
-        class TestNode(base.PermissionMixin, base.Node):
+        class TestNode(PermissionMixin, Node):
             pass
 
         flow_task = TestNode().Permission(auto_create=True)
@@ -50,7 +51,7 @@ class Test(TestCase):
             """
             task_result_summary = "Summary for the completed task"
 
-        class TestNode(base.TaskDescriptionViewMixin, base.Node):
+        class TestNode(TaskDescriptionViewMixin, Node):
             pass
 
         flow_task = TestNode(TestView)

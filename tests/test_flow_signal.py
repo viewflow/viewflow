@@ -3,7 +3,7 @@ from django.test import TestCase
 
 from viewflow import flow
 from viewflow.base import Flow, this
-from viewflow.flow.signal import Receiver
+from viewflow.types import Receiver
 
 
 class Test(TestCase):

@@ -76,21 +76,6 @@ class Test(TestCase):
         act.undo()
         self.assertEqual(act.task.status, STATUS.CANCELED)
 
-    def test_startviewactivation_lifecycle(self):
-        flow_task = self.init_node(flow.Start())
-
-        act = activation.StartViewActivation()
-        act.initialize(flow_task, None)
-
-        # execute
-        act.prepare()
-        act.done()
-        self.assertEqual(act.task.status, STATUS.DONE)
-
-        # undo
-        act.undo()
-        self.assertEqual(act.task.status, STATUS.CANCELED)
-
     def test_viewactivation_lifecycle(self):
         flow_task = self.init_node(flow.View(lambda _: None))
 

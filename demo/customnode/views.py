@@ -1,12 +1,12 @@
 from django.views import generic
 from django.http import HttpResponseRedirect
 
-from viewflow.views import task
+from viewflow.views import TaskViewMixin
 
 from . import models
 
 
-class DecisionView(task.TaskViewMixin, generic.CreateView):
+class DecisionView(TaskViewMixin, generic.CreateView):
     model = models.Decision
     fields = ['decision']
 

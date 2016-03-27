@@ -7,12 +7,13 @@ from django.views import generic
 from viewflow import flow, views
 from viewflow.activation import STATUS
 from viewflow.base import Flow, this
-from viewflow.views import start
+from viewflow.views import StartViewMixin, StartProcessView, StartActivationViewMixin
+from viewflow.flow.activation import ManagedStartViewActivation
 
 
 class Test(TestCase):
     def test_startview_mixin_with_create_view(self):
-        class StartView(start.StartViewMixin, generic.CreateView):
+        class StartView(StartViewMixin, generic.CreateView):
             model = StartViewFlowEntity
             fields = []
 
@@ -39,7 +40,7 @@ class Test(TestCase):
         process.get_task(StartViewTestFlow.start, status=[STATUS.DONE])
 
     def test_startactivationview_mixin_with_create_view(self):
-        class StartView(flow.ManagedStartViewActivation, start.StartActivationViewMixin, generic.CreateView):
+        class StartView(ManagedStartViewActivation, StartActivationViewMixin, generic.CreateView):
             model = StartViewFlowEntity
             fields = []
 
@@ -66,7 +67,7 @@ class Test(TestCase):
         process.get_task(StartViewTestFlow.start, status=[STATUS.DONE])
 
     def test_startprocess_view(self):
-        view = start.StartProcessView.as_view()
+        view = StartProcessView.as_view()
         user = User.objects.create(username='test', is_superuser=True)
 
         # get

@@ -1,19 +1,18 @@
 from django.contrib import messages
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
-from django.utils.timezone import now
 from django.utils.http import is_safe_url
 from django.utils.safestring import mark_safe
-from django.views import generic
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
+from django.views import generic
 
-from ..activation import STATUS
-from ..exceptions import FlowRuntimeError
-from .base import FlowManagePermissionMixin, BaseTaskActionView, \
-    get_task_hyperlink, get_process_hyperlink
+from ...activation import STATUS
+from ...exceptions import FlowRuntimeError
+from .base import FlowManagePermissionMixin, get_process_hyperlink
 
 
-class ProcessCancelView(FlowManagePermissionMixin, generic.DetailView):
+class CancelView(FlowManagePermissionMixin, generic.DetailView):
     flow_cls = None
     context_object_name = 'process'
     pk_url_kwarg = 'process_pk'
@@ -60,10 +59,10 @@ class ProcessCancelView(FlowManagePermissionMixin, generic.DetailView):
 
         lock = self.flow_cls.lock_impl(self.flow_cls.instance)
         with lock(self.flow_cls, kwargs['process_pk']):
-            return super(ProcessCancelView, self).dispatch(request, *args, **kwargs)
+            return super(CancelView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
-        context = super(ProcessCancelView, self).get_context_data(**kwargs)
+        context = super(CancelView, self).get_context_data(**kwargs)
         context['active_tasks'] = self._get_task_list()
         context['flow_cls'] = self.flow_cls
         context['uncancelable_tasks'] = self._get_uncancelable_tasks(context['active_tasks'])
@@ -105,71 +104,3 @@ class ProcessCancelView(FlowManagePermissionMixin, generic.DetailView):
         self.object.status = STATUS.CANCELED
         self.object.finished = now()
         self.object.save()
-
-
-class TaskUndoView(FlowManagePermissionMixin, BaseTaskActionView):
-    action_name = 'undo'
-
-    def can_proceed(self):
-        return self.activation.undo.can_proceed()
-
-    def perform(self):
-        self.activation.undo()
-        hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
-        msg = _('Task {hyperlink} has been undone.').format(hyperlink=hyperlink)
-        messages.info(self.request, mark_safe(msg), fail_silently=True)
-
-
-class TaskCancelView(FlowManagePermissionMixin, BaseTaskActionView):
-    action_name = 'cancel'
-
-    def can_proceed(self):
-        return self.activation.cancel.can_proceed()
-
-    def perform(self):
-        self.activation.cancel()
-        hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
-        msg = _('Task {hyperlink} has been canceled.').format(hyperlink=hyperlink)
-        messages.info(self.request, mark_safe(msg), fail_silently=True)
-
-
-class TaskPerformView(FlowManagePermissionMixin, BaseTaskActionView):
-    """Non-interactive task that cancelled and need to be started manually."""
-
-    action_name = 'execute'
-
-    def can_proceed(self):
-        return self.activation.perform.can_proceed()
-
-    def perform(self):
-        self.activation.perform()
-        hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
-        msg = _('Task {hyperlink} has been executed.').format(hyperlink=hyperlink)
-        messages.success(self.request, mark_safe(msg), fail_silently=True)
-
-
-class TaskActivateNextView(FlowManagePermissionMixin, BaseTaskActionView):
-    """Activate next task without interactive task redone."""
-
-    action_name = 'activate_next'
-
-    def can_proceed(self):
-        return self.activation.activate_next.can_proceed()
-
-    def perform(self):
-        self.activation.activate_next()
-
-
-class TaskUnAssignView(BaseTaskActionView):
-    action_name = 'unassign'
-
-    def can_proceed(self):
-        if self.activation.unassign.can_proceed():
-            return self.activation.flow_task.can_unassign(self.request.user, self.activation.task)
-        return False
-
-    def perform(self):
-        self.activation.unassign()
-        hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
-        msg = _('Task {hyperlink} has been unassigned.').format(hyperlink=hyperlink)
-        messages.info(self.request, mark_safe(msg), fail_silently=True)

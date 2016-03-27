@@ -3,8 +3,9 @@ from django.test import TestCase
 from viewflow import flow
 from viewflow.activation import context, Context, STATUS
 from viewflow.fields import get_task_ref
-from viewflow.flow import job
+from viewflow.activation import AbstractJobActivation
 from viewflow.base import this, Flow
+from viewflow.flow import AbstractJob
 
 
 class Test(TestCase):
@@ -46,12 +47,12 @@ def job_handler(activation):
         raise ValueError('Expected test error')
 
 
-class JobActivation(job.AbstractJobActivation):
+class JobActivation(AbstractJobActivation):
     def async(self):
         """Do Nothing."""
 
 
 class JobTestFlow(Flow):
     start = flow.StartFunction().Next(this.job)
-    job = job.AbstractJob(job_handler, activation_cls=JobActivation).Next(this.end)
+    job = AbstractJob(job_handler, activation_cls=JobActivation).Next(this.end)
     end = flow.End()

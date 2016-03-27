@@ -7,12 +7,13 @@ from django.views import generic
 from viewflow import flow, views
 from viewflow.activation import STATUS
 from viewflow.base import Flow, this
-from viewflow.views import task as task_views
+from viewflow.flow.activation import ManagedViewActivation
+from viewflow.flow.views import ViewMixin, ActivationViewMixin, ProcessView, AssignView
 
 
 class Test(TestCase):
     def test_taskview_mixin_with_create_view(self):
-        class StartView(task_views.TaskViewMixin, generic.CreateView):
+        class StartView(ViewMixin, generic.CreateView):
             model = TaskViewFlowEntity
             fields = []
 
@@ -23,7 +24,7 @@ class Test(TestCase):
 
         # unassigned redirect
         request = RequestFactory().get('/start/')
-        request.user = user
+        request.user = user        
         response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 302)
@@ -53,7 +54,7 @@ class Test(TestCase):
         self.assertEqual(task.status, STATUS.DONE)
 
     def test_taskactivationview_mixin_with_create_view(self):
-        class TaskView(flow.ManagedViewActivation, task_views.TaskActivationViewMixin, generic.CreateView):
+        class TaskView(ManagedViewActivation, ActivationViewMixin, generic.CreateView):
             model = TaskViewFlowEntity
             fields = []
 
@@ -95,7 +96,7 @@ class Test(TestCase):
         self.assertEqual(task.status, STATUS.DONE)
 
     def test_processview(self):
-        view = task_views.ProcessView.as_view()
+        view = ProcessView.as_view()
         user = User.objects.create(username='test', is_superuser=True)
 
         act = TaskViewTestFlow.start.run()
@@ -125,7 +126,7 @@ class Test(TestCase):
         self.assertEqual(task.status, STATUS.DONE)
 
     def test_assignview(self):
-        view = task_views.AssignView.as_view()
+        view = AssignView.as_view()
         user = User.objects.create(username='test', is_superuser=True)
 
         act = TaskViewTestFlow.start.run()
