@@ -13,7 +13,7 @@ def users(request):
 def login_as(request):
     user = None
 
-    user_pk = request.REQUEST.get('user_pk', None)
+    user_pk = request.GET.get('user_pk', None)
     if user_pk:
         try:
             user = User.objects.get(pk=user_pk)
