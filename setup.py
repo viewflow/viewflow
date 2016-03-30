@@ -37,9 +37,11 @@ setup(
     packages=['viewflow',
               'viewflow.contrib',
               'viewflow.flow',
+              'viewflow.flow.views',
               'viewflow.management',
               'viewflow.migrations',
+              'viewflow.nodes',
               'viewflow.south_migrations',
-              'viewflow.templatetags',
-              'viewflow.views'],
-    include_package_data=True)
+              'viewflow.templatetags'],
+    include_package_data=True,
+    zip_safe=False)
