@@ -37,7 +37,7 @@ class JoinActivation(Activation):
             return True
 
         join_prefixes = set(
-            prev.token.get_common_split_prefix()
+            prev.token.get_common_split_prefix(self.task.token, prev.pk)
             for prev in self.task.previous.exclude(status=STATUS.CANCELED).all())
 
         if len(join_prefixes) > 1:
