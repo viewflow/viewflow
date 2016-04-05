@@ -49,16 +49,10 @@ class BaseStart(mixins.TaskDescriptionViewMixin,
             url(r'^{}/$'.format(self.name), self.view, {'flow_task': self}, name=self.name))
         return urls
 
-    def get_task_url(self, task, url_type='guess', **kwargs):
-        if url_type in ['execute', 'guess']:
-            if 'user' in kwargs and self.can_execute(kwargs['user'], task):
-                url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
-                return reverse(url_name)
-
-        return super(BaseStart, self).get_task_url(task, url_type=url_type, **kwargs)
-
 
 class Start(mixins.PermissionMixin, BaseStart):
+    activation_cls = StartActivation
+
     def Available(self, owner=None, **owner_kwargs):
         """
         Make process start action available for the User
@@ -72,6 +66,14 @@ class Start(mixins.PermissionMixin, BaseStart):
         else:
             self._owner = owner_kwargs
         return self
+
+    def get_task_url(self, task, url_type='guess', **kwargs):
+        if url_type in ['execute', 'guess']:
+            if 'user' in kwargs and self.can_execute(kwargs['user'], task):
+                url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
+                return reverse(url_name)
+
+        return super(BaseStart, self).get_task_url(task, url_type=url_type, **kwargs)
 
     def can_execute(self, user, task=None):
         if task and task.status != STATUS.NEW:
@@ -150,6 +152,7 @@ class BaseView(mixins.TaskDescriptionViewMixin,
 
 
 class View(mixins.PermissionMixin, BaseView):
+    activation_cls = ViewActivation
     assign_view_class = None
     unassign_view_class = None
 
