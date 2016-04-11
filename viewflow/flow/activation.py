@@ -32,9 +32,6 @@ class ManagedStartViewActivation(StartActivation):
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.management_form.errors))
             self.task = self.management_form.save(commit=False)
 
-    def has_perm(self, user):
-        return self.flow_task.can_execute(user)
-
 
 class ManagedViewActivation(ViewActivation):
     """
@@ -67,9 +64,6 @@ class ManagedViewActivation(ViewActivation):
             if not self.management_form.is_valid():
                 raise FlowRuntimeError('Activation metadata is broken {}'.format(self.management_form.errors))
             self.task = self.management_form.save(commit=False)
-
-    def has_perm(self, user):
-        return self.flow_task.can_execute(user, self.task)
 
     @classmethod
     def create_task(cls, flow_task, prev_activation, token):

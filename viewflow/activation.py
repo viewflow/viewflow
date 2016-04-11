@@ -283,6 +283,9 @@ class StartActivation(Activation):
         if handler:
             handler(self)
 
+    def has_perm(self, user):
+        return self.flow_task.can_execute(user)
+
 
 class ViewActivation(Activation):
     """
@@ -395,6 +398,9 @@ class ViewActivation(Activation):
         activation.initialize(flow_task, task)
 
         return activation
+
+    def has_perm(self, user):
+        return self.flow_task.can_execute(user, self.task)
 
 
 class FuncActivation(Activation):
