@@ -15,7 +15,8 @@ class DynamicSplitActivation(AbstractGateActivation):
                 self.flow_task._next.activate(prev_activation=self, token=next(token_source))
 
 
-class DynamicSplit(mixins.NextNodeMixin,
+class DynamicSplit(mixins.TaskDescriptionMixin,
+                   mixins.NextNodeMixin,
                    mixins.UndoViewMixin,
                    mixins.CancelViewMixin,
                    mixins.PerformViewMixin,
@@ -44,6 +45,6 @@ class DynamicSplit(mixins.NextNodeMixin,
 
     activation_cls = DynamicSplitActivation
 
-    def __init__(self, callback):
-        super(DynamicSplit, self).__init__()
+    def __init__(self, callback, **kwargs):
+        super(DynamicSplit, self).__init__(**kwargs)
         self._task_count_callback = callback
