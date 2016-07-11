@@ -1,48 +1,54 @@
-import extra_views
+from django.core.exceptions import PermissionDenied
+from django.forms.models import modelform_factory, inlineformset_factory
 from django.views import generic
-from viewflow import views as flow_views
-from material import LayoutMixin, Layout, Fieldset, Inline, Row, Span2, Span5, Span7
+from django.shortcuts import render, redirect
+from viewflow.flow import flow_start_view
+from viewflow.flow.views import ViewMixin, get_next_task_url
+
 
 from .models import Shipment, ShipmentItem, Insurance
 
 
-class ItemInline(extra_views.InlineFormSet):
-    model = ShipmentItem
-    fields = ['name', 'quantity']
+@flow_start_view()
+def start_view(request, activation):
+    form_cls = modelform_factory(Shipment, fields=[
+        'shipment_no', 'first_name', 'last_name',
+        'email', 'phone', 'address', 'zipcode',
+        'city', 'state', 'country'])
+
+    formset_cls = inlineformset_factory(Shipment, ShipmentItem, fields=[
+        'name', 'quantity'], can_delete=False)
+
+    if not activation.has_perm(request.user):
+        raise PermissionDenied
+    activation.prepare(request.POST or None, user=request.user)
+
+    form = form_cls(request.POST or None)
+    formset = formset_cls(request.POST or None)
+
+    is_valid = all([form.is_valid(), formset.is_valid()])
+    if is_valid:
+        shipment = form.save()
+        activation.process.shipment = shipment
+        for item in formset.save(commit=False):
+            item.shipment = shipment
+            item.save()
+        activation.done()
+        return redirect(get_next_task_url(request, activation.process))
+
+    return render(request, 'shipment/shipment/start.html', {
+        'activation': activation,
+        'form': form,
+        'formset': formset
+    })
 
 
-class StartView(LayoutMixin,
-                flow_views.StartViewMixin,
-                extra_views.NamedFormsetsMixin,
-                extra_views.CreateWithInlinesView):
-    model = Shipment
-    layout = Layout(
-        Row('shipment_no'),
-        Fieldset('Customer Details',
-                 Row('first_name', 'last_name', 'email'),
-                 Row('phone')),
-        Fieldset('Address',
-                 Row(Span7('address'), Span5('zipcode')),
-                 Row(Span5('city'), Span2('state'), Span5('country'))),
-        Inline('Shipment Items', ItemInline),
-    )
-
-    def activation_done(self, form, inlines):
-        self.object = form.save()
-        for formset in inlines:
-            formset.save()
-
-        self.activation.process.created_by = self.request.user
-        self.activation.process.shipment = self.object
-        self.activation.done()
-
-
-class ShipmentView(flow_views.TaskViewMixin, generic.UpdateView):
+class ShipmentView(ViewMixin, generic.UpdateView):
     def get_object(self):
         return self.activation.process.shipment
 
 
-class InsuranceView(flow_views.TaskViewMixin, generic.CreateView):
+class InsuranceView(ViewMixin, generic.CreateView):
     model = Insurance
     fields = ['company_name', 'cost']
 

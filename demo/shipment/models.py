@@ -1,7 +1,6 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from django.conf import settings
 from django.utils.encoding import python_2_unicode_compatible
 from viewflow.models import Process, Task
 
@@ -63,7 +62,6 @@ class ShipmentItem(models.Model):
 
 class ShipmentProcess(Process):
     shipment = models.ForeignKey(Shipment, blank=True, null=True)
-    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True)
 
     def is_normal_post(self):
         try:

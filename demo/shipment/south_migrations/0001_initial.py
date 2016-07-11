@@ -59,7 +59,6 @@ class Migration(SchemaMigration):
         db.create_table('shipment_shipmentprocess', (
             ('process_ptr', self.gf('django.db.models.fields.related.OneToOneField')(unique=True, to=orm['viewflow.Process'], primary_key=True)),
             ('shipment', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['shipment.Shipment'], blank=True)),
-            ('created_by', self.gf('django.db.models.fields.related.ForeignKey')(null=True, to=orm['auth.User'], blank=True)),
         ))
         db.send_create_signal('shipment', ['ShipmentProcess'])
 
@@ -159,7 +158,6 @@ class Migration(SchemaMigration):
         },
         'shipment.shipmentprocess': {
             'Meta': {'object_name': 'ShipmentProcess', '_ormbases': ['viewflow.Process']},
-            'created_by': ('django.db.models.fields.related.ForeignKey', [], {'null': 'True', 'to': "orm['auth.User']", 'blank': 'True'}),
             'process_ptr': ('django.db.models.fields.related.OneToOneField', [], {'unique': 'True', 'to': "orm['viewflow.Process']", 'primary_key': 'True'}),
             'shipment': ('django.db.models.fields.related.ForeignKey', [], {'null': 'True', 'to': "orm['shipment.Shipment']", 'blank': 'True'})
         },

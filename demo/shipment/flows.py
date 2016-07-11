@@ -17,7 +17,7 @@ class ShipmentFlow(Flow):
         to {{ process.shipment.first_name }} {{ process.shipment.last_name }} / {{ process.shipment.city }}
         """
 
-    start = flow.Start(views.StartView) \
+    start = flow.Start(views.start_view) \
         .Permission('shipment.can_start_request') \
         .Next(this.split_clerk_warehouse)
 

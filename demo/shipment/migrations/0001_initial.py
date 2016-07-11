@@ -64,7 +64,6 @@ class Migration(migrations.Migration):
             name='ShipmentProcess',
             fields=[
                 ('process_ptr', models.OneToOneField(to='viewflow.Process', primary_key=True, parent_link=True, serialize=False, auto_created=True)),
-                ('created_by', models.ForeignKey(blank=True, to=settings.AUTH_USER_MODEL, null=True)),
                 ('shipment', models.ForeignKey(blank=True, to='shipment.Shipment', null=True)),
             ],
             options={

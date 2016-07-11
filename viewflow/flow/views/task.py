@@ -54,20 +54,6 @@ class ViewMixin(object):
             msg = _('Process {hyperlink} has been completed.').format(hyperlink=hyperlink)
             messages.info(self.request, mark_safe(msg), fail_silently=True)
 
-    def formset_valid(self, *args, **kwargs):
-        """Called if base class is :class:`extra_views.FormsetView`."""
-        super(ViewMixin, self).formset_valid(*args, **kwargs)
-        self.activation_done(*args, **kwargs)
-        self.message_complete()
-        return HttpResponseRedirect(self.get_success_url())
-
-    def forms_valid(self, *args, **kwargs):
-        """Called if base class is :class:`extra_views.InlinesView`."""
-        super(ViewMixin, self).forms_valid(*args, **kwargs)
-        self.activation_done(*args, **kwargs)
-        self.message_complete()
-        return HttpResponseRedirect(self.get_success_url())
-
     def form_valid(self, *args, **kwargs):
         super(ViewMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
@@ -126,20 +112,6 @@ class ActivationViewMixin(object):
             hyperlink = get_process_hyperlink(self.process)
             msg = _('Process {hyperlink} has been completed.').format(hyperlink=hyperlink)
             messages.info(self.request, mark_safe(msg), fail_silently=True)
-
-    def formset_valid(self, *args, **kwargs):
-        """Called if base class is :class:`extra_views.FormsetView`."""
-        super(ActivationViewMixin, self).formset_valid(*args, **kwargs)
-        self.activation_done(*args, **kwargs)
-        self.message_complete()
-        return HttpResponseRedirect(self.get_success_url())
-
-    def forms_valid(self, *args, **kwargs):
-        """Called if base class is :class:`extra_views.InlineView`."""
-        super(ActivationViewMixin, self).forms_valid(*args, **kwargs)
-        self.activation_done(*args, **kwargs)
-        self.message_complete()
-        return HttpResponseRedirect(self.get_success_url())
 
     def form_valid(self, *args, **kwargs):
         super(ActivationViewMixin, self).form_valid(*args, **kwargs)
