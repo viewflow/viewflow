@@ -173,7 +173,7 @@ class PermissionMixin(object):
     def Permission(self, permission=None, auto_create=False, obj=None, help_text=None):
         """
         Make task available for users with specific permission,
-        aceps permissions name of callable :: Process -> permission_name::
+        aceps permissions name of callable :: Activation -> permission_name::
 
             .Permission('my_app.can_approve')
             .Permission(lambda process: 'my_app.department_manager_{}'.format(process.depratment.pk))

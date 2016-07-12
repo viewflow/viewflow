@@ -22,11 +22,11 @@ class ThisObject(object):
     @property
     def owner(self):
         """Return same process finished task owner."""
-        def get_task_owner(process):
-            flow_cls = process.flow_cls
+        def get_task_owner(activation):
+            flow_cls = activation.process.flow_cls
             task_node = flow_cls._meta.node(self.name)
             task = flow_cls.task_cls.objects.get(
-                process=process,
+                process=activation.process,
                 flow_task=task_node,
                 status=STATUS.DONE)
             return task.owner

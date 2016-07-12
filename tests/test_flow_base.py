@@ -23,11 +23,11 @@ class Test(TestCase):
         user = User.objects.create(username='testowner')
         process = TestFlowBaseFlow.process_cls.objects.create(flow_cls=TestFlowBaseFlow)
 
-        TestFlowBaseFlow.task_cls.objects.create(
+        task = TestFlowBaseFlow.task_cls.objects.create(
             process=process, flow_task=TestFlowBaseFlow.start,
-            owner=user, status=STATUS.DONE)  # TODO allow any non cancelled status
+            owner=user, status=STATUS.DONE)
 
-        self.assertEqual(this.start.owner(process), user)
+        self.assertEqual(this.start.owner(task.activate()), user)
 
     def test_permission_mixin_creation(self):
         class TestNode(PermissionMixin, Node):

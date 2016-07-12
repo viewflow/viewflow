@@ -34,12 +34,12 @@ class ShipmentFlow(Flow):
         flow.View(
             views.ShipmentView, fields=["carrier"],
             task_description="Carrier selection")
-        .Assign(lambda p: p.created_by)
+        .Assign(lambda act: act.process.created_by)
         .Next(this.delivery_mode)
     )
 
     delivery_mode = (
-        flow.If(cond=lambda p: p.is_normal_post())
+        flow.If(cond=lambda act: act.process.is_normal_post())
         .Then(this.check_insurance)
         .Else(this.request_quotes)
     )
@@ -48,7 +48,7 @@ class ShipmentFlow(Flow):
         flow.View(
             views.ShipmentView,
             fields=["carrier_quote"])
-        .Assign(lambda p: p.created_by)
+        .Assign(lambda act: act.process.created_by)
         .Next(this.join_clerk_warehouse)
     )
 
@@ -56,7 +56,7 @@ class ShipmentFlow(Flow):
         flow.View(
             views.ShipmentView,
             fields=["need_insurance"])
-        .Assign(lambda p: p.created_by)
+        .Assign(lambda act: act.process.created_by)
         .Next('split_on_insurance')
     )
 
@@ -64,7 +64,7 @@ class ShipmentFlow(Flow):
         flow.Split()
         .Next(
             this.take_extra_insurance,
-            cond=lambda p: p.need_extra_insurance())
+            cond=lambda act: act.process.need_extra_insurance())
         .Always(this.fill_post_label)
     )
 
@@ -72,7 +72,7 @@ class ShipmentFlow(Flow):
         flow.View(
             views.ShipmentView,
             fields=["post_label"])
-        .Assign(lambda p: p.created_by)
+        .Assign(lambda act: act.process.created_by)
         .Next(this.join_on_insurance)
     )
 

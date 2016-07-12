@@ -69,13 +69,15 @@ class ManagedViewActivation(ViewActivation):
     def create_task(cls, flow_task, prev_activation, token):
         task = ViewActivation.create_task(flow_task, prev_activation, token)
 
+        activation = task.activate()
+
         # Try to assign permission
-        owner_permission = flow_task.calc_owner_permission(task)
+        owner_permission = flow_task.calc_owner_permission(activation)
         if owner_permission:
             task.owner_permission = owner_permission
 
         # Try to assign owner
-        owner = flow_task.calc_owner(task)
+        owner = flow_task.calc_owner(activation)
         if owner:
             task.owner = owner
             task.status = STATUS.ASSIGNED

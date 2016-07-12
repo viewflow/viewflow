@@ -85,7 +85,7 @@ class Test(TestCase):
             flow.Task(ShipmentFlow.package_goods).User('shipment/worker') \
                 .Execute()
 
-            # Manager takes extra insurance
+            # Manager takes extra insurance            
             flow.Task(ShipmentFlow.take_extra_insurance).User('shipment/manager') \
                 .Execute({'company_name': 'Test company',
                           'cost': 100}) \

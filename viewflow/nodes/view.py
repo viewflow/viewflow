@@ -214,20 +214,20 @@ class View(mixins.PermissionMixin, BaseView):
 
         return super(View, self).get_task_url(task, url_type, **kwargs)
 
-    def calc_owner(self, task):
+    def calc_owner(self, activation):
         from django.contrib.auth import get_user_model
 
         owner = self._owner
         if callable(owner):
-            owner = owner(task.process)
+            owner = owner(activation)
         elif isinstance(owner, dict):
             owner = get_user_model() ._default_manager.get(**owner)
         return owner
 
-    def calc_owner_permission(self, task):
+    def calc_owner_permission(self, activation):
         owner_permission = self._owner_permission
         if callable(owner_permission):
-            owner_permission = owner_permission(task.process)
+            owner_permission = owner_permission(activation)
         return owner_permission
 
     def can_assign(self, user, task):
