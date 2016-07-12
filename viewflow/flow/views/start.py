@@ -1,25 +1,20 @@
-from django.contrib import messages
 from django.core.exceptions import PermissionDenied
-from django.http import HttpResponseRedirect
 from django.views import generic
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext_lazy as _
-from django.utils.safestring import mark_safe
 
 from ...decorators import flow_start_view
-from ..activation import ManagedStartViewActivation
-from .base import get_next_task_url, get_process_hyperlink
+from .mixins import MessageUserMixin
+from .utils import get_next_task_url
 
 
-class StartViewMixin(object):
+class BaseStartFlowMixin(object):
 
     """Mixin for start views, that do not implement activation interface."""
 
     def get_context_data(self, **kwargs):
         """Add ``activation`` to context data."""
-        context = super(StartViewMixin, self).get_context_data(**kwargs)
-        context['activation'] = self.activation
-        return context
+        kwargs['activation'] = self.activation
+        return super(BaseStartFlowMixin, self).get_context_data(**kwargs)
 
     def get_success_url(self):
         return get_next_task_url(self.request, self.activation.process)
@@ -37,26 +32,6 @@ class StartViewMixin(object):
         """Finish activation."""
         self.activation.done()
 
-    def formset_valid(self, *args, **kwargs):
-        """Called if base class is :class:`extra_views.FormsetView`."""
-        super(StartViewMixin, self).formset_valid(*args, **kwargs)
-        self.activation_done(*args, **kwargs)
-        self._message_process_started()
-        return HttpResponseRedirect(self.get_success_url())
-
-    def forms_valid(self, *args, **kwargs):
-        """Called if base class is :class:`extra_views.InlineView`."""
-        super(StartViewMixin, self).forms_valid(*args, **kwargs)
-        self.activation_done(*args, **kwargs)
-        self._message_process_started()
-        return HttpResponseRedirect(self.get_success_url())
-
-    def form_valid(self, *args, **kwargs):
-        super(StartViewMixin, self).form_valid(*args, **kwargs)
-        self.activation_done(*args, **kwargs)
-        self._message_process_started()
-        return HttpResponseRedirect(self.get_success_url())
-
     @method_decorator(flow_start_view)
     def dispatch(self, request, **kwargs):
         """Check user permissions, and prepare flow to execution."""
@@ -65,15 +40,18 @@ class StartViewMixin(object):
             raise PermissionDenied
 
         self.activation.prepare(request.POST or None, user=request.user)
-        return super(StartViewMixin, self).dispatch(request, **kwargs)
-
-    def _message_process_started(self):
-        hyperlink = get_process_hyperlink(self.activation.process)
-        msg = _('Process {hyperlink} has been started.').format(hyperlink=hyperlink)
-        messages.info(self.request, mark_safe(msg), fail_silently=True)
+        return super(BaseStartFlowMixin, self).dispatch(request, **kwargs)
 
 
-class StartProcessView(ManagedStartViewActivation, StartViewMixin, generic.UpdateView):
+class StartFlowMixin(MessageUserMixin, BaseStartFlowMixin):
+    def form_valid(self, *args, **kwargs):
+        response = super(StartFlowMixin, self).form_valid(*args, **kwargs)
+        self.activation_done(*args, **kwargs)
+        self.success('Process {process} has been started.')
+        return response
+
+
+class StartFlowView(StartFlowMixin, generic.UpdateView):
     fields = []
 
     @property

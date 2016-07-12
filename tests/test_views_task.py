@@ -8,18 +8,17 @@ from viewflow import flow
 from viewflow.activation import STATUS
 from viewflow.base import Flow, this
 from viewflow.flow import views
-from viewflow.flow.views import list as list_views
 
 
 class Test(TestCase):
     def test_taskview_mixin_with_create_view(self):
-        class StartView(views.ViewMixin, generic.CreateView):
+        class FlowView(views.FlowViewMixin, generic.CreateView):
             model = TaskViewFlowEntity
             fields = []
 
         act = TaskViewTestFlow.start.run()
         task = act.process.get_task(TaskViewTestFlow.task)
-        view = StartView.as_view()
+        view = FlowView.as_view()
         user = User.objects.create(username='test', is_superuser=True)
 
         # unassigned redirect
@@ -53,8 +52,8 @@ class Test(TestCase):
         task.refresh_from_db()
         self.assertEqual(task.status, STATUS.DONE)
 
-    def test_processview(self):
-        view = views.ProcessView.as_view()
+    def test_flowview(self):
+        view = views.FlowView.as_view()
         user = User.objects.create(username='test', is_superuser=True)
 
         act = TaskViewTestFlow.start.run()
@@ -84,7 +83,7 @@ class Test(TestCase):
         self.assertEqual(task.status, STATUS.DONE)
 
     def test_assignview(self):
-        view = views.AssignView.as_view()
+        view = views.AssignTaskView.as_view()
         user = User.objects.create(username='test', is_superuser=True)
 
         act = TaskViewTestFlow.start.run()
@@ -136,10 +135,10 @@ class TaskViewFlowEntity(models.Model):
 urlpatterns = [
     url(r'^test/', include([
         TaskViewTestFlow.instance.urls,
-        url('^$', list_views.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', list_views.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', list_views.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', list_views.ProcessDetailView.as_view(), name='details'),
+        url('^$', views.ProcessListView.as_view(), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(), name='queue'),
+        url('^details/(?P<process_pk>\d+)/$', views.DetailProcessView.as_view(), name='details'),
     ], namespace=TaskViewTestFlow.instance.namespace), {'flow_cls': TaskViewTestFlow})
 ]
 

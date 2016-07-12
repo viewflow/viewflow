@@ -7,15 +7,12 @@ from django.views import generic
 from viewflow import flow
 from viewflow.activation import STATUS
 from viewflow.base import Flow, this
-from viewflow.flow.views import (
-    StartViewMixin, StartProcessView,
-    list as list_views)
-from viewflow.flow.activation import ManagedStartViewActivation
+from viewflow.flow import views
 
 
 class Test(TestCase):
     def test_startview_mixin_with_create_view(self):
-        class StartView(StartViewMixin, generic.CreateView):
+        class StartView(views.StartFlowMixin, generic.CreateView):
             model = StartViewFlowEntity
             fields = []
 
@@ -42,7 +39,7 @@ class Test(TestCase):
         process.get_task(StartViewTestFlow.start, status=[STATUS.DONE])
 
     def test_startprocess_view(self):
-        view = StartProcessView.as_view()
+        view = views.StartFlowView.as_view()
         user = User.objects.create(username='test', is_superuser=True)
 
         # get
@@ -77,10 +74,10 @@ class StartViewFlowEntity(models.Model):
 urlpatterns = [
     url(r'^test/', include([
         StartViewTestFlow.instance.urls,
-        url('^$', list_views.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', list_views.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', list_views.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', list_views.ProcessDetailView.as_view(), name='details'),
+        url('^$', views.ProcessListView.as_view(), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(), name='queue'),
+        url('^details/(?P<process_pk>\d+)/$', views.DetailProcessView.as_view(), name='details'),
     ], namespace=StartViewTestFlow.instance.namespace), {'flow_cls': StartViewTestFlow})
 ]
 

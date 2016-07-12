@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 from django.test import TestCase
 
-from viewflow import views as viewflow
+from viewflow.flow import views as viewflow
 from viewflow.test import FlowTest
 
 from .flows import HelloWorldFlow
@@ -34,8 +34,8 @@ urlpatterns = [
         url('^$', viewflow.ProcessListView.as_view(), name='index'),
         url('^tasks/$', viewflow.TaskListView.as_view(), name='tasks'),
         url('^queue/$', viewflow.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', viewflow.ProcessDetailView.as_view(), name='details'),
-        url('^action/cancel/(?P<process_pk>\d+)/$', viewflow.ProcessCancelView.as_view(), name='action_cancel'),
+        url('^details/(?P<process_pk>\d+)/$', viewflow.DetailProcessView.as_view(), name='details'),
+        url('^action/cancel/(?P<process_pk>\d+)/$', viewflow.CancelProcessView.as_view(), name='action_cancel'),
     ], namespace=HelloWorldFlow.instance.namespace), {'flow_cls': HelloWorldFlow}),
 ]
 

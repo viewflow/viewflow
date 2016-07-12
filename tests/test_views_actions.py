@@ -7,14 +7,13 @@ from viewflow import flow
 from viewflow.base import Flow, this
 from viewflow.activation import STATUS
 from viewflow.models import Task
-from viewflow.flow.views import actions, process, ProcessView, UnassignView
-from viewflow.flow.views import list as list_views
+from viewflow.flow import views
 
 
 class Test(TestCase):
     def test_process_cancel_view(self):
         act = ActionsTestFlow.start.run()
-        view = process.CancelView.as_view()
+        view = views.CancelProcessView.as_view()
 
         # get
         request = RequestFactory().get('/cancel/')
@@ -42,7 +41,7 @@ class Test(TestCase):
 
     def test_task_undo_view(self):
         act = ActionsTestFlow.start.run()
-        view = actions.UndoView.as_view()
+        view = views.UndoTaskView.as_view()
 
         # prepare the process with cancelable start action
         task = act.process.get_task(ActionsTestFlow.task, status=[STATUS.NEW])
@@ -81,7 +80,7 @@ class Test(TestCase):
 
     def test_task_cancel_view(self):
         act = ActionsTestFlow.start.run()
-        view = actions.CancelView.as_view()
+        view = views.CancelTaskView.as_view()
         task = act.process.get_task(ActionsTestFlow.task, status=[STATUS.NEW])
 
         # get
@@ -113,7 +112,7 @@ class Test(TestCase):
 
     def test_task_perform_view(self):
         act = ActionsTestFlow.start.run()
-        view = actions.PerformView.as_view()
+        view = views.PerformTaskView.as_view()
         if_gate = Task.objects.create(process=act.process, flow_task=ActionsTestFlow.if_gate)
 
         # get
@@ -147,7 +146,7 @@ class Test(TestCase):
 
     def test_task_activate_next_view(self):
         act = ActionsTestFlow.start.run()
-        view = actions.ActivateNextView.as_view()
+        view = views.ActivateNextTaskView.as_view()
         task = act.process.get_task(ActionsTestFlow.task, status=[STATUS.NEW])
         task.finished = timezone.now()
         task.status = STATUS.DONE
@@ -184,7 +183,7 @@ class Test(TestCase):
     def test_task_unassign_view(self):
         # prepare assigned task
         user = User.objects.create(username='test', is_superuser=True)
-        view = UnassignView.as_view()
+        view = views.UnassignTaskView.as_view()
 
         act = ActionsTestFlow.start.run()
         task = act.process.get_task(ActionsTestFlow.task, status=[STATUS.NEW])
@@ -222,17 +221,17 @@ class Test(TestCase):
 class ActionsTestFlow(Flow):
     start = flow.StartFunction().Next(this.task)
     if_gate = flow.If(lambda p: True).OnTrue(this.end).OnFalse(this.end)
-    task = flow.View(ProcessView, fields=[]).Next(this.end)
+    task = flow.View(views.FlowView, fields=[]).Next(this.end)
     end = flow.End()
 
 
 urlpatterns = [
     url(r'^test/', include([
         ActionsTestFlow.instance.urls,
-        url('^$', list_views.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', list_views.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', list_views.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', list_views.ProcessDetailView.as_view(), name='details'),
+        url('^$', views.ProcessListView.as_view(), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(), name='queue'),
+        url('^details/(?P<process_pk>\d+)/$', views.DetailProcessView.as_view(), name='details'),
     ], namespace=ActionsTestFlow.instance.namespace), {'flow_cls': ActionsTestFlow})
 ]
 

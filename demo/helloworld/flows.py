@@ -19,11 +19,11 @@ class HelloWorldFlow(Flow):
 
     summary_template = "'{{ process.text }}' message to the world"
 
-    start = flow.Start(flow_views.StartProcessView, fields=['text']) \
+    start = flow.Start(flow_views.StartFlowView, fields=['text']) \
         .Permission(auto_create=True) \
         .Next(this.approve)
 
-    approve = flow.View(flow_views.ProcessView, fields=['approved'],
+    approve = flow.View(flow_views.FlowView, fields=['approved'],
                         task_description="Message approvement required",
                         task_result_summary="Messsage was {{ process.approved|yesno:'Approved,Rejected' }}") \
         .Permission(auto_create=True) \

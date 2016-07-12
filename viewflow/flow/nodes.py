@@ -24,11 +24,11 @@ class StartFunction(nodes.StartFunction):
 
     """
 
-    activate_next_view_class = views.ActivateNextView
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    perform_view_class = views.PerformView
-    undo_view_class = views.UndoView
+    activate_next_view_class = views.ActivateNextTaskView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    perform_view_class = views.PerformTaskView
+    undo_view_class = views.UndoTaskView
 
 
 class Function(nodes.Function):
@@ -53,11 +53,11 @@ class Function(nodes.Function):
 
     """
 
-    activate_next_view_class = views.ActivateNextView
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    perform_view_class = views.PerformView
-    undo_view_class = views.UndoView
+    activate_next_view_class = views.ActivateNextTaskView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    perform_view_class = views.PerformTaskView
+    undo_view_class = views.UndoTaskView
 
 
 class Handler(nodes.Handler):
@@ -89,11 +89,11 @@ class Handler(nodes.Handler):
 
     """
 
-    activate_next_view_class = views.ActivateNextView
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    perform_view_class = views.PerformView
-    undo_view_class = views.UndoView
+    activate_next_view_class = views.ActivateNextTaskView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    perform_view_class = views.PerformTaskView
+    undo_view_class = views.UndoTaskView
 
 
 class If(nodes.If):
@@ -106,10 +106,10 @@ class If(nodes.If):
            .OnTrue(this.approved) \\
            .OnFalse(this.end)
     """
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    perform_view_class = views.PerformView
-    undo_view_class = views.UndoView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    perform_view_class = views.PerformTaskView
+    undo_view_class = views.UndoTaskView
 
 
 class Switch(nodes.Switch):
@@ -117,10 +117,10 @@ class Switch(nodes.Switch):
     Activates first path with matched condition
     """
 
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    perform_view_class = views.PerformView
-    undo_view_class = views.UndoView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    perform_view_class = views.PerformTaskView
+    undo_view_class = views.UndoTaskView
 
 
 class Join(nodes.Join):
@@ -136,10 +136,10 @@ class Join(nodes.Join):
 
     """
 
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    perform_view_class = views.PerformView
-    undo_view_class = views.UndoView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    perform_view_class = views.PerformTaskView
+    undo_view_class = views.UndoTaskView
 
 
 class Split(nodes.Split):
@@ -153,10 +153,10 @@ class Split(nodes.Split):
             .Next(this.perform_task_always)
     """
 
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    perform_view_class = views.PerformView
-    undo_view_class = views.UndoView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    perform_view_class = views.PerformTaskView
+    undo_view_class = views.UndoTaskView
 
 
 class AbstractJob(nodes.AbstractJob):
@@ -164,10 +164,10 @@ class AbstractJob(nodes.AbstractJob):
     Base task fro background jobs
     """
 
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    perform_view_class = views.PerformView
-    undo_view_class = views.UndoView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    perform_view_class = views.PerformTaskView
+    undo_view_class = views.UndoTaskView
 
 
 class StartSignal(nodes.StartSignal):
@@ -190,9 +190,9 @@ class StartSignal(nodes.StartSignal):
 
     """
 
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    undo_view_class = views.UndoView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
 
 
 class Signal(nodes.Signal):
@@ -211,9 +211,9 @@ class Signal(nodes.Signal):
 
     """
 
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    undo_view_class = views.UndoView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
 
 
 class Start(nodes.Start):
@@ -253,11 +253,11 @@ class Start(nodes.Start):
                   <button type="submit"/>
              </form>
     """
-    activate_next_view_class = views.ActivateNextView
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    undo_view_class = views.UndoView
-    start_view_class = views.StartProcessView
+    activate_next_view_class = views.ActivateNextTaskView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
+    start_view_class = views.StartFlowView
 
     activation_cls = ManagedStartViewActivation
 
@@ -299,12 +299,12 @@ class View(nodes.View):
                   <button type="submit"/>
              </form>
     """
-    activate_next_view_class = views.ActivateNextView
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    undo_view_class = views.UndoView
-    assign_view_class = views.AssignView
-    unassign_view_class = views.UnassignView
+    activate_next_view_class = views.ActivateNextTaskView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
+    assign_view_class = views.AssignTaskView
+    unassign_view_class = views.UnassignTaskView
 
     activation_cls = ManagedViewActivation
 
@@ -314,7 +314,7 @@ class End(nodes.End):
     End process event.
     """
 
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    perform_view_class = views.PerformView
-    undo_view_class = views.UndoView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    perform_view_class = views.PerformTaskView
+    undo_view_class = views.UndoTaskView

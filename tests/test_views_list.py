@@ -6,25 +6,27 @@ from django.utils import timezone
 from viewflow import flow
 from viewflow.base import Flow, this
 from viewflow.models import Task, Process
-from viewflow.flow.views import list
+from viewflow.flow import views
+from viewflow.flow.views.utils import flow_start_actions, flows_start_actions
+from viewflow.flow.views.list import TaskFilter
 
 
 class Test(TestCase):
     def test_flow_start_actions(self):
         user = User.objects.create(username='superuser', is_superuser=True)
-        actions = list.flow_start_actions(ListViewTestFlow, user)
+        actions = flow_start_actions(ListViewTestFlow, user)
 
         self.assertEqual(actions, [
             ('/test/start2/', 'start2'),
             ('/test/start3/', 'start3')])
 
         user = User.objects.create(username='user', is_superuser=False)
-        actions = list.flow_start_actions(ListViewTestFlow, user)
+        actions = flow_start_actions(ListViewTestFlow, user)
         self.assertEqual(actions, [('/test/start3/', 'start3')])
 
     def test_flows_start_actions(self):
         user = User.objects.create(username='superuser', is_superuser=True)
-        actions = list.flows_start_actions([ListViewTestFlow], user)
+        actions = flows_start_actions([ListViewTestFlow], user)
 
         self.assertEqual(actions, {
             ListViewTestFlow: [
@@ -40,13 +42,13 @@ class Test(TestCase):
 
         # filter by current year
         with self.assertNumQueries(2):
-            task_filter = list.TaskFilter({'created': 4}, Task.objects.all())
+            task_filter = TaskFilter({'created': 4}, Task.objects.all())
             str(task_filter.form)
 
         self.assertEqual([task for task in task_filter.qs], [task2])
 
     def test_all_processlist_view(self):
-        view = list.AllProcessListView.as_view()
+        view = views.AllProcessListView.as_view()
 
         request = RequestFactory().get('/processes/')
         request.user = User(username='test', is_superuser=True)
@@ -55,7 +57,7 @@ class Test(TestCase):
         self.assertEqual(response.template_name, 'viewflow/site_index.html')
 
     def test_all_tasklist_view(self):
-        view = list.AllTaskListView.as_view()
+        view = views.AllTaskListView.as_view()
 
         request = RequestFactory().get('/tasks/')
         request.user = User(username='test', is_superuser=True)
@@ -64,7 +66,7 @@ class Test(TestCase):
         self.assertEqual(response.template_name, 'viewflow/site_tasks.html')
 
     def test_all_queuelist_view(self):
-        view = list.AllQueueListView.as_view()
+        view = views.AllQueueListView.as_view()
 
         request = RequestFactory().get('/queues/')
         request.user = User(username='test', is_superuser=True)
@@ -73,7 +75,7 @@ class Test(TestCase):
         self.assertEqual(response.template_name, 'viewflow/site_queue.html')
 
     def test_all_archivelist_view(self):
-        view = list.AllArchiveListView.as_view()
+        view = views.AllArchiveListView.as_view()
 
         request = RequestFactory().get('/archives/')
         request.user = User(username='test', is_superuser=True)
@@ -82,7 +84,7 @@ class Test(TestCase):
         self.assertEqual(response.template_name, 'viewflow/site_archive.html')
 
     def test_processlist_view(self):
-        view = list.ProcessListView.as_view()
+        view = views.ProcessListView.as_view()
 
         request = RequestFactory().get('/process_list/')
         request.user = User(username='test', is_superuser=True)
@@ -94,7 +96,7 @@ class Test(TestCase):
 
     def test_processdetail_view(self):
         process = Process.objects.create(flow_cls=ListViewTestFlow)
-        view = list.ProcessDetailView.as_view()
+        view = views.DetailProcessView.as_view()
 
         request = RequestFactory().get('/process/')
         request.user = User(username='test', is_superuser=True)
@@ -106,7 +108,7 @@ class Test(TestCase):
                           'viewflow/flow/process_details.html'))
 
     def test_tasklist_view(self):
-        view = list.TaskListView.as_view()
+        view = views.TaskListView.as_view()
 
         request = RequestFactory().get('/task_list/')
         request.user = User(username='test', is_superuser=True)
@@ -118,7 +120,7 @@ class Test(TestCase):
                           'viewflow/flow/task_list.html'))
 
     def test_queuelist_view(self):
-        view = list.QueueListView.as_view()
+        view = views.QueueListView.as_view()
 
         request = RequestFactory().get('/task_list/')
         request.user = User(username='test', is_superuser=True)
@@ -141,10 +143,10 @@ class ListViewTestFlow(Flow):
 urlpatterns = [
     url(r'^test/', include([
         ListViewTestFlow.instance.urls,
-        url('^$', list.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', list.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', list.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', list.ProcessDetailView.as_view(), name='details'),
+        url('^$', views.ProcessListView.as_view(), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(), name='queue'),
+        url('^details/(?P<process_pk>\d+)/$', views.DetailProcessView.as_view(), name='details'),
     ], namespace=ListViewTestFlow.instance.namespace), {'flow_cls': ListViewTestFlow})
 ]
 

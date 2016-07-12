@@ -1,7 +1,4 @@
-from collections import OrderedDict
-
 from django.views import generic
-from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
@@ -9,34 +6,8 @@ from django_filters import FilterSet, ChoiceFilter, DateRangeFilter, ModelChoice
 
 from ... import activation, models
 from ...fields import import_task_by_ref
-from .base import FlowViewPermissionMixin
-
-
-def flow_start_actions(flow_cls, user=None):
-    """Return list of start flow actions data available."""
-    actions = []
-    from ... import flow  # TODO
-    for node in flow_cls._meta.nodes():
-        if isinstance(node, flow.Start) and (user is None or node.can_execute(user)):
-            node_url = reverse('{}:{}'.format(flow_cls.instance.namespace, node.name))
-            actions.append((node_url, node.name))
-
-    actions.sort(key=lambda action: action[0])
-    return actions
-
-
-def flows_start_actions(flow_classes, user=None):
-    actions = OrderedDict()
-
-    for flow_cls in sorted(flow_classes, key=lambda flow_cls: flow_cls.process_title):
-        actions[flow_cls] = flow_start_actions(flow_cls, user)
-    return actions
-
-
-class LoginRequiredMixin(object):
-    @method_decorator(login_required)
-    def dispatch(self, *args, **kwargs):
-        return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
+from .mixins import LoginRequiredMixin, FlowViewPermissionMixin
+from .utils import flows_start_actions, flow_start_actions
 
 
 class TaskFilter(FilterSet):
@@ -213,31 +184,6 @@ class ProcessListView(FlowViewPermissionMixin, generic.ListView):
         self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
         self.filter = ProcessFilter(request.GET, self.get_base_queryset(request.user))
         return super(ProcessListView, self).dispatch(request, *args, **kwargs)
-
-
-class ProcessDetailView(FlowViewPermissionMixin, generic.DetailView):
-
-    """Details for process."""
-
-    context_object_name = 'process'
-    pk_url_kwarg = 'process_pk'
-
-    def get_template_names(self):
-        opts = self.flow_cls._meta
-
-        return (
-            '{}/{}/process_details.html'.format(opts.app_label, opts.flow_label),
-            'viewflow/flow/process_details.html')
-
-    def get_context_data(self, **kwargs):
-        context = super(ProcessDetailView, self).get_context_data(**kwargs)
-        context['start_actions'] = flow_start_actions(self.flow_cls, self.request.user)
-        context['flow_cls'] = self.flow_cls
-        context['task_list'] = context['process'].task_set.all().order_by('created')
-        return context
-
-    def get_queryset(self):
-        return self.flow_cls.process_cls._default_manager.all()
 
 
 class TaskListView(FlowViewPermissionMixin, generic.ListView):

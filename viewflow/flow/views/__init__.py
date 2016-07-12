@@ -1,21 +1,27 @@
-from .actions import UndoView, CancelView, PerformView, ActivateNextView
-from .base import DetailsView, get_next_task_url
+from .actions import (
+    UndoTaskView, CancelTaskView, PerformTaskView,
+    ActivateNextTaskView, CancelProcessView
+)
+from .detail import DetailTaskView, DetailProcessView
 from .list import (
     AllProcessListView, AllTaskListView, AllQueueListView, AllArchiveListView,
-    ProcessListView, ProcessDetailView, TaskListView, QueueListView,
+    ProcessListView, TaskListView, QueueListView,
 )
-from .process import CancelView as ProcessCancelView
-from .start import StartViewMixin, StartProcessView
+from .start import StartFlowMixin, StartFlowView
 from .task import (
-    ViewMixin, ProcessView,
-    AssignView, UnassignView
+    FlowViewMixin, FlowView,
+    AssignTaskView, UnassignTaskView
 )
+from .utils import get_next_task_url
+
 
 __all__ = [
-    'UndoView', 'CancelView', 'PerformView', 'ActivateNextView',
-    'StartViewMixin', 'StartProcessView', 'ViewMixin',  'ProcessView',
-    'AssignView', 'UnassignView', 'DetailsView', 'ProcessCancelView',
-    'AllProcessListView', 'AllTaskListView', 'AllQueueListView', 'AllArchiveListView',
-    'ProcessListView', 'ProcessDetailView', 'TaskListView', 'QueueListView',
-    'get_next_task_url'
+    'ActivateNextTaskView', 'AllArchiveListView',
+    'AllProcessListView', 'AllQueueListView', 'AllTaskListView',
+    'AssignTaskView', 'CancelProcessView', 'CancelTaskView',
+    'DetailProcessView', 'DetailTaskView', 'FlowView',
+    'FlowViewMixin', 'PerformTaskView', 'ProcessListView',
+    'QueueListView', 'StartFlowMixin', 'StartFlowView',
+    'TaskListView', 'UnassignTaskView', 'UndoTaskView',
+    'get_next_task_url',
 ]

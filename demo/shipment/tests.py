@@ -2,7 +2,7 @@ from django.conf.urls import include, url
 from django.test import TestCase
 
 from viewflow.models import Task
-from viewflow import views as viewflow
+from viewflow.flow import views as viewflow
 from viewflow.test import FlowTest
 
 from .flows import ShipmentFlow
@@ -103,7 +103,7 @@ urlpatterns = [
         url('^$', viewflow.ProcessListView.as_view(), name='index'),
         url('^tasks/$', viewflow.TaskListView.as_view(), name='tasks'),
         url('^queue/$', viewflow.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', viewflow.ProcessDetailView.as_view(), name='details'),
+        url('^details/(?P<process_pk>\d+)/$', viewflow.DetailProcessView.as_view(), name='details'),
     ], namespace=ShipmentFlow.instance.namespace), {'flow_cls': ShipmentFlow}),
 ]
 

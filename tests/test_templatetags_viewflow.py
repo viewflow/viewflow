@@ -72,7 +72,7 @@ except ImportError:
 
 class TestTemplateTagsFlow(Flow):
     start = flow.StartFunction().Next(this.view)
-    view = flow.View(views.ProcessView).Next(this.end)
+    view = flow.View(views.FlowView).Next(this.end)
     end = flow.End()
 
 
@@ -82,7 +82,7 @@ urlpatterns = [
         url('^$', views.ProcessListView.as_view(), name='index'),
         url('^tasks/$', views.TaskListView.as_view(), name='tasks'),
         url('^queue/$', views.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', views.ProcessDetailView.as_view(), name='details'),
-        url('^action/cancel/(?P<process_pk>\d+)/$', views.ProcessCancelView.as_view(), name='action_cancel'),
+        url('^details/(?P<process_pk>\d+)/$', views.DetailProcessView.as_view(), name='details'),
+        url('^action/cancel/(?P<process_pk>\d+)/$', views.CancelProcessView.as_view(), name='action_cancel'),
     ], namespace=TestTemplateTagsFlow.instance.namespace), {'flow_cls': TestTemplateTagsFlow}),
 ]
