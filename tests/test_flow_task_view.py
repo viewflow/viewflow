@@ -3,7 +3,7 @@ from datetime import datetime
 
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
-from django.test import TestCase
+from django.test import TestCase, RequestFactory
 
 from viewflow import flow
 from viewflow.base import Flow
@@ -18,14 +18,15 @@ class Test(TestCase):
         process = Process.objects.create(flow_cls=TaskTestFlow)
         task = Task.objects.create(process=process, flow_task=TaskTestFlow.task)
 
-        @flow_view()
-        def test_view(request, activation):
-            activation.assign()
-            activation.prepare()
-            activation.done()
-            return activation
+        @flow_view
+        def test_view(request):
+            request.activation.assign()
+            request.activation.prepare()
+            request.activation.done()
+            return request.activation
 
-        act = test_view(None, TaskTestFlow, TaskTestFlow.task, process.pk, task.pk)
+        request = RequestFactory().get('')
+        act = test_view(request, TaskTestFlow, TaskTestFlow.task, process.pk, task.pk)
         self.assertEqual(act.task.status, STATUS.DONE)
 
     def test_managed_view_activation_prepare(self):

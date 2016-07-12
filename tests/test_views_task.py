@@ -4,16 +4,16 @@ from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
 from django.views import generic
 
-from viewflow import flow, views
+from viewflow import flow
 from viewflow.activation import STATUS
 from viewflow.base import Flow, this
-from viewflow.flow.activation import ManagedViewActivation
-from viewflow.flow.views import ViewMixin, ActivationViewMixin, ProcessView, AssignView
+from viewflow.flow import views
+from viewflow.flow.views import list as list_views
 
 
 class Test(TestCase):
     def test_taskview_mixin_with_create_view(self):
-        class StartView(ViewMixin, generic.CreateView):
+        class StartView(views.ViewMixin, generic.CreateView):
             model = TaskViewFlowEntity
             fields = []
 
@@ -24,49 +24,7 @@ class Test(TestCase):
 
         # unassigned redirect
         request = RequestFactory().get('/start/')
-        request.user = user        
-        response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
-                        process_pk=act.process.pk, task_pk=task.pk)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/test/{}/task/{}/details/'.format(act.process.pk, task.pk))
-
-        # assigned get
-        act = task.activate()
-        act.assign(user=user)
-
-        request = RequestFactory().get('/start/')
         request.user = user
-        response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
-                        process_pk=act.process.pk, task_pk=task.pk)
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.template_name,
-                         ('tests/test_views_task/taskviewtest/task.html',
-                          'tests/test_views_task/taskviewtest/task.html',
-                          'viewflow/flow/task.html'))
-        # assigned post
-        request = RequestFactory().post('/task/')
-        request.user = user
-        response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
-                        process_pk=act.process.pk, task_pk=task.pk)
-        self.assertEqual(response.status_code, 302)
-
-        task.refresh_from_db()
-        self.assertEqual(task.status, STATUS.DONE)
-
-    def test_taskactivationview_mixin_with_create_view(self):
-        class TaskView(ManagedViewActivation, ActivationViewMixin, generic.CreateView):
-            model = TaskViewFlowEntity
-            fields = []
-
-        act = TaskViewTestFlow.start.run()
-        task = act.process.get_task(TaskViewTestFlow.task)
-        view = TaskView.as_view()
-        user = User.objects.create(username='test', is_superuser=True)
-
-        # unassigned redirect
-        request = RequestFactory().get('/start/')
-        request.user = user
-
         response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 302)
@@ -96,7 +54,7 @@ class Test(TestCase):
         self.assertEqual(task.status, STATUS.DONE)
 
     def test_processview(self):
-        view = ProcessView.as_view()
+        view = views.ProcessView.as_view()
         user = User.objects.create(username='test', is_superuser=True)
 
         act = TaskViewTestFlow.start.run()
@@ -126,7 +84,7 @@ class Test(TestCase):
         self.assertEqual(task.status, STATUS.DONE)
 
     def test_assignview(self):
-        view = AssignView.as_view()
+        view = views.AssignView.as_view()
         user = User.objects.create(username='test', is_superuser=True)
 
         act = TaskViewTestFlow.start.run()
@@ -178,10 +136,10 @@ class TaskViewFlowEntity(models.Model):
 urlpatterns = [
     url(r'^test/', include([
         TaskViewTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', views.ProcessDetailView.as_view(), name='details'),
+        url('^$', list_views.ProcessListView.as_view(), name='index'),
+        url('^tasks/$', list_views.TaskListView.as_view(), name='tasks'),
+        url('^queue/$', list_views.QueueListView.as_view(), name='queue'),
+        url('^details/(?P<process_pk>\d+)/$', list_views.ProcessDetailView.as_view(), name='details'),
     ], namespace=TaskViewTestFlow.instance.namespace), {'flow_cls': TaskViewTestFlow})
 ]
 

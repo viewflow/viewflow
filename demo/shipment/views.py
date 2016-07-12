@@ -9,7 +9,7 @@ from viewflow.flow.views import ViewMixin, get_next_task_url
 from .models import Shipment, ShipmentItem, Insurance
 
 
-@flow_start_view()
+@flow_start_view
 def start_view(request, activation):
     form_cls = modelform_factory(Shipment, fields=[
         'shipment_no', 'first_name', 'last_name',

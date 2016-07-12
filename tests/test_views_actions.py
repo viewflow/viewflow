@@ -3,11 +3,12 @@ from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
 from django.utils import timezone
 
-from viewflow import flow, views
+from viewflow import flow
 from viewflow.base import Flow, this
 from viewflow.activation import STATUS
 from viewflow.models import Task
 from viewflow.flow.views import actions, process, ProcessView, UnassignView
+from viewflow.flow.views import list as list_views
 
 
 class Test(TestCase):
@@ -228,10 +229,10 @@ class ActionsTestFlow(Flow):
 urlpatterns = [
     url(r'^test/', include([
         ActionsTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', views.ProcessDetailView.as_view(), name='details'),
+        url('^$', list_views.ProcessListView.as_view(), name='index'),
+        url('^tasks/$', list_views.TaskListView.as_view(), name='tasks'),
+        url('^queue/$', list_views.QueueListView.as_view(), name='queue'),
+        url('^details/(?P<process_pk>\d+)/$', list_views.ProcessDetailView.as_view(), name='details'),
     ], namespace=ActionsTestFlow.instance.namespace), {'flow_cls': ActionsTestFlow})
 ]
 

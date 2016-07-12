@@ -7,7 +7,7 @@ from django.utils.decorators import method_decorator
 from django.utils.translation import ugettext_lazy as _
 from django_filters import FilterSet, ChoiceFilter, DateRangeFilter, ModelChoiceFilter
 
-from ... import activation, flow, models
+from ... import activation, models
 from ...fields import import_task_by_ref
 from .base import FlowViewPermissionMixin
 
@@ -15,6 +15,7 @@ from .base import FlowViewPermissionMixin
 def flow_start_actions(flow_cls, user=None):
     """Return list of start flow actions data available."""
     actions = []
+    from ... import flow  # TODO
     for node in flow_cls._meta.nodes():
         if isinstance(node, flow.Start) and (user is None or node.can_execute(user)):
             node_url = reverse('{}:{}'.format(flow_cls.instance.namespace, node.name))

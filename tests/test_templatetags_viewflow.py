@@ -5,8 +5,8 @@ from django.template import Template, Context
 from django.test import TestCase
 
 from viewflow import flow
-from viewflow import views as viewflow
 from viewflow.base import this, Flow
+from viewflow.flow import views
 
 
 class Test(TestCase):
@@ -72,17 +72,17 @@ except ImportError:
 
 class TestTemplateTagsFlow(Flow):
     start = flow.StartFunction().Next(this.view)
-    view = flow.View(viewflow.ProcessView).Next(this.end)
+    view = flow.View(views.ProcessView).Next(this.end)
     end = flow.End()
 
 
 urlpatterns = [
     url(r'^test_tempaltetags/', include([
         TestTemplateTagsFlow.instance.urls,
-        url('^$', viewflow.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', viewflow.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', viewflow.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', viewflow.ProcessDetailView.as_view(), name='details'),
-        url('^action/cancel/(?P<process_pk>\d+)/$', viewflow.ProcessCancelView.as_view(), name='action_cancel'),
+        url('^$', views.ProcessListView.as_view(), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(), name='queue'),
+        url('^details/(?P<process_pk>\d+)/$', views.ProcessDetailView.as_view(), name='details'),
+        url('^action/cancel/(?P<process_pk>\d+)/$', views.ProcessCancelView.as_view(), name='action_cancel'),
     ], namespace=TestTemplateTagsFlow.instance.namespace), {'flow_cls': TestTemplateTagsFlow}),
 ]

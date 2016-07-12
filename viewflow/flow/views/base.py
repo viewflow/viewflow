@@ -4,6 +4,7 @@ from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
 from django.utils.http import is_safe_url
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -115,9 +116,9 @@ class DetailsView(generic.TemplateView):
         context['activation'] = self.activation
         return context
 
-    @flow_view()
-    def dispatch(self, request, activation, *args, **kwargs):
-        self.activation = activation
+    @method_decorator(flow_view)
+    def dispatch(self, request, *args, **kwargs):
+        self.activation = request.activation
 
         if not self.activation.flow_task.can_view(request.user, self.activation.task):
             raise PermissionDenied
@@ -160,10 +161,10 @@ class BaseTaskActionView(generic.TemplateView):
         else:
             return self.get(request, *args, **kwargs)
 
-    @flow_view()
-    def dispatch(self, request, activation, **kwargs):
-        self.flow_cls = activation.flow_cls
-        self.activation = activation
+    @method_decorator(flow_view)
+    def dispatch(self, request, **kwargs):
+        self.activation = request.activation
+        self.flow_cls = self.activation.flow_cls
 
         if not self.can_proceed():
             hyperlink = get_task_hyperlink(self.activation.task, self.request.user)
@@ -171,6 +172,7 @@ class BaseTaskActionView(generic.TemplateView):
                 .format(hyperlink=hyperlink, action=self.action_name.title)
             messages.error(request, mark_safe(msg), fail_silently=True)
 
-            return redirect(activation.flow_task.get_task_url(activation.task, url_type='details', user=request.user))
+            return redirect(self.activation.flow_task.get_task_url(
+                self.activation.task, url_type='details', user=request.user))
 
         return super(BaseTaskActionView, self).dispatch(request, **kwargs)

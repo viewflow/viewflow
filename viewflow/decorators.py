@@ -1,14 +1,10 @@
 import traceback
 import functools
 
-from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from .import types
-from .activation import (
-    StartActivation, ViewActivation, FuncActivation,
-    AbstractJobActivation, STATUS
-)
+from .activation import FuncActivation, AbstractJobActivation, STATUS
 from .exceptions import FlowRuntimeError
 from .fields import import_task_by_ref
 
@@ -213,95 +209,46 @@ def flow_signal(task_loader=None, allow_skip_signals=False, **lock_args):
     return decorator
 
 
-def flow_start_view():
+def flow_start_view(view):
     """
     Decorator for start views, creates and initializes start activation
 
-    Expects view with the signature `(request, activation, **kwargs)`
-    or CBV view that implements ViewActivation, in this case, dispatch
-    would be called with `(request, **kwargs)`
-
-    Returns `(request, flow_task, **kwargs)`
+    Expects view with the signature `(request, **kwargs)`
+    Returns view with the signature `(request, flow_cls, flow_task, **kwargs)`
     """
-    class StartViewDecorator(object):
-        def __init__(self, func, activation=None):
-            self.func = func
-            self.activation = activation
-            functools.update_wrapper(self, func)
 
-        def __call__(self, request, flow_cls, flow_task, **kwargs):
-            if self.activation:
-                self.activation.initialize(flow_task, None)
-                with transaction.atomic():
-                    return self.func(request, **kwargs)
-            else:
-                activation = flow_task.activation_cls()
-                activation.initialize(flow_task, None)
-                with transaction.atomic():
-                    return self.func(request, activation, **kwargs)
+    @functools.wraps(view)
+    def _wrapper(request, flow_cls, flow_task, **kwargs):
+            activation = flow_task.activation_cls()
+            activation.initialize(flow_task, None)
 
-        def __get__(self, instance, instancetype):
-            """
-            If we decorate method on CBV that implements StartActivation interface,
-            no custom activation is required.
-            """
-            if instance is None:
-                return self
+            request.activation = activation
+            request.process = activation.process
+            request.task = activation.task
 
-            func = self.func.__get__(instance, type)
-            activation = instance if isinstance(instance, StartActivation) else None
-
-            return self.__class__(func, activation=activation)
-
-    return StartViewDecorator
+            return view(request, **kwargs)
+    return _wrapper
 
 
-def flow_view(**lock_args):
+def flow_view(view):
     """
     Decorator that locks and runs the flow view in transaction.
 
-    Expects view with the signature `(request, activation, **kwargs)`
-    or CBV view that implements TaskActivation, in this case, dispatch
-    with would be called with `(request, **kwargs)`
-
-    Returns `(request, flow_task, process_pk, task_pk, **kwargs)`
+    Expects view with the signature `(request, **kwargs)`
+    Returns view with the signature `(request, flow_cls, flow_task, process_pk, task_pk, **kwargs)
     """
-    class flow_view_decorator(object):
-        def __init__(self, func, activation=None):
-            self.func = func
-            self.activation = activation
-            functools.update_wrapper(self, func)
 
-        def __call__(self, request, flow_cls, flow_task, process_pk, task_pk, **kwargs):
-            lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
-            with lock(flow_task.flow_cls, process_pk):
-                task = get_object_or_404(flow_task.flow_cls.task_cls._default_manager, pk=task_pk)
+    @functools.wraps(view)
+    def _wrapper(request, flow_cls, flow_task, process_pk, task_pk, **kwargs):
+        lock = flow_task.flow_cls.lock_impl(flow_cls.instance)
+        with lock(flow_cls, process_pk):
+            task = get_object_or_404(flow_task.flow_cls.task_cls._default_manager, pk=task_pk)
+            activation = flow_task.activation_cls()
+            activation.initialize(flow_task, task)
 
-                if self.activation:
-                    """
-                    Class-based view that implements TaskActivation interface
-                    """
-                    self.activation.initialize(flow_task, task)
-                    return self.func(request, **kwargs)
-                else:
-                    """
-                    Function based view or CBV without TaskActvation interface implementation
-                    """
-                    activation = flow_task.activation_cls()
-                    activation.initialize(flow_task, task)
-                    return self.func(request, activation, **kwargs)
+            request.activation = activation
+            request.process = activation.process
+            request.task = activation.task
 
-        def __get__(self, instance, instancetype):
-            """
-            If we decorate method on CBV that implements StartActivation interface,
-            no custom activation is required.
-            """
-            if instance is None:
-                return self
-
-            func = self.func.__get__(instance, type)
-            activation = instance if isinstance(instance, ViewActivation) else None
-
-            return self.__class__(func, activation=activation)
-
-    return flow_view_decorator
+            return view(request, **kwargs)
+    return _wrapper
