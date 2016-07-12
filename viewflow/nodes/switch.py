@@ -11,7 +11,7 @@ class SwitchActivation(AbstractGateActivation):
     def calculate_next(self):
         for node, cond in self.flow_task.branches:
             if cond:
-                if cond(self.process):
+                if cond(self):
                     self.next_task = node
                     break
             else:

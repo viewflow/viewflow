@@ -8,7 +8,7 @@ class IfActivation(AbstractGateActivation):
         super(IfActivation, self).__init__(**kwargs)
 
     def calculate_next(self):
-        self.condition_result = self.flow_task.condition(self.process)
+        self.condition_result = self.flow_task.condition(self)
 
     def activate_next(self):
         if self.condition_result:

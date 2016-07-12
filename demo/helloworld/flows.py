@@ -37,7 +37,7 @@ class HelloWorldFlow(Flow):
     )
 
     check_approve = (
-        flow.If(cond=lambda p: p.approved)
+        flow.If(cond=lambda act: act.process.approved)
         .Then(this.send)
         .Else(this.end)
     )

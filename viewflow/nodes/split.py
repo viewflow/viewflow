@@ -12,7 +12,7 @@ class SplitActivation(AbstractGateActivation):
     def calculate_next(self):
         for node, cond in self.flow_task.branches:
             if cond:
-                if cond(self.process):
+                if cond(self):
                     self.next_tasks.append(node)
             else:
                 self.next_tasks.append(node)
