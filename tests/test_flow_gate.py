@@ -22,7 +22,7 @@ class Test(TestCase):
 
     def test_if_activation_activate_true(self):
         next_task = FlowTaskStub()
-        flow_task = self.init_node(If(lambda process: True).OnTrue(next_task))
+        flow_task = self.init_node(If(lambda process: True).Then(next_task))
 
         act = IfActivation()
         act.initialize(flow_task, TaskStub())
@@ -32,7 +32,7 @@ class Test(TestCase):
 
     def test_if_activation_activate_false(self):
         next_task = FlowTaskStub()
-        flow_task = self.init_node(If(lambda process: False).OnFalse(next_task))
+        flow_task = self.init_node(If(lambda process: False).Else(next_task))
 
         act = IfActivation()
         act.initialize(flow_task, TaskStub())

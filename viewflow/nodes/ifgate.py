@@ -41,11 +41,11 @@ class If(mixins.TaskDescriptionMixin,
         self._on_true = resolver.get_implementation(self._on_true)
         self._on_false = resolver.get_implementation(self._on_false)
 
-    def OnTrue(self, node):
+    def Then(self, node):
         self._on_true = node
         return self
 
-    def OnFalse(self, node):
+    def Else(self, node):
         self._on_false = node
         return self
 

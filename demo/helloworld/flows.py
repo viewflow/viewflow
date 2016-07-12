@@ -19,21 +19,29 @@ class HelloWorldFlow(Flow):
 
     summary_template = "'{{ process.text }}' message to the world"
 
-    start = flow.Start(flow_views.StartFlowView, fields=['text']) \
-        .Permission(auto_create=True) \
+    start = (
+        flow.Start(
+            flow_views.StartFlowView,
+            fields=['text'])
+        .Permission(auto_create=True)
         .Next(this.approve)
+    )
 
-    approve = flow.View(flow_views.FlowView, fields=['approved'],
-                        task_description="Message approvement required",
-                        task_result_summary="Messsage was {{ process.approved|yesno:'Approved,Rejected' }}") \
-        .Permission(auto_create=True) \
+    approve = (
+        flow.View(
+            flow_views.FlowView, fields=['approved'],
+            task_description="Message approvement required",
+            task_result_summary="Messsage was {{ process.approved|yesno:'Approved,Rejected' }}")
+        .Permission(auto_create=True)
         .Next(this.check_approve)
+    )
 
-    check_approve = flow.If(cond=lambda p: p.approved) \
-        .OnTrue(this.send) \
-        .OnFalse(this.end)
+    check_approve = (
+        flow.If(cond=lambda p: p.approved)
+        .Then(this.send)
+        .Else(this.end)
+    )
 
-    send = celery.Job(send_hello_world_request) \
-        .Next(this.end)
+    send = celery.Job(send_hello_world_request).Next(this.end)
 
     end = flow.End()
