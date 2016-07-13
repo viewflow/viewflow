@@ -9,45 +9,34 @@ from .exceptions import FlowRuntimeError
 from .fields import import_task_by_ref
 
 
-def flow_func(task_loader=None, **lock_args):
-    """Decorator for flow functions."""
-    def decorator(func_or_cls):
-        def wrapper(flow_task, *func_args, **func_kwargs):
-            if isinstance(func_or_cls, type) and issubclass(func_or_cls, types.FlowFunc):
-                receiver_cls = func_or_cls
-            else:
-                class FuncWrapper(types.FlowFunc):
-                    def get_task(self, flow_task, *func_args, **func_kwargs):
-                        return task_loader(flow_task, *func_args, **func_kwargs)
+def flow_start_func(func):
+    @functools.wraps(func)
+    def _wrapper(flow_task, *args, **kwargs):
+        activation = flow_task.activation_cls()
+        activation.initialize(flow_task, None)
+        return func(activation, *args, **kwargs)
+    return _wrapper
 
-                    def __call__(self, activation, *func_args, **func_kwargs):
-                        return func_or_cls(activation, *func_args, **func_kwargs)
 
-                receiver_cls = FuncWrapper
+def flow_func(func):
+    """
+    Decorator for flow functions.
 
-            receiver = receiver_cls()
+    Expect function that gets activation instance as the first parameter,
+    Returns function that expects task instance as the first parameter instead
+    """
+    @functools.wraps(func)
+    def _wrapper(task, *args, **kwargs):
+        flow_task = task.flow_task
+        flow_cls = flow_task.flow_cls
 
-            task = receiver.get_task(flow_task, *func_args, **func_kwargs)
-            if task is None:
-                raise FlowRuntimeError(
-                    "The task_loader didn't return any task for {}\n{}\n{}".format(
-                        flow_task.name, func_args, func_kwargs))
-
-            lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
-
-            with lock(flow_task.flow_cls, task.process_id):
-                task = flow_task.flow_cls.task_cls._default_manager.get(pk=task.pk)
-                if isinstance(receiver, FuncActivation):
-                    receiver.initialize(flow_task, task)
-                    return receiver(*func_args, **func_kwargs)
-                else:
-                    activation = flow_task.activation_cls()
-                    activation.initialize(flow_task, task)
-                    return receiver(activation, *func_args, **func_kwargs)
-
-        return wrapper
-
-    return decorator
+        lock = flow_cls.lock_impl(flow_cls.instance)
+        with lock(flow_cls, task.process_id):
+            task = flow_cls.task_cls._default_manager.get(pk=task.pk)
+            activation = flow_task.activation_cls()
+            activation.initialize(flow_task, task)
+            return func(activation, *args, **kwargs)
+    return _wrapper
 
 
 def flow_job(**lock_args):

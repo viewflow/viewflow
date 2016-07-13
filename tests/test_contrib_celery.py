@@ -81,6 +81,7 @@ class TestCeleryProcess(Process):
         app_label = 'tests'
 
 
+@flow.flow_start_func
 def create_test_flow(activation, throw_error=False):
     activation.prepare()
     activation.process.throw_error = throw_error

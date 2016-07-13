@@ -1,11 +1,3 @@
-class FlowFunc(object):
-    def get_task(self, flow_task, *func_args, **func_kwars):
-        raise NotImplementedError
-
-    def __call__(self, *args, **kwargs):
-        raise NotImplementedError
-
-
 class Receiver(object):
 
     """

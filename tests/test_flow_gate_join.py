@@ -29,7 +29,7 @@ class Test(TestCase):
         self.assertTrue(all(task.finished is not None for task in tasks))
 
 
-@flow.flow_func(task_loader=lambda flow_task, task: task)
+@flow.flow_func
 def func(activation, task):
     activation.prepare()
     activation.done()
@@ -38,7 +38,7 @@ def func(activation, task):
 class JoinTestFlow(Flow):
     start = flow.StartFunction().Next(this.split)
     split = flow.Split().Next(this.task1).Next(this.task2)
-    task1 = flow.Function(func).Next(this.join)
-    task2 = flow.Function(func).Next(this.join)
+    task1 = flow.Function(func, task_loader=lambda flow_task, task: task).Next(this.join)
+    task2 = flow.Function(func, task_loader=lambda flow_task, task: task).Next(this.join)
     join = flow.Join().Next(this.end)
     end = flow.End()

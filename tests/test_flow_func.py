@@ -2,12 +2,11 @@ from django.test import TestCase
 from django.utils.decorators import method_decorator
 
 from viewflow import flow, lock
-from viewflow.activation import STATUS, StartActivation, Activation, Context
+from viewflow.activation import STATUS, Context
 from viewflow.base import this
 from viewflow.compat import mock
 from viewflow.activation import FuncActivation
 from viewflow.nodes.handler import HandlerActivation
-from viewflow.types import FlowFunc
 
 
 class Test(TestCase):
@@ -27,26 +26,8 @@ class Test(TestCase):
         act = flow_task.run()
         self.assertEqual(act.task.status, STATUS.DONE)
 
-    def test_start_function_inline_activation(self):
-        class StartFunc(StartActivation):
-            inline_called = False
-
-            @Activation.status.super()
-            def initialize(self, flow_task, task):
-                StartFunc.inline_called = True
-                super(StartFunc, self).initialize(flow_task, task)
-
-            def __call__(self):
-                self.prepare()
-                self.done()
-                return self
-
-        flow_task = self.init_node(flow.StartFunction(StartFunc))
-        act = flow_task.run()
-        self.assertEqual(act.task.status, STATUS.DONE)
-        self.assertTrue(StartFunc.inline_called)
-
     def test_start_function_with_default_activation(self):
+        @flow.flow_start_func
         def start_func(activation):
             activation.prepare()
             activation.done()
@@ -60,6 +41,7 @@ class Test(TestCase):
         class Flow(FlowStub):
             start = flow.StartFunction(this.start_task_func)
 
+            @method_decorator(flow.flow_start_func)
             def start_task_func(self, activation):
                 activation.prepare()
                 FlowStub.method_called = True
@@ -90,40 +72,23 @@ class Test(TestCase):
         act.cancel()
         self.assertEqual(act.task.status, STATUS.CANCELED)
 
-    def test_function_inline_activation(self):
-        class Func(FuncActivation, FlowFunc):
-            inline_called = False
-
-            def get_task(self, flow_task, *func_args, **func_kwars):
-                return TaskStub()
-
-            @Activation.status.super()
-            def initialize(self, flow_task, task):
-                Func.inline_called = True
-                super(Func, self).initialize(flow_task, task)
-
-            def __call__(self):
-                self.prepare()
-                self.done()
-                return self
-
     def test_function_with_default_activation(self):
-        @flow.flow_func(task_loader=lambda flow_task: TaskStub())
+        @flow.flow_func
         def func_impl(activation):
             activation.prepare()
             activation.done()
             return activation
 
-        flow_task = self.init_node(flow.Function(func_impl))
+        flow_task = self.init_node(flow.Function(func_impl, task_loader=lambda flow_task: TaskStub(flow_task)))
         act = flow_task.run()
         self.assertEqual(act.task.status, STATUS.DONE)
 
     def test_function_from_flow_method(self):
         class Flow(FlowStub):
-            func_task = flow.Function(this.task_func)
+            func_task = flow.Function(this.task_func, task_loader=lambda flow_task: TaskStub(flow_task))
             method_called = False
 
-            @method_decorator(flow.flow_func(task_loader=lambda flow_task: TaskStub()))
+            @method_decorator(flow.flow_func)
             def task_func(self, activation):
                 activation.prepare()
                 FlowStub.method_called = True
