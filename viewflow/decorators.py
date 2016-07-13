@@ -3,9 +3,7 @@ import functools
 
 from django.shortcuts import get_object_or_404
 
-from .import types
-from .activation import FuncActivation, STATUS
-from .exceptions import FlowRuntimeError
+from .activation import STATUS
 from .fields import import_task_by_ref
 
 
@@ -101,81 +99,31 @@ def flow_job(func):
     return _wrapper
 
 
-def flow_signal(task_loader=None, allow_skip_signals=False, **lock_args):
+def flow_start_signal(handler):
+    @functools.wraps(handler)
+    def _wrapper(sender, flow_task=None, **signal_kwargs):
+        activation = flow_task.activation_cls()
+        activation.initialize(flow_task, None)
+        return handler(sender=sender, activation=activation, **signal_kwargs)
+    return _wrapper
+
+
+def flow_signal(handler):
     """
     Decorator providing a flow signal receiver with the activation.
-
-    Args:
-        task_loader (callable): callable that returns the signaled flow_task
-
-    The decorator can be used ether with a callable defining a `task_loader`
-    or with a :class:`.Receiver` subclass and no `task_loader`.
-
-    if `allow_skip_signals` is True, flow_task will not be proceed if task_loader
-    returns None.
-
-    Example::
-
-        @flow_signal(task_loader=lambda flow_task, **kwargs: kwargs['process'].get_task(flow_task))
-        def my_receiver(activation, **kwargs):
-            activation.prepare()
-            activation.done()
-
-    or::
-
-        @flow_signal()
-        class MyReceiver(Receiver):
-            def get_task(self, flow_task, **signal_kwargs):
-                return kwargs['process'].get_task(flow_task)
-
-            def __call__(self, activation, **signal_kwargs):
-                activation.prepare()
-                activation.done()
-
-    .. note::
-
-        In both examples your signal will need to be send
-        with ``process`` as a kwarg.
-
     """
-    def decorator(func_or_cls):
-        def wrapper(flow_task, **signal_kwargs):
-            if isinstance(func_or_cls, type) and issubclass(func_or_cls, types.Receiver):
-                receiver_cls = func_or_cls
-            else:
-                class FuncWrapper(types.Receiver):
-                    def get_task(self, flow_task, **kwargs):
-                        return task_loader(flow_task, **kwargs)
+    @functools.wraps(handler)
+    def _wrapper(sender, task=None, **signal_kwargs):
+        flow_task = task.flow_task
+        flow_cls = flow_task.flow_cls
 
-                    def __call__(self, activation, *args, **kwargs):
-                        return func_or_cls(activation, *args, **kwargs)
-
-                receiver_cls = FuncWrapper
-
-            receiver = receiver_cls()
-            task = receiver.get_task(flow_task, **signal_kwargs)
-            if task is None:
-                if allow_skip_signals:
-                    return
-                else:
-                    raise FlowRuntimeError(
-                        "The task_loader didn't return any task for {}\n{}".format(
-                            flow_task.name, signal_kwargs))
-
-            lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
-            with lock(flow_task.flow_cls, task.process_id):
-                task = flow_task.flow_cls.task_cls._default_manager.get(pk=task.pk)
-                if isinstance(receiver, FuncActivation):
-                    receiver.initialize(flow_task, task)
-                    receiver(**signal_kwargs)
-                else:
-                    activation = flow_task.activation_cls()
-                    activation.initialize(flow_task, task)
-                    receiver(activation, **signal_kwargs)
-
-        return wrapper
-
-    return decorator
+        lock = flow_cls.lock_impl(flow_cls.instance)
+        with lock(flow_cls, task.process_id):
+            task = flow_cls.task_cls._default_manager.get(pk=task.pk)
+            activation = flow_task.activation_cls()
+            activation.initialize(flow_task, task)
+            return handler(sender=sender, activation=activation, **signal_kwargs)
+    return _wrapper
 
 
 def flow_start_view(view):

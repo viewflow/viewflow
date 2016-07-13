@@ -1,9 +1,9 @@
 from django.dispatch import Signal
+from django.utils.decorators import method_decorator
 from django.test import TestCase
 
 from viewflow import flow
 from viewflow.base import Flow, this
-from viewflow.types import Receiver
 
 
 class Test(TestCase):
@@ -36,39 +36,62 @@ task_test_signal = Signal(providing_args=["process"])
 ignorable_test_signal = Signal(providing_args=["process", "ignore_me"])
 
 
-def create_flow(activation, **kwargs):
+@flow.flow_start_signal
+def create_flow(sender, activation, **kwargs):
     activation.prepare()
     activation.done()
     return activation
 
 
-@flow.flow_signal(task_loader=lambda flow_task, **kwargs: kwargs['process'].get_task(SignalFlow.signal_task))
+@flow.flow_signal
 def signal_task(activation, **kwargs):
     activation.prepare()
     activation.done()
 
 
 class SignalFlow(Flow):
-    start = flow.StartSignal(start_test_signal, create_flow).Next(this.signal_task)
-    signal_task = flow.Signal(task_test_signal, signal_task).Next(this.end)
+    start = (
+        flow.StartSignal(
+            start_test_signal, create_flow)
+        .Next(this.signal_task)
+    )
+
+    signal_task = (
+        flow.Signal(
+            task_test_signal, signal_task,
+            task_loader=this.get_signal_task)
+        .Next(this.end)
+    )
+
     end = flow.End()
 
+    def get_signal_task(self, flow_task, **kwargs):
+        return kwargs['process'].get_task(SignalFlow.signal_task)
 
-@flow.flow_signal(allow_skip_signals=True)
-class IgnorableReceiver(Receiver):
-    def get_task(self, flow_task, **kwargs):
+
+class IgnorableSignalFlow(Flow):
+    start = (
+        flow.StartSignal(
+            start_ignorable_test_signal, create_flow)
+        .Next(this.signal_task)
+    )
+
+    signal_task = (
+        flow.Signal(
+            ignorable_test_signal, this.on_test_signal,
+            task_loader=this.get_signal_task,
+            allow_skip=True)
+        .Next(this.end)
+    )
+
+    end = flow.End()
+
+    def get_signal_task(self, flow_task, **kwargs):
         if kwargs['ignore_me']:
             return None
         return kwargs['process'].get_task(IgnorableSignalFlow.signal_task)
 
-    def __call__(self, activation, **signal_kwargs):
+    @method_decorator(flow.flow_signal)
+    def on_test_signal(self, activation, **signal_kwargs):
         activation.prepare()
         activation.done()
-
-
-class IgnorableSignalFlow(Flow):
-    start = flow.StartSignal(start_ignorable_test_signal, create_flow) \
-        .Next(this.signal_task)
-    signal_task = flow.Signal(ignorable_test_signal, IgnorableReceiver) \
-        .Next(this.end)
-    end = flow.End()
