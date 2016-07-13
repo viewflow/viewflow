@@ -4,7 +4,7 @@ import functools
 from django.shortcuts import get_object_or_404
 
 from .import types
-from .activation import FuncActivation, AbstractJobActivation, STATUS
+from .activation import FuncActivation, STATUS
 from .exceptions import FlowRuntimeError
 from .fields import import_task_by_ref
 
@@ -39,7 +39,7 @@ def flow_func(func):
     return _wrapper
 
 
-def flow_job(**lock_args):
+def flow_job(func):
     """
     Decorator that prepares celery task for execution
 
@@ -53,72 +53,52 @@ def flow_job(**lock_args):
     Process instance is locked only before and after the function execution.
     Please avoid any process state modification during the celery job.
     """
-    class flow_task_decorator(object):
-        def __init__(self, func, activation=None):
-            self.func = func
-            self.activation = activation
-            functools.update_wrapper(self, func)
+    @functools.wraps(func)
+    def _wrapper(*args, **kwargs):
+        flow_task_strref = kwargs.pop('flow_task_strref') if 'flow_task_strref' in kwargs else args[0]
+        process_pk = kwargs.pop('process_pk') if 'process_pk' in kwargs else args[1]
+        task_pk = kwargs.pop('task_pk') if 'task_pk' in kwargs else args[2]
+        flow_task = import_task_by_ref(flow_task_strref)
 
-        def __call__(self, *args, **kwargs):
-            flow_task_strref = kwargs.pop('flow_task_strref') if 'flow_task_strref' in kwargs else args[0]
-            process_pk = kwargs.pop('process_pk') if 'process_pk' in kwargs else args[1]
-            task_pk = kwargs.pop('task_pk') if 'task_pk' in kwargs else args[2]
+        lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance)
 
-            flow_task = import_task_by_ref(flow_task_strref)
-
-            # start
-            lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance, **lock_args)
-            with lock(flow_task.flow_cls, process_pk):
-                try:
-                    task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
-                    if task.status == STATUS.CANCELED:
-                        return
-                except flow_task.flow_cls.task_cls.DoesNotExist:
-                    # There was rollback on job task created transaction,
-                    # we don't need to do the job
-                    return
-                else:
-                    activation = self.activation if self.activation else flow_task.activation_cls()
-                    activation.initialize(flow_task, task)
-                    activation.start()
-
-            # execute
+        # start
+        with lock(flow_task.flow_cls, process_pk):
             try:
-                if self.activation:
-                    result = self.func(**kwargs)
-                else:
-                    result = self.func(activation, **kwargs)
-            except Exception as exc:
-                # mark as error
-                with lock(flow_task.flow_cls, process_pk):
-                    task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
-                    activation = self.activation if self.activation else flow_task.activation_cls()
-                    activation.initialize(flow_task, task)
-                    activation.error(comments="{}\n{}".format(exc, traceback.format_exc()))
-                raise
+                task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
+                if task.status == STATUS.CANCELED:
+                    return
+            except flow_task.flow_cls.task_cls.DoesNotExist:
+                # There was rollback on job task created transaction,
+                # we don't need to do the job
+                return
             else:
-                # mark as done
-                with lock(flow_task.flow_cls, process_pk):
-                    task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
-                    activation = self.activation if self.activation else flow_task.activation_cls()
-                    activation.initialize(flow_task, task)
-                    activation.done()
+                activation = flow_task.activation_cls()
+                activation.initialize(flow_task, task)
+                activation.start()
 
-                return result
+        # execute
+        try:
+            result = func(activation, **kwargs)
+        except Exception as exc:
+            # mark as error
+            with lock(flow_task.flow_cls, process_pk):
+                task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
+                activation = flow_task.activation_cls()
+                activation.initialize(flow_task, task)
+                activation.error(comments="{}\n{}".format(exc, traceback.format_exc()))
+            raise
+        else:
+            # mark as done
+            with lock(flow_task.flow_cls, process_pk):
+                task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
+                activation = flow_task.activation_cls()
+                activation.initialize(flow_task, task)
+                activation.done()
 
-        def __get__(self, instance, instancetype):
-            """
-            Bound methods called with self instance
-            """
-            if instance is None:
-                return self
+            return result
 
-            func = self.func.__get__(instance, type)
-            activation = instance if isinstance(instance, AbstractJobActivation) else None
-
-            return self.__class__(func, activation=activation)
-
-    return flow_task_decorator
+    return _wrapper
 
 
 def flow_signal(task_loader=None, allow_skip_signals=False, **lock_args):

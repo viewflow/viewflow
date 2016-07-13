@@ -90,8 +90,8 @@ def create_test_flow(activation, throw_error=False):
     return activation
 
 
-@celery_app.task()
-@flow.flow_job()
+@celery_app.task
+@flow.flow_job
 def celery_test_job(activation):
     if activation.process.throw_error:
         raise ValueError('Process raised error')

@@ -41,7 +41,7 @@ class Test(TestCase):
         self.assertIn('Expected test error', job_task.comments)
 
 
-@flow.flow_job()
+@flow.flow_job
 def job_handler(activation):
     if context.throw_test_error:
         raise ValueError('Expected test error')
