@@ -37,10 +37,10 @@ class DynamicSplit(mixins.NextNodeMixin,
     """
     task_type = 'SPLIT'
 
-    cancel_view_class = views.CancelView
-    details_view_class = views.DetailsView
-    perform_view_class = views.PerformView
-    undo_view_class = views.UndoView
+    cancel_view_class = views.CancelTaskView
+    details_view_class = views.DetailTaskView
+    perform_view_class = views.PerformTaskView
+    undo_view_class = views.UndoTaskView
 
     activation_cls = DynamicSplitActivation
 

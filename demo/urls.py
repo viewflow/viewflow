@@ -2,7 +2,7 @@ import django
 
 from django.conf.urls import include, url
 from django.contrib import admin
-from viewflow import views as viewflow
+from viewflow.flow import views as viewflow
 
 from .helloworld.flows import HelloWorldFlow
 from .shipment.flows import ShipmentFlow
@@ -26,8 +26,8 @@ urlpatterns = [
         url('^$', viewflow.ProcessListView.as_view(), name='index'),
         url('^tasks/$', viewflow.TaskListView.as_view(), name='tasks'),
         url('^queue/$', viewflow.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', viewflow.ProcessDetailView.as_view(), name='details'),
-        url('^action/cancel/(?P<process_pk>\d+)/$', viewflow.ProcessCancelView.as_view(), name='action_cancel'),
+        url('^details/(?P<process_pk>\d+)/$', viewflow.DetailProcessView.as_view(), name='details'),
+        url('^action/cancel/(?P<process_pk>\d+)/$', viewflow.CancelProcessView.as_view(), name='action_cancel'),
     ], namespace=HelloWorldFlow.instance.namespace), {'flow_cls': HelloWorldFlow}),
 
     # shipment
@@ -36,7 +36,7 @@ urlpatterns = [
         url('^$', viewflow.ProcessListView.as_view(), name='index'),
         url('^tasks/$', viewflow.TaskListView.as_view(), name='tasks'),
         url('^queue/$', viewflow.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', viewflow.ProcessDetailView.as_view(), name='details'),
+        url('^details/(?P<process_pk>\d+)/$', viewflow.DetailProcessView.as_view(), name='details'),
     ], namespace=ShipmentFlow.instance.namespace), {'flow_cls': ShipmentFlow}),
 
     # dynamic split
@@ -45,7 +45,7 @@ urlpatterns = [
         url('^$', viewflow.ProcessListView.as_view(), name='index'),
         url('^tasks/$', viewflow.TaskListView.as_view(), name='tasks'),
         url('^queue/$', viewflow.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', viewflow.ProcessDetailView.as_view(), name='details'),
+        url('^details/(?P<process_pk>\d+)/$', viewflow.DetailProcessView.as_view(), name='details'),
     ], namespace=DynamicSplitFlow.instance.namespace), {'flow_cls': DynamicSplitFlow}),
 
     url(r'^admin/', include(admin.site.urls)),
