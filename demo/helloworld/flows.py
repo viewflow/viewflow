@@ -1,7 +1,6 @@
-from viewflow import flow, lock
-from viewflow.base import this, Flow
+from viewflow import flow, lock, this, Flow
 from viewflow.contrib import celery
-from viewflow.flow import views as flow_views
+from viewflow.flow.views import StartFlowView, FlowView
 
 
 from .models import HelloWorldProcess
@@ -21,7 +20,7 @@ class HelloWorldFlow(Flow):
 
     start = (
         flow.Start(
-            flow_views.StartFlowView,
+            StartFlowView,
             fields=['text'])
         .Permission(auto_create=True)
         .Next(this.approve)
@@ -29,7 +28,7 @@ class HelloWorldFlow(Flow):
 
     approve = (
         flow.View(
-            flow_views.FlowView, fields=['approved'],
+            FlowView, fields=['approved'],
             task_description="Message approvement required",
             task_result_summary="Messsage was {{ process.approved|yesno:'Approved,Rejected' }}")
         .Permission(auto_create=True)
