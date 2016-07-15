@@ -219,13 +219,6 @@ class FlowInstanceDescriptor(object):
 class FlowMetaClass(type):
     def __new__(cls, class_name, bases, attrs):
         new_class = super(FlowMetaClass, cls).__new__(cls, class_name, bases, attrs)
-        if new_class.__module__ == 'viewflow.base':
-            # allow viewflow.base.Flow import in viewflow/__init__.py
-            return new_class
-
-        app_label, _ = get_containing_app_data(new_class.__module__)
-        if app_label is None:
-            raise ImportError("Flow can't be imported before app setup")
 
         # singleton instance
         new_class.instance = FlowInstanceDescriptor()
@@ -248,6 +241,11 @@ class FlowMetaClass(type):
             target._incoming_edges = edges
 
         # set up workflow meta
+        app_label, _ = get_containing_app_data(new_class.__module__)
+
+        if app_label is None:
+            get_containing_app_data(new_class.__module__)
+            raise ImportError("Flow can't be imported before app setup")
         new_class._meta = FlowMeta(app_label, new_class, nodes)
 
         # flow back reference

@@ -1,4 +1,5 @@
-from viewflow import flow, this, Flow
+from viewflow import flow
+from viewflow.base import this, Flow
 from viewflow.flow.views import FlowView
 from viewflow.lock import select_for_update_lock
 

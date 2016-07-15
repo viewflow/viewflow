@@ -1,5 +1,6 @@
-from viewflow import flow, this, Flow
+from viewflow import flow
 from viewflow.flow.views import StartFlowView
+from viewflow.base import this, Flow
 
 from . import models, views
 from .nodes import DynamicSplit
