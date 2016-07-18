@@ -46,11 +46,11 @@ class DetailsViewMixin(object):
         )
         return urls
 
-    def get_task_url(self, task, url_type, **kwargs):
+    def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
         if url_type in ['details', 'guess']:
-            url_name = '{}:{}__details'.format(self.flow_cls.instance.namespace, self.name)
+            url_name = '{}:{}__details'.format(namespace, self.name)
             return reverse(url_name, args=[task.process_id, task.pk])
-        return super(DetailsViewMixin, self).get_task_url(task, url_type, **kwargs)
+        return super(DetailsViewMixin, self).get_task_url(task, url_type, namespace=namespace, **kwargs)
 
     def can_view(self, user, task):
         return user.has_perm(self.flow_cls.instance.view_permission_name)
@@ -75,11 +75,11 @@ class UndoViewMixin(object):
         )
         return urls
 
-    def get_task_url(self, task, url_type, **kwargs):
+    def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
         if url_type in ['undo']:
-            url_name = '{}:{}__undo'.format(self.flow_cls.instance.namespace, self.name)
+            url_name = '{}:{}__undo'.format(namespace, self.name)
             return reverse(url_name, args=[task.process_id, task.pk])
-        return super(UndoViewMixin, self).get_task_url(task, url_type, **kwargs)
+        return super(UndoViewMixin, self).get_task_url(task, url_type, namespace=namespace, **kwargs)
 
 
 class CancelViewMixin(object):
@@ -101,11 +101,11 @@ class CancelViewMixin(object):
         )
         return urls
 
-    def get_task_url(self, task, url_type, **kwargs):
+    def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
         if url_type in ['cancel']:
-            url_name = '{}:{}__cancel'.format(self.flow_cls.instance.namespace, self.name)
+            url_name = '{}:{}__cancel'.format(namespace, self.name)
             return reverse(url_name, args=[task.process_id, task.pk])
-        return super(CancelViewMixin, self).get_task_url(task, url_type, **kwargs)
+        return super(CancelViewMixin, self).get_task_url(task, url_type, namespace=namespace, **kwargs)
 
 
 class PerformViewMixin(object):
@@ -125,11 +125,11 @@ class PerformViewMixin(object):
                     self.perform_view, {'flow_task': self}, name="{}__perform".format(self.name)))
         return urls
 
-    def get_task_url(self, task, url_type, **kwargs):
+    def get_task_url(self, task, url_type='guess', namespace='',  **kwargs):
         if url_type in ['perform']:
-            url_name = '{}:{}__perform'.format(self.flow_cls.instance.namespace, self.name)
+            url_name = '{}:{}__perform'.format(namespace, self.name)
             return reverse(url_name, args=[task.process_id, task.pk])
-        return super(PerformViewMixin, self).get_task_url(task, url_type, **kwargs)
+        return super(PerformViewMixin, self).get_task_url(task, url_type, namespace=namespace, **kwargs)
 
 
 class ActivateNextMixin(object):
@@ -151,11 +151,11 @@ class ActivateNextMixin(object):
         )
         return urls
 
-    def get_task_url(self, task, url_type, **kwargs):
+    def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
         if url_type in ['activate_next']:
-            url_name = '{}:{}__activate_next'.format(self.flow_cls.instance.namespace, self.name)
+            url_name = '{}:{}__activate_next'.format(namespace, self.name)
             return reverse(url_name, args=[task.process_id, task.pk])
-        return super(ActivateNextMixin, self).get_task_url(task, url_type, **kwargs)
+        return super(ActivateNextMixin, self).get_task_url(task, url_type, namespace=namespace, **kwargs)
 
 
 class PermissionMixin(object):

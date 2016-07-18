@@ -45,7 +45,7 @@ def _(flow_node, test_task, **post_kwargs):
     url_args.setdefault('task', None)
     url_args.setdefault('user', auth.authenticate(django_webtest_user=test_task.user))
 
-    task_url = flow_node.get_task_url(url_type='execute', **url_args)
+    task_url = flow_node.get_task_url(url_type='execute', namespace=test_task.namespace, **url_args)
 
     form = test_task.app.get(task_url, user=test_task.user).form
 
@@ -70,13 +70,13 @@ def _(flow_node, test_task, **post_kwargs):
 
     # Assign
     if not task.owner:
-        task_url = flow_node.get_task_url(url_type='assign', **url_args)
+        task_url = flow_node.get_task_url(url_type='assign', namespace=test_task.namespace, **url_args)
         form = test_task.app.get(task_url, user=test_task.user).form
         form = form.submit('assign').follow().form
         url_args['task'] = flow_node.flow_cls.task_cls._default_manager.get(pk=url_args['task'].pk)
 
     # Execute
-    task_url = flow_node.get_task_url(url_type='execute', **url_args)
+    task_url = flow_node.get_task_url(url_type='execute', namespace=test_task.namespace, **url_args)
     form = test_task.app.get(task_url, user=test_task.user).form
 
     for key, value in post_kwargs.items():
@@ -94,9 +94,10 @@ def flow_patch_manager(flow_node):
 
 
 class FlowTaskTest(object):
-    def __init__(self, app, flow_cls, flow_task):
+    def __init__(self, app, flow_cls, flow_task, namespace):
         self.app = app
         self.flow_cls, self.flow_task = flow_cls, flow_task
+        self.namespace = namespace
 
         self.user = None
         self.url_args = {}
@@ -186,8 +187,9 @@ class FlowTaskTest(object):
 
 
 class FlowTest(WebTestMixin):
-    def __init__(self, flow_cls):
+    def __init__(self, flow_cls, namespace=''):
         self.flow_cls = flow_cls
+        self.namespace = namespace
 
         self.patch_managers = []
         for node in flow_cls._meta.nodes():
@@ -196,7 +198,7 @@ class FlowTest(WebTestMixin):
                 self.patch_managers.append(manager)
 
     def Task(self, flow_task):
-        return FlowTaskTest(self.app, self.flow_cls, flow_task)
+        return FlowTaskTest(self.app, self.flow_cls, flow_task, self.namespace)
 
     def __enter__(self):
         self._patch_settings()

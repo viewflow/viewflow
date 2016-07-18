@@ -71,12 +71,6 @@ class AbstractProcess(models.Model):
     class Meta:
         abstract = True
 
-    def get_absolute_url(self):
-        return reverse(
-            '{}:details'.format(self.flow_cls.instance.namespace),
-            kwargs={'process_pk': self.pk}
-        )
-
 
 class AbstractTask(models.Model):
     """
@@ -145,7 +139,7 @@ class AbstractTask(models.Model):
     def __str__(self):
         if self.flow_task:
             return "<{}.{}/{}> - {}".format(
-                self.flow_task.flow_cls._meta.namespace,
+                self.flow_task.flow_cls._meta.flow_label,
                 self.flow_task,
                 self.pk,
                 self.status)

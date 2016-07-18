@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
-from django.db import models
+from django.core.urlresolvers import resolve
 from django.contrib.auth.models import User
+from django.db import models
 from django.test import TestCase, RequestFactory
 from django.views import generic
 
@@ -22,6 +23,7 @@ class Test(TestCase):
         # get
         request = RequestFactory().get('/start/')
         request.user = user
+        request.resolver_match = resolve('/test/start/')
         response = view(request, flow_cls=StartViewTestFlow, flow_task=StartViewTestFlow.start)
 
         self.assertEqual(response.template_name,
@@ -32,6 +34,7 @@ class Test(TestCase):
         # post
         request = RequestFactory().post('/start/')
         request.user = user
+        request.resolver_match = resolve('/test/start/')
         response = view(request, flow_cls=StartViewTestFlow, flow_task=StartViewTestFlow.start)
         self.assertEqual(response.status_code, 302)
 
@@ -45,6 +48,7 @@ class Test(TestCase):
         # get
         request = RequestFactory().get('/start/')
         request.user = user
+        request.resolver_match = resolve('/test/start/')
         response = view(request, flow_cls=StartViewTestFlow, flow_task=StartViewTestFlow.start)
 
         self.assertEqual(response.template_name,
@@ -55,6 +59,7 @@ class Test(TestCase):
         # post
         request = RequestFactory().post('/start/')
         request.user = user
+        request.resolver_match = resolve('/test/start/')
         response = view(request, flow_cls=StartViewTestFlow, flow_task=StartViewTestFlow.start)
         self.assertEqual(response.status_code, 302)
 
@@ -74,11 +79,12 @@ class StartViewFlowEntity(models.Model):
 urlpatterns = [
     url(r'^test/', include([
         StartViewTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', views.DetailProcessView.as_view(), name='details'),
-    ], namespace=StartViewTestFlow.instance.namespace), {'flow_cls': StartViewTestFlow})
+        url('^$', views.ProcessListView.as_view(flow_cls=StartViewTestFlow), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(flow_cls=StartViewTestFlow), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(flow_cls=StartViewTestFlow), name='queue'),
+        url('^detail/(?P<process_pk>\d+)/$',
+            views.DetailProcessView.as_view(flow_cls=StartViewTestFlow), name='detail'),
+    ], namespace='startviewtest'))
 ]
 
 try:

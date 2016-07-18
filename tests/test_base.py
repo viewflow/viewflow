@@ -10,7 +10,6 @@ class Test(TestCase):
         flow_meta = base.FlowMeta('tests', type('StubFlow', (object,), {}), {})
 
         self.assertEqual(flow_meta.flow_label, 'test_base/stub')
-        self.assertEqual(flow_meta.namespace, 'tests/test_base/stub')
 
     def test_flowmetaclass_setup_succeed(self):
         class TestFlow(base.Flow):

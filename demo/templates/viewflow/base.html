@@ -60,13 +60,13 @@
                               <li><a href="{% url 'index' %}">All Process</a>
                                   <ul class="nav nav-pills nav-stacked">
                                       {% if perms.helloworld.view_helloworldprocess %}
-                                      <li><a href="{% url 'helloworld/helloworld:index' %}">&nbsp;&nbsp;&nbsp;&nbsp;Hello World</a></li>
+                                      <li><a href="{% url 'helloworld:index' %}">&nbsp;&nbsp;&nbsp;&nbsp;Hello World</a></li>
                                       {% endif %}
                                       {% if perms.shipment.view_shipmentprocess %}
-                                      <li><a href="{% url 'shipment/shipment:index' %}">&nbsp;&nbsp;&nbsp;&nbsp;Shipment</a></li>
+                                      <li><a href="{% url 'shipment:index' %}">&nbsp;&nbsp;&nbsp;&nbsp;Shipment</a></li>
                                       {% endif %}
                                       {% if perms.customnode.view_dynamicsplitprocess %}
-                                      <li><a href="{% url 'customnode/dynamicsplit:index' %}">&nbsp;&nbsp;&nbsp;&nbsp;Dynamic split</a></li>
+                                      <li><a href="{% url 'split:index' %}">&nbsp;&nbsp;&nbsp;&nbsp;Dynamic split</a></li>
                                       {% endif %}
                                   </ul>
                               </li>

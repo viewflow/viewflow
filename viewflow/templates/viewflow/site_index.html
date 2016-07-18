@@ -18,13 +18,13 @@
     <tbody>
         {% for process in process_list %}
         <tr>
-            <td><a href="{% flowurl process 'details' %}">{{ process.id }}</a></td>
+            <td><a href="{% flowurl process 'detail' namespace_map=view.flows %}">{{ process.id }}</a></td>
             <td>{{ process.flow_cls.process_title }}</td>
             <td>{{ process.created }}</td>
             <td>{{ process.finished|default:"" }}</td>
             <td>
                 {% for task in process.active_tasks %}
-                {% flowurl task user=request.user as task_url %}
+                {% flowurl task user=request.user namespace_map=view.flows as task_url %}
                 {% if task_url %}
                 <a href="{{ task_url }}?back={{ request.get_full_path|urlencode }}">
                     {{ task.flow_task }}

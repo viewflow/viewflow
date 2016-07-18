@@ -36,7 +36,9 @@ class BaseTaskActionView(MessageUserMixin, generic.TemplateView):
             'viewflow/flow/task_action.html')
 
     def get_success_url(self):
-        return self.activation.flow_task.get_task_url(self.activation.task, 'details', user=self.request.user)
+        return self.activation.flow_task.get_task_url(
+            self.activation.task, 'details', user=self.request.user,
+            namespace=self.request.resolver_match.namespace)
 
     def get_context_data(self, **kwargs):
         context = super(BaseTaskActionView, self).get_context_data(**kwargs)
@@ -118,8 +120,11 @@ class CancelProcessView(FlowManagePermissionMixin, generic.DetailView):
     pk_url_kwarg = 'process_pk'
 
     def report(self, message, level=messages.INFO, fail_silently=True, **kwargs):
+        namespace = self.request.resolver_match.namespace
+
+        process_url = reverse('{}:detail'.format(namespace), args=[self.object.pk])
         process_link = '<a href="{process_url}">#{process_pk}</a>'.format(
-            process_url=self.object.get_absolute_url(),
+            process_url=process_url,
             process_pk=self.object.pk)
         kwargs.update({
             'process': process_link,
@@ -151,7 +156,7 @@ class CancelProcessView(FlowManagePermissionMixin, generic.DetailView):
                 back_url = '/'
             return back_url
 
-        return reverse('{}:index'.format(self.object.flow_cls.instance.namespace))
+        return reverse('{}:index'.format(self.request.resolver_match.namespace))
 
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()

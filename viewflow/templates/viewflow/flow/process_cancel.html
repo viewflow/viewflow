@@ -42,7 +42,7 @@
             <td>{{ task.flow_task }}</td>
             <td>{{ task.created }}</td>
             <td>{{ task.finished|default:"" }}</td>
-            <td><a href="{% flowurl task.process 'details' %}">{{ task.process }}</td>
+            <td><a href="{% flowurl task.process 'detail' %}">{{ task.process }}</td>
             <td>
                 {{ task.status }}
                 {% if task in uncancelable_tasks %}

@@ -1,3 +1,4 @@
+from django.core.urlresolvers import resolve
 from django.conf.urls import include, url
 from django.db import models
 from django.contrib.auth.models import User
@@ -24,6 +25,7 @@ class Test(TestCase):
         # unassigned redirect
         request = RequestFactory().get('/start/')
         request.user = user
+        request.resolver_match = resolve('/test/1/task/1/')
         response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 302)
@@ -35,6 +37,7 @@ class Test(TestCase):
 
         request = RequestFactory().get('/start/')
         request.user = user
+        request.resolver_match = resolve('/test/1/task/1/')
         response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 200)
@@ -45,6 +48,7 @@ class Test(TestCase):
         # assigned post
         request = RequestFactory().post('/task/')
         request.user = user
+        request.resolver_match = resolve('/test/1/task/1/')
         response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 302)
@@ -65,6 +69,7 @@ class Test(TestCase):
 
         request = RequestFactory().get('/start/')
         request.user = user
+        request.resolver_match = resolve('/test/1/task/1/')
         response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 200)
@@ -75,6 +80,7 @@ class Test(TestCase):
         # assigned post
         request = RequestFactory().post('/task/')
         request.user = user
+        request.resolver_match = resolve('/test/1/task/1/')
         response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 302)
@@ -92,6 +98,7 @@ class Test(TestCase):
         # unassigned get
         request = RequestFactory().get('/start/')
         request.user = user
+        request.resolver_match = resolve('/test/1/task/1/')
 
         response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
@@ -104,6 +111,7 @@ class Test(TestCase):
         # unassigned post
         request = RequestFactory().post('/task/')
         request.user = user
+        request.resolver_match = resolve('/test/1/task/1/')
         response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 302)
@@ -116,6 +124,7 @@ class Test(TestCase):
         # assigned get
         request = RequestFactory().get('/start/')
         request.user = user
+        request.resolver_match = resolve('/test/1/task/1/')
 
         response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
@@ -135,11 +144,12 @@ class TaskViewFlowEntity(models.Model):
 urlpatterns = [
     url(r'^test/', include([
         TaskViewTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', views.DetailProcessView.as_view(), name='details'),
-    ], namespace=TaskViewTestFlow.instance.namespace), {'flow_cls': TaskViewTestFlow})
+        url('^$', views.ProcessListView.as_view(flow_cls=TaskViewTestFlow), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(flow_cls=TaskViewTestFlow), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(flow_cls=TaskViewTestFlow), name='queue'),
+        url('^detail/(?P<process_pk>\d+)/$',
+            views.DetailProcessView.as_view(flow_cls=TaskViewTestFlow), name='detail'),
+    ], namespace='taskviewtest'))
 ]
 
 try:

@@ -53,7 +53,8 @@ class DetailProcessView(FlowViewPermissionMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(DetailProcessView, self).get_context_data(**kwargs)
-        context['start_actions'] = flow_start_actions(self.flow_cls, self.request.user)
+        context['start_actions'] = flow_start_actions(
+            self.flow_cls, namespace=self.request.resolver_match.namespace, user=self.request.user)
         context['flow_cls'] = self.flow_cls
         context['task_list'] = context['process'].task_set.all().order_by('created')
         return context

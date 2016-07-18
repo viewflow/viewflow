@@ -67,13 +67,13 @@ class Start(mixins.PermissionMixin, BaseStart):
             self._owner = owner_kwargs
         return self
 
-    def get_task_url(self, task, url_type='guess', **kwargs):
+    def get_task_url(self, task, url_type='guess', namespace='',  **kwargs):
         if url_type in ['execute', 'guess']:
             if 'user' in kwargs and self.can_execute(kwargs['user'], task):
-                url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
+                url_name = '{}:{}'.format(namespace, self.name)
                 return reverse(url_name)
 
-        return super(BaseStart, self).get_task_url(task, url_type=url_type, **kwargs)
+        return super(BaseStart, self).get_task_url(task, url_type=url_type, namespace=namespace, **kwargs)
 
     def can_execute(self, user, task=None):
         if task and task.status != STATUS.NEW:
@@ -191,28 +191,28 @@ class View(mixins.PermissionMixin, BaseView):
                     self.unassign_view, {'flow_task': self}, name="{}__unassign".format(self.name)))
         return urls
 
-    def get_task_url(self, task, url_type, **kwargs):
+    def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
         user = kwargs.get('user', None)
 
         # assign
         if url_type in ['assign', 'guess']:
             if task.status == STATUS.NEW and self.can_assign(user, task):
-                url_name = '{}:{}__assign'.format(self.flow_cls.instance.namespace, self.name)
+                url_name = '{}:{}__assign'.format(namespace, self.name)
                 return reverse(url_name, kwargs={'process_pk': task.process_id, 'task_pk': task.pk})
 
         # execute
         if url_type in ['execute', 'guess']:
             if task.status == STATUS.ASSIGNED and self.can_execute(user, task):
-                url_name = '{}:{}'.format(self.flow_cls.instance.namespace, self.name)
+                url_name = '{}:{}'.format(namespace, self.name)
                 return reverse(url_name, kwargs={'process_pk': task.process_id, 'task_pk': task.pk})
 
         # unassign
         if url_type in ['unassign']:
             if task.status == STATUS.ASSIGNED and self.can_unassign(user, task):
-                url_name = '{}:{}__unassign'.format(self.flow_cls.instance.namespace, self.name)
+                url_name = '{}:{}__unassign'.format(namespace, self.name)
                 return reverse(url_name, kwargs={'process_pk': task.process_id, 'task_pk': task.pk})
 
-        return super(View, self).get_task_url(task, url_type, **kwargs)
+        return super(View, self).get_task_url(task, url_type, namespace=namespace, **kwargs)
 
     def calc_owner(self, activation):
         from django.contrib.auth import get_user_model

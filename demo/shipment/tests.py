@@ -33,7 +33,7 @@ class Test(TestCase):
         self.special_carrier = Carrier.objects.exclude(name=Carrier.DEFAULT)[0]
 
     def test_normal_post_succeed(self):
-        with FlowTest(ShipmentFlow) as flow:
+        with FlowTest(ShipmentFlow, 'shipment') as flow:
             # Clerk start process
             flow.Task(ShipmentFlow.start).User('shipment/clerk') \
                 .Execute(self.sample_shipment) \
@@ -60,7 +60,7 @@ class Test(TestCase):
                 .Assert(lambda p: p.finished is not None)
 
     def test_insured_post_succeed(self):
-        with FlowTest(ShipmentFlow) as flow:
+        with FlowTest(ShipmentFlow, 'shipment') as flow:
             # Clerk start process
             flow.Task(ShipmentFlow.start).User('shipment/clerk') \
                 .Execute(self.sample_shipment) \
@@ -100,11 +100,12 @@ urlpatterns = [
     # shipment
     url(r'^shipment/', include([
         ShipmentFlow.instance.urls,
-        url('^$', viewflow.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', viewflow.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', viewflow.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', viewflow.DetailProcessView.as_view(), name='details'),
-    ], namespace=ShipmentFlow.instance.namespace), {'flow_cls': ShipmentFlow}),
+        url('^$', viewflow.ProcessListView.as_view(flow_cls=ShipmentFlow), name='index'),
+        url('^tasks/$', viewflow.TaskListView.as_view(flow_cls=ShipmentFlow), name='tasks'),
+        url('^queue/$', viewflow.QueueListView.as_view(flow_cls=ShipmentFlow), name='queue'),
+        url('^detail/(?P<process_pk>\d+)/$',
+            viewflow.DetailProcessView.as_view(flow_cls=ShipmentFlow), name='detail'),
+    ], namespace='shipment')),
 ]
 
 

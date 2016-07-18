@@ -1,3 +1,4 @@
+from django.core.urlresolvers import resolve
 from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
@@ -18,6 +19,8 @@ class Test(TestCase):
         # get
         request = RequestFactory().get('/cancel/')
         request.user = User(username='test', is_superuser=True)
+        request.resolver_match = resolve('/test/')
+
         response = view(request, flow_cls=ActionsTestFlow, process_pk=act.process.pk)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.template_name,
@@ -31,6 +34,8 @@ class Test(TestCase):
         # post
         request = RequestFactory().post('/cancel/', {'_cancel_process': 1})
         request.user = User(username='test', is_superuser=True)
+        request.resolver_match = resolve('/test/')
+
         response = view(request, flow_cls=ActionsTestFlow, process_pk=act.process.pk)
         act.process.refresh_from_db()
 
@@ -53,6 +58,8 @@ class Test(TestCase):
         # get
         request = RequestFactory().get('/undo/')
         request.user = User(username='test', is_superuser=True)
+        request.resolver_match = resolve('/test/')
+
         response = view(
             request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.start,
             process_pk=act.process.pk, task_pk=start.pk)
@@ -68,6 +75,8 @@ class Test(TestCase):
         # post
         request = RequestFactory().post('/undo/', {'run_action': 1})
         request.user = User(username='test', is_superuser=True)
+        request.resolver_match = resolve('/test/')
+
         response = view(
             request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.start,
             process_pk=act.process.pk, task_pk=start.pk)
@@ -86,6 +95,8 @@ class Test(TestCase):
         # get
         request = RequestFactory().get('/cancel/')
         request.user = User(username='test', is_superuser=True)
+        request.resolver_match = resolve('/test/')
+
         response = view(
             request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.task,
             process_pk=act.process.pk, task_pk=task.pk)
@@ -101,6 +112,8 @@ class Test(TestCase):
         # post
         request = RequestFactory().post('/cancel/', {'run_action': 1})
         request.user = User(username='test', is_superuser=True)
+        request.resolver_match = resolve('/test/')
+
         response = view(
             request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.start,
             process_pk=act.process.pk, task_pk=task.pk)
@@ -118,6 +131,8 @@ class Test(TestCase):
         # get
         request = RequestFactory().get('/perform/')
         request.user = User(username='test', is_superuser=True)
+        request.resolver_match = resolve('/test/')
+
         response = view(
             request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.if_gate,
             process_pk=act.process.pk, task_pk=if_gate.pk)
@@ -134,6 +149,8 @@ class Test(TestCase):
         # post
         request = RequestFactory().post('/perform/', {'run_action': 1})
         request.user = User(username='test', is_superuser=True)
+        request.resolver_match = resolve('/test/')
+
         response = view(
             request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.if_gate,
             process_pk=act.process.pk, task_pk=if_gate.pk)
@@ -155,6 +172,8 @@ class Test(TestCase):
         # get
         request = RequestFactory().get('/activate_next/')
         request.user = User(username='test', is_superuser=True)
+        request.resolver_match = resolve('/test/')
+
         response = view(
             request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.task,
             process_pk=act.process.pk, task_pk=task.pk)
@@ -171,6 +190,8 @@ class Test(TestCase):
         # post
         request = RequestFactory().post('/activate_next/', {'run_action': 1})
         request.user = User(username='test', is_superuser=True)
+        request.resolver_match = resolve('/test/')
+
         response = view(
             request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.task,
             process_pk=act.process.pk, task_pk=task.pk)
@@ -192,6 +213,8 @@ class Test(TestCase):
         # get
         request = RequestFactory().get('/unassign/')
         request.user = user
+        request.resolver_match = resolve('/test/')
+
         response = view(
             request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.task,
             process_pk=act.process.pk, task_pk=task.pk)
@@ -208,6 +231,8 @@ class Test(TestCase):
         # post
         request = RequestFactory().post('/unassign/', {'run_action': 1})
         request.user = user
+        request.resolver_match = resolve('/test/')
+
         response = view(
             request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.task,
             process_pk=act.process.pk, task_pk=task.pk)
@@ -228,11 +253,12 @@ class ActionsTestFlow(Flow):
 urlpatterns = [
     url(r'^test/', include([
         ActionsTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', views.DetailProcessView.as_view(), name='details'),
-    ], namespace=ActionsTestFlow.instance.namespace), {'flow_cls': ActionsTestFlow})
+        url('^$', views.ProcessListView.as_view(flow_cls=ActionsTestFlow), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(flow_cls=ActionsTestFlow), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(flow_cls=ActionsTestFlow), name='queue'),
+        url('^detail/(?P<process_pk>\d+)/$',
+            views.DetailProcessView.as_view(flow_cls=ActionsTestFlow), name='detail'),
+    ], namespace='actionstest'))
 ]
 
 try:

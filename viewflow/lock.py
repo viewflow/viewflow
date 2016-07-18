@@ -73,7 +73,7 @@ class CacheLock(object):
 
         @contextmanager
         def lock(flow_cls, process_pk):
-            key = 'django-viewflow-lock-{}/{}'.format(flow_cls._meta.namespace, process_pk)
+            key = 'django-viewflow-lock-{}/{}'.format(flow_cls._meta.flow_label, process_pk)
 
             for i in range(attempts):
                 stored = cache.add(key, 1, expires)

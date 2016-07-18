@@ -46,7 +46,8 @@ class BaseFlowViewMixin(object):
         if not self.activation.prepare.can_proceed():
             self.error('Task {task} cannot be executed.')
             return redirect(self.activation.flow_task.get_task_url(
-                self.activation.task, url_type='details', user=request.user))
+                self.activation.task, url_type='details', user=request.user,
+                namespace=self.request.resolver_match.namespace))
 
         if not self.activation.has_perm(request.user):
             raise PermissionDenied
@@ -100,8 +101,8 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
     def get_success_url(self):
         """Continue on task or redirect back to task list."""
         url = self.activation.flow_task.get_task_url(
-            self.activation.task, url_type='guess',
-            user=self.request.user)
+            self.activation.task, url_type='guess', user=self.request.user,
+            namespace=self.request.resolver_match.namespace)
 
         back = self.request.GET.get('back', None)
         if back and not is_safe_url(url=back, host=self.request.get_host()):
@@ -132,7 +133,8 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
         if not self.activation.assign.can_proceed():
             self.error('Task {task} cannot be assigned to you')
             return redirect(self.activation.flow_task.get_task_url(
-                self.activation.task, url_type='details', user=request.user))
+                self.activation.task, url_type='details', user=request.user,
+                namespace=self.request.resolver_match.namespace))
 
         if not self.activation.flow_task.can_assign(request.user, self.activation.task):
             raise PermissionDenied

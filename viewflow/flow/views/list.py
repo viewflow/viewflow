@@ -38,7 +38,7 @@ class AllProcessListView(LoginRequiredMixin, generic.ListView):
 
     """All process instances list available for current user."""
 
-    flow_classes = []
+    flows = []
 
     paginate_by = 15
     paginate_orphans = 5
@@ -49,12 +49,12 @@ class AllProcessListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(AllProcessListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flows_start_actions(self.flow_classes, self.request.user)
+        context['start_actions'] = flows_start_actions(self.flows, self.request.user)
         return context
 
     def get_queryset(self):
         return models.Process.objects \
-            .filter_available(self.flow_classes, self.request.user) \
+            .filter_available(self.flows.values(), self.request.user) \
             .order_by('-created')
 
 
@@ -62,7 +62,7 @@ class AllTaskListView(generic.ListView):
 
     """All tasks from all processes assigned to current user."""
 
-    flow_classes = []
+    flows = []
 
     paginate_by = 15
     paginate_orphans = 5
@@ -73,7 +73,7 @@ class AllTaskListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(AllTaskListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flows_start_actions(self.flow_classes, self.request.user)
+        context['start_actions'] = flows_start_actions(self.flows, self.request.user)
         context['filter'] = self.filter
         return context
 
@@ -81,7 +81,7 @@ class AllTaskListView(generic.ListView):
         return self.filter.qs
 
     def get_base_queryset(self, user):
-        return models.Task.objects.inbox(self.flow_classes, user).order_by('-created')
+        return models.Task.objects.inbox(self.flows.values(), user).order_by('-created')
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -93,7 +93,7 @@ class AllQueueListView(generic.ListView):
 
     """All unassigned tasks available for current user."""
 
-    flow_classes = []
+    flows = []
 
     paginate_by = 15
     paginate_orphans = 5
@@ -104,7 +104,7 @@ class AllQueueListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(AllQueueListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flows_start_actions(self.flow_classes, self.request.user)
+        context['start_actions'] = flows_start_actions(self.flows, self.request.user)
         context['filter'] = self.filter
         return context
 
@@ -112,7 +112,7 @@ class AllQueueListView(generic.ListView):
         return self.filter.qs
 
     def get_base_queryset(self, user):
-        return models.Task.objects.queue(self.flow_classes, user).order_by('-created')
+        return models.Task.objects.queue(self.flows.values(), user).order_by('-created')
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -124,7 +124,7 @@ class AllArchiveListView(LoginRequiredMixin, generic.ListView):
 
     """All tasks from all processes assigned to current user."""
 
-    flow_classes = []
+    flows = {}
 
     paginate_by = 15
     paginate_orphans = 5
@@ -135,11 +135,11 @@ class AllArchiveListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(AllArchiveListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flows_start_actions(self.flow_classes, self.request.user)
+        context['start_actions'] = flows_start_actions(self.flows, self.request.user)
         return context
 
     def get_queryset(self):
-        return models.Task.objects.archive(self.flow_classes, self.request.user).order_by('-created')
+        return models.Task.objects.archive(self.flows.values(), self.request.user).order_by('-created')
 
 
 class ProcessFilter(FilterSet):
@@ -167,7 +167,8 @@ class ProcessListView(FlowViewPermissionMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flow_start_actions(self.flow_cls, self.request.user)
+        context['start_actions'] = flow_start_actions(
+            self.flow_cls, namespace=self.request.resolver_match.namespace, user=self.request.user)
         context['flow_cls'] = self.flow_cls
         return context
 
@@ -203,7 +204,8 @@ class TaskListView(FlowViewPermissionMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(TaskListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flow_start_actions(self.flow_cls, self.request.user)
+        context['start_actions'] = flow_start_actions(
+            self.flow_cls, namespace=self.request.resolver_match.namespace, user=self.request.user)
         context['flow_cls'] = self.flow_cls
         return context
 
@@ -232,7 +234,8 @@ class QueueListView(FlowViewPermissionMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(QueueListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flow_start_actions(self.flow_cls, self.request.user)
+        context['start_actions'] = flow_start_actions(
+            self.flow_cls, namespace=self.request.resolver_match.namespace, user=self.request.user)
         context['flow_cls'] = self.flow_cls
         return context
 

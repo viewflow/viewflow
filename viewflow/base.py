@@ -177,10 +177,6 @@ class FlowMeta(object):
         self._nodes_by_name = nodes
 
     @property
-    def namespace(self):
-        return "{}/{}".format(self.app_label, self.flow_label)
-
-    @property
     def flow_label(self):
         module = "{}.{}".format(self.flow_cls.__module__, self.flow_cls.__name__)
         app_label, app_package = get_containing_app_data(module)
@@ -311,10 +307,6 @@ class Flow(object, metaclass=FlowMetaClass):
     summary_template = "{{ flow_cls.process_title }} - {{ process.status }}"
 
     @property
-    def namespace(self):
-        return "{}/{}".format(self._meta.app_label, self._meta.flow_label)
-
-    @property
     def urls(self):
         """
         Provides ready to include urlpatterns required for this flow
@@ -323,7 +315,7 @@ class Flow(object, metaclass=FlowMetaClass):
         for node in self._meta.nodes():
             node_urls += node.urls()
 
-        return url('^', include(node_urls))
+        return url('^', include(node_urls), {'flow_cls': self})
 
     @property
     def view_permission_name(self):

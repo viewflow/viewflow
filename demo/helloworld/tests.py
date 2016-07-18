@@ -11,7 +11,7 @@ class Test(TestCase):
     fixtures = ['helloworld/default_data.json']
 
     def test_normal_flow_succeed(self):
-        with FlowTest(HelloWorldFlow) as flow:
+        with FlowTest(HelloWorldFlow, namespace='helloworld') as flow:
             # The `employee` starts process
             flow.Task(HelloWorldFlow.start).User('helloworld/employee') \
                 .Execute({'text': 'Test Request'}) \
@@ -31,12 +31,14 @@ class Test(TestCase):
 urlpatterns = [
     url(r'^helloworld/', include([
         HelloWorldFlow.instance.urls,
-        url('^$', viewflow.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', viewflow.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', viewflow.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', viewflow.DetailProcessView.as_view(), name='details'),
-        url('^action/cancel/(?P<process_pk>\d+)/$', viewflow.CancelProcessView.as_view(), name='action_cancel'),
-    ], namespace=HelloWorldFlow.instance.namespace), {'flow_cls': HelloWorldFlow}),
+        url('^$', viewflow.ProcessListView.as_view(flow_cls=HelloWorldFlow), name='index'),
+        url('^tasks/$', viewflow.TaskListView.as_view(flow_cls=HelloWorldFlow), name='tasks'),
+        url('^queue/$', viewflow.QueueListView.as_view(flow_cls=HelloWorldFlow), name='queue'),
+        url('^detail/(?P<process_pk>\d+)/$',
+            viewflow.DetailProcessView.as_view(flow_cls=HelloWorldFlow), name='detail'),
+        url('^action/cancel/(?P<process_pk>\d+)/$',
+            viewflow.CancelProcessView.as_view(flow_cls=HelloWorldFlow), name='action_cancel'),
+    ], namespace='helloworld')),
 ]
 
 try:

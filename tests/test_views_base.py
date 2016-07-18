@@ -1,3 +1,4 @@
+from django.core.urlresolvers import resolve
 from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
@@ -12,6 +13,7 @@ class Test(TestCase):
     def test_get_next_task_url_flow_index(self):
         request = RequestFactory().get('/test/')
         request.user = User(username='test')
+        request.resolver_match = resolve('/test/')
 
         next_url = views.get_next_task_url(request, BaseViewTestFlow.process_cls(flow_cls=BaseViewTestFlow))
         self.assertEqual(next_url, '/test/')
@@ -20,19 +22,22 @@ class Test(TestCase):
         process = BaseViewTestFlow.process_cls.objects.create(flow_cls=BaseViewTestFlow)
         request = RequestFactory().get('/test/')
         request.user = User(username='test')
+        request.resolver_match = resolve('/test/')
 
         next_url = views.get_next_task_url(request, process)
-        self.assertEqual(next_url, '/test/details/{}/'.format(process.pk))
+        self.assertEqual(next_url, '/test/detail/{}/'.format(process.pk))
 
     def test_get_next_task_url_back(self):
         request = RequestFactory().get('/test/', {'back': '/test_back_url/'})
         request.user = User(username='test')
+        request.resolver_match = resolve('/test/')
 
         next_url = views.get_next_task_url(request, None)
         self.assertEqual(next_url, '/test_back_url/')
 
         request = RequestFactory().get('/test/', {'back': 'http://unsafe.com/test_back_url/'})
         request.user = User(username='test')
+        request.resolver_match = resolve('/test/')
 
         next_url = views.get_next_task_url(request, None)
         self.assertEqual(next_url, '/')
@@ -45,6 +50,7 @@ class Test(TestCase):
 
         request = RequestFactory().post('/done/', {'_continue': '1'})
         request.user = user
+        request.resolver_match = resolve('/test/')
 
         next_url = views.get_next_task_url(request, act.process)
         self.assertEqual(next_url, '/test/{}/test_task/{}/'.format(task.process_id, task.pk))
@@ -57,6 +63,7 @@ class Test(TestCase):
 
         request = RequestFactory().post('/done/', {'_continue': '1'})
         request.user = user
+        request.resolver_match = resolve('/test/')
 
         next_url = views.get_next_task_url(request, act.process)
         self.assertEqual(next_url, '/test/{}/test_task/{}/assign/'.format(task.process_id, task.pk))
@@ -69,6 +76,8 @@ class Test(TestCase):
         # get
         request = RequestFactory().get('/details/')
         request.user = User(username='test', is_superuser=True)
+        request.resolver_match = resolve('/test/')
+
         response = view(
             request, flow_cls=BaseViewTestFlow, flow_task=BaseViewTestFlow.test_task,
             process_pk=act.process.pk, task_pk=task.pk)
@@ -91,11 +100,12 @@ class BaseViewTestFlow(Flow):
 urlpatterns = [
     url(r'^test/', include([
         BaseViewTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$', views.DetailProcessView.as_view(), name='details'),
-    ], namespace=BaseViewTestFlow.instance.namespace), {'flow_cls': BaseViewTestFlow})
+        url('^$', views.ProcessListView.as_view(flow_cls=BaseViewTestFlow), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(flow_cls=BaseViewTestFlow), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(flow_cls=BaseViewTestFlow), name='queue'),
+        url('^detail/(?P<process_pk>\d+)/$',
+            views.DetailProcessView.as_view(flow_cls=BaseViewTestFlow), name='detail'),
+    ], namespace='baseviewtest'))
 ]
 
 try:

@@ -19,8 +19,8 @@
     <tbody>
         {% for task in queue %}
         <tr>
-            <td><a href="{% flowurl task user=request.user %}">{{ task.process.id }}/{{ task.id }}</a></td>
-            <td><a href="{% flowurl task.process 'details' %}">{{ task.process.id }}</a></td>
+            <td><a href="{% flowurl task user=request.user namespace_map=view.flows %}">{{ task.process.id }}/{{ task.id }}</a></td>
+            <td><a href="{% flowurl task.process 'detail' namespace_map=view.flows %}">{{ task.process.id }}</a></td>
             <td>{{ task.flow_task }}</td>
             <td>{{ task.created }}</td>
             <td>{{ task.finished|default:"" }}</td>
