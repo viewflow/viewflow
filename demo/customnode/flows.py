@@ -1,5 +1,5 @@
 from viewflow import flow
-from viewflow.flow.views import StartFlowView
+from viewflow.flow.views import CreateProcessView
 from viewflow.base import this, Flow
 
 from . import models, views
@@ -21,7 +21,7 @@ class DynamicSplitFlow(Flow):
 
     start = (
         flow.Start(
-            StartFlowView,
+            CreateProcessView,
             fields=['question', 'split_count'],
             task_result_summary="Asks for {{ process.split_count }} decisions")
         .Permission(auto_create=True)

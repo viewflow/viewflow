@@ -257,7 +257,7 @@ class Start(nodes.Start):
     cancel_view_class = views.CancelTaskView
     details_view_class = views.DetailTaskView
     undo_view_class = views.UndoTaskView
-    start_view_class = views.StartFlowView
+    start_view_class = views.CreateProcessView
 
     activation_cls = ManagedStartViewActivation
 

@@ -42,7 +42,7 @@ class Test(TestCase):
         process.get_task(StartViewTestFlow.start, status=[STATUS.DONE])
 
     def test_startprocess_view(self):
-        view = views.StartFlowView.as_view()
+        view = views.CreateProcessView.as_view()
         user = User.objects.create(username='test', is_superuser=True)
 
         # get

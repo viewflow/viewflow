@@ -1,6 +1,6 @@
 from viewflow import flow
 from viewflow.base import this, Flow
-from viewflow.flow.views import FlowView
+from viewflow.flow.views import UpdateProcessView
 from viewflow.lock import select_for_update_lock
 
 from . import views
@@ -90,7 +90,7 @@ class ShipmentFlow(Flow):
 
     # Warehouse worker
     package_goods = (
-        flow.View(FlowView)
+        flow.View(UpdateProcessView)
         .Permission('shipment.can_package_goods')
         .Next(this.join_clerk_warehouse)
     )
@@ -101,7 +101,7 @@ class ShipmentFlow(Flow):
     )
 
     move_package = (
-        flow.View(FlowView)
+        flow.View(UpdateProcessView)
         .Assign(this.package_goods.owner)
         .Next(this.end)
     )

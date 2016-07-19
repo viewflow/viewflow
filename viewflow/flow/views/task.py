@@ -35,10 +35,6 @@ class BaseFlowViewMixin(object):
             '{}/{}/task.html'.format(opts.app_label, opts.flow_label),
             'viewflow/flow/task.html')
 
-    def activation_done(self, *args, **kwargs):
-        """Finish activation."""
-        self.activation.done()
-
     @method_decorator(flow_view)
     def dispatch(self, request, **kwargs):
         self.activation = request.activation
@@ -57,6 +53,10 @@ class BaseFlowViewMixin(object):
 
 
 class FlowViewMixin(MessageUserMixin, BaseFlowViewMixin):
+    def activation_done(self, *args, **kwargs):
+        """Finish activation."""
+        self.activation.done()
+
     def form_valid(self, *args, **kwargs):
         response = super(FlowViewMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
@@ -66,7 +66,7 @@ class FlowViewMixin(MessageUserMixin, BaseFlowViewMixin):
         return response
 
 
-class FlowView(FlowViewMixin, generic.UpdateView):
+class UpdateProcessView(FlowViewMixin, generic.UpdateView):
     fields = []
 
     @property

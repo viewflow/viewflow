@@ -79,7 +79,7 @@ except ImportError:
 
 class TestTemplateTagsFlow(Flow):
     start = flow.StartFunction().Next(this.view)
-    view = flow.View(views.FlowView).Next(this.end)
+    view = flow.View(views.UpdateProcessView).Next(this.end)
     end = flow.End()
 
 

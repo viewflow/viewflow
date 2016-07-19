@@ -57,7 +57,7 @@ class Test(TestCase):
         self.assertEqual(task.status, STATUS.DONE)
 
     def test_flowview(self):
-        view = views.FlowView.as_view()
+        view = views.UpdateProcessView.as_view()
         user = User.objects.create(username='test', is_superuser=True)
 
         act = TaskViewTestFlow.start.run()

@@ -28,10 +28,6 @@ class BaseStartFlowMixin(object):
             '{}/{}/start.html'.format(opts.app_label, opts.flow_label),
             'viewflow/flow/start.html')
 
-    def activation_done(self, *args, **kwargs):
-        """Finish activation."""
-        self.activation.done()
-
     @method_decorator(flow_start_view)
     def dispatch(self, request, **kwargs):
         """Check user permissions, and prepare flow to execution."""
@@ -44,6 +40,10 @@ class BaseStartFlowMixin(object):
 
 
 class StartFlowMixin(MessageUserMixin, BaseStartFlowMixin):
+    def activation_done(self, *args, **kwargs):
+        """Finish activation."""
+        self.activation.done()
+
     def form_valid(self, *args, **kwargs):
         response = super(StartFlowMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
@@ -51,7 +51,7 @@ class StartFlowMixin(MessageUserMixin, BaseStartFlowMixin):
         return response
 
 
-class StartFlowView(StartFlowMixin, generic.UpdateView):
+class CreateProcessView(StartFlowMixin, generic.UpdateView):
     fields = []
 
     @property

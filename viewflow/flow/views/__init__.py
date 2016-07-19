@@ -7,9 +7,9 @@ from .list import (
     AllProcessListView, AllTaskListView, AllQueueListView, AllArchiveListView,
     ProcessListView, TaskListView, QueueListView,
 )
-from .start import StartFlowMixin, StartFlowView
+from .start import StartFlowMixin, CreateProcessView
 from .task import (
-    FlowViewMixin, FlowView,
+    FlowViewMixin, UpdateProcessView,
     AssignTaskView, UnassignTaskView
 )
 from .utils import get_next_task_url
@@ -19,9 +19,9 @@ __all__ = [
     'ActivateNextTaskView', 'AllArchiveListView',
     'AllProcessListView', 'AllQueueListView', 'AllTaskListView',
     'AssignTaskView', 'CancelProcessView', 'CancelTaskView',
-    'DetailProcessView', 'DetailTaskView', 'FlowView',
+    'DetailProcessView', 'DetailTaskView', 'UpdateProcessView',
     'FlowViewMixin', 'PerformTaskView', 'ProcessListView',
-    'QueueListView', 'StartFlowMixin', 'StartFlowView',
+    'QueueListView', 'StartFlowMixin', 'CreateProcessView',
     'TaskListView', 'UnassignTaskView', 'UndoTaskView',
     'get_next_task_url',
 ]

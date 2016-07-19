@@ -246,7 +246,7 @@ class Test(TestCase):
 class ActionsTestFlow(Flow):
     start = flow.StartFunction().Next(this.task)
     if_gate = flow.If(lambda p: True).Then(this.end).Else(this.end)
-    task = flow.View(views.FlowView, fields=[]).Next(this.end)
+    task = flow.View(views.UpdateProcessView, fields=[]).Next(this.end)
     end = flow.End()
 
 

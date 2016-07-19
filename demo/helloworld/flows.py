@@ -21,7 +21,7 @@ class HelloWorldFlow(Flow):
 
     start = (
         flow.Start(
-            flow_views.StartFlowView,
+            flow_views.CreateProcessView,
             fields=['text'])
         .Permission(auto_create=True)
         .Next(this.approve)
@@ -29,7 +29,7 @@ class HelloWorldFlow(Flow):
 
     approve = (
         flow.View(
-            flow_views.FlowView, fields=['approved'],
+            flow_views.UpdateProcessView, fields=['approved'],
             task_description="Message approvement required",
             task_result_summary="Messsage was {{ process.approved|yesno:'Approved,Rejected' }}")
         .Permission(auto_create=True)
