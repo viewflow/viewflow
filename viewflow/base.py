@@ -220,7 +220,13 @@ class FlowMetaClass(type):
         new_class.instance = FlowInstanceDescriptor()
 
         # set up flow tasks
-        nodes = {name: attr for name, attr in attrs.items() if isinstance(attr, Node)}
+        nodes = {}
+        for base_cls in bases:
+            for name, attr in base_cls.__dict__.items():
+                if isinstance(attr, Node):
+                    nodes[name] = attr
+        nodes.update({name: attr for name, attr in attrs.items()
+                      if isinstance(attr, Node)})
 
         for name, node in nodes.items():
             node.name = name

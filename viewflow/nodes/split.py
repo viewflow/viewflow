@@ -1,3 +1,5 @@
+from copy import copy
+
 from .. import base, mixins
 from ..activation import AbstractGateActivation
 from ..exceptions import FlowRuntimeError
@@ -56,9 +58,11 @@ class Split(mixins.TaskDescriptionMixin,
         return self._activate_next
 
     def Next(self, node, cond=None):
-        self._activate_next.append((node, cond))
-        return self
+        result = copy(self)
+        result._activate_next.append((node, cond))
+        return result
 
     def Always(self, node):
-        self._activate_next.append((node, None))
-        return self
+        result = copy(self)
+        result._activate_next.append((node, None))
+        return result

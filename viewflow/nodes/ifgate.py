@@ -1,3 +1,5 @@
+from copy import copy
+
 from .. import base, mixins
 from ..activation import AbstractGateActivation
 
@@ -42,12 +44,14 @@ class If(mixins.TaskDescriptionMixin,
         self._on_false = resolver.get_implementation(self._on_false)
 
     def Then(self, node):
-        self._on_true = node
-        return self
+        result = copy(self)
+        result._on_true = node
+        return result
 
     def Else(self, node):
-        self._on_false = node
-        return self
+        result = copy(self)
+        result._on_false = node
+        return result
 
     @property
     def condition(self):

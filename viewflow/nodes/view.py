@@ -1,3 +1,5 @@
+from copy import copy
+
 from django.conf.urls import url
 from django.core.urlresolvers import reverse
 
@@ -169,11 +171,13 @@ class View(mixins.PermissionMixin, BaseView):
             .Assign(username='employee')
             .Assign(lambda process: process.created_by)
         """
+        result = copy(self)
+
         if owner:
-            self._owner = owner
+            result._owner = owner
         else:
-            self._owner = owner_kwargs
-        return self
+            result._owner = owner_kwargs
+        return result
 
     @property
     def assign_view(self):

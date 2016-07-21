@@ -1,3 +1,4 @@
+from copy import copy
 from textwrap import dedent
 from django.conf.urls import url
 from django.core.urlresolvers import reverse
@@ -14,9 +15,9 @@ class NextNodeMixin(object):
         super(NextNodeMixin, self).__init__(*args, **kwargs)
 
     def Next(self, node):
-        assert self._next is None, 'Next node already specified'
-        self._next = node
-        return self
+        result = copy(self)
+        result._next = node
+        return result
 
     def _resolve(self, resolver):
         if self._next:
@@ -190,12 +191,12 @@ class PermissionMixin(object):
         if permission is None and not auto_create:
             raise ValueError('Please specify existion permission name or mark as auto_create=True')
 
-        self._owner_permission = permission
-        self._owner_permission_obj = obj
-        self._owner_permission_auto_create = auto_create
-        self._owner_permission_help_text = help_text
-
-        return self
+        result = copy(self)
+        result._owner_permission = permission
+        result._owner_permission_obj = obj
+        result._owner_permission_auto_create = auto_create
+        result._owner_permission_help_text = help_text
+        return result
 
     def ready(self):
         if self._owner_permission_auto_create:
