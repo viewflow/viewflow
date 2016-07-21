@@ -56,14 +56,14 @@ class FlowViewMixin(MessageUserMixin, BaseFlowViewMixin):
     def activation_done(self, *args, **kwargs):
         """Finish activation."""
         self.activation.done()
-
-    def form_valid(self, *args, **kwargs):
-        response = super(FlowViewMixin, self).form_valid(*args, **kwargs)
-        self.activation_done(*args, **kwargs)
         self.success('Task {task} has been completed.')
         if self.activation.process.finished:
             self.success('Process {process} has been completed.')
-        return response
+
+    def form_valid(self, *args, **kwargs):
+        super(FlowViewMixin, self).form_valid(*args, **kwargs)
+        self.activation_done(*args, **kwargs)
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class UpdateProcessView(FlowViewMixin, generic.UpdateView):

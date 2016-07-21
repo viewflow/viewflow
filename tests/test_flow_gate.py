@@ -89,6 +89,7 @@ class TaskStub(object):
         self.pk = 1
         self.status = STATUS.NEW
         self.token = token
+        self.started = None
 
     @property
     def leading(self):

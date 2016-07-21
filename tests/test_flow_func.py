@@ -189,6 +189,7 @@ class TaskStub(object):
         self.process_id = 1
         self.pk = 1
         self.status = STATUS.NEW
+        self.started = None
 
     @property
     def leading(self):

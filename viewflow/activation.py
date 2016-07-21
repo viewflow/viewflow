@@ -227,7 +227,8 @@ class StartActivation(Activation):
 
         No db changes performed. It is safe to call it on GET requests.
         """
-        self.task.started = now()
+        if self.task.started is None:
+            self.task.started = now()
 
     @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
     def done(self):
@@ -339,7 +340,8 @@ class ViewActivation(Activation):
 
         No db changes performed. It is safe to call it on GET requests.
         """
-        self.task.started = now()
+        if self.task.started is None:
+            self.task.started = now()
 
     @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
     def done(self):
@@ -406,7 +408,8 @@ class ViewActivation(Activation):
 class FuncActivation(Activation):
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.PREPARED)
     def prepare(self):
-        self.task.started = now()
+        if self.task.started is None:
+            self.task.started = now()
         signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
     @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)

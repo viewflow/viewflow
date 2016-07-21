@@ -1,4 +1,5 @@
 from django.core.exceptions import PermissionDenied
+from django.http import HttpResponseRedirect
 from django.views import generic
 from django.utils.decorators import method_decorator
 
@@ -43,12 +44,12 @@ class StartFlowMixin(MessageUserMixin, BaseStartFlowMixin):
     def activation_done(self, *args, **kwargs):
         """Finish activation."""
         self.activation.done()
+        self.success('Process {process} has been started.')
 
     def form_valid(self, *args, **kwargs):
-        response = super(StartFlowMixin, self).form_valid(*args, **kwargs)
+        super(StartFlowMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
-        self.success('Process {process} has been started.')
-        return response
+        return HttpResponseRedirect(self.get_success_url())
 
 
 class CreateProcessView(StartFlowMixin, generic.UpdateView):

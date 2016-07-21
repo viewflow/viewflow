@@ -26,6 +26,7 @@ class Test(TestCase):
 
         def __init__(self, flow_task=None):
             self.flow_task = flow_task
+            self.started = None
 
         @property
         def leading(self):
