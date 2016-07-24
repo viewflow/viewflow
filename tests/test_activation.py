@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from viewflow import activation, flow
+from viewflow import activation, flow, lock
 from viewflow.activation import STATUS
 from viewflow.compat import mock
 
@@ -16,6 +16,7 @@ class Test(TestCase):
             return []
 
         def save(self):
+            self.pk = 1
             return
 
     ProcessStub._default_manager.get.return_value = ProcessStub()
@@ -34,6 +35,7 @@ class Test(TestCase):
             return Task.objects.none()
 
         def save(self):
+            self.pk = 1
             return
 
     class UserStub(object):
@@ -42,6 +44,7 @@ class Test(TestCase):
     def init_node(self, node):
         class FlowStub(object):
             process_cls = Test.ProcessStub
+            lock_impl = staticmethod(lock.no_lock)
             task_cls = Test.TaskStub
             instance = None
 

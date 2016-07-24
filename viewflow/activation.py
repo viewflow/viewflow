@@ -212,6 +212,7 @@ class StartActivation(Activation):
 
     @Activation.status.super()
     def initialize(self, flow_task, task):
+        self.lock = None
         self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
 
         if task:
@@ -248,6 +249,10 @@ class StartActivation(Activation):
         signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
 
         self.process.save()
+
+        lock_impl = self.flow_cls.lock_impl(self.flow_cls.instance)
+        self.lock = lock_impl(self.flow_cls, self.process.pk)
+        self.lock.__enter__()
 
         self.task.process = self.process
         self.task.finished = now()

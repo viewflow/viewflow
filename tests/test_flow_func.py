@@ -178,6 +178,7 @@ class ProcessStub(object):
         return []
 
     def save(self):
+        self.pk = 1
         return
 
 
@@ -197,6 +198,7 @@ class TaskStub(object):
         return Task.objects.none()
 
     def save(self):
+        self.pk = 1
         return
 
 

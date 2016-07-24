@@ -1,3 +1,4 @@
+import sys
 import traceback
 import functools
 
@@ -10,9 +11,13 @@ from .fields import import_task_by_ref
 def flow_start_func(func):
     @functools.wraps(func)
     def _wrapper(flow_task, *args, **kwargs):
-        activation = flow_task.activation_cls()
-        activation.initialize(flow_task, None)
-        return func(activation, *args, **kwargs)
+        try:
+            activation = flow_task.activation_cls()
+            activation.initialize(flow_task, None)
+            return func(activation, *args, **kwargs)
+        finally:
+            if activation.lock:
+                activation.lock.__exit__(*sys.exc_info())
     return _wrapper
 
 
@@ -102,9 +107,13 @@ def flow_job(func):
 def flow_start_signal(handler):
     @functools.wraps(handler)
     def _wrapper(sender, flow_task=None, **signal_kwargs):
-        activation = flow_task.activation_cls()
-        activation.initialize(flow_task, None)
-        return handler(sender=sender, activation=activation, **signal_kwargs)
+        try:
+            activation = flow_task.activation_cls()
+            activation.initialize(flow_task, None)
+            return handler(sender=sender, activation=activation, **signal_kwargs)
+        finally:
+            if activation.lock:
+                activation.lock.__exit__(*sys.exc_info())
     return _wrapper
 
 
@@ -136,14 +145,17 @@ def flow_start_view(view):
 
     @functools.wraps(view)
     def _wrapper(request, flow_cls, flow_task, **kwargs):
+        try:
             activation = flow_task.activation_cls()
             activation.initialize(flow_task, None)
 
             request.activation = activation
             request.process = activation.process
             request.task = activation.task
-
             return view(request, **kwargs)
+        finally:
+            if activation.lock:
+                activation.lock.__exit__(*sys.exc_info())
     return _wrapper
 
 
