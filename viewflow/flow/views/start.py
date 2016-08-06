@@ -53,7 +53,10 @@ class StartFlowMixin(MessageUserMixin, BaseStartFlowMixin):
 
 
 class CreateProcessView(StartFlowMixin, generic.UpdateView):
-    fields = []
+    def __init__(self, *args, **kwargs):
+        super(CreateProcessView, self).__init__(*args, **kwargs)
+        if self.form_class is None and self.fields is None:
+            self.fields = []
 
     @property
     def model(self):
