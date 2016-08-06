@@ -7,11 +7,11 @@ from viewflow.token import Token
 
 class Test(TestCase):
     def test_import_flow_by_ref_succeed(self):
-        flow_cls = fields.import_flow_by_ref('viewflow/base.Flow')
-        self.assertTrue(issubclass(flow_cls, Flow))
+        flow_class = fields.import_flow_by_ref('viewflow/base.Flow')
+        self.assertTrue(issubclass(flow_class, Flow))
 
-        flow_cls = fields.import_flow_by_ref('tests/test_fields.TestFlow')
-        self.assertTrue(flow_cls is TestFlow)
+        flow_class = fields.import_flow_by_ref('tests/test_fields.TestFlow')
+        self.assertTrue(flow_class is TestFlow)
 
     def test_get_flow_ref_succeed(self):
         self.assertEqual(fields.get_flow_ref(Flow), 'viewflow/base.Flow')

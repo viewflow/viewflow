@@ -10,8 +10,8 @@ from viewflow.nodes.handler import HandlerActivation
 
 
 class Test(TestCase):
-    def init_node(self, node, flow_cls=None, name='test_node'):
-        node.flow_cls = flow_cls or FlowStub
+    def init_node(self, node, flow_class=None, name='test_node'):
+        node.flow_class = flow_class or FlowStub
         node.name = name
         node.ready()
         return node
@@ -49,7 +49,7 @@ class Test(TestCase):
                 return activation
 
         Flow.instance = Flow()
-        flow_task = self.init_node(Flow.start, flow_cls=Flow, name='start')
+        flow_task = self.init_node(Flow.start, flow_class=Flow, name='start')
 
         act = flow_task.run()
         self.assertEqual(act.task.status, STATUS.DONE)
@@ -96,7 +96,7 @@ class Test(TestCase):
                 return activation
 
         Flow.instance = Flow()
-        flow_task = self.init_node(Flow.func_task, flow_cls=Flow, name='task')
+        flow_task = self.init_node(Flow.func_task, flow_class=Flow, name='task')
 
         act = flow_task.run()
         self.assertEqual(act.task.status, STATUS.DONE)
@@ -156,7 +156,7 @@ class Test(TestCase):
                 Flow.method_called = True
 
         Flow.instance = Flow()
-        flow_task = self.init_node(Flow.handler_task, flow_cls=Flow, name='task')
+        flow_task = self.init_node(Flow.handler_task, flow_class=Flow, name='task')
 
         act = HandlerActivation()
         act.initialize(flow_task, TaskStub())
@@ -171,8 +171,8 @@ class Test(TestCase):
 class ProcessStub(object):
     _default_manager = mock.Mock()
 
-    def __init__(self, flow_cls=None):
-        self.flow_cls = flow_cls
+    def __init__(self, flow_class=None):
+        self.flow_class = flow_class
 
     def active_tasks(self):
         return []
@@ -203,8 +203,8 @@ class TaskStub(object):
 
 
 class FlowStub(object):
-    process_cls = ProcessStub
-    task_cls = TaskStub
+    process_class = ProcessStub
+    task_class = TaskStub
     lock_impl = lock.no_lock
     instance = None
 

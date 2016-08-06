@@ -28,7 +28,7 @@ class BaseFlowViewMixin(object):
 
     def get_template_names(self):
         flow_task = self.activation.flow_task
-        opts = self.activation.flow_task.flow_cls._meta
+        opts = self.activation.flow_task.flow_class._meta
 
         return (
             '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
@@ -74,7 +74,7 @@ class UpdateProcessView(FlowViewMixin, generic.UpdateView):
 
     @property
     def model(self):
-        return self.activation.flow_cls.process_cls
+        return self.activation.flow_class.process_class
 
     def get_object(self, queryset=None):
         return self.activation.process
@@ -89,7 +89,7 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
 
     def get_template_names(self):
         flow_task = self.activation.flow_task
-        opts = self.activation.flow_cls._meta
+        opts = self.activation.flow_class._meta
 
         return (
             '{}/{}/{}_assign.html'.format(opts.app_label, opts.flow_label, flow_task.name),

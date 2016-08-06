@@ -42,7 +42,7 @@ class DynamicSplit(mixins.NextNodeMixin,
     perform_view_class = views.PerformTaskView
     undo_view_class = views.UndoTaskView
 
-    activation_cls = DynamicSplitActivation
+    activation_class = DynamicSplitActivation
 
     def __init__(self, callback):
         super(DynamicSplit, self).__init__()

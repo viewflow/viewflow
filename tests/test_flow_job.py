@@ -54,5 +54,5 @@ class JobActivation(AbstractJobActivation):
 
 class JobTestFlow(Flow):
     start = flow.StartFunction().Next(this.job)
-    job = AbstractJob(job_handler, activation_cls=JobActivation).Next(this.end)
+    job = AbstractJob(job_handler, activation_class=JobActivation).Next(this.end)
     end = flow.End()

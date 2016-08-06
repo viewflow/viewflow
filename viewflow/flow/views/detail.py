@@ -16,7 +16,7 @@ class DetailTaskView(generic.TemplateView):
 
     def get_template_names(self):
         flow_task = self.activation.flow_task
-        opts = self.activation.flow_task.flow_cls._meta
+        opts = self.activation.flow_task.flow_class._meta
 
         return (
             '{}/{}/{}_details.html'.format(opts.app_label, opts.flow_label, flow_task.name),
@@ -45,7 +45,7 @@ class DetailProcessView(FlowViewPermissionMixin, generic.DetailView):
     pk_url_kwarg = 'process_pk'
 
     def get_template_names(self):
-        opts = self.flow_cls._meta
+        opts = self.flow_class._meta
 
         return (
             '{}/{}/process_details.html'.format(opts.app_label, opts.flow_label),
@@ -54,10 +54,10 @@ class DetailProcessView(FlowViewPermissionMixin, generic.DetailView):
     def get_context_data(self, **kwargs):
         context = super(DetailProcessView, self).get_context_data(**kwargs)
         context['start_actions'] = flow_start_actions(
-            self.flow_cls, namespace=self.request.resolver_match.namespace, user=self.request.user)
-        context['flow_cls'] = self.flow_cls
+            self.flow_class, namespace=self.request.resolver_match.namespace, user=self.request.user)
+        context['flow_class'] = self.flow_class
         context['task_list'] = context['process'].task_set.all().order_by('created')
         return context
 
     def get_queryset(self):
-        return self.flow_cls.process_cls._default_manager.all()
+        return self.flow_class.process_class._default_manager.all()

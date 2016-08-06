@@ -23,10 +23,10 @@ class ProcessAdmin(admin.ModelAdmin):
     """
     actions = None
     date_hierarchy = 'created'
-    list_display = ['pk', 'created', 'flow_cls', 'status', 'participants']
-    list_display_links = ['pk', 'created', 'flow_cls']
+    list_display = ['pk', 'created', 'flow_class', 'status', 'participants']
+    list_display_links = ['pk', 'created', 'flow_class']
     list_filter = ['status']
-    readonly_fields = ['flow_cls', 'status', 'finished']
+    readonly_fields = ['flow_class', 'status', 'finished']
     # inlines = [TaskInline]
 
     def has_add_permission(self, request):
@@ -74,8 +74,8 @@ class TaskAdmin(admin.ModelAdmin):
                               if action.startswith('_change_status_')), None)
         if status_action:
             activation = obj.activate()
-            activation_cls = activation.__class__
-            transition = next((transition for transition in activation_cls.status.get_available_transtions(activation)
+            activation_class = activation.__class__
+            transition = next((transition for transition in activation_class.status.get_available_transtions(activation)
                                if transition.name == status_action), None)
             if transition:
                 transition(activation)

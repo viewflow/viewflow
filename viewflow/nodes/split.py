@@ -37,7 +37,7 @@ class Split(mixins.TaskDescriptionMixin,
             base.Gateway):
 
     task_type = 'SPLIT'
-    activation_cls = SplitActivation
+    activation_class = SplitActivation
 
     def __init__(self, **kwargs):
         super(Split, self).__init__(**kwargs)

@@ -109,7 +109,7 @@ class Activation(object):
         Activation should be available for instantiate without any
         constructor parameters
         """
-        self.flow_cls, self.flow_task = None, None
+        self.flow_class, self.flow_task = None, None
         self.process, self.task = None, None
 
         super(Activation, self).__init__(*args, **kwargs)
@@ -144,7 +144,7 @@ class Activation(object):
                     self.task.finished = now()
                     self.set_status(STATUS.ERROR)
                     self.task.save()
-                    signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task)
+                    signals.task_failed.send(sender=self.flow_class, process=self.process, task=self.task)
                 else:
                     raise
         return guard()
@@ -157,9 +157,9 @@ class Activation(object):
 
         This method does additional viewflow specific initilization,
         and bounds activation and task instances.  """
-        self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
+        self.flow_task, self.flow_class = flow_task, flow_task.flow_class
 
-        self.process = self.flow_cls.process_cls._default_manager.get(flow_cls=self.flow_cls, pk=task.process_id)
+        self.process = self.flow_class.process_class._default_manager.get(flow_class=self.flow_class, pk=task.process_id)
         self.task = task
 
     @status.transition(source=STATUS.DONE, target=STATUS.NEW, conditions=[all_leading_canceled])
@@ -174,7 +174,7 @@ class Activation(object):
 
         # call custom undo handler
         handler_name = '{}_undo'.format(self.flow_task.name)
-        handler = getattr(self.flow_cls.instance, handler_name, None)
+        handler = getattr(self.flow_class.instance, handler_name, None)
         if handler:
             handler(self)
 
@@ -213,13 +213,13 @@ class StartActivation(Activation):
     @Activation.status.super()
     def initialize(self, flow_task, task):
         self.lock = None
-        self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
+        self.flow_task, self.flow_class = flow_task, flow_task.flow_class
 
         if task:
             self.process, self.task = task.flow_process, task
         else:
-            self.process = self.flow_cls.process_cls(flow_cls=self.flow_cls)
-            self.task = self.flow_cls.task_cls(flow_task=self.flow_task)
+            self.process = self.flow_class.process_class(flow_class=self.flow_class)
+            self.task = self.flow_class.task_class(flow_task=self.flow_task)
 
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.PREPARED)
     def prepare(self):
@@ -246,20 +246,20 @@ class StartActivation(Activation):
             :data:`viewflow.signals.flow_started`
 
         """
-        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
         self.process.save()
 
-        lock_impl = self.flow_cls.lock_impl(self.flow_cls.instance)
-        self.lock = lock_impl(self.flow_cls, self.process.pk)
+        lock_impl = self.flow_class.lock_impl(self.flow_class.instance)
+        self.lock = lock_impl(self.flow_class, self.process.pk)
         self.lock.__enter__()
 
         self.task.process = self.process
         self.task.finished = now()
         self.task.save()
 
-        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
-        signals.flow_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
+        signals.flow_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
         self.activate_next()
 
@@ -285,7 +285,7 @@ class StartActivation(Activation):
 
         # call custom undo handler
         handler_name = '{}_undo'.format(self.flow_task.name)
-        handler = getattr(self.flow_cls.instance, handler_name, None)
+        handler = getattr(self.flow_class.instance, handler_name, None)
         if handler:
             handler(self)
 
@@ -359,12 +359,12 @@ class ViewActivation(Activation):
         .. seealso::
             :data:`viewflow.signals.task_finished`
         """
-        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
         self.task.finished = now()
         self.task.save()
 
-        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
 
         self.activate_next()
 
@@ -386,7 +386,7 @@ class ViewActivation(Activation):
 
     @classmethod
     def create_task(cls, flow_task, prev_activation, token):
-        return flow_task.flow_cls.task_cls(
+        return flow_task.flow_class.task_class(
             process=prev_activation.process,
             flow_task=flow_task,
             token=token)
@@ -415,14 +415,14 @@ class FuncActivation(Activation):
     def prepare(self):
         if self.task.started is None:
             self.task.started = now()
-        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
     @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
     def done(self):
         self.task.finished = now()
         self.task.save()
 
-        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
 
         self.activate_next()
 
@@ -435,7 +435,7 @@ class FuncActivation(Activation):
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
         """Instantiate new task."""
-        task = flow_task.flow_cls.task_cls(
+        task = flow_task.flow_class.task_class(
             process=prev_activation.process,
             flow_task=flow_task,
             token=token)
@@ -500,7 +500,7 @@ class AbstractGateActivation(Activation):
             self.task.started = now()
             self.task.save()
 
-            signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+            signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
             self.calculate_next()
 
@@ -508,7 +508,7 @@ class AbstractGateActivation(Activation):
             self.set_status(STATUS.DONE)
             self.task.save()
 
-            signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+            signals.task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
 
             self.activate_next()
 
@@ -537,10 +537,10 @@ class AbstractGateActivation(Activation):
         It is safe to schedule job just now b/c the process instance is locked,
         and job will wait until this transaction completes.
         """
-        flow_cls, flow_task = flow_task.flow_cls, flow_task
+        flow_class, flow_task = flow_task.flow_class, flow_task
         process = prev_activation.process
 
-        task = flow_cls.task_cls(
+        task = flow_class.task_class(
             process=process,
             flow_task=flow_task,
             token=token)
@@ -624,7 +624,7 @@ class AbstractJobActivation(Activation):
         """
         self.task.started = now()
         self.task.save()
-        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
     @Activation.status.transition(source=STATUS.STARTED, target=STATUS.DONE)
     def done(self):
@@ -639,7 +639,7 @@ class AbstractJobActivation(Activation):
         self.set_status(STATUS.DONE)
         self.task.save()
 
-        signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
 
         self.activate_next()
 
@@ -655,7 +655,7 @@ class AbstractJobActivation(Activation):
         self.task.comments = comments
         self.task.finished = now()
         self.task.save()
-        signals.task_failed.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.task_failed.send(sender=self.flow_class, process=self.process, task=self.task)
 
     @Activation.status.transition(source=[STATUS.SCHEDULED, STATUS.STARTED, STATUS.ERROR])
     def retry(self):
@@ -692,10 +692,10 @@ class AbstractJobActivation(Activation):
         It is safe to schedule job just now b/c the process instance is locked,
         and job will wait until this transaction completes.
         """
-        flow_cls, flow_task = flow_task.flow_cls, flow_task
+        flow_class, flow_task = flow_task.flow_class, flow_task
         process = prev_activation.process
 
-        task = flow_cls.task_cls(
+        task = flow_class.task_class(
             process=process,
             flow_task=flow_task,
             token=token)
@@ -744,7 +744,7 @@ class EndActivation(Activation):
             self.task.started = now()
             self.task.save()
 
-            signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+            signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
             for task in self.process.active_tasks():
                 if task != self.task:
@@ -757,8 +757,8 @@ class EndActivation(Activation):
             self.task.finished = now()
             self.task.save()
 
-            signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
-            signals.flow_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+            signals.task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
+            signals.flow_finished.send(sender=self.flow_class, process=self.process, task=self.task)
 
     @Activation.status.super()
     def undo(self):
@@ -775,10 +775,10 @@ class EndActivation(Activation):
         """
         Mark process as done, and cancel all other active tasks.
         """
-        flow_cls, flow_task = flow_task.flow_cls, flow_task
+        flow_class, flow_task = flow_task.flow_class, flow_task
         process = prev_activation.process
 
-        task = flow_cls.task_cls(
+        task = flow_class.task_class(
             process=process,
             flow_task=flow_task,
             token=token)

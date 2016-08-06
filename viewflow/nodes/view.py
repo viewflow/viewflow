@@ -18,30 +18,30 @@ class BaseStart(mixins.TaskDescriptionViewMixin,
     task_type = 'START'
     start_view_class = None
 
-    def __init__(self, view_or_cls=None, **kwargs):
+    def __init__(self, view_or_class=None, **kwargs):
         """
         Accepts view callable or CBV View class with view kwargs,
-        if CBV view implements StartActivation, it used as activation_cls
+        if CBV view implements StartActivation, it used as activation_class
         """
-        self._view, self._view_cls, self._view_args = None, None, None
+        self._view, self._view_class, self._view_args = None, None, None
 
-        if isinstance(view_or_cls, type):
-            self._view_cls = view_or_cls
+        if isinstance(view_or_class, type):
+            self._view_class = view_or_class
 
-            if issubclass(view_or_cls, StartActivation):
-                kwargs.setdefault('activation_cls', view_or_cls)
+            if issubclass(view_or_class, StartActivation):
+                kwargs.setdefault('activation_class', view_or_class)
         else:
-            self._view = view_or_cls
+            self._view = view_or_class
 
-        super(BaseStart, self).__init__(view_or_cls=view_or_cls, **kwargs)
+        super(BaseStart, self).__init__(view_or_class=view_or_class, **kwargs)
 
     @property
     def view(self):
         if not self._view:
-            if not self._view_cls:
+            if not self._view_class:
                 return self.start_view_class.as_view()
             else:
-                self._view = self._view_cls.as_view(**self._view_args)
+                self._view = self._view_class.as_view(**self._view_args)
                 return self._view
         return self._view
 
@@ -53,7 +53,7 @@ class BaseStart(mixins.TaskDescriptionViewMixin,
 
 
 class Start(mixins.PermissionMixin, BaseStart):
-    activation_cls = StartActivation
+    activation_class = StartActivation
 
     def Available(self, owner=None, **owner_kwargs):
         """
@@ -121,27 +121,27 @@ class BaseView(mixins.TaskDescriptionViewMixin,
     task_type = 'HUMAN'
     task_view_class = None
 
-    def __init__(self, view_or_cls, **kwargs):
+    def __init__(self, view_or_class, **kwargs):
         """
         Accepts view callable or CBV View class with view kwargs,
-        if CBV view implements ViewActivation, it used as activation_cls
+        if CBV view implements ViewActivation, it used as activation_class
         """
-        self._view, self._view_cls, self._view_args = None, None, None
+        self._view, self._view_class, self._view_args = None, None, None
 
-        if isinstance(view_or_cls, type):
-            self._view_cls = view_or_cls
+        if isinstance(view_or_class, type):
+            self._view_class = view_or_class
 
-            if issubclass(view_or_cls, ViewActivation):
-                kwargs.setdefault('activation_cls', view_or_cls)
+            if issubclass(view_or_class, ViewActivation):
+                kwargs.setdefault('activation_class', view_or_class)
         else:
-            self._view = view_or_cls
+            self._view = view_or_class
 
-        super(BaseView, self).__init__(view_or_cls=view_or_cls, **kwargs)
+        super(BaseView, self).__init__(view_or_class=view_or_class, **kwargs)
 
     @property
     def view(self):
         if not self._view:
-            self._view = self._view_cls.as_view(**self._view_args)
+            self._view = self._view_class.as_view(**self._view_args)
         return self._view
 
     def urls(self):
@@ -154,7 +154,7 @@ class BaseView(mixins.TaskDescriptionViewMixin,
 
 
 class View(mixins.PermissionMixin, BaseView):
-    activation_cls = ViewActivation
+    activation_class = ViewActivation
     assign_view_class = None
     unassign_view_class = None
 
@@ -271,7 +271,7 @@ class View(mixins.PermissionMixin, BaseView):
             return True
 
         # User have flow management permissions
-        return user.has_perm(self.flow_cls.instance.manage_permission_name)
+        return user.has_perm(self.flow_class.instance.manage_permission_name)
 
     def can_execute(self, user, task):
         if task.owner_permission is None and task.owner is None:

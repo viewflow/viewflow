@@ -34,7 +34,7 @@ class Switch(mixins.TaskDescriptionMixin,
              base.Gateway):
 
     task_type = 'SWITCH'
-    activation_cls = SwitchActivation
+    activation_class = SwitchActivation
 
     def __init__(self, **kwargs):
         super(Switch, self).__init__(**kwargs)

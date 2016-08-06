@@ -22,7 +22,7 @@ class BaseStartFlowMixin(object):
 
     def get_template_names(self):
         flow_task = self.activation.flow_task
-        opts = self.activation.flow_task.flow_cls._meta
+        opts = self.activation.flow_task.flow_class._meta
 
         return (
             '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
@@ -60,7 +60,7 @@ class CreateProcessView(StartFlowMixin, generic.UpdateView):
 
     @property
     def model(self):
-        return self.activation.flow_cls.process_cls
+        return self.activation.flow_class.process_class
 
     def get_object(self):
         return self.activation.process

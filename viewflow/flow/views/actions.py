@@ -16,7 +16,7 @@ from .mixins import FlowManagePermissionMixin, MessageUserMixin
 
 
 class BaseTaskActionView(MessageUserMixin, generic.TemplateView):
-    flow_cls = None
+    flow_class = None
     action_name = None
 
     def can_proceed(self):
@@ -27,7 +27,7 @@ class BaseTaskActionView(MessageUserMixin, generic.TemplateView):
 
     def get_template_names(self):
         flow_task = self.activation.flow_task
-        opts = self.activation.flow_task.flow_cls._meta
+        opts = self.activation.flow_task.flow_class._meta
 
         return (
             '{}/{}/{}_{}.html'.format(opts.app_label, opts.flow_label, flow_task.name, self.action_name),
@@ -43,7 +43,7 @@ class BaseTaskActionView(MessageUserMixin, generic.TemplateView):
     def get_context_data(self, **kwargs):
         context = super(BaseTaskActionView, self).get_context_data(**kwargs)
         context['activation'] = self.activation
-        context['flow_cls'] = self.flow_cls
+        context['flow_class'] = self.flow_class
         return context
 
     def post(self, request, *args, **kwargs):
@@ -56,7 +56,7 @@ class BaseTaskActionView(MessageUserMixin, generic.TemplateView):
     @method_decorator(flow_view)
     def dispatch(self, request, **kwargs):
         self.activation = request.activation
-        self.flow_cls = self.activation.flow_cls
+        self.flow_class = self.activation.flow_class
 
         if not self.can_proceed():
             self.error("Task {task} Can't execute action {action}.", action=self.action_name.title)
@@ -115,7 +115,7 @@ class ActivateNextTaskView(FlowManagePermissionMixin, BaseTaskActionView):
 
 
 class CancelProcessView(FlowManagePermissionMixin, generic.DetailView):
-    flow_cls = None
+    flow_class = None
     context_object_name = 'process'
     pk_url_kwarg = 'process_pk'
 
@@ -140,14 +140,14 @@ class CancelProcessView(FlowManagePermissionMixin, generic.DetailView):
         self.report(message, level=messages.ERROR, fail_silently=fail_silently, **kwargs)
 
     def get_template_names(self):
-        opts = self.flow_cls._meta
+        opts = self.flow_class._meta
 
         return (
             '{}/{}/process_cancel.html'.format(opts.app_label, opts.flow_label),
             'viewflow/flow/process_cancel.html')
 
     def get_queryset(self):
-        return self.flow_cls.process_cls._default_manager.all()
+        return self.flow_class.process_class._default_manager.all()
 
     def get_success_url(self):
         if 'back' in self.request.GET:
@@ -173,16 +173,16 @@ class CancelProcessView(FlowManagePermissionMixin, generic.DetailView):
             return self.get(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
-        self.flow_cls = kwargs.pop('flow_cls', None)
+        self.flow_class = kwargs.pop('flow_class', None)
 
-        lock = self.flow_cls.lock_impl(self.flow_cls.instance)
-        with lock(self.flow_cls, kwargs['process_pk']):
+        lock = self.flow_class.lock_impl(self.flow_class.instance)
+        with lock(self.flow_class, kwargs['process_pk']):
             return super(CancelProcessView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
         context = super(CancelProcessView, self).get_context_data(**kwargs)
         context['active_tasks'] = self._get_task_list()
-        context['flow_cls'] = self.flow_cls
+        context['flow_class'] = self.flow_class
         context['uncancelable_tasks'] = self._get_uncancelable_tasks(context['active_tasks'])
         return context
 

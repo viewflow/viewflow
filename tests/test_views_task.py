@@ -26,7 +26,7 @@ class Test(TestCase):
         request = RequestFactory().get('/start/')
         request.user = user
         request.resolver_match = resolve('/test/1/task/1/')
-        response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
+        response = view(request, flow_class=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], '/test/{}/task/{}/details/'.format(act.process.pk, task.pk))
@@ -38,7 +38,7 @@ class Test(TestCase):
         request = RequestFactory().get('/start/')
         request.user = user
         request.resolver_match = resolve('/test/1/task/1/')
-        response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
+        response = view(request, flow_class=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.template_name,
@@ -49,7 +49,7 @@ class Test(TestCase):
         request = RequestFactory().post('/task/')
         request.user = user
         request.resolver_match = resolve('/test/1/task/1/')
-        response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
+        response = view(request, flow_class=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 302)
 
@@ -70,7 +70,7 @@ class Test(TestCase):
         request = RequestFactory().get('/start/')
         request.user = user
         request.resolver_match = resolve('/test/1/task/1/')
-        response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
+        response = view(request, flow_class=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.template_name,
@@ -81,7 +81,7 @@ class Test(TestCase):
         request = RequestFactory().post('/task/')
         request.user = user
         request.resolver_match = resolve('/test/1/task/1/')
-        response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
+        response = view(request, flow_class=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 302)
 
@@ -100,7 +100,7 @@ class Test(TestCase):
         request.user = user
         request.resolver_match = resolve('/test/1/task/1/')
 
-        response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
+        response = view(request, flow_class=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.template_name,
@@ -112,7 +112,7 @@ class Test(TestCase):
         request = RequestFactory().post('/task/')
         request.user = user
         request.resolver_match = resolve('/test/1/task/1/')
-        response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
+        response = view(request, flow_class=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['location'], '/test/{}/task/{}/'.format(act.process.pk, task.pk))
@@ -126,7 +126,7 @@ class Test(TestCase):
         request.user = user
         request.resolver_match = resolve('/test/1/task/1/')
 
-        response = view(request, flow_cls=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
+        response = view(request, flow_class=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 302)
 
@@ -144,11 +144,11 @@ class TaskViewFlowEntity(models.Model):
 urlpatterns = [
     url(r'^test/', include([
         TaskViewTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(flow_cls=TaskViewTestFlow), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(flow_cls=TaskViewTestFlow), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(flow_cls=TaskViewTestFlow), name='queue'),
+        url('^$', views.ProcessListView.as_view(flow_class=TaskViewTestFlow), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(flow_class=TaskViewTestFlow), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(flow_class=TaskViewTestFlow), name='queue'),
         url('^detail/(?P<process_pk>\d+)/$',
-            views.DetailProcessView.as_view(flow_cls=TaskViewTestFlow), name='detail'),
+            views.DetailProcessView.as_view(flow_class=TaskViewTestFlow), name='detail'),
     ], namespace='taskviewtest'))
 ]
 

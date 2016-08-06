@@ -11,7 +11,7 @@ class StartSignal(mixins.TaskDescriptionMixin,
                   base.Event):
 
     task_type = 'START'
-    activation_cls = StartActivation
+    activation_class = StartActivation
 
     def __init__(self, signal, receiver, sender=None, **kwargs):
         self.signal = signal
@@ -25,12 +25,12 @@ class StartSignal(mixins.TaskDescriptionMixin,
 
     def ready(self):
         if isinstance(self.receiver, base.ThisObject):
-            self.receiver = getattr(self.flow_cls.instance, self.receiver.name)
+            self.receiver = getattr(self.flow_class.instance, self.receiver.name)
 
         self.signal.connect(
             self.on_signal, sender=self.sender,
             dispatch_uid="viewflow.flow.signal/{}.{}.{}".format(
-                self.flow_cls.__module__, self.flow_cls.__name__, self.name))
+                self.flow_class.__module__, self.flow_class.__name__, self.name))
 
 
 class Signal(mixins.TaskDescriptionMixin,
@@ -41,7 +41,7 @@ class Signal(mixins.TaskDescriptionMixin,
              base.Event):
 
     task_type = 'FUNC'
-    activation_cls = FuncActivation
+    activation_class = FuncActivation
 
     def __init__(self, signal, receiver, sender=None, task_loader=None, allow_skip=False, **kwargs):
         self.signal = signal
@@ -67,11 +67,11 @@ class Signal(mixins.TaskDescriptionMixin,
 
     def ready(self):
         if isinstance(self.receiver, base.ThisObject):
-            self.receiver = getattr(self.flow_cls.instance, self.receiver.name)
+            self.receiver = getattr(self.flow_class.instance, self.receiver.name)
         if isinstance(self.task_loader, base.ThisObject):
-            self.task_loader = getattr(self.flow_cls.instance, self.task_loader.name)
+            self.task_loader = getattr(self.flow_class.instance, self.task_loader.name)
 
         self.signal.connect(
             self.on_signal, sender=self.sender,
             dispatch_uid="viewflow.flow.signal/{}.{}.{}".format(
-                self.flow_cls.__module__, self.flow_cls.__name__, self.name))
+                self.flow_class.__module__, self.flow_class.__name__, self.name))

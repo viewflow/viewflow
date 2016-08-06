@@ -8,8 +8,8 @@ from .models import ShipmentProcess, ShipmentTask
 
 
 class ShipmentFlow(Flow):
-    process_cls = ShipmentProcess
-    task_cls = ShipmentTask
+    process_class = ShipmentProcess
+    task_class = ShipmentTask
     lock_impl = select_for_update_lock
 
     summary_template = """

@@ -12,7 +12,7 @@ def flow_start_func(func):
     @functools.wraps(func)
     def _wrapper(flow_task, *args, **kwargs):
         try:
-            activation = flow_task.activation_cls()
+            activation = flow_task.activation_class()
             activation.initialize(flow_task, None)
             return func(activation, *args, **kwargs)
         finally:
@@ -31,12 +31,12 @@ def flow_func(func):
     @functools.wraps(func)
     def _wrapper(task, *args, **kwargs):
         flow_task = task.flow_task
-        flow_cls = flow_task.flow_cls
+        flow_class = flow_task.flow_class
 
-        lock = flow_cls.lock_impl(flow_cls.instance)
-        with lock(flow_cls, task.process_id):
-            task = flow_cls.task_cls._default_manager.get(pk=task.pk)
-            activation = flow_task.activation_cls()
+        lock = flow_class.lock_impl(flow_class.instance)
+        with lock(flow_class, task.process_id):
+            task = flow_class.task_class._default_manager.get(pk=task.pk)
+            activation = flow_task.activation_class()
             activation.initialize(flow_task, task)
             return func(activation, *args, **kwargs)
     return _wrapper
@@ -63,20 +63,20 @@ def flow_job(func):
         task_pk = kwargs.pop('task_pk') if 'task_pk' in kwargs else args[2]
         flow_task = import_task_by_ref(flow_task_strref)
 
-        lock = flow_task.flow_cls.lock_impl(flow_task.flow_cls.instance)
+        lock = flow_task.flow_class.lock_impl(flow_task.flow_class.instance)
 
         # start
-        with lock(flow_task.flow_cls, process_pk):
+        with lock(flow_task.flow_class, process_pk):
             try:
-                task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
+                task = flow_task.flow_class.task_class.objects.get(pk=task_pk)
                 if task.status == STATUS.CANCELED:
                     return
-            except flow_task.flow_cls.task_cls.DoesNotExist:
+            except flow_task.flow_class.task_class.DoesNotExist:
                 # There was rollback on job task created transaction,
                 # we don't need to do the job
                 return
             else:
-                activation = flow_task.activation_cls()
+                activation = flow_task.activation_class()
                 activation.initialize(flow_task, task)
                 activation.start()
 
@@ -85,17 +85,17 @@ def flow_job(func):
             result = func(activation, **kwargs)
         except Exception as exc:
             # mark as error
-            with lock(flow_task.flow_cls, process_pk):
-                task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
-                activation = flow_task.activation_cls()
+            with lock(flow_task.flow_class, process_pk):
+                task = flow_task.flow_class.task_class.objects.get(pk=task_pk)
+                activation = flow_task.activation_class()
                 activation.initialize(flow_task, task)
                 activation.error(comments="{}\n{}".format(exc, traceback.format_exc()))
             raise
         else:
             # mark as done
-            with lock(flow_task.flow_cls, process_pk):
-                task = flow_task.flow_cls.task_cls.objects.get(pk=task_pk)
-                activation = flow_task.activation_cls()
+            with lock(flow_task.flow_class, process_pk):
+                task = flow_task.flow_class.task_class.objects.get(pk=task_pk)
+                activation = flow_task.activation_class()
                 activation.initialize(flow_task, task)
                 activation.done()
 
@@ -108,7 +108,7 @@ def flow_start_signal(handler):
     @functools.wraps(handler)
     def _wrapper(sender, flow_task=None, **signal_kwargs):
         try:
-            activation = flow_task.activation_cls()
+            activation = flow_task.activation_class()
             activation.initialize(flow_task, None)
             return handler(sender=sender, activation=activation, **signal_kwargs)
         finally:
@@ -124,12 +124,12 @@ def flow_signal(handler):
     @functools.wraps(handler)
     def _wrapper(sender, task=None, **signal_kwargs):
         flow_task = task.flow_task
-        flow_cls = flow_task.flow_cls
+        flow_class = flow_task.flow_class
 
-        lock = flow_cls.lock_impl(flow_cls.instance)
-        with lock(flow_cls, task.process_id):
-            task = flow_cls.task_cls._default_manager.get(pk=task.pk)
-            activation = flow_task.activation_cls()
+        lock = flow_class.lock_impl(flow_class.instance)
+        with lock(flow_class, task.process_id):
+            task = flow_class.task_class._default_manager.get(pk=task.pk)
+            activation = flow_task.activation_class()
             activation.initialize(flow_task, task)
             return handler(sender=sender, activation=activation, **signal_kwargs)
     return _wrapper
@@ -140,13 +140,13 @@ def flow_start_view(view):
     Decorator for start views, creates and initializes start activation
 
     Expects view with the signature `(request, **kwargs)`
-    Returns view with the signature `(request, flow_cls, flow_task, **kwargs)`
+    Returns view with the signature `(request, flow_class, flow_task, **kwargs)`
     """
 
     @functools.wraps(view)
-    def _wrapper(request, flow_cls, flow_task, **kwargs):
+    def _wrapper(request, flow_class, flow_task, **kwargs):
         try:
-            activation = flow_task.activation_cls()
+            activation = flow_task.activation_class()
             activation.initialize(flow_task, None)
 
             request.activation = activation
@@ -164,15 +164,15 @@ def flow_view(view):
     Decorator that locks and runs the flow view in transaction.
 
     Expects view with the signature `(request, **kwargs)`
-    Returns view with the signature `(request, flow_cls, flow_task, process_pk, task_pk, **kwargs)
+    Returns view with the signature `(request, flow_class, flow_task, process_pk, task_pk, **kwargs)
     """
 
     @functools.wraps(view)
-    def _wrapper(request, flow_cls, flow_task, process_pk, task_pk, **kwargs):
-        lock = flow_task.flow_cls.lock_impl(flow_cls.instance)
-        with lock(flow_cls, process_pk):
-            task = get_object_or_404(flow_task.flow_cls.task_cls._default_manager, pk=task_pk)
-            activation = flow_task.activation_cls()
+    def _wrapper(request, flow_class, flow_task, process_pk, task_pk, **kwargs):
+        lock = flow_task.flow_class.lock_impl(flow_class.instance)
+        with lock(flow_class, process_pk):
+            task = get_object_or_404(flow_task.flow_class.task_class._default_manager, pk=task_pk)
+            activation = flow_task.activation_class()
             activation.initialize(flow_task, task)
 
             request.activation = activation

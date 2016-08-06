@@ -24,7 +24,7 @@ class Test(TestCase):
         request = RequestFactory().get('/start/')
         request.user = user
         request.resolver_match = resolve('/test/start/')
-        response = view(request, flow_cls=StartViewTestFlow, flow_task=StartViewTestFlow.start)
+        response = view(request, flow_class=StartViewTestFlow, flow_task=StartViewTestFlow.start)
 
         self.assertEqual(response.template_name,
                          ('tests/test_views_start/startviewtest/start.html',
@@ -35,10 +35,10 @@ class Test(TestCase):
         request = RequestFactory().post('/start/')
         request.user = user
         request.resolver_match = resolve('/test/start/')
-        response = view(request, flow_cls=StartViewTestFlow, flow_task=StartViewTestFlow.start)
+        response = view(request, flow_class=StartViewTestFlow, flow_task=StartViewTestFlow.start)
         self.assertEqual(response.status_code, 302)
 
-        process = StartViewTestFlow.process_cls.objects.all()[0]
+        process = StartViewTestFlow.process_class.objects.all()[0]
         process.get_task(StartViewTestFlow.start, status=[STATUS.DONE])
 
     def test_startprocess_view(self):
@@ -49,7 +49,7 @@ class Test(TestCase):
         request = RequestFactory().get('/start/')
         request.user = user
         request.resolver_match = resolve('/test/start/')
-        response = view(request, flow_cls=StartViewTestFlow, flow_task=StartViewTestFlow.start)
+        response = view(request, flow_class=StartViewTestFlow, flow_task=StartViewTestFlow.start)
 
         self.assertEqual(response.template_name,
                          ('tests/test_views_start/startviewtest/start.html',
@@ -60,10 +60,10 @@ class Test(TestCase):
         request = RequestFactory().post('/start/')
         request.user = user
         request.resolver_match = resolve('/test/start/')
-        response = view(request, flow_cls=StartViewTestFlow, flow_task=StartViewTestFlow.start)
+        response = view(request, flow_class=StartViewTestFlow, flow_task=StartViewTestFlow.start)
         self.assertEqual(response.status_code, 302)
 
-        process = StartViewTestFlow.process_cls.objects.all()[0]
+        process = StartViewTestFlow.process_class.objects.all()[0]
         process.get_task(StartViewTestFlow.start, status=[STATUS.DONE])
 
 
@@ -79,11 +79,11 @@ class StartViewFlowEntity(models.Model):
 urlpatterns = [
     url(r'^test/', include([
         StartViewTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(flow_cls=StartViewTestFlow), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(flow_cls=StartViewTestFlow), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(flow_cls=StartViewTestFlow), name='queue'),
+        url('^$', views.ProcessListView.as_view(flow_class=StartViewTestFlow), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(flow_class=StartViewTestFlow), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(flow_class=StartViewTestFlow), name='queue'),
         url('^detail/(?P<process_pk>\d+)/$',
-            views.DetailProcessView.as_view(flow_cls=StartViewTestFlow), name='detail'),
+            views.DetailProcessView.as_view(flow_class=StartViewTestFlow), name='detail'),
     ], namespace='startviewtest'))
 ]
 

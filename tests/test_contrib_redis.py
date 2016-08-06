@@ -37,7 +37,7 @@ class Test(TestCase):
 
     def setUp(self):
         self.finished = False
-        self.process = Test.TestFlow.process_cls.objects.create(flow_cls=Test.TestFlow)
+        self.process = Test.TestFlow.process_class.objects.create(flow_class=Test.TestFlow)
         self.exception_queue = queue.Queue()
 
     def run_with_lock(self, lock_impl):

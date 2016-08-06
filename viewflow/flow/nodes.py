@@ -259,7 +259,7 @@ class Start(nodes.Start):
     undo_view_class = views.UndoTaskView
     start_view_class = views.CreateProcessView
 
-    activation_cls = ManagedStartViewActivation
+    activation_class = ManagedStartViewActivation
 
 
 class View(nodes.View):
@@ -306,7 +306,7 @@ class View(nodes.View):
     assign_view_class = views.AssignTaskView
     unassign_view_class = views.UnassignTaskView
 
-    activation_cls = ManagedViewActivation
+    activation_class = ManagedViewActivation
 
 
 class End(nodes.End):

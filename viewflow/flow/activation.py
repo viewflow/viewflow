@@ -6,26 +6,26 @@ class ManagedStartViewActivation(StartActivation):
     """
     Tracks task statistics in activation form
     """
-    management_form_cls = None
+    management_form_class = None
 
     def __init__(self, **kwargs):
         super(ManagedStartViewActivation, self).__init__(**kwargs)
         self.management_form = None
-        self.management_form_cls = kwargs.pop('management_form_cls', None)
+        self.management_form_class = kwargs.pop('management_form_class', None)
 
-    def get_management_form_cls(self):
-        if self.management_form_cls:
-            return self.management_form_cls
+    def get_management_form_class(self):
+        if self.management_form_class:
+            return self.management_form_class
         else:
-            return self.flow_cls.management_form_cls
+            return self.flow_class.management_form_class
 
     @Activation.status.super()
     def prepare(self, data=None, user=None):
         super(ManagedStartViewActivation, self).prepare.original()
         self.task.owner = user
 
-        management_form_cls = self.get_management_form_cls()
-        self.management_form = management_form_cls(data=data, instance=self.task)
+        management_form_class = self.get_management_form_class()
+        self.management_form = management_form_class(data=data, instance=self.task)
 
         if data:
             if not self.management_form.is_valid():
@@ -37,18 +37,18 @@ class ManagedViewActivation(ViewActivation):
     """
     Tracks task statistics in activation form
     """
-    management_form_cls = None
+    management_form_class = None
 
     def __init__(self, **kwargs):
         super(ManagedViewActivation, self).__init__(**kwargs)
         self.management_form = None
-        self.management_form_cls = kwargs.pop('management_form_cls', None)
+        self.management_form_class = kwargs.pop('management_form_class', None)
 
-    def get_management_form_cls(self):
-        if self.management_form_cls:
-            return self.management_form_cls
+    def get_management_form_class(self):
+        if self.management_form_class:
+            return self.management_form_class
         else:
-            return self.flow_cls.management_form_cls
+            return self.flow_class.management_form_class
 
     @Activation.status.super()
     def prepare(self, data=None, user=None):
@@ -57,8 +57,8 @@ class ManagedViewActivation(ViewActivation):
         if user:
             self.task.owner = user
 
-        management_form_cls = self.get_management_form_cls()
-        self.management_form = management_form_cls(data=data, instance=self.task)
+        management_form_class = self.get_management_form_class()
+        self.management_form = management_form_class(data=data, instance=self.task)
 
         if data:
             if not self.management_form.is_valid():

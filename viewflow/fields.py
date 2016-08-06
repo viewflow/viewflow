@@ -11,8 +11,8 @@ def import_flow_by_ref(flow_strref):
     return import_string('{}.{}'.format(get_app_package(app_label), flow_path))
 
 
-def get_flow_ref(flow_cls):
-    module = "{}.{}".format(flow_cls.__module__, flow_cls.__name__)
+def get_flow_ref(flow_class):
+    module = "{}.{}".format(flow_class.__module__, flow_class.__name__)
     app_label, app_package = get_containing_app_data(module)
     if app_label is None:
         raise FlowRuntimeError('No application found for {}. Check your INSTALLED_APPS setting'.format(module))
@@ -27,19 +27,19 @@ def import_task_by_ref(task_strref):
     """
     app_label, flow_path = task_strref.split('/')
     flow_path, task_name = flow_path.rsplit('.', 1)
-    flow_cls = import_string('{}.{}'.format(get_app_package(app_label), flow_path))
-    return flow_cls._meta.node(task_name)
+    flow_class = import_string('{}.{}'.format(get_app_package(app_label), flow_path))
+    return flow_class._meta.node(task_name)
 
 
 def get_task_ref(flow_task):
-    module = flow_task.flow_cls.__module__
+    module = flow_task.flow_class.__module__
     app_label, app_package = get_containing_app_data(module)
     if app_label is None:
         raise FlowRuntimeError('No application found for {}. Check your INSTALLED_APPS setting'.format(module))
 
     subpath = module[len(app_package) + 1:]
 
-    return "{}/{}.{}.{}".format(app_label, subpath, flow_task.flow_cls.__name__, flow_task.name)
+    return "{}/{}.{}.{}".format(app_label, subpath, flow_task.flow_class.__name__, flow_task.name)
 
 
 class ClassValueWrapper(object):

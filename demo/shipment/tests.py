@@ -100,11 +100,11 @@ urlpatterns = [
     # shipment
     url(r'^shipment/', include([
         ShipmentFlow.instance.urls,
-        url('^$', viewflow.ProcessListView.as_view(flow_cls=ShipmentFlow), name='index'),
-        url('^tasks/$', viewflow.TaskListView.as_view(flow_cls=ShipmentFlow), name='tasks'),
-        url('^queue/$', viewflow.QueueListView.as_view(flow_cls=ShipmentFlow), name='queue'),
+        url('^$', viewflow.ProcessListView.as_view(flow_class=ShipmentFlow), name='index'),
+        url('^tasks/$', viewflow.TaskListView.as_view(flow_class=ShipmentFlow), name='tasks'),
+        url('^queue/$', viewflow.QueueListView.as_view(flow_class=ShipmentFlow), name='queue'),
         url('^detail/(?P<process_pk>\d+)/$',
-            viewflow.DetailProcessView.as_view(flow_cls=ShipmentFlow), name='detail'),
+            viewflow.DetailProcessView.as_view(flow_class=ShipmentFlow), name='detail'),
     ], namespace='shipment')),
 ]
 

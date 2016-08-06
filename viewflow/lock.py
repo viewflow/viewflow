@@ -17,7 +17,7 @@ def no_lock(flow):
     Not suitable when you have Join nodes in your flow.
     """
     @contextmanager
-    def lock(flow_cls, process_pk):
+    def lock(flow_class, process_pk):
         with transaction.atomic():
             yield
     return lock
@@ -31,11 +31,11 @@ def select_for_update_lock(flow, nowait=True, attempts=5):
     Recommended for use with PostgreSQL.
     """
     @contextmanager
-    def lock(flow_cls, process_pk):
+    def lock(flow_class, process_pk):
         with transaction.atomic():
             for i in range(attempts):
                 try:
-                    flow_cls.process_cls._default_manager \
+                    flow_class.process_class._default_manager \
                         .filter(pk=process_pk) \
                         .select_for_update(nowait=nowait) \
                         .exists()
@@ -45,7 +45,7 @@ def select_for_update_lock(flow, nowait=True, attempts=5):
                         sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
                         time.sleep(sleep_time)
                     else:
-                        raise FlowLockFailed('Lock failed for {}'.format(flow_cls))
+                        raise FlowLockFailed('Lock failed for {}'.format(flow_class))
 
             yield
 
@@ -72,8 +72,8 @@ class CacheLock(object):
         cache = self.cache
 
         @contextmanager
-        def lock(flow_cls, process_pk):
-            key = 'django-viewflow-lock-{}/{}'.format(flow_cls._meta.flow_label, process_pk)
+        def lock(flow_class, process_pk):
+            key = 'django-viewflow-lock-{}/{}'.format(flow_class._meta.flow_label, process_pk)
 
             for i in range(attempts):
                 stored = cache.add(key, 1, expires)
@@ -83,7 +83,7 @@ class CacheLock(object):
                     sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
                     time.sleep(sleep_time)
             else:
-                raise FlowLockFailed('Lock failed for {}'.format(flow_cls))
+                raise FlowLockFailed('Lock failed for {}'.format(flow_class))
 
             try:
                 with transaction.atomic():

@@ -15,7 +15,7 @@ from viewflow.models import Process, Task
 
 class Test(TestCase):
     def test_flow_view_decorator(self):
-        process = Process.objects.create(flow_cls=TaskTestFlow)
+        process = Process.objects.create(flow_class=TaskTestFlow)
         task = Task.objects.create(process=process, flow_task=TaskTestFlow.task)
 
         @flow_view
@@ -30,7 +30,7 @@ class Test(TestCase):
         self.assertEqual(act.task.status, STATUS.DONE)
 
     def test_managed_view_activation_prepare(self):
-        process = Process.objects.create(flow_cls=TaskTestFlow)
+        process = Process.objects.create(flow_class=TaskTestFlow)
         task = Task.objects.create(process=process, flow_task=TaskTestFlow.task)
 
         act = ManagedViewActivation()
@@ -42,7 +42,7 @@ class Test(TestCase):
 
     def test_view_permissins_calc(self):
         user = User.objects.create(username="test")
-        process = Process.objects.create(flow_cls=TaskTestFlow)
+        process = Process.objects.create(flow_class=TaskTestFlow)
         task = Task.objects.create(process=process, flow_task=TaskTestFlow.task)
 
         flow_task = flow.View(lambda request: None).Assign(lambda p: "TEST USER")
@@ -63,7 +63,7 @@ class Test(TestCase):
         permission = Permission.objects.create(
             name='existing_perm', content_type=user_type, codename='existing_perm')
         user.user_permissions.add(permission)
-        process = Process.objects.create(flow_cls=TaskTestFlow)
+        process = Process.objects.create(flow_class=TaskTestFlow)
 
         flow_task = flow.View(lambda request: None).Permission('auth.existing_perm')
         task = Task.objects.create(process=process, flow_task=TaskTestFlow.task,

@@ -27,7 +27,7 @@ class If(mixins.TaskDescriptionMixin,
          base.Gateway):
 
     task_type = 'IF'
-    activation_cls = IfActivation
+    activation_class = IfActivation
 
     def __init__(self, cond, **kwargs):
         super(If, self).__init__(**kwargs)

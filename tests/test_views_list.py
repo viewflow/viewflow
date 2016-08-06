@@ -35,7 +35,7 @@ class Test(TestCase):
                 ('/test/start3/', 'start3')]})
 
     def test_task_filter(self):
-        process = Process.objects.create(flow_cls=ListViewTestFlow)
+        process = Process.objects.create(flow_class=ListViewTestFlow)
         task1 = Task.objects.create(process=process, flow_task=ListViewTestFlow.start1)
         task1.created = timezone.now().replace(year=1900)
         task1.save()
@@ -95,20 +95,20 @@ class Test(TestCase):
         request.user = User(username='test', is_superuser=True)
         request.resolver_match = resolve('/test/')
 
-        response = view(request, flow_cls=ListViewTestFlow)
+        response = view(request, flow_class=ListViewTestFlow)
         self.assertEqual(response.template_name,
                          ('tests/test_views_list/listviewtest/process_list.html',
                           'viewflow/flow/process_list.html'))
 
     def test_processdetail_view(self):
-        process = Process.objects.create(flow_cls=ListViewTestFlow)
+        process = Process.objects.create(flow_class=ListViewTestFlow)
         view = views.DetailProcessView.as_view()
 
         request = RequestFactory().get('/process/')
         request.user = User(username='test', is_superuser=True)
         request.resolver_match = resolve('/test/')
 
-        response = view(request, flow_cls=ListViewTestFlow, process_pk=process.pk)
+        response = view(request, flow_class=ListViewTestFlow, process_pk=process.pk)
 
         self.assertEqual(response.template_name,
                          ('tests/test_views_list/listviewtest/process_details.html',
@@ -121,7 +121,7 @@ class Test(TestCase):
         request.user = User(username='test', is_superuser=True)
         request.resolver_match = resolve('/test/')
 
-        response = view(request, flow_cls=ListViewTestFlow)
+        response = view(request, flow_class=ListViewTestFlow)
 
         self.assertEqual(response.template_name,
                          ('tests/test_views_list/listviewtest/task_list.html',
@@ -134,7 +134,7 @@ class Test(TestCase):
         request.user = User(username='test', is_superuser=True)
         request.resolver_match = resolve('/test/')
 
-        response = view(request, flow_cls=ListViewTestFlow)
+        response = view(request, flow_class=ListViewTestFlow)
 
         self.assertEqual(response.template_name,
                          ('tests/test_views_list/listviewtest/queue.html',
@@ -152,11 +152,11 @@ class ListViewTestFlow(Flow):
 urlpatterns = [
     url(r'^test/', include([
         ListViewTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(flow_cls=ListViewTestFlow), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(flow_cls=ListViewTestFlow), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(flow_cls=ListViewTestFlow), name='queue'),
+        url('^$', views.ProcessListView.as_view(flow_class=ListViewTestFlow), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(flow_class=ListViewTestFlow), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(flow_class=ListViewTestFlow), name='queue'),
         url('^details/(?P<process_pk>\d+)/$',
-            views.DetailProcessView.as_view(flow_cls=ListViewTestFlow), name='details'),
+            views.DetailProcessView.as_view(flow_class=ListViewTestFlow), name='details'),
     ], namespace='listviewtest'))
 ]
 

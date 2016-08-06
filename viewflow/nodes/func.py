@@ -14,7 +14,7 @@ class StartFunction(mixins.TaskDescriptionMixin,
                     mixins.PerformViewMixin,
                     base.Event):
     task_type = 'START'
-    activation_cls = StartActivation
+    activation_class = StartActivation
 
     def __init__(self, func=None, **kwargs):
         self.func = func if func is not None else self.start_func_default
@@ -28,7 +28,7 @@ class StartFunction(mixins.TaskDescriptionMixin,
 
     def ready(self):
         if isinstance(self.func, base.ThisObject):
-            self.func = getattr(self.flow_cls.instance, self.func.name)
+            self.func = getattr(self.flow_class.instance, self.func.name)
 
     def run(self, *args, **kwargs):
         return self.func(self, *args, **kwargs)
@@ -43,7 +43,7 @@ class Function(mixins.TaskDescriptionMixin,
                base.Event):
 
     task_type = 'FUNC'
-    activation_cls = FuncActivation
+    activation_class = FuncActivation
 
     def __init__(self, func, task_loader=None, **kwargs):
         self.func = func
@@ -52,14 +52,14 @@ class Function(mixins.TaskDescriptionMixin,
 
     def ready(self):
         if isinstance(self.func, base.ThisObject):
-            self.func = getattr(self.flow_cls.instance, self.func.name)
+            self.func = getattr(self.flow_class.instance, self.func.name)
         if isinstance(self.task_loader, base.ThisObject):
-            self.task_loader = getattr(self.flow_cls.instance, self.task_loader.name)
+            self.task_loader = getattr(self.flow_class.instance, self.task_loader.name)
 
     def run(self, *args, **kwargs):
         if self.task_loader is None:
             if 'task' not in kwargs:
-                if len(args) == 0 or not isinstance(args[0], self.flow_cls.task_cls):
+                if len(args) == 0 or not isinstance(args[0], self.flow_class.task_class):
                     raise FlowRuntimeError('Function {} should be called with task instance', self.name)
             return self.func(*args, **kwargs)
         else:

@@ -43,7 +43,7 @@ class JobActivation(AbstractJobActivation):
 
 
 class Job(AbstractJob):
-    activation_cls = JobActivation
+    activation_class = JobActivation
 
     def __init__(self, *args, **kwargs):
         self._eta = None

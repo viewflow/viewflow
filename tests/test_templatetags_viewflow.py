@@ -22,8 +22,8 @@ class Test(TestCase):
         self.assertEqual('/test/', url)
 
     def test_flowurl_by_flow_class(self):
-        url = Template("{% load viewflow %}{% flowurl flow_cls 'tasks' %}").render(
-            Context({'request': self.request, 'flow_cls': TestTemplateTagsFlow}))
+        url = Template("{% load viewflow %}{% flowurl flow_class 'tasks' %}").render(
+            Context({'request': self.request, 'flow_class': TestTemplateTagsFlow}))
         self.assertEqual('/test/tasks/', url)
 
     def test_flowurl_by_process(self):
@@ -86,12 +86,12 @@ class TestTemplateTagsFlow(Flow):
 urlpatterns = [
     url(r'^test/', include([
         TestTemplateTagsFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(flow_cls=TestTemplateTagsFlow), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(flow_cls=TestTemplateTagsFlow), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(flow_cls=TestTemplateTagsFlow), name='queue'),
+        url('^$', views.ProcessListView.as_view(flow_class=TestTemplateTagsFlow), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(flow_class=TestTemplateTagsFlow), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(flow_class=TestTemplateTagsFlow), name='queue'),
         url('^details/(?P<process_pk>\d+)/$',
-            views.DetailProcessView.as_view(flow_cls=TestTemplateTagsFlow), name='details'),
+            views.DetailProcessView.as_view(flow_class=TestTemplateTagsFlow), name='details'),
         url('^action/cancel/(?P<process_pk>\d+)/$',
-            views.CancelProcessView.as_view(flow_cls=TestTemplateTagsFlow), name='action_cancel'),
+            views.CancelProcessView.as_view(flow_class=TestTemplateTagsFlow), name='action_cancel'),
     ], namespace='testtemplatetags')),
 ]

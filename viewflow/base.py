@@ -23,9 +23,9 @@ class ThisObject(object):
     def owner(self):
         """Return same process finished task owner."""
         def get_task_owner(activation):
-            flow_cls = activation.process.flow_cls
-            task_node = flow_cls._meta.node(self.name)
-            task = flow_cls.task_cls.objects.get(
+            flow_class = activation.process.flow_class
+            task_node = flow_class._meta.node(self.name)
+            task = flow_class.task_class.objects.get(
                 process=activation.process,
                 flow_task=task_node,
                 status=STATUS.DONE)
@@ -76,19 +76,19 @@ class Node(object):
     Base class for flow task.
 
     :keyword task_type: Human readable task type
-    :keyword activation_cls: Activation implementation specific for this node
+    :keyword activation_class: Activation implementation specific for this node
     """
     task_type = None
-    activation_cls = None
+    activation_class = None
 
-    def __init__(self, activation_cls=None, **kwargs):
+    def __init__(self, activation_class=None, **kwargs):
         self._incoming_edges = []
 
-        self.flow_cls = None
+        self.flow_class = None
         self.name = None
 
-        if activation_cls:
-            self.activation_cls = activation_cls
+        if activation_class:
+            self.activation_class = activation_class
 
         super(Node, self).__init__(**kwargs)
 
@@ -124,7 +124,7 @@ class Node(object):
 
     def activate(self, prev_activation, token):
         """Creates task activation."""
-        return self.activation_cls.activate(self, prev_activation, token)
+        return self.activation_class.activate(self, prev_activation, token)
 
 
 class Event(Node):
@@ -171,14 +171,14 @@ class FlowMeta(object):
     """
     Flow options
     """
-    def __init__(self, app_label, flow_cls, nodes):
+    def __init__(self, app_label, flow_class, nodes):
         self.app_label = app_label
-        self.flow_cls = flow_cls
+        self.flow_class = flow_class
         self._nodes_by_name = nodes
 
     @property
     def flow_label(self):
-        module = "{}.{}".format(self.flow_cls.__module__, self.flow_cls.__name__)
+        module = "{}.{}".format(self.flow_class.__module__, self.flow_class.__name__)
         app_label, app_package = get_containing_app_data(module)
 
         subpath = module[len(app_package) + 1:]
@@ -221,8 +221,8 @@ class FlowMetaClass(type):
 
         # set up flow tasks
         nodes = {}
-        for base_cls in bases:
-            for name, attr in base_cls.__dict__.items():
+        for base_class in bases:
+            for name, attr in base_class.__dict__.items():
                 if isinstance(attr, Node):
                     nodes[name] = attr
         nodes.update({name: attr for name, attr in attrs.items()
@@ -252,7 +252,7 @@ class FlowMetaClass(type):
 
         # flow back reference
         for name, node in nodes.items():
-            node.flow_cls = new_class
+            node.flow_class = new_class
 
         # description
         if new_class.__doc__:
@@ -268,7 +268,7 @@ class FlowMetaClass(type):
                 .rstrip('Flow')
 
         # view process permission
-        process_options = new_class.process_cls._meta
+        process_options = new_class.process_class._meta
         if hasattr(process_options, 'default_permissions'):
             # django 1.7
             for permission in ('view', 'manage'):
@@ -296,21 +296,21 @@ class Flow(object, metaclass=FlowMetaClass):
     """
     Base class for flow definition
 
-    :keyword process_cls: Defines model class for Process
-    :keyword task_cls: Defines model class for Task
-    :keyword management_form_cls: Defines form class for task state tracking over GET requests
+    :keyword process_class: Defines model class for Process
+    :keyword task_class: Defines model class for Task
+    :keyword management_form_class: Defines form class for task state tracking over GET requests
     :keyword lock_impl: Locking implementation for flow
 
     """
-    process_cls = models.Process
-    task_cls = models.Task
-    management_form_cls = forms.ActivationDataForm
+    process_class = models.Process
+    task_class = models.Task
+    management_form_class = forms.ActivationDataForm
     lock_impl = lock.no_lock
 
     process_title = None
     process_description = None
 
-    summary_template = "{{ flow_cls.process_title }} - {{ process.status }}"
+    summary_template = "{{ flow_class.process_title }} - {{ process.status }}"
 
     @property
     def urls(self):
@@ -321,16 +321,16 @@ class Flow(object, metaclass=FlowMetaClass):
         for node in self._meta.nodes():
             node_urls += node.urls()
 
-        return url('^', include(node_urls), {'flow_cls': self})
+        return url('^', include(node_urls), {'flow_class': self})
 
     @property
     def view_permission_name(self):
-        opts = self.process_cls._meta
+        opts = self.process_class._meta
         return "{}.view_{}".format(opts.app_label, opts.model_name)
 
     @property
     def manage_permission_name(self):
-        opts = self.process_cls._meta
+        opts = self.process_class._meta
         return "{}.manage_{}".format(opts.app_label, opts.model_name)
 
     def __str__(self):

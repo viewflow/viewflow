@@ -10,7 +10,7 @@ class End(mixins.TaskDescriptionMixin,
           base.Event):
 
     task_type = 'END'
-    activation_cls = EndActivation
+    activation_class = EndActivation
 
     def __init__(self, **kwargs):
         super(End, self).__init__(**kwargs)

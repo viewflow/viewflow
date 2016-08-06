@@ -19,7 +19,7 @@
         {% for process in process_list %}
         <tr>
             <td><a href="{% flowurl process 'detail' namespace_map=view.flows %}">{{ process.id }}</a></td>
-            <td>{{ process.flow_cls.process_title }}</td>
+            <td>{{ process.flow_class.process_title }}</td>
             <td>{{ process.created }}</td>
             <td>{{ process.finished|default:"" }}</td>
             <td>

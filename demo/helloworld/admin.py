@@ -17,7 +17,7 @@ class HelloWorldTaskAdmin(TaskAdmin):
 
     def get_queryset(self, request):
         qs = super(HelloWorldTaskAdmin, self).get_queryset(request)
-        return qs.filter(process__flow_cls=flows.HelloWorldFlow)
+        return qs.filter(process__flow_class=flows.HelloWorldFlow)
 
 
 admin.site.register(models.HelloWorldProcess, HelloWorldProcessAdmin)

@@ -98,7 +98,7 @@ def celery_test_job(activation):
 
 
 class TestCeleryFlow(Flow):
-    process_cls = TestCeleryProcess
+    process_class = TestCeleryProcess
 
     start = flow.StartFunction(create_test_flow).Next(this.task)
     task = celery.Job(celery_test_job).Next(this.end)

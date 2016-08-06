@@ -28,9 +28,9 @@ class Test(TestCase):
 
         # Node initialized
         self.assertEqual(TestFlow.start.name, 'start')
-        self.assertEqual(TestFlow.start.flow_cls, TestFlow)
+        self.assertEqual(TestFlow.start.flow_class, TestFlow)
         self.assertEqual(TestFlow.end.name, 'end')
-        self.assertEqual(TestFlow.end.flow_cls, TestFlow)
+        self.assertEqual(TestFlow.end.flow_class, TestFlow)
 
         # Node interlinks are resolved
         self.assertEqual(TestFlow.start._next, TestFlow.end)

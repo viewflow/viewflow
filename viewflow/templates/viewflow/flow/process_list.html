@@ -1,15 +1,15 @@
 {% extends 'viewflow/base.html' %}
 {% load viewflow %}
 
-{% block title %}{{ block.super}} | {{ flow_cls.process_title }}{% endblock %}
+{% block title %}{{ block.super}} | {{ flow_class.process_title }}{% endblock %}
 
 {% block content %}
-{% if flow_cls.process_title %}
-<h1>{{ flow_cls.process_title }}</h1>
+{% if flow_class.process_title %}
+<h1>{{ flow_class.process_title }}</h1>
 {% endif %}
 
-{% if flow_cls.process_description %}
-<p>{{ flow_cls.process_description }}</p>
+{% if flow_class.process_description %}
+<p>{{ flow_class.process_description }}</p>
 {% endif %}
 
 {% if start_actions %}

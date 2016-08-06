@@ -60,7 +60,7 @@ def _(flow_node, test_task, **post_kwargs):
     """
     Assign if required and executes view task
     """
-    task = test_task.flow_cls.task_cls._default_manager.get(
+    task = test_task.flow_class.task_class._default_manager.get(
         flow_task=test_task.flow_task,
         status__in=[STATUS.NEW, STATUS.ASSIGNED])
 
@@ -73,7 +73,7 @@ def _(flow_node, test_task, **post_kwargs):
         task_url = flow_node.get_task_url(url_type='assign', namespace=test_task.namespace, **url_args)
         form = test_task.app.get(task_url, user=test_task.user).form
         form = form.submit('assign').follow().form
-        url_args['task'] = flow_node.flow_cls.task_cls._default_manager.get(pk=url_args['task'].pk)
+        url_args['task'] = flow_node.flow_class.task_class._default_manager.get(pk=url_args['task'].pk)
 
     # Execute
     task_url = flow_node.get_task_url(url_type='execute', namespace=test_task.namespace, **url_args)
@@ -94,9 +94,9 @@ def flow_patch_manager(flow_node):
 
 
 class FlowTaskTest(object):
-    def __init__(self, app, flow_cls, flow_task, namespace):
+    def __init__(self, app, flow_class, flow_task, namespace):
         self.app = app
-        self.flow_cls, self.flow_task = flow_cls, flow_task
+        self.flow_class, self.flow_task = flow_class, flow_task
         self.namespace = namespace
 
         self.user = None
@@ -118,14 +118,14 @@ class FlowTaskTest(object):
         """
         Reread process instanse from db, once after test call ends
         """
-        return self.flow_cls.process_cls._default_manager.get(pk=self._task.process_id)
+        return self.flow_class.process_class._default_manager.get(pk=self._task.process_id)
 
     @cached_property
     def task(self):
         """
         Reread task instanse from db, once after test call ends
         """
-        return self.flow_cls.task_cls._default_manager.get(pk=self._task.pk)
+        return self.flow_class.task_class._default_manager.get(pk=self._task.pk)
 
     def Url(self, **kwargs):
         self.url_args = kwargs
@@ -187,18 +187,18 @@ class FlowTaskTest(object):
 
 
 class FlowTest(WebTestMixin):
-    def __init__(self, flow_cls, namespace=''):
-        self.flow_cls = flow_cls
+    def __init__(self, flow_class, namespace=''):
+        self.flow_class = flow_class
         self.namespace = namespace
 
         self.patch_managers = []
-        for node in flow_cls._meta.nodes():
+        for node in flow_class._meta.nodes():
             manager = flow_patch_manager(node)
             if manager:
                 self.patch_managers.append(manager)
 
     def Task(self, flow_task):
-        return FlowTaskTest(self.app, self.flow_cls, flow_task, self.namespace)
+        return FlowTaskTest(self.app, self.flow_class, flow_task, self.namespace)
 
     def __enter__(self):
         self._patch_settings()

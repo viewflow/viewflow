@@ -15,10 +15,10 @@ from .base import get_model_display_data
 register = template.Library()
 
 
-def _get_namespace(flow_cls, base_namespace, namespace_map):
+def _get_namespace(flow_class, base_namespace, namespace_map):
     if namespace_map:
-        for ns, map_cls in namespace_map.items():
-            if map_cls == flow_cls:
+        for ns, map_class in namespace_map.items():
+            if map_class == flow_class:
                 return '{}:{}'.format(base_namespace, ns) if base_namespace else ns
     return base_namespace
 
@@ -35,7 +35,7 @@ def flowurl(parser, token):
     Examples::
 
         {% flowurl 'app_label/FlowCls' 'index' %}
-        {% flowurl flow_cls 'index' as index_url %}
+        {% flowurl flow_class 'index' as index_url %}
         {% flowurl process 'index' %}
         {% flowurl process 'detail' %}
         {% flowurl task 'assign' user=request.user %}
@@ -48,19 +48,19 @@ def flowurl(parser, token):
             url_ref = '{}:{}'.format(namespace, url_name if url_name else 'index')
             return reverse(url_ref)
         elif isinstance(ref, AbstractProcess):
-            namespace = _get_namespace(ref.flow_cls, namespace, namespace_map)
+            namespace = _get_namespace(ref.flow_class, namespace, namespace_map)
             kwargs, url_ref = {}, '{}:{}'.format(namespace, url_name if url_name else 'index')
             if url_name in ['detail', 'cancel']:
                 kwargs['process_pk'] = ref.pk
             return reverse(url_ref, kwargs=kwargs)
         elif isinstance(ref, AbstractTask):
-            namespace = _get_namespace(ref.flow_task.flow_cls, namespace, namespace_map)
+            namespace = _get_namespace(ref.flow_task.flow_class, namespace, namespace_map)
             return ref.flow_task.get_task_url(
                 ref, url_type=url_name if url_name else 'guess',
                 user=user, namespace=namespace)
         else:
             try:
-                app_label, flow_cls_path = ref.split('/')
+                app_label, flow_class_path = ref.split('/')
             except ValueError:
                 raise TemplateSyntaxError(
                     "Flow reference string should  looks like 'app_label/FlowCls' but '{}'".format(ref))
@@ -69,8 +69,8 @@ def flowurl(parser, token):
             if app_package is None:
                 raise TemplateSyntaxError("{} app not found".format(app_label))
 
-            flow_cls = import_string('{}.flows.{}'.format(app_package, flow_cls_path))
-            namespace = _get_namespace(flow_cls, namespace, namespace_map)
+            flow_class = import_string('{}.flows.{}'.format(app_package, flow_class_path))
+            namespace = _get_namespace(flow_class, namespace, namespace_map)
             url_ref = '{}:{}'.format(namespace, url_name if url_name else 'index')
             return reverse(url_ref)
 
@@ -138,7 +138,7 @@ def include_process_data(context, process):
             "include_process_data template tag requires 'django.core.context_processors.request'"
             " context processor installed.")
 
-    opts = process.flow_cls._meta
+    opts = process.flow_class._meta
 
     template_names = (
         '{}/{}/process_data.html'.format(opts.app_label, opts.flow_label),
@@ -158,10 +158,10 @@ def include_process_data(context, process):
 def viewflow_task_submit_row(context):
     task = context.get('original', None)
     activation = task.activate()
-    activation_cls = activation.__class__
+    activation_class = activation.__class__
 
     transitions = [(transition.name.replace('_', ' ').capitalize(), transition.name)
-                   for transition in activation_cls.status.get_available_transtions(activation)]
+                   for transition in activation_class.status.get_available_transtions(activation)]
 
     row_context = submit_row(context)
     row_context['transitions'] = transitions

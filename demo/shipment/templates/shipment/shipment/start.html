@@ -1,7 +1,7 @@
 {% extends 'viewflow/flow/start.html' %}
 
 {% block content %}
-<h1>{% if activation.flow_task.task_title %}{{ activation.flow_task.task_title }}{% else %}Start {{ activation.flow_cls.process_title|lower }}{% endif %}</h1>
+<h1>{% if activation.flow_task.task_title %}{{ activation.flow_task.task_title }}{% else %}Start {{ activation.flow_class.process_title|lower }}{% endif %}</h1>
 
 <form role="form" method="POST">
     {% csrf_token %}

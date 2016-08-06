@@ -7,9 +7,9 @@ from ..exceptions import FlowRuntimeError
 
 class JoinActivation(Activation):
     def initialize(self, flow_task, task):
-        self.flow_task, self.flow_cls = flow_task, flow_task.flow_cls
+        self.flow_task, self.flow_class = flow_task, flow_task.flow_class
 
-        self.process = self.flow_cls.process_cls._default_manager.get(flow_cls=self.flow_cls, pk=task.process_id)
+        self.process = self.flow_class.process_class._default_manager.get(flow_class=self.flow_class, pk=task.process_id)
         self.task = task
 
     def __init__(self, **kwargs):
@@ -19,7 +19,7 @@ class JoinActivation(Activation):
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.STARTED)
     def start(self):
         self.task.save()
-        signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+        signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
     @Activation.status.transition(source=STATUS.STARTED)
     def done(self):
@@ -28,7 +28,7 @@ class JoinActivation(Activation):
             self.set_status(STATUS.DONE)
             self.task.save()
 
-            signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+            signals.task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
 
             self.activate_next()
 
@@ -45,7 +45,7 @@ class JoinActivation(Activation):
 
         join_token_prefix = next(iter(join_prefixes))
 
-        active = self.flow_cls.task_cls._default_manager \
+        active = self.flow_class.task_class._default_manager \
             .filter(process=self.process, token__startswith=join_token_prefix) \
             .exclude(status__in=[STATUS.DONE, STATUS.CANCELED])
 
@@ -87,11 +87,11 @@ class JoinActivation(Activation):
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
-        flow_cls, flow_task = flow_task.flow_cls, flow_task
+        flow_class, flow_task = flow_task.flow_class, flow_task
         process = prev_activation.process
 
         # lookup for active join instance
-        tasks = flow_cls.task_cls._default_manager.filter(
+        tasks = flow_class.task_class._default_manager.filter(
             flow_task=flow_task,
             process=process,
             status=STATUS.STARTED)
@@ -106,7 +106,7 @@ class JoinActivation(Activation):
             if token.is_split_token():
                 token = token.get_base_split_token()
 
-            task = flow_cls.task_cls(
+            task = flow_class.task_class(
                 process=process,
                 flow_task=flow_task,
                 token=token)
@@ -135,7 +135,7 @@ class Join(mixins.TaskDescriptionMixin,
            base.Gateway):
 
     task_type = 'JOIN'
-    activation_cls = JoinActivation
+    activation_class = JoinActivation
 
     def __init__(self, wait_all=True, **kwargs):
         super(Join, self).__init__(**kwargs)

@@ -9,7 +9,7 @@ from viewflow.base import Flow, this
 class Test(TestCase):
     def test_signal_usecase(self):
         start_test_signal.send(sender=self)
-        process = SignalFlow.process_cls.objects.get()
+        process = SignalFlow.process_class.objects.get()
         task_test_signal.send(sender=self, process=process)
 
         tasks = process.task_set.all()
@@ -18,7 +18,7 @@ class Test(TestCase):
 
     def test_signal_ignore_activation(self):
         start_ignorable_test_signal.send(sender=self)
-        process = SignalFlow.process_cls.objects.get()
+        process = SignalFlow.process_class.objects.get()
         ignorable_test_signal.send(sender=self, process=process, ignore_me=True)
 
         active_tasks = process.active_tasks()

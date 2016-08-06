@@ -9,8 +9,8 @@ from viewflow.nodes.switch import SwitchActivation
 
 
 class Test(TestCase):
-    def init_node(self, node, flow_cls=None, name='test_node'):
-        node.flow_cls = flow_cls or FlowStub
+    def init_node(self, node, flow_class=None, name='test_node'):
+        node.flow_class = flow_class or FlowStub
         node.name = name
         return node
 
@@ -70,8 +70,8 @@ class Test(TestCase):
 class ProcessStub(object):
     _default_manager = mock.Mock()
 
-    def __init__(self, flow_cls=None):
-        self.flow_cls = flow_cls
+    def __init__(self, flow_class=None):
+        self.flow_class = flow_class
 
     def active_tasks(self):
         return []
@@ -101,8 +101,8 @@ class TaskStub(object):
 
 
 class FlowStub(object):
-    process_cls = ProcessStub
-    task_cls = TaskStub
+    process_class = ProcessStub
+    task_class = TaskStub
     lock_impl = lock.no_lock
     instance = None
 

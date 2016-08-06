@@ -1,10 +1,10 @@
 {% extends 'viewflow/base.html' %}
 {% load viewflow %}
 
-{% block title %}{{ block.super}} | {{ flow_cls.process_title }}{% endblock %}
+{% block title %}{{ block.super}} | {{ flow_class.process_title }}{% endblock %}
 
 {% block content %}
-<h1>{{ flow_cls.process_title }} task list</h1>
+<h1>{{ flow_class.process_title }} task list</h1>
 
 <table class="table">
     <thead>

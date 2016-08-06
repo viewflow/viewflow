@@ -13,20 +13,20 @@ class LoginRequiredMixin(object):
 
 
 class FlowViewPermissionMixin(object):
-    flow_cls = None
+    flow_class = None
 
     def dispatch(self, *args, **kwargs):
-        self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
-        return permission_required(self.flow_cls.instance.view_permission_name)(
+        self.flow_class = kwargs.get('flow_class', self.flow_class)
+        return permission_required(self.flow_class.instance.view_permission_name)(
             super(FlowViewPermissionMixin, self).dispatch)(*args, **kwargs)
 
 
 class FlowManagePermissionMixin(object):
-    flow_cls = None
+    flow_class = None
 
     def dispatch(self, *args, **kwargs):
-        self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
-        return permission_required(self.flow_cls.instance.manage_permission_name)(
+        self.flow_class = kwargs.get('flow_class', self.flow_class)
+        return permission_required(self.flow_class.instance.manage_permission_name)(
             super(FlowManagePermissionMixin, self).dispatch)(*args, **kwargs)
 
 

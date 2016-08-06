@@ -54,7 +54,7 @@ class DetailsViewMixin(object):
         return super(DetailsViewMixin, self).get_task_url(task, url_type, namespace=namespace, **kwargs)
 
     def can_view(self, user, task):
-        return user.has_perm(self.flow_cls.instance.view_permission_name)
+        return user.has_perm(self.flow_class.instance.view_permission_name)
 
 
 class UndoViewMixin(object):
@@ -205,20 +205,20 @@ class PermissionMixin(object):
 
             if not self._owner_permission:
                 self._owner_permission = 'can_{}_{}'.format(
-                    self.name, self.flow_cls.process_cls._meta.model_name)
+                    self.name, self.flow_class.process_class._meta.model_name)
                 self._owner_permission_help_text = 'Can {}'.format(
                     self.name.replace('_', ' '))
             elif not self._owner_permission_help_text:
                 self._owner_permission_help_text = self._owner_permission.replace('_', ' ').capitalize()
 
-            for codename, _ in self.flow_cls.process_cls._meta.permissions:
+            for codename, _ in self.flow_class.process_class._meta.permissions:
                 if codename == self._owner_permission:
                     break
             else:
-                self.flow_cls.process_cls._meta.permissions.append(
+                self.flow_class.process_class._meta.permissions.append(
                     (self._owner_permission, self._owner_permission_help_text))
 
-            self._owner_permission = '{}.{}'.format(self.flow_cls.process_cls._meta.app_label, self._owner_permission)
+            self._owner_permission = '{}.{}'.format(self.flow_class.process_class._meta.app_label, self._owner_permission)
 
         super(PermissionMixin, self).ready()
 
@@ -228,7 +228,7 @@ class TaskDescriptionMixin(object):
     task_description = None
     task_result_summary = None
 
-    def __init__(self, view_or_cls=None, task_title=None, task_description=None, task_result_summary=None, **kwargs):
+    def __init__(self, view_or_class=None, task_title=None, task_description=None, task_result_summary=None, **kwargs):
         if task_title:
             self.task_title = task_title
         if task_description:
@@ -244,18 +244,18 @@ class TaskDescriptionViewMixin(TaskDescriptionMixin):
     Extract task desctiption from view docstring
     """
 
-    def __init__(self, view_or_cls=None, **kwargs):
+    def __init__(self, view_or_class=None, **kwargs):
         super(TaskDescriptionViewMixin, self).__init__(**kwargs)
 
-        if view_or_cls:
-            if view_or_cls.__doc__ and (self.task_title is None or self.task_description is None):
-                docstring = view_or_cls.__doc__.split('\n\n', 1)
+        if view_or_class:
+            if view_or_class.__doc__ and (self.task_title is None or self.task_description is None):
+                docstring = view_or_class.__doc__.split('\n\n', 1)
                 if self.task_title is None and len(docstring) > 0:
                     self.task_title = docstring[0].strip()
                 if self.task_description is None and len(docstring) > 1:
                     self.task_description = dedent(docstring[1]).strip()
-            if hasattr(view_or_cls, 'task_result_summary') and self.task_result_summary is None:
-                self.task_result_summary = view_or_cls.task_result_summary
+            if hasattr(view_or_class, 'task_result_summary') and self.task_result_summary is None:
+                self.task_result_summary = view_or_class.task_result_summary
 
 
 class ViewArgsMixin(object):

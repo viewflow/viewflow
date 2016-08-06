@@ -13,7 +13,7 @@ class AbstractProcess(models.Model):
     """
     Base class for Process data object
     """
-    flow_cls = FlowReferenceField()
+    flow_class = FlowReferenceField()
     status = models.CharField(max_length=50, default=STATUS.NEW)
 
     created = models.DateTimeField(auto_now_add=True)
@@ -23,11 +23,11 @@ class AbstractProcess(models.Model):
 
     @property
     def created_by(self):
-        return self.flow_cls.task_cls._default_manager \
+        return self.flow_class.task_class._default_manager \
             .get(process=self, flow_task_type='START').owner
 
     def active_tasks(self):
-        return self.flow_cls.task_cls._default_manager \
+        return self.flow_class.task_class._default_manager \
             .filter(process=self, finished__isnull=True) \
             .order_by('created')
 
@@ -40,21 +40,21 @@ class AbstractProcess(models.Model):
         elif not isinstance(status, (list, tuple)):
             status = [status]
 
-        return self.flow_cls.task_cls._default_manager.get(
+        return self.flow_class.task_class._default_manager.get(
             process=self, flow_task=flow_task, status__in=status)
 
     def summary(self):
         """
         Quick textual process state representation for end user
         """
-        if self.flow_cls and self.flow_cls.process_cls == type(self):
-            return Template(self.flow_cls.summary_template).render(Context({'process': self, 'flow_cls': self.flow_cls}))
+        if self.flow_class and self.flow_class.process_class == type(self):
+            return Template(self.flow_class.summary_template).render(Context({'process': self, 'flow_class': self.flow_class}))
 
-        return "{} - {}".format(self.flow_cls.process_title, self.status)
+        return "{} - {}".format(self.flow_class.process_title, self.status)
 
     def __str__(self):
-        if self.flow_cls:
-            return '{} #{}'.format(self.flow_cls.process_title, self.pk)
+        if self.flow_class:
+            return '{} #{}'.format(self.flow_class.process_title, self.pk)
         return "<Process {}> - {}".format(self.pk, self.status)
 
     def refresh_from_db(self, using=None, fields=None, **kwargs):
@@ -96,10 +96,10 @@ class AbstractTask(models.Model):
     @property
     def flow_process(self):
         """
-        Returns process instance of flow_cls type
+        Returns process instance of flow_class type
         """
         if self.flow_task is not None:
-            return coerce_to_related_instance(self.process, self.flow_task.flow_cls.process_cls)
+            return coerce_to_related_instance(self.process, self.flow_task.flow_class.process_class)
 
     def summary(self):
         """
@@ -111,7 +111,7 @@ class AbstractTask(models.Model):
                     return Template(self.flow_task.task_result_summary or "").render(Context({
                         'process': self.flow_process,
                         'task': self,
-                        'flow_cls': self.flow_task.flow_cls,
+                        'flow_class': self.flow_task.flow_class,
                         'flow_task': self.flow_task}))
             else:
                 if hasattr(self.flow_task, 'task_description'):
@@ -132,14 +132,14 @@ class AbstractTask(models.Model):
         """
         Instantiate and configure new task activation
         """
-        activation = self.flow_task.activation_cls()
+        activation = self.flow_task.activation_class()
         activation.initialize(self.flow_task, self)
         return activation
 
     def __str__(self):
         if self.flow_task:
             return "<{}.{}/{}> - {}".format(
-                self.flow_task.flow_cls._meta.flow_label,
+                self.flow_task.flow_class._meta.flow_label,
                 self.flow_task,
                 self.pk,
                 self.status)

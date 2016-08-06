@@ -21,9 +21,9 @@ class Test(TestCase):
     def test_this_owner(self):
         this = This()
         user = User.objects.create(username='testowner')
-        process = TestFlowBaseFlow.process_cls.objects.create(flow_cls=TestFlowBaseFlow)
+        process = TestFlowBaseFlow.process_class.objects.create(flow_class=TestFlowBaseFlow)
 
-        task = TestFlowBaseFlow.task_cls.objects.create(
+        task = TestFlowBaseFlow.task_class.objects.create(
             process=process, flow_task=TestFlowBaseFlow.start,
             owner=user, status=STATUS.DONE)
 
@@ -35,11 +35,11 @@ class Test(TestCase):
 
         flow_task = TestNode().Permission(auto_create=True)
         flow_task.name = "test_task"
-        flow_task.flow_cls = TestFlowBaseFlow
+        flow_task.flow_class = TestFlowBaseFlow
         flow_task.ready()
 
         self.assertIn(('can_test_task_testflowbaseprocess', 'Can test task'),
-                      TestFlowBaseFlow.process_cls._meta.permissions)
+                      TestFlowBaseFlow.process_class._meta.permissions)
 
     def test_task_description_mixin_parse(self):
         class TestView(object):
@@ -77,5 +77,5 @@ class TestFlowBaseProcess(Process):
 
 
 class TestFlowBaseFlow(Flow):
-    process_cls = TestFlowBaseProcess
+    process_class = TestFlowBaseProcess
     start = flow.Start(lambda request: None)

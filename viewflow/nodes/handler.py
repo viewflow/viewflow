@@ -13,7 +13,7 @@ class HandlerActivation(Activation):
         with self.exception_guard():
             self.task.started = now()
 
-            signals.task_started.send(sender=self.flow_cls, process=self.process, task=self.task)
+            signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
             self.execute()
 
@@ -21,7 +21,7 @@ class HandlerActivation(Activation):
             self.set_status(STATUS.DONE)
             self.task.save()
 
-            signals.task_finished.send(sender=self.flow_cls, process=self.process, task=self.task)
+            signals.task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
 
             self.activate_next()
 
@@ -48,7 +48,7 @@ class HandlerActivation(Activation):
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
         """Instantiate new task."""
-        task = flow_task.flow_cls.task_cls(
+        task = flow_task.flow_class.task_class(
             process=prev_activation.process,
             flow_task=flow_task,
             token=token)
@@ -72,7 +72,7 @@ class Handler(mixins.TaskDescriptionMixin,
               base.Event):
 
     task_type = 'FUNC'
-    activation_cls = HandlerActivation
+    activation_class = HandlerActivation
 
     def __init__(self, handler, **kwargs):
         self.handler = handler
@@ -80,4 +80,4 @@ class Handler(mixins.TaskDescriptionMixin,
 
     def ready(self):
         if isinstance(self.handler, base.ThisObject):
-            self.handler = getattr(self.flow_cls.instance, self.handler.name)
+            self.handler = getattr(self.flow_class.instance, self.handler.name)

@@ -15,11 +15,11 @@ class Test(TestCase):
         request.user = User(username='test')
         request.resolver_match = resolve('/test/')
 
-        next_url = views.get_next_task_url(request, BaseViewTestFlow.process_cls(flow_cls=BaseViewTestFlow))
+        next_url = views.get_next_task_url(request, BaseViewTestFlow.process_class(flow_class=BaseViewTestFlow))
         self.assertEqual(next_url, '/test/')
 
     def test_get_next_task_url_process_list(self):
-        process = BaseViewTestFlow.process_cls.objects.create(flow_cls=BaseViewTestFlow)
+        process = BaseViewTestFlow.process_class.objects.create(flow_class=BaseViewTestFlow)
         request = RequestFactory().get('/test/')
         request.user = User(username='test')
         request.resolver_match = resolve('/test/')
@@ -79,7 +79,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(
-            request, flow_cls=BaseViewTestFlow, flow_task=BaseViewTestFlow.test_task,
+            request, flow_class=BaseViewTestFlow, flow_task=BaseViewTestFlow.test_task,
             process_pk=act.process.pk, task_pk=task.pk)
 
         self.assertEqual(response.status_code, 200)
@@ -100,11 +100,11 @@ class BaseViewTestFlow(Flow):
 urlpatterns = [
     url(r'^test/', include([
         BaseViewTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(flow_cls=BaseViewTestFlow), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(flow_cls=BaseViewTestFlow), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(flow_cls=BaseViewTestFlow), name='queue'),
+        url('^$', views.ProcessListView.as_view(flow_class=BaseViewTestFlow), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(flow_class=BaseViewTestFlow), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(flow_class=BaseViewTestFlow), name='queue'),
         url('^detail/(?P<process_pk>\d+)/$',
-            views.DetailProcessView.as_view(flow_cls=BaseViewTestFlow), name='detail'),
+            views.DetailProcessView.as_view(flow_class=BaseViewTestFlow), name='detail'),
     ], namespace='baseviewtest'))
 ]
 

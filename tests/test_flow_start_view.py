@@ -13,8 +13,8 @@ from viewflow.flow.activation import ManagedStartViewActivation
 
 
 class Test(TestCase):
-    def init_node(self, node, flow_cls=None, name='test_node'):
-        node.flow_cls = flow_cls or Flow
+    def init_node(self, node, flow_class=None, name='test_node'):
+        node.flow_class = flow_class or Flow
         node.name = name
         return node
 

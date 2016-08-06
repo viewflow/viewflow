@@ -12,11 +12,11 @@ from .fields import ClassValueWrapper
 
 def _available_flows(flow_classes, user):
     result = []
-    for flow_cls in flow_classes:
-        opts = flow_cls.process_cls._meta
+    for flow_class in flow_classes:
+        opts = flow_class.process_class._meta
         view_perm = "{}.view_{}".format(opts.app_label, opts.model_name)
         if user.has_perm(view_perm):
-            result.append(flow_cls)
+            result.append(flow_class)
     return result
 
 
@@ -75,9 +75,9 @@ def coerce_to_related_instance(instance, target_model):
 
 class ProcessQuerySet(QuerySet):
     def filter(self, *args, **kwargs):
-        flow_cls = kwargs.pop('flow_cls', None)
-        if flow_cls and not isinstance(flow_cls, ClassValueWrapper):
-            kwargs['flow_cls'] = ClassValueWrapper(flow_cls)
+        flow_class = kwargs.pop('flow_class', None)
+        if flow_class and not isinstance(flow_class, ClassValueWrapper):
+            kwargs['flow_class'] = ClassValueWrapper(flow_class)
 
         return super(ProcessQuerySet, self).filter(*args, **kwargs)
 
@@ -88,10 +88,10 @@ class ProcessQuerySet(QuerySet):
 
         related = filter(
             None, map(
-                lambda flow_cls: _get_related_path(flow_cls.process_cls, self.model),
+                lambda flow_class: _get_related_path(flow_class.process_class, self.model),
                 flow_classes))
 
-        return self.filter(flow_cls__in=flow_classes).select_related(*related)
+        return self.filter(flow_class__in=flow_classes).select_related(*related)
 
     def filter_available(self, flow_classes, user):
         return self.model.objects.coerce_for(_available_flows(flow_classes, user))
@@ -105,13 +105,13 @@ class ProcessQuerySet(QuerySet):
 
     def iterator(self):
         """
-        Coerce queryset results to process subclasses depends onf flow_cls.process_cls
+        Coerce queryset results to process subclasses depends onf flow_class.process_class
         """
         base_itererator = super(ProcessQuerySet, self).iterator()
         if getattr(self, '_coerced', False):
             for process in base_itererator:
                 if isinstance(process, self.model):
-                    process = coerce_to_related_instance(process, process.flow_cls.process_cls)
+                    process = coerce_to_related_instance(process, process.flow_class.process_class)
                 yield process
         else:
             for process in base_itererator:
@@ -120,9 +120,9 @@ class ProcessQuerySet(QuerySet):
 
 class TaskQuerySet(QuerySet):
     def filter(self, *args, **kwargs):
-        flow_cls = kwargs.pop('process__flow_cls', None)
-        if flow_cls and not isinstance(flow_cls, ClassValueWrapper):
-            kwargs['process__flow_cls'] = ClassValueWrapper(flow_cls)
+        flow_class = kwargs.pop('process__flow_class', None)
+        if flow_class and not isinstance(flow_class, ClassValueWrapper):
+            kwargs['process__flow_class'] = ClassValueWrapper(flow_class)
 
         return super(TaskQuerySet, self).filter(*args, **kwargs)
 
@@ -132,22 +132,22 @@ class TaskQuerySet(QuerySet):
 
         related = filter(
             None, map(
-                lambda flow_cls: _get_related_path(flow_cls.task_cls, self.model),
+                lambda flow_class: _get_related_path(flow_class.task_class, self.model),
                 flow_classes))
 
-        return self.filter(process__flow_cls__in=flow_classes).select_related('process', *related)
+        return self.filter(process__flow_class__in=flow_classes).select_related('process', *related)
 
-    def user_queue(self, user, flow_cls=None):
+    def user_queue(self, user, flow_class=None):
         """
         List of tasks permitted for user
         """
         queryset = self.filter(flow_task_type='HUMAN')
 
-        if flow_cls is not None:
-            if not isinstance(flow_cls, ClassValueWrapper):
-                flow_cls = ClassValueWrapper(flow_cls)
+        if flow_class is not None:
+            if not isinstance(flow_class, ClassValueWrapper):
+                flow_class = ClassValueWrapper(flow_class)
 
-            queryset = queryset.filter(process__flow_cls=flow_cls)
+            queryset = queryset.filter(process__flow_class=flow_class)
 
         if not user.is_superuser:
             has_permission = Q(owner_permission__in=user.get_all_permissions()) \
@@ -192,13 +192,13 @@ class TaskQuerySet(QuerySet):
 
     def iterator(self):
         """
-        Coerce queryset results to process subclasses depends onf flow_cls.task_cls
+        Coerce queryset results to process subclasses depends onf flow_class.task_class
         """
         base_itererator = super(TaskQuerySet, self).iterator()
         if getattr(self, '_coerced', False):
             for task in base_itererator:
                 if isinstance(task, self.model):
-                    task = coerce_to_related_instance(task, task.flow_task.flow_cls.task_cls)
+                    task = coerce_to_related_instance(task, task.flow_task.flow_class.task_class)
                 yield task
         else:
             for task in base_itererator:

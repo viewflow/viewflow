@@ -9,8 +9,8 @@ class Test(TestCase):
     class ProcessStub(object):
         _default_manager = mock.Mock()
 
-        def __init__(self, flow_cls=None):
-            self.flow_cls = flow_cls
+        def __init__(self, flow_class=None):
+            self.flow_class = flow_class
 
         def active_tasks(self):
             return []
@@ -43,12 +43,12 @@ class Test(TestCase):
 
     def init_node(self, node):
         class FlowStub(object):
-            process_cls = Test.ProcessStub
+            process_class = Test.ProcessStub
             lock_impl = staticmethod(lock.no_lock)
-            task_cls = Test.TaskStub
+            task_class = Test.TaskStub
             instance = None
 
-        node.flow_cls = FlowStub()
+        node.flow_class = FlowStub()
 
         return node
 

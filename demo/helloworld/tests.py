@@ -31,13 +31,13 @@ class Test(TestCase):
 urlpatterns = [
     url(r'^helloworld/', include([
         HelloWorldFlow.instance.urls,
-        url('^$', viewflow.ProcessListView.as_view(flow_cls=HelloWorldFlow), name='index'),
-        url('^tasks/$', viewflow.TaskListView.as_view(flow_cls=HelloWorldFlow), name='tasks'),
-        url('^queue/$', viewflow.QueueListView.as_view(flow_cls=HelloWorldFlow), name='queue'),
+        url('^$', viewflow.ProcessListView.as_view(flow_class=HelloWorldFlow), name='index'),
+        url('^tasks/$', viewflow.TaskListView.as_view(flow_class=HelloWorldFlow), name='tasks'),
+        url('^queue/$', viewflow.QueueListView.as_view(flow_class=HelloWorldFlow), name='queue'),
         url('^detail/(?P<process_pk>\d+)/$',
-            viewflow.DetailProcessView.as_view(flow_cls=HelloWorldFlow), name='detail'),
+            viewflow.DetailProcessView.as_view(flow_class=HelloWorldFlow), name='detail'),
         url('^action/cancel/(?P<process_pk>\d+)/$',
-            viewflow.CancelProcessView.as_view(flow_cls=HelloWorldFlow), name='action_cancel'),
+            viewflow.CancelProcessView.as_view(flow_class=HelloWorldFlow), name='action_cancel'),
     ], namespace='helloworld')),
 ]
 

@@ -22,7 +22,7 @@ class TaskFilter(FilterSet):
 
         def task_name(task_ref):
             flow_task = import_task_by_ref(task_ref)
-            return "{}/{}".format(flow_task.flow_cls.process_title, flow_task.name.title())
+            return "{}/{}".format(flow_task.flow_class.process_title, flow_task.name.title())
 
         tasks = [(task_ref, task_name(task_ref))
                  for task_ref in queryset.order_by('flow_task').distinct().values_list('flow_task', flat=True)]
@@ -159,7 +159,7 @@ class ProcessListView(FlowViewPermissionMixin, generic.ListView):
     context_object_name = 'process_list'
 
     def get_template_names(self):
-        opts = self.flow_cls._meta
+        opts = self.flow_class._meta
 
         return (
             '{}/{}/process_list.html'.format(opts.app_label, opts.flow_label),
@@ -168,21 +168,21 @@ class ProcessListView(FlowViewPermissionMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
         context['start_actions'] = flow_start_actions(
-            self.flow_cls, namespace=self.request.resolver_match.namespace, user=self.request.user)
-        context['flow_cls'] = self.flow_cls
+            self.flow_class, namespace=self.request.resolver_match.namespace, user=self.request.user)
+        context['flow_class'] = self.flow_class
         return context
 
     def get_queryset(self):
         return self.filter.qs
 
     def get_base_queryset(self, user):
-        return self.flow_cls.process_cls.objects \
-            .filter(flow_cls=self.flow_cls) \
+        return self.flow_class.process_class.objects \
+            .filter(flow_class=self.flow_class) \
             .order_by('-created')
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
-        self.flow_cls = kwargs.get('flow_cls', self.flow_cls)
+        self.flow_class = kwargs.get('flow_class', self.flow_class)
         self.filter = ProcessFilter(request.GET, self.get_base_queryset(request.user))
         return super(ProcessListView, self).dispatch(request, *args, **kwargs)
 
@@ -196,7 +196,7 @@ class TaskListView(FlowViewPermissionMixin, generic.ListView):
     context_object_name = 'task_list'
 
     def get_template_names(self):
-        opts = self.flow_cls._meta
+        opts = self.flow_class._meta
 
         return (
             '{}/{}/task_list.html'.format(opts.app_label, opts.flow_label),
@@ -205,13 +205,13 @@ class TaskListView(FlowViewPermissionMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(TaskListView, self).get_context_data(**kwargs)
         context['start_actions'] = flow_start_actions(
-            self.flow_cls, namespace=self.request.resolver_match.namespace, user=self.request.user)
-        context['flow_cls'] = self.flow_cls
+            self.flow_class, namespace=self.request.resolver_match.namespace, user=self.request.user)
+        context['flow_class'] = self.flow_class
         return context
 
     def get_queryset(self):
-        return self.flow_cls.task_cls.objects \
-            .filter(process__flow_cls=self.flow_cls,
+        return self.flow_class.task_class.objects \
+            .filter(process__flow_class=self.flow_class,
                     owner=self.request.user,
                     status=activation.STATUS.ASSIGNED) \
             .order_by('-created')
@@ -226,7 +226,7 @@ class QueueListView(FlowViewPermissionMixin, generic.ListView):
     context_object_name = 'queue'
 
     def get_template_names(self):
-        opts = self.flow_cls._meta
+        opts = self.flow_class._meta
 
         return (
             '{}/{}/queue.html'.format(opts.app_label, opts.flow_label),
@@ -235,12 +235,12 @@ class QueueListView(FlowViewPermissionMixin, generic.ListView):
     def get_context_data(self, **kwargs):
         context = super(QueueListView, self).get_context_data(**kwargs)
         context['start_actions'] = flow_start_actions(
-            self.flow_cls, namespace=self.request.resolver_match.namespace, user=self.request.user)
-        context['flow_cls'] = self.flow_cls
+            self.flow_class, namespace=self.request.resolver_match.namespace, user=self.request.user)
+        context['flow_class'] = self.flow_class
         return context
 
     def get_queryset(self):
-        queryset = self.flow_cls.task_cls.objects.user_queue(self.request.user, flow_cls=self.flow_cls) \
+        queryset = self.flow_class.task_class.objects.user_queue(self.request.user, flow_class=self.flow_class) \
             .filter(status=activation.STATUS.NEW).order_by('-created')
 
         return queryset

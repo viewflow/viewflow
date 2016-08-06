@@ -21,7 +21,7 @@ class Test(TestCase):
         request.user = User(username='test', is_superuser=True)
         request.resolver_match = resolve('/test/')
 
-        response = view(request, flow_cls=ActionsTestFlow, process_pk=act.process.pk)
+        response = view(request, flow_class=ActionsTestFlow, process_pk=act.process.pk)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.template_name,
                          ('tests/test_views_actions/actionstest/process_cancel.html',
@@ -36,7 +36,7 @@ class Test(TestCase):
         request.user = User(username='test', is_superuser=True)
         request.resolver_match = resolve('/test/')
 
-        response = view(request, flow_cls=ActionsTestFlow, process_pk=act.process.pk)
+        response = view(request, flow_class=ActionsTestFlow, process_pk=act.process.pk)
         act.process.refresh_from_db()
 
         self.assertEqual(response.status_code, 302)
@@ -61,7 +61,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(
-            request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.start,
+            request, flow_class=ActionsTestFlow, flow_task=ActionsTestFlow.start,
             process_pk=act.process.pk, task_pk=start.pk)
 
         self.assertEqual(response.status_code, 200)
@@ -78,7 +78,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(
-            request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.start,
+            request, flow_class=ActionsTestFlow, flow_task=ActionsTestFlow.start,
             process_pk=act.process.pk, task_pk=start.pk)
         start.refresh_from_db()
 
@@ -98,7 +98,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(
-            request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.task,
+            request, flow_class=ActionsTestFlow, flow_task=ActionsTestFlow.task,
             process_pk=act.process.pk, task_pk=task.pk)
 
         self.assertEqual(response.status_code, 200)
@@ -115,7 +115,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(
-            request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.start,
+            request, flow_class=ActionsTestFlow, flow_task=ActionsTestFlow.start,
             process_pk=act.process.pk, task_pk=task.pk)
         task.refresh_from_db()
 
@@ -134,7 +134,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(
-            request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.if_gate,
+            request, flow_class=ActionsTestFlow, flow_task=ActionsTestFlow.if_gate,
             process_pk=act.process.pk, task_pk=if_gate.pk)
 
         self.assertEqual(response.status_code, 200)
@@ -152,7 +152,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(
-            request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.if_gate,
+            request, flow_class=ActionsTestFlow, flow_task=ActionsTestFlow.if_gate,
             process_pk=act.process.pk, task_pk=if_gate.pk)
         if_gate.refresh_from_db()
         if_gate.process.refresh_from_db()
@@ -175,7 +175,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(
-            request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.task,
+            request, flow_class=ActionsTestFlow, flow_task=ActionsTestFlow.task,
             process_pk=act.process.pk, task_pk=task.pk)
 
         self.assertEqual(response.status_code, 200)
@@ -193,7 +193,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(
-            request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.task,
+            request, flow_class=ActionsTestFlow, flow_task=ActionsTestFlow.task,
             process_pk=act.process.pk, task_pk=task.pk)
         task.refresh_from_db()
         task.process.refresh_from_db()
@@ -216,7 +216,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(
-            request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.task,
+            request, flow_class=ActionsTestFlow, flow_task=ActionsTestFlow.task,
             process_pk=act.process.pk, task_pk=task.pk)
 
         self.assertEqual(response.status_code, 200)
@@ -234,7 +234,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(
-            request, flow_cls=ActionsTestFlow, flow_task=ActionsTestFlow.task,
+            request, flow_class=ActionsTestFlow, flow_task=ActionsTestFlow.task,
             process_pk=act.process.pk, task_pk=task.pk)
         task.refresh_from_db()
         task.process.refresh_from_db()
@@ -253,11 +253,11 @@ class ActionsTestFlow(Flow):
 urlpatterns = [
     url(r'^test/', include([
         ActionsTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(flow_cls=ActionsTestFlow), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(flow_cls=ActionsTestFlow), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(flow_cls=ActionsTestFlow), name='queue'),
+        url('^$', views.ProcessListView.as_view(flow_class=ActionsTestFlow), name='index'),
+        url('^tasks/$', views.TaskListView.as_view(flow_class=ActionsTestFlow), name='tasks'),
+        url('^queue/$', views.QueueListView.as_view(flow_class=ActionsTestFlow), name='queue'),
         url('^detail/(?P<process_pk>\d+)/$',
-            views.DetailProcessView.as_view(flow_cls=ActionsTestFlow), name='detail'),
+            views.DetailProcessView.as_view(flow_class=ActionsTestFlow), name='detail'),
     ], namespace='actionstest'))
 ]
 

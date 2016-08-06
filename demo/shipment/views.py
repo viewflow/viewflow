@@ -11,20 +11,20 @@ from .models import Shipment, ShipmentItem, Insurance
 
 @flow_start_view
 def start_view(request):
-    form_cls = modelform_factory(Shipment, fields=[
+    form_class = modelform_factory(Shipment, fields=[
         'shipment_no', 'first_name', 'last_name',
         'email', 'phone', 'address', 'zipcode',
         'city', 'state', 'country'])
 
-    formset_cls = inlineformset_factory(Shipment, ShipmentItem, fields=[
+    formset_class = inlineformset_factory(Shipment, ShipmentItem, fields=[
         'name', 'quantity'], can_delete=False)
 
     if not request.activation.has_perm(request.user):
         raise PermissionDenied
     request.activation.prepare(request.POST or None, user=request.user)
 
-    form = form_cls(request.POST or None)
-    formset = formset_cls(request.POST or None)
+    form = form_class(request.POST or None)
+    formset = formset_class(request.POST or None)
 
     is_valid = all([form.is_valid(), formset.is_valid()])
     if is_valid:

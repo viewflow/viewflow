@@ -12,7 +12,7 @@ class DynamicSplitFlow(Flow):
 
     Depends on initial decision, several instances on make_decision task would be instantiated
     """
-    process_cls = models.DynamicSplitProcess
+    process_class = models.DynamicSplitProcess
 
     summary_template = """
     Decision on: {{ process.question }}<br/>

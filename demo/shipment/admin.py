@@ -17,7 +17,7 @@ class ShipmentTaskAdmin(TaskAdmin):
 
     def get_queryset(self, request):
         qs = super(ShipmentTaskAdmin, self).get_queryset(request)
-        return qs.filter(process__flow_cls=flows.ShipmentFlow)
+        return qs.filter(process__flow_class=flows.ShipmentFlow)
 
 
 class CarrierAdmin(admin.ModelAdmin):
