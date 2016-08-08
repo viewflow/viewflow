@@ -8,7 +8,7 @@ from ..exceptions import FlowRuntimeError
 
 class StartFunction(mixins.TaskDescriptionMixin,
                     mixins.NextNodeMixin,
-                    mixins.DetailsViewMixin,
+                    mixins.DetailViewMixin,
                     mixins.UndoViewMixin,
                     mixins.CancelViewMixin,
                     mixins.PerformViewMixin,
@@ -36,7 +36,7 @@ class StartFunction(mixins.TaskDescriptionMixin,
 
 class Function(mixins.TaskDescriptionMixin,
                mixins.NextNodeMixin,
-               mixins.DetailsViewMixin,
+               mixins.DetailViewMixin,
                mixins.UndoViewMixin,
                mixins.CancelViewMixin,
                mixins.PerformViewMixin,

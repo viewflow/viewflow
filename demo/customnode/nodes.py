@@ -19,7 +19,7 @@ class DynamicSplit(mixins.NextNodeMixin,
                    mixins.UndoViewMixin,
                    mixins.CancelViewMixin,
                    mixins.PerformViewMixin,
-                   mixins.DetailsViewMixin,
+                   mixins.DetailViewMixin,
                    base.Gateway):
     """
     Activates several outgoing task instances depends on callback value
@@ -38,7 +38,7 @@ class DynamicSplit(mixins.NextNodeMixin,
     task_type = 'SPLIT'
 
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     perform_view_class = views.PerformTaskView
     undo_view_class = views.UndoTaskView
 

@@ -30,7 +30,7 @@ class SplitActivation(AbstractGateActivation):
 
 
 class Split(mixins.TaskDescriptionMixin,
-            mixins.DetailsViewMixin,
+            mixins.DetailViewMixin,
             mixins.UndoViewMixin,
             mixins.CancelViewMixin,
             mixins.PerformViewMixin,

@@ -2,7 +2,7 @@ import warnings
 
 from ..base import ThisObject, This, Edge, Node, Event, Task, Gateway
 from ..mixins import (
-    NextNodeMixin, DetailsViewMixin, UndoViewMixin, CancelViewMixin,
+    NextNodeMixin, DetailViewMixin, UndoViewMixin, CancelViewMixin,
     PerformViewMixin, ActivateNextMixin, PermissionMixin, TaskDescriptionMixin,
     TaskDescriptionViewMixin, ViewArgsMixin
 )
@@ -10,7 +10,7 @@ from ..mixins import (
 
 __all__ = [
     'ThisObject', 'This', 'Edge', 'Node', 'Event', 'Task', 'Gateway',
-    'NextNodeMixin', 'DetailsViewMixin', 'UndoViewMixin', 'CancelViewMixin',
+    'NextNodeMixin', 'DetailViewMixin', 'UndoViewMixin', 'CancelViewMixin',
     'PerformViewMixin', 'ActivateNextMixin', 'PermissionMixin', 'TaskDescriptionMixin',
     'TaskDescriptionViewMixin', 'ViewArgsMixin'
 ]

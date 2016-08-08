@@ -29,7 +29,7 @@ class Test(TestCase):
         response = view(request, flow_class=TaskViewTestFlow, flow_task=TaskViewTestFlow.task,
                         process_pk=act.process.pk, task_pk=task.pk)
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response['location'], '/test/{}/task/{}/details/'.format(act.process.pk, task.pk))
+        self.assertEqual(response['location'], '/test/{}/task/{}/detail/'.format(act.process.pk, task.pk))
 
         # assigned get
         act = task.activate()

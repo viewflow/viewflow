@@ -40,7 +40,7 @@ class MessageUserMixin(object):
             process_pk=self.activation.process.pk)
 
         task_url = self.activation.task.flow_task.get_task_url(
-            self.activation.task, url_type='details', user=self.request.user, namespace=namespace)
+            self.activation.task, url_type='detail', user=self.request.user, namespace=namespace)
         task_link = '<a href="{task_url}">#{task_pk}</a>'.format(
             task_url=task_url,
             task_pk=self.activation.task.pk)

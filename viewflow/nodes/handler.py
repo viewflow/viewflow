@@ -65,7 +65,7 @@ class HandlerActivation(Activation):
 
 class Handler(mixins.TaskDescriptionMixin,
               mixins.NextNodeMixin,
-              mixins.DetailsViewMixin,
+              mixins.DetailViewMixin,
               mixins.UndoViewMixin,
               mixins.CancelViewMixin,
               mixins.PerformViewMixin,

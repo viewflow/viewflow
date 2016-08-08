@@ -42,7 +42,7 @@ class BaseFlowViewMixin(object):
         if not self.activation.prepare.can_proceed():
             self.error('Task {task} cannot be executed.')
             return redirect(self.activation.flow_task.get_task_url(
-                self.activation.task, url_type='details', user=request.user,
+                self.activation.task, url_type='detail', user=request.user,
                 namespace=self.request.resolver_match.namespace))
 
         if not self.activation.has_perm(request.user):
@@ -136,7 +136,7 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
         if not self.activation.assign.can_proceed():
             self.error('Task {task} cannot be assigned to you')
             return redirect(self.activation.flow_task.get_task_url(
-                self.activation.task, url_type='details', user=request.user,
+                self.activation.task, url_type='detail', user=request.user,
                 namespace=self.request.resolver_match.namespace))
 
         if not self.activation.flow_task.can_assign(request.user, self.activation.task):

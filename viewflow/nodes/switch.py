@@ -27,7 +27,7 @@ class SwitchActivation(AbstractGateActivation):
 
 
 class Switch(mixins.TaskDescriptionMixin,
-             mixins.DetailsViewMixin,
+             mixins.DetailViewMixin,
              mixins.UndoViewMixin,
              mixins.CancelViewMixin,
              mixins.PerformViewMixin,

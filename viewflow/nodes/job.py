@@ -5,7 +5,7 @@ class AbstractJob(mixins.TaskDescriptionMixin,
                   mixins.NextNodeMixin,
                   mixins.UndoViewMixin,
                   mixins.CancelViewMixin,
-                  mixins.DetailsViewMixin,
+                  mixins.DetailViewMixin,
                   base.Task):
     """
     Base class for task that runs in background

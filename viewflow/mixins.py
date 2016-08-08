@@ -28,30 +28,30 @@ class NextNodeMixin(object):
             yield Edge(src=self, dst=self._next, edge_class='next')
 
 
-class DetailsViewMixin(object):
-    details_view_class = None
+class DetailViewMixin(object):
+    detail_view_class = None
 
     def __init__(self, *args, **kwargs):
-        self._details_view = kwargs.pop('details_view', None)
-        super(DetailsViewMixin, self).__init__(*args, **kwargs)
+        self._detail_view = kwargs.pop('detail_view', None)
+        super(DetailViewMixin, self).__init__(*args, **kwargs)
 
     @property
-    def details_view(self):
-        return self._details_view if self._details_view else self.details_view_class.as_view()
+    def detail_view(self):
+        return self._detail_view if self._detail_view else self.detail_view_class.as_view()
 
     def urls(self):
-        urls = super(DetailsViewMixin, self).urls()
+        urls = super(DetailViewMixin, self).urls()
         urls.append(
-            url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/details/$'.format(self.name),
-                self.details_view, {'flow_task': self}, name="{}__details".format(self.name))
+            url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/detail/$'.format(self.name),
+                self.detail_view, {'flow_task': self}, name="{}__detail".format(self.name))
         )
         return urls
 
     def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
-        if url_type in ['details', 'guess']:
-            url_name = '{}:{}__details'.format(namespace, self.name)
+        if url_type in ['detail', 'guess']:
+            url_name = '{}:{}__detail'.format(namespace, self.name)
             return reverse(url_name, args=[task.process_id, task.pk])
-        return super(DetailsViewMixin, self).get_task_url(task, url_type, namespace=namespace, **kwargs)
+        return super(DetailViewMixin, self).get_task_url(task, url_type, namespace=namespace, **kwargs)
 
     def can_view(self, user, task):
         return user.has_perm(self.flow_class.instance.view_permission_name)

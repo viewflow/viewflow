@@ -20,7 +20,7 @@ class IfActivation(AbstractGateActivation):
 
 
 class If(mixins.TaskDescriptionMixin,
-         mixins.DetailsViewMixin,
+         mixins.DetailViewMixin,
          mixins.UndoViewMixin,
          mixins.CancelViewMixin,
          mixins.PerformViewMixin,

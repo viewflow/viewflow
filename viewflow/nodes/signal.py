@@ -5,7 +5,7 @@ from ..exceptions import FlowRuntimeError
 
 class StartSignal(mixins.TaskDescriptionMixin,
                   mixins.NextNodeMixin,
-                  mixins.DetailsViewMixin,
+                  mixins.DetailViewMixin,
                   mixins.UndoViewMixin,
                   mixins.CancelViewMixin,
                   base.Event):
@@ -35,7 +35,7 @@ class StartSignal(mixins.TaskDescriptionMixin,
 
 class Signal(mixins.TaskDescriptionMixin,
              mixins.NextNodeMixin,
-             mixins.DetailsViewMixin,
+             mixins.DetailViewMixin,
              mixins.UndoViewMixin,
              mixins.CancelViewMixin,
              base.Event):

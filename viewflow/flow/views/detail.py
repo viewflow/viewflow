@@ -19,9 +19,9 @@ class DetailTaskView(generic.TemplateView):
         opts = self.activation.flow_task.flow_class._meta
 
         return (
-            '{}/{}/{}_details.html'.format(opts.app_label, opts.flow_label, flow_task.name),
-            '{}/{}/task_details.html'.format(opts.app_label, opts.flow_label),
-            'viewflow/flow/task_details.html')
+            '{}/{}/{}_detail.html'.format(opts.app_label, opts.flow_label, flow_task.name),
+            '{}/{}/task_detail.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/task_detail.html')
 
     def get_context_data(self, **kwargs):
         context = super(DetailTaskView, self).get_context_data(**kwargs)
@@ -39,7 +39,7 @@ class DetailTaskView(generic.TemplateView):
 
 class DetailProcessView(FlowViewPermissionMixin, generic.DetailView):
 
-    """Details for process."""
+    """Detail for process."""
 
     context_object_name = 'process'
     pk_url_kwarg = 'process_pk'
@@ -48,8 +48,8 @@ class DetailProcessView(FlowViewPermissionMixin, generic.DetailView):
         opts = self.flow_class._meta
 
         return (
-            '{}/{}/process_details.html'.format(opts.app_label, opts.flow_label),
-            'viewflow/flow/process_details.html')
+            '{}/{}/process_detail.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/process_detail.html')
 
     def get_context_data(self, **kwargs):
         context = super(DetailProcessView, self).get_context_data(**kwargs)

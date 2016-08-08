@@ -38,9 +38,9 @@ class Test(TestCase):
     def test_child_flow_contains_all_urls(self):
         patterns_names = sorted([pat.name for pat in ChildFlow.instance.urls.url_patterns])
         self.assertEqual(patterns_names, sorted([
-            'alert__perform', 'alert__cancel', 'alert__undo', 'alert__details',
-            'end__perform', 'end__cancel', 'end__undo', 'end__details',
+            'alert__perform', 'alert__cancel', 'alert__undo', 'alert__detail',
+            'end__perform', 'end__cancel', 'end__undo', 'end__detail',
             'notify_admins__perform', 'notify_admins__cancel', 'notify_admins__undo',
-            'notify_admins__details', 'notify_users__perform', 'notify_users__cancel',
-            'notify_users__undo', 'notify_users__details', 'start__perform',
-            'start__cancel', 'start__undo', 'start__details']))
+            'notify_admins__detail', 'notify_users__perform', 'notify_users__cancel',
+            'notify_users__undo', 'notify_users__detail', 'start__perform',
+            'start__cancel', 'start__undo', 'start__detail']))

@@ -3,7 +3,7 @@ from .. import base, mixins
 
 
 class End(mixins.TaskDescriptionMixin,
-          mixins.DetailsViewMixin,
+          mixins.DetailViewMixin,
           mixins.UndoViewMixin,
           mixins.CancelViewMixin,
           mixins.PerformViewMixin,

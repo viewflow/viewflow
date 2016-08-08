@@ -26,7 +26,7 @@ class StartFunction(nodes.StartFunction):
 
     activate_next_view_class = views.ActivateNextTaskView
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     perform_view_class = views.PerformTaskView
     undo_view_class = views.UndoTaskView
 
@@ -55,7 +55,7 @@ class Function(nodes.Function):
 
     activate_next_view_class = views.ActivateNextTaskView
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     perform_view_class = views.PerformTaskView
     undo_view_class = views.UndoTaskView
 
@@ -91,7 +91,7 @@ class Handler(nodes.Handler):
 
     activate_next_view_class = views.ActivateNextTaskView
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     perform_view_class = views.PerformTaskView
     undo_view_class = views.UndoTaskView
 
@@ -107,7 +107,7 @@ class If(nodes.If):
            .OnFalse(this.end)
     """
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     perform_view_class = views.PerformTaskView
     undo_view_class = views.UndoTaskView
 
@@ -118,7 +118,7 @@ class Switch(nodes.Switch):
     """
 
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     perform_view_class = views.PerformTaskView
     undo_view_class = views.UndoTaskView
 
@@ -137,7 +137,7 @@ class Join(nodes.Join):
     """
 
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     perform_view_class = views.PerformTaskView
     undo_view_class = views.UndoTaskView
 
@@ -154,7 +154,7 @@ class Split(nodes.Split):
     """
 
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     perform_view_class = views.PerformTaskView
     undo_view_class = views.UndoTaskView
 
@@ -165,7 +165,7 @@ class AbstractJob(nodes.AbstractJob):
     """
 
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     perform_view_class = views.PerformTaskView
     undo_view_class = views.UndoTaskView
 
@@ -191,7 +191,7 @@ class StartSignal(nodes.StartSignal):
     """
 
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     undo_view_class = views.UndoTaskView
 
 
@@ -212,7 +212,7 @@ class Signal(nodes.Signal):
     """
 
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     undo_view_class = views.UndoTaskView
 
 
@@ -255,7 +255,7 @@ class Start(nodes.Start):
     """
     activate_next_view_class = views.ActivateNextTaskView
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     undo_view_class = views.UndoTaskView
     start_view_class = views.CreateProcessView
 
@@ -301,7 +301,7 @@ class View(nodes.View):
     """
     activate_next_view_class = views.ActivateNextTaskView
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     undo_view_class = views.UndoTaskView
     assign_view_class = views.AssignTaskView
     unassign_view_class = views.UnassignTaskView
@@ -315,6 +315,6 @@ class End(nodes.End):
     """
 
     cancel_view_class = views.CancelTaskView
-    details_view_class = views.DetailTaskView
+    detail_view_class = views.DetailTaskView
     perform_view_class = views.PerformTaskView
     undo_view_class = views.UndoTaskView

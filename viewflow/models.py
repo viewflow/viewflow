@@ -156,11 +156,6 @@ class AbstractTask(models.Model):
             for field in self._meta.concrete_fields:
                 setattr(self, field.attname, getattr(db_instance, field.attname))
 
-    def get_absolute_url(self, user=None):
-        if user:
-            return self.flow_task.get_task_url(self, url_type='details', user=user)
-        return self.flow_task.get_task_url(self, url_type='details')
-
     class Meta:
         abstract = True
 

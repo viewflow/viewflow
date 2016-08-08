@@ -6,7 +6,7 @@ urlpatterns = [
     url('^$', views.ProcessListView.as_view(flow_class=HelloWorldFlow), name='index'),
     url('^tasks/$', views.TaskListView.as_view(flow_class=HelloWorldFlow), name='tasks'),
     url('^queue/$', views.QueueListView.as_view(flow_class=HelloWorldFlow), name='queue'),
-    url('^details/(?P<process_pk>\d+)/$',
+    url('^detail/(?P<process_pk>\d+)/$',
         views.DetailProcessView.as_view(flow_class=HelloWorldFlow), name='detail'),
     url('^action/cancel/(?P<process_pk>\d+)/$',
         views.CancelProcessView.as_view(flow_class=HelloWorldFlow), name='action_cancel'),

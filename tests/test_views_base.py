@@ -68,13 +68,13 @@ class Test(TestCase):
         next_url = views.get_next_task_url(request, act.process)
         self.assertEqual(next_url, '/test/{}/test_task/{}/assign/'.format(task.process_id, task.pk))
 
-    def test_details_view(self):
+    def test_detail_view(self):
         act = BaseViewTestFlow.start.run()
         view = views.DetailTaskView.as_view()
         task = act.process.get_task(BaseViewTestFlow.test_task)
 
         # get
-        request = RequestFactory().get('/details/')
+        request = RequestFactory().get('/detail/')
         request.user = User(username='test', is_superuser=True)
         request.resolver_match = resolve('/test/')
 
@@ -85,9 +85,9 @@ class Test(TestCase):
         self.assertEqual(response.status_code, 200)
 
         self.assertEqual(response.template_name,
-                         ('tests/test_views_base/baseviewtest/test_task_details.html',
-                          'tests/test_views_base/baseviewtest/task_details.html',
-                          'viewflow/flow/task_details.html'))
+                         ('tests/test_views_base/baseviewtest/test_task_detail.html',
+                          'tests/test_views_base/baseviewtest/task_detail.html',
+                          'viewflow/flow/task_detail.html'))
         self.assertEqual(response.context_data['activation'].process, act.process)
 
 

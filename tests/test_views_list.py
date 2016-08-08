@@ -111,8 +111,8 @@ class Test(TestCase):
         response = view(request, flow_class=ListViewTestFlow, process_pk=process.pk)
 
         self.assertEqual(response.template_name,
-                         ('tests/test_views_list/listviewtest/process_details.html',
-                          'viewflow/flow/process_details.html'))
+                         ('tests/test_views_list/listviewtest/process_detail.html',
+                          'viewflow/flow/process_detail.html'))
 
     def test_tasklist_view(self):
         view = views.TaskListView.as_view()
@@ -155,8 +155,8 @@ urlpatterns = [
         url('^$', views.ProcessListView.as_view(flow_class=ListViewTestFlow), name='index'),
         url('^tasks/$', views.TaskListView.as_view(flow_class=ListViewTestFlow), name='tasks'),
         url('^queue/$', views.QueueListView.as_view(flow_class=ListViewTestFlow), name='queue'),
-        url('^details/(?P<process_pk>\d+)/$',
-            views.DetailProcessView.as_view(flow_class=ListViewTestFlow), name='details'),
+        url('^detail/(?P<process_pk>\d+)/$',
+            views.DetailProcessView.as_view(flow_class=ListViewTestFlow), name='detail'),
     ], namespace='listviewtest'))
 ]
 
