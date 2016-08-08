@@ -4,7 +4,6 @@ from django.core.exceptions import PermissionDenied
 from .mixins import FlowViewPermissionMixin
 
 from ...decorators import flow_view
-from .utils import flow_start_actions
 
 
 class DetailTaskView(generic.TemplateView):
@@ -53,9 +52,6 @@ class DetailProcessView(FlowViewPermissionMixin, generic.DetailView):
 
     def get_context_data(self, **kwargs):
         context = super(DetailProcessView, self).get_context_data(**kwargs)
-        context['start_actions'] = flow_start_actions(
-            self.flow_class, namespace=self.request.resolver_match.namespace, user=self.request.user)
-        context['flow_class'] = self.flow_class
         context['task_list'] = context['process'].task_set.all().order_by('created')
         return context
 

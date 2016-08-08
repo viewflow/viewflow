@@ -1,3 +1,4 @@
+from collections import OrderedDict
 from inspect import getargspec
 
 from django import template
@@ -6,6 +7,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.template.loader import select_template
 
+from .. import flow
 from ..base import Flow
 from ..compat import get_app_package, import_string, TemplateSyntaxError, TagHelperNode, parse_bits
 from ..models import AbstractProcess, AbstractTask
@@ -128,6 +130,34 @@ def flow_perms(user, task):
         result.append('can_view')
 
     return result
+
+
+@register.assignment_tag
+def flow_start_actions(flow_class, user=None):
+    """
+    List of actions to start flow available for the user
+
+    {% flow_start_actions view.flow_class request.user as flow_start_actions %}
+    """
+    actions = [
+        node for node in flow_class._meta.nodes()
+        if isinstance(node, flow.Start)
+        if user is None or node.can_execute(user)
+    ]
+    return sorted(actions, key=lambda node: node.name)
+
+
+@register.assignment_tag
+def flows_start_actions(flow_classes, user=None):
+    """
+    List of actions to start each flow available for the user
+
+    {% flows_start_actions view.flows request.user as flow_start_actions %}
+    """
+    actions = OrderedDict()
+    for flow_class in sorted(flow_classes, key=lambda flow_class: flow_class.process_title):
+        actions[flow_class] = flow_start_actions(flow_class, user=user)
+    return actions
 
 
 @register.simple_tag(takes_context=True)

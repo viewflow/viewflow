@@ -8,32 +8,10 @@ from viewflow import flow
 from viewflow.base import Flow, this
 from viewflow.models import Task, Process
 from viewflow.flow import views
-from viewflow.flow.views.utils import flow_start_actions, flows_start_actions
 from viewflow.flow.views.list import TaskFilter
 
 
 class Test(TestCase):
-    def test_flow_start_actions(self):
-        user = User.objects.create(username='superuser', is_superuser=True)
-        actions = flow_start_actions(ListViewTestFlow, namespace='listviewtest', user=user)
-
-        self.assertEqual(actions, [
-            ('/test/start2/', 'start2'),
-            ('/test/start3/', 'start3')])
-
-        user = User.objects.create(username='user', is_superuser=False)
-        actions = flow_start_actions(ListViewTestFlow, namespace='listviewtest', user=user)
-        self.assertEqual(actions, [('/test/start3/', 'start3')])
-
-    def test_flows_start_actions(self):
-        user = User.objects.create(username='superuser', is_superuser=True)
-        actions = flows_start_actions({'listviewtest': ListViewTestFlow}, user)
-
-        self.assertEqual(actions, {
-            ListViewTestFlow: [
-                ('/test/start2/', 'start2'),
-                ('/test/start3/', 'start3')]})
-
     def test_task_filter(self):
         process = Process.objects.create(flow_class=ListViewTestFlow)
         task1 = Task.objects.create(process=process, flow_task=ListViewTestFlow.start1)

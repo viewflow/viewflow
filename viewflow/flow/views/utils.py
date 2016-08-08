@@ -1,31 +1,7 @@
-from collections import OrderedDict
-
 from django.core.urlresolvers import reverse
 from django.utils.http import is_safe_url
 
 from ... import activation
-
-
-def flow_start_actions(flow_class, namespace, user=None):
-    """Return list of start flow actions data available."""
-    from ... import flow
-
-    actions = []
-    for node in flow_class._meta.nodes():
-        if isinstance(node, flow.Start) and (user is None or node.can_execute(user)):
-            node_url = reverse('{}:{}'.format(namespace, node.name))
-            actions.append((node_url, node.name))
-
-    actions.sort(key=lambda action: action[0])
-    return actions
-
-
-def flows_start_actions(flow_classes, user=None):
-    actions = OrderedDict()
-
-    for namespace, flow_class in sorted(flow_classes.items(), key=lambda item: item[1].process_title):
-        actions[flow_class] = flow_start_actions(flow_class, namespace, user=user)
-    return actions
 
 
 def get_next_task_url(request, process):

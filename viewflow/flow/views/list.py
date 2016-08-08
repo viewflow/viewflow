@@ -7,7 +7,6 @@ from django_filters import FilterSet, ChoiceFilter, DateRangeFilter, ModelChoice
 from ... import activation, models
 from ...fields import import_task_by_ref
 from .mixins import LoginRequiredMixin, FlowViewPermissionMixin
-from .utils import flows_start_actions, flow_start_actions
 
 
 class TaskFilter(FilterSet):
@@ -47,11 +46,6 @@ class AllProcessListView(LoginRequiredMixin, generic.ListView):
     def get_template_names(self):
         return 'viewflow/site_index.html'
 
-    def get_context_data(self, **kwargs):
-        context = super(AllProcessListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flows_start_actions(self.flows, self.request.user)
-        return context
-
     def get_queryset(self):
         return models.Process.objects \
             .filter_available(self.flows.values(), self.request.user) \
@@ -73,7 +67,6 @@ class AllTaskListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(AllTaskListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flows_start_actions(self.flows, self.request.user)
         context['filter'] = self.filter
         return context
 
@@ -104,7 +97,6 @@ class AllQueueListView(generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(AllQueueListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flows_start_actions(self.flows, self.request.user)
         context['filter'] = self.filter
         return context
 
@@ -135,7 +127,6 @@ class AllArchiveListView(LoginRequiredMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(AllArchiveListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flows_start_actions(self.flows, self.request.user)
         return context
 
     def get_queryset(self):
@@ -167,8 +158,6 @@ class ProcessListView(FlowViewPermissionMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(ProcessListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flow_start_actions(
-            self.flow_class, namespace=self.request.resolver_match.namespace, user=self.request.user)
         context['flow_class'] = self.flow_class
         return context
 
@@ -204,8 +193,6 @@ class TaskListView(FlowViewPermissionMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(TaskListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flow_start_actions(
-            self.flow_class, namespace=self.request.resolver_match.namespace, user=self.request.user)
         context['flow_class'] = self.flow_class
         return context
 
@@ -234,8 +221,6 @@ class QueueListView(FlowViewPermissionMixin, generic.ListView):
 
     def get_context_data(self, **kwargs):
         context = super(QueueListView, self).get_context_data(**kwargs)
-        context['start_actions'] = flow_start_actions(
-            self.flow_class, namespace=self.request.resolver_match.namespace, user=self.request.user)
         context['flow_class'] = self.flow_class
         return context
 
