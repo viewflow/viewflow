@@ -2,6 +2,7 @@ import django
 
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.contrib.auth import views as auth
 from viewflow.flow import views as viewflow
 
 from .helloworld.flows import HelloWorldFlow
@@ -29,7 +30,7 @@ urlpatterns = [
     url(r'^split/', include('demo.customnode.urls', namespace='split')),
 
     url(r'^admin/', include(admin.site.urls)),
-    url(r'^accounts/login/$', 'django.contrib.auth.views.login', name='login'),
-    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', name='logout'),
+    url(r'^accounts/login/$', auth.login, name='login'),
+    url(r'^accounts/logout/$', auth.logout, name='logout'),
     url(r'^', include('demo.website')),
 ]

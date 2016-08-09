@@ -57,15 +57,20 @@ DATABASES = {
 
 # Templates
 
-from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
-TEMPLATE_CONTEXT_PROCESSORS = list(TEMPLATE_CONTEXT_PROCESSORS) + [
-    'django.core.context_processors.request',
-    'demo.website.users',
-]
+try:
+    from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
+    TEMPLATE_CONTEXT_PROCESSORS = list(TEMPLATE_CONTEXT_PROCESSORS) + [
+        'django.core.context_processors.request',
+        'demo.website.users',
+    ]
 
-TEMPLATE_DIRS = (
-    os.path.join(BASE_DIR, 'demo/templates'),
-)
+    TEMPLATE_DIRS = (
+        os.path.join(BASE_DIR, 'demo/templates'),
+    )
+except ImportError:
+    """
+    Ok, on django 1.10
+    """
 
 TEMPLATES = [
     {

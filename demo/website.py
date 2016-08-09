@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.shortcuts import redirect
@@ -29,5 +29,6 @@ def login_as(request):
     return redirect('/')
 
 
-urlpatterns = patterns('',  # NOQA
-    url(r'^login_as/$', login_as, name="login_as"))
+urlpatterns = [
+    url(r'^login_as/$', login_as, name="login_as")
+]
