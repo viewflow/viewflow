@@ -7,6 +7,7 @@ import sys
 import time
 
 from django.db import models, connection
+from django.utils.decorators import method_decorator
 from django.test import TransactionTestCase
 
 from viewflow import flow
@@ -73,6 +74,14 @@ class Test(TransactionTestCase):
         process = TestCeleryProcess.objects.get(pk=task.process_id)
         self.assertEqual(STATUS.DONE, process.status)
 
+    def test_flow_retry(self):
+        activation = TestCeleryRetryFlow.start.run(throw_error=True)
+
+        self.wait_for_task(activation.process, TestCeleryRetryFlow.task, status=STATUS.DONE)
+
+        process = TestCeleryProcess.objects.get(pk=activation.process.pk)
+        self.assertEqual(STATUS.DONE, process.status)
+
 
 class TestCeleryProcess(Process):
     throw_error = models.BooleanField(default=False)
@@ -102,4 +111,21 @@ class TestCeleryFlow(Flow):
 
     start = flow.StartFunction(create_test_flow).Next(this.task)
     task = celery.Job(celery_test_job).Next(this.end)
+    end = flow.End()
+
+
+@celery_app.task(bind=True, default_retry_delay=1)
+@method_decorator(flow.flow_job)
+def celery_test_retry_job(self, activation):
+    if activation.process.throw_error:
+        activation.process.throw_error = False
+        activation.process.save()
+        self.retry()
+
+
+class TestCeleryRetryFlow(Flow):
+    process_class = TestCeleryProcess
+
+    start = flow.StartFunction(create_test_flow).Next(this.task)
+    task = celery.Job(celery_test_retry_job).Next(this.end)
     end = flow.End()

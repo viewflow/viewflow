@@ -81,7 +81,10 @@ def flow_job(func):
             else:
                 activation = flow_task.activation_class()
                 activation.initialize(flow_task, task)
-                activation.start()
+                if task.status == STATUS.SCHEDULED:
+                    activation.start()
+                else:
+                    activation.restart()
 
         # execute
         try:

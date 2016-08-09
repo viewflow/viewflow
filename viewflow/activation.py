@@ -626,6 +626,13 @@ class AbstractJobActivation(Activation):
         self.task.save()
         signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
+    @Activation.status.transition(source=[STATUS.SCHEDULED, STATUS.STARTED, STATUS.ERROR], target=STATUS.STARTED)
+    def restart(self):
+        if not self.task.started:
+            self.task.started = now()
+        self.task.save()
+        signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
+
     @Activation.status.transition(source=STATUS.STARTED, target=STATUS.DONE)
     def done(self):
         """
