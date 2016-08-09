@@ -2,6 +2,7 @@ import sys
 import traceback
 import functools
 
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 
 from .activation import STATUS
@@ -9,6 +10,7 @@ from .fields import import_task_by_ref
 
 
 def flow_start_func(func):
+    @transaction.atomic
     @functools.wraps(func)
     def _wrapper(flow_task, *args, **kwargs):
         try:
@@ -28,6 +30,7 @@ def flow_func(func):
     Expect function that gets activation instance as the first parameter,
     Returns function that expects task instance as the first parameter instead
     """
+    @transaction.atomic
     @functools.wraps(func)
     def _wrapper(task, *args, **kwargs):
         flow_task = task.flow_task
@@ -66,7 +69,7 @@ def flow_job(func):
         lock = flow_task.flow_class.lock_impl(flow_task.flow_class.instance)
 
         # start
-        with lock(flow_task.flow_class, process_pk):
+        with transaction.atomic(), lock(flow_task.flow_class, process_pk):
             try:
                 task = flow_task.flow_class.task_class.objects.get(pk=task_pk)
                 if task.status == STATUS.CANCELED:
@@ -85,7 +88,7 @@ def flow_job(func):
             result = func(activation, **kwargs)
         except Exception as exc:
             # mark as error
-            with lock(flow_task.flow_class, process_pk):
+            with transaction.atomic(), lock(flow_task.flow_class, process_pk):
                 task = flow_task.flow_class.task_class.objects.get(pk=task_pk)
                 activation = flow_task.activation_class()
                 activation.initialize(flow_task, task)
@@ -93,7 +96,7 @@ def flow_job(func):
             raise
         else:
             # mark as done
-            with lock(flow_task.flow_class, process_pk):
+            with transaction.atomic(), lock(flow_task.flow_class, process_pk):
                 task = flow_task.flow_class.task_class.objects.get(pk=task_pk)
                 activation = flow_task.activation_class()
                 activation.initialize(flow_task, task)
@@ -105,6 +108,7 @@ def flow_job(func):
 
 
 def flow_start_signal(handler):
+    @transaction.atomic
     @functools.wraps(handler)
     def _wrapper(sender, flow_task=None, **signal_kwargs):
         try:
@@ -121,6 +125,7 @@ def flow_signal(handler):
     """
     Decorator providing a flow signal receiver with the activation.
     """
+    @transaction.atomic
     @functools.wraps(handler)
     def _wrapper(sender, task=None, **signal_kwargs):
         flow_task = task.flow_task
@@ -143,6 +148,7 @@ def flow_start_view(view):
     Returns view with the signature `(request, flow_class, flow_task, **kwargs)`
     """
 
+    @transaction.atomic
     @functools.wraps(view)
     def _wrapper(request, flow_class, flow_task, **kwargs):
         try:
@@ -167,6 +173,7 @@ def flow_view(view):
     Returns view with the signature `(request, flow_class, flow_task, process_pk, task_pk, **kwargs)
     """
 
+    @transaction.atomic
     @functools.wraps(view)
     def _wrapper(request, flow_class, flow_task, process_pk, task_pk, **kwargs):
         lock = flow_task.flow_class.lock_impl(flow_class.instance)
