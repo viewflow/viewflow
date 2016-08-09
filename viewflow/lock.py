@@ -35,10 +35,9 @@ def select_for_update_lock(flow, nowait=True, attempts=5):
         with transaction.atomic():
             for i in range(attempts):
                 try:
-                    flow_class.process_class._default_manager \
-                        .filter(pk=process_pk) \
-                        .select_for_update(nowait=nowait) \
-                        .exists()
+                    process = flow_class.process_class._default_manager.filter(pk=process_pk)
+                    if not process.select_for_update(nowait=nowait).exists():
+                        raise DatabaseError('Process not exists')
                     break
                 except DatabaseError:
                     if i != attempts - 1:
