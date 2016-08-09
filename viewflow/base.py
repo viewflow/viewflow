@@ -262,10 +262,12 @@ class FlowMetaClass(type):
             if 'process_description' not in attrs and len(docstring) > 1:
                 new_class.process_description = dedent(docstring[1]).strip()
         else:
-            # convert camel case to separate words
-            new_class.process_title = re.sub('([a-z0-9])([A-Z])', r'\1 \2',
-                                             re.sub('(.)([A-Z][a-z]+)', r'\1 \2', class_name)) \
-                .rstrip('Flow')
+            if 'process_title' not in attrs:
+                # convert camel case to separate words
+                new_class.process_title = re.sub('([a-z0-9])([A-Z])', r'\1 \2',
+                                                 re.sub('(.)([A-Z][a-z]+)', r'\1 \2', class_name))
+                if new_class.process_title.endswith(' Flow'):
+                    new_class.process_title = new_class.process_title[:-5]
 
         # view process permission
         process_options = new_class.process_class._meta
