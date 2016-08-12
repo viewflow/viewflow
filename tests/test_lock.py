@@ -1,17 +1,19 @@
+import os
+import queue
+import threading
 import time
 import unittest
-import threading
-import queue
 
 from django.db import connection
-from django.test import skipUnlessDBFeature
+from django.test import skipUnlessDBFeature, TestCase
 
 from viewflow import flow, lock
 from viewflow.base import Flow, this
 from viewflow.exceptions import FlowLockFailed
 
 
-class Test(unittest.TestCase):
+@unittest.skipUnless('DATABASE_URL' in os.environ, 'Lock test requires specific database config')
+class Test(TestCase):
     class TestFlow(Flow):
         start = flow.Start().Next(this.end)
         end = flow.End()

@@ -75,9 +75,11 @@ class CacheLock(object):
             key = 'django-viewflow-lock-{}/{}'.format(flow_class._meta.flow_label, process_pk)
 
             for i in range(attempts):
-                stored = cache.add(key, 1, expires)
-                if stored:
-                    break
+                process = flow_class.process_class._default_manager.filter(pk=process_pk)
+                if process.exists():
+                    stored = cache.add(key, 1, expires)
+                    if stored:
+                        break
                 if i != attempts - 1:
                     sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
                     time.sleep(sleep_time)

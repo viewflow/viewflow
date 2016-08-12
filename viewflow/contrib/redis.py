@@ -42,10 +42,12 @@ class RedisLock(object):
             key = 'django-viewflow-lock-{}/{}'.format(flow_class._meta.flow_label, process_pk)
 
             for i in range(attempts):
-                lock = cache.lock(key, timeout=expires)
-                stored = lock.acquire(blocking=False)
-                if stored:
-                    break
+                process = flow_class.process_class._default_manager.filter(pk=process_pk)
+                if process.exists():
+                    lock = cache.lock(key, timeout=expires)
+                    stored = lock.acquire(blocking=False)
+                    if stored:
+                        break
                 if i != attempts - 1:
                     sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
                     time.sleep(sleep_time)
