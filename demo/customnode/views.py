@@ -18,6 +18,6 @@ class DecisionView(FlowViewMixin, generic.CreateView):
         self.object.save()
 
         self.activation.done()
-        self.message_complete()
+        self.success('Task {task} has been completed.')
 
         return HttpResponseRedirect(self.get_success_url())
