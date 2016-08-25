@@ -1,6 +1,6 @@
 from copy import copy
 
-from .. import base, mixins
+from .. import Gateway, Edge, mixins
 from ..activation import AbstractGateActivation
 
 
@@ -24,7 +24,7 @@ class If(mixins.TaskDescriptionMixin,
          mixins.UndoViewMixin,
          mixins.CancelViewMixin,
          mixins.PerformViewMixin,
-         base.Gateway):
+         Gateway):
 
     task_type = 'IF'
     activation_class = IfActivation
@@ -36,8 +36,8 @@ class If(mixins.TaskDescriptionMixin,
         self._on_false = None
 
     def _outgoing(self):
-        yield base.Edge(src=self, dst=self._on_true, edge_class='cond_true')
-        yield base.Edge(src=self, dst=self._on_false, edge_class='cond_false')
+        yield Edge(src=self, dst=self._on_true, edge_class='cond_true')
+        yield Edge(src=self, dst=self._on_false, edge_class='cond_false')
 
     def _resolve(self, resolver):
         self._on_true = resolver.get_implementation(self._on_true)

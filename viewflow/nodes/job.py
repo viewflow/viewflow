@@ -1,4 +1,4 @@
-from .. import base, mixins
+from .. import Task, mixins
 
 
 class AbstractJob(mixins.TaskDescriptionMixin,
@@ -6,7 +6,7 @@ class AbstractJob(mixins.TaskDescriptionMixin,
                   mixins.UndoViewMixin,
                   mixins.CancelViewMixin,
                   mixins.DetailViewMixin,
-                  base.Task):
+                  Task):
     """
     Base class for task that runs in background
 

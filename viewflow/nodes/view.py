@@ -3,7 +3,7 @@ from copy import copy
 from django.conf.urls import url
 from django.core.urlresolvers import reverse
 
-from .. import base, mixins
+from .. import Event, Task, mixins
 from ..activation import StartActivation, ViewActivation, STATUS
 
 
@@ -13,7 +13,7 @@ class BaseStart(mixins.TaskDescriptionViewMixin,
                 mixins.DetailViewMixin,
                 mixins.UndoViewMixin,
                 mixins.CancelViewMixin,
-                base.Event,
+                Event,
                 mixins.ViewArgsMixin):
     task_type = 'START'
     start_view_class = None
@@ -113,7 +113,7 @@ class BaseView(mixins.TaskDescriptionViewMixin,
                mixins.DetailViewMixin,
                mixins.UndoViewMixin,
                mixins.CancelViewMixin,
-               base.Task,
+               Task,
                mixins.ViewArgsMixin):
     """
     Base class for ViewTasks

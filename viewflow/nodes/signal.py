@@ -1,4 +1,4 @@
-from .. import base, mixins
+from .. import Event, ThisObject, mixins
 from ..activation import StartActivation, FuncActivation
 from ..exceptions import FlowRuntimeError
 
@@ -8,7 +8,7 @@ class StartSignal(mixins.TaskDescriptionMixin,
                   mixins.DetailViewMixin,
                   mixins.UndoViewMixin,
                   mixins.CancelViewMixin,
-                  base.Event):
+                  Event):
 
     task_type = 'START'
     activation_class = StartActivation
@@ -24,7 +24,7 @@ class StartSignal(mixins.TaskDescriptionMixin,
         return self.receiver(sender=sender, flow_task=self, **signal_kwargs)
 
     def ready(self):
-        if isinstance(self.receiver, base.ThisObject):
+        if isinstance(self.receiver, ThisObject):
             self.receiver = getattr(self.flow_class.instance, self.receiver.name)
 
         self.signal.connect(
@@ -38,7 +38,7 @@ class Signal(mixins.TaskDescriptionMixin,
              mixins.DetailViewMixin,
              mixins.UndoViewMixin,
              mixins.CancelViewMixin,
-             base.Event):
+             Event):
 
     task_type = 'FUNC'
     activation_class = FuncActivation
@@ -66,9 +66,9 @@ class Signal(mixins.TaskDescriptionMixin,
                 return self.receiver(sender=sender, task=task, **signal_kwargs)
 
     def ready(self):
-        if isinstance(self.receiver, base.ThisObject):
+        if isinstance(self.receiver, ThisObject):
             self.receiver = getattr(self.flow_class.instance, self.receiver.name)
-        if isinstance(self.task_loader, base.ThisObject):
+        if isinstance(self.task_loader, ThisObject):
             self.task_loader = getattr(self.flow_class.instance, self.task_loader.name)
 
         self.signal.connect(

@@ -1,4 +1,4 @@
-from ..base import Node
+from .. import Node
 from .nodes import (
     AbstractJob, End, Function, Handler, If, Join, Signal,
     Split, Start, StartFunction, StartSignal, Switch, View

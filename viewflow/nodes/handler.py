@@ -1,6 +1,6 @@
 from django.utils.timezone import now
 
-from .. import base, mixins, signals
+from .. import Event, ThisObject, mixins, signals
 from ..activation import Activation, STATUS
 
 
@@ -69,7 +69,7 @@ class Handler(mixins.TaskDescriptionMixin,
               mixins.UndoViewMixin,
               mixins.CancelViewMixin,
               mixins.PerformViewMixin,
-              base.Event):
+              Event):
 
     task_type = 'FUNC'
     activation_class = HandlerActivation
@@ -79,5 +79,5 @@ class Handler(mixins.TaskDescriptionMixin,
         super(Handler, self).__init__(**kwargs)
 
     def ready(self):
-        if isinstance(self.handler, base.ThisObject):
+        if isinstance(self.handler, ThisObject):
             self.handler = getattr(self.flow_class.instance, self.handler.name)

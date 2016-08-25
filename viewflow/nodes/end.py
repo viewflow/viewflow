@@ -1,5 +1,5 @@
 from ..activation import EndActivation
-from .. import base, mixins
+from .. import Event, mixins
 
 
 class End(mixins.TaskDescriptionMixin,
@@ -7,7 +7,7 @@ class End(mixins.TaskDescriptionMixin,
           mixins.UndoViewMixin,
           mixins.CancelViewMixin,
           mixins.PerformViewMixin,
-          base.Event):
+          Event):
 
     task_type = 'END'
     activation_class = EndActivation

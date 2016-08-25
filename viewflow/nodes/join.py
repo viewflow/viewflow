@@ -1,6 +1,6 @@
 from django.utils.timezone import now
 
-from .. import base, mixins, signals
+from .. import Gateway, mixins, signals
 from ..activation import Activation, STATUS, all_leading_canceled
 from ..exceptions import FlowRuntimeError
 
@@ -132,7 +132,7 @@ class Join(mixins.TaskDescriptionMixin,
            mixins.UndoViewMixin,
            mixins.CancelViewMixin,
            mixins.PerformViewMixin,
-           base.Gateway):
+           Gateway):
 
     task_type = 'JOIN'
     activation_class = JoinActivation

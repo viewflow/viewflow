@@ -1,6 +1,6 @@
 from copy import copy
 
-from .. import base, mixins
+from .. import Gateway, Edge, mixins
 from ..activation import AbstractGateActivation
 from ..exceptions import FlowRuntimeError
 from ..token import Token
@@ -34,7 +34,7 @@ class Split(mixins.TaskDescriptionMixin,
             mixins.UndoViewMixin,
             mixins.CancelViewMixin,
             mixins.PerformViewMixin,
-            base.Gateway):
+            Gateway):
 
     task_type = 'SPLIT'
     activation_class = SplitActivation
@@ -46,7 +46,7 @@ class Split(mixins.TaskDescriptionMixin,
     def _outgoing(self):
         for next_node, cond in self._activate_next:
             edge_class = 'cond_true' if cond else 'default'
-            yield base.Edge(src=self, dst=next_node, edge_class=edge_class)
+            yield Edge(src=self, dst=next_node, edge_class=edge_class)
 
     def _resolve(self, resolver):
         self._activate_next = \

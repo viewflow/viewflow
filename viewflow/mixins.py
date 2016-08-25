@@ -3,7 +3,7 @@ from textwrap import dedent
 from django.conf.urls import url
 from django.core.urlresolvers import reverse
 
-from .base import Edge
+from . import Edge
 
 
 class NextNodeMixin(object):

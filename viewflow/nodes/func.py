@@ -1,6 +1,6 @@
 from django.utils.decorators import method_decorator
 
-from .. import base, mixins
+from .. import Event, ThisObject, mixins
 from ..activation import FuncActivation, StartActivation
 from ..decorators import flow_start_func
 from ..exceptions import FlowRuntimeError
@@ -12,7 +12,7 @@ class StartFunction(mixins.TaskDescriptionMixin,
                     mixins.UndoViewMixin,
                     mixins.CancelViewMixin,
                     mixins.PerformViewMixin,
-                    base.Event):
+                    Event):
     task_type = 'START'
     activation_class = StartActivation
 
@@ -27,7 +27,7 @@ class StartFunction(mixins.TaskDescriptionMixin,
         return activation
 
     def ready(self):
-        if isinstance(self.func, base.ThisObject):
+        if isinstance(self.func, ThisObject):
             self.func = getattr(self.flow_class.instance, self.func.name)
 
     def run(self, *args, **kwargs):
@@ -40,7 +40,7 @@ class Function(mixins.TaskDescriptionMixin,
                mixins.UndoViewMixin,
                mixins.CancelViewMixin,
                mixins.PerformViewMixin,
-               base.Event):
+               Event):
 
     task_type = 'FUNC'
     activation_class = FuncActivation
@@ -51,9 +51,9 @@ class Function(mixins.TaskDescriptionMixin,
         super(Function, self).__init__(**kwargs)
 
     def ready(self):
-        if isinstance(self.func, base.ThisObject):
+        if isinstance(self.func, ThisObject):
             self.func = getattr(self.flow_class.instance, self.func.name)
-        if isinstance(self.task_loader, base.ThisObject):
+        if isinstance(self.task_loader, ThisObject):
             self.task_loader = getattr(self.flow_class.instance, self.task_loader.name)
 
     def run(self, *args, **kwargs):

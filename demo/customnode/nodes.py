@@ -1,5 +1,5 @@
 from viewflow.activation import AbstractGateActivation
-from viewflow import base, mixins
+from viewflow import Gateway, mixins
 from viewflow.token import Token
 from viewflow.flow import views
 
@@ -20,7 +20,7 @@ class DynamicSplit(mixins.NextNodeMixin,
                    mixins.CancelViewMixin,
                    mixins.PerformViewMixin,
                    mixins.DetailViewMixin,
-                   base.Gateway):
+                   Gateway):
     """
     Activates several outgoing task instances depends on callback value
 
