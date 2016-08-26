@@ -11,18 +11,11 @@ from .. import flow
 from ..base import Flow
 from ..compat import get_app_package, import_string, TemplateSyntaxError, TagHelperNode, parse_bits
 from ..models import AbstractProcess, AbstractTask
+from ..utils import get_flow_namespace
 from .base import get_model_display_data
 
 
 register = template.Library()
-
-
-def _get_namespace(flow_class, base_namespace, namespace_map):
-    if namespace_map:
-        for ns, map_class in namespace_map.items():
-            if map_class == flow_class:
-                return '{}:{}'.format(base_namespace, ns) if base_namespace else ns
-    return base_namespace
 
 
 @register.tag
@@ -32,7 +25,7 @@ def flowurl(parser, token):
 
     Usage::
 
-        {% flowurl ref [urlname] [user=]  [as varname]%}
+        {% flowurl ref [urlname] [user=]  [ns=] [ns_map=] [as varname]%}
 
     Examples::
 
@@ -43,20 +36,25 @@ def flowurl(parser, token):
         {% flowurl task 'assign' user=request.user %}
         {% flowurl task user=request.user %}
 
+    Examples to use links outside of flow views::
+
+        {% flowurl task 'detail' ns='viewflow:helloworld' %}
+        {% flowurl task 'detail' ns=request.resolver_match.namespace ns_map=view.ns_map %}
+
     """
-    def geturl(namespace, ref, url_name=None, user=None, namespace_map=None):
+    def geturl(ns, ref, url_name=None, user=None, ns_map=None):
         if isinstance(ref, Flow):
-            namespace = _get_namespace(ref, namespace, namespace_map)
+            namespace = get_flow_namespace(ref, ns, ns_map)
             url_ref = '{}:{}'.format(namespace, url_name if url_name else 'index')
             return reverse(url_ref)
         elif isinstance(ref, AbstractProcess):
-            namespace = _get_namespace(ref.flow_class, namespace, namespace_map)
+            namespace = get_flow_namespace(ref.flow_class, ns, ns_map)
             kwargs, url_ref = {}, '{}:{}'.format(namespace, url_name if url_name else 'index')
             if url_name in ['detail', 'cancel']:
                 kwargs['process_pk'] = ref.pk
             return reverse(url_ref, kwargs=kwargs)
         elif isinstance(ref, AbstractTask):
-            namespace = _get_namespace(ref.flow_task.flow_class, namespace, namespace_map)
+            namespace = get_flow_namespace(ref.flow_task.flow_class, ns, ns_map)
             return ref.flow_task.get_task_url(
                 ref, url_type=url_name if url_name else 'guess',
                 user=user, namespace=namespace)
@@ -72,7 +70,7 @@ def flowurl(parser, token):
                 raise TemplateSyntaxError("{} app not found".format(app_label))
 
             flow_class = import_string('{}.flows.{}'.format(app_package, flow_class_path))
-            namespace = _get_namespace(flow_class, namespace, namespace_map)
+            namespace = get_flow_namespace(flow_class, ns, ns_map)
             url_ref = '{}:{}'.format(namespace, url_name if url_name else 'index')
             return reverse(url_ref)
 
@@ -85,11 +83,13 @@ def flowurl(parser, token):
             request = context['request']  # TODO Check that request template context installed
             resolved_args, resolved_kwargs = self.get_resolved_arguments(context)
 
-            namespace = resolved_kwargs.pop('namespace', None)
-            if namespace is None:
-                namespace = request.resolver_match.namespace
+            base_namespace = resolved_kwargs.pop('ns', None)
+            ns_map = resolved_kwargs.get('ns_map', None)
 
-                url = geturl(namespace, *resolved_args, **resolved_kwargs)
+            if base_namespace is None and ns_map is None:
+                base_namespace = request.resolver_match.namespace
+
+            url = geturl(base_namespace, *resolved_args, **resolved_kwargs)
             if self.target_var:
                 context[self.target_var] = url
                 return ''

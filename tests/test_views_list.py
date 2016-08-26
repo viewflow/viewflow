@@ -27,7 +27,7 @@ class Test(TestCase):
         self.assertEqual([task for task in task_filter.qs], [task2])
 
     def test_all_processlist_view(self):
-        view = views.AllProcessListView.as_view(flows={'listviewtest': ListViewTestFlow})
+        view = views.AllProcessListView.as_view(ns_map={'listviewtest': ListViewTestFlow})
 
         request = RequestFactory().get('/processes/')
         request.user = User(username='test', is_superuser=True)
@@ -37,7 +37,7 @@ class Test(TestCase):
         self.assertEqual(response.template_name, 'viewflow/site_index.html')
 
     def test_all_tasklist_view(self):
-        view = views.AllTaskListView.as_view(flows={'listviewtest': ListViewTestFlow})
+        view = views.AllTaskListView.as_view(ns_map={'listviewtest': ListViewTestFlow})
 
         request = RequestFactory().get('/tasks/')
         request.user = User(username='test', is_superuser=True)
@@ -47,7 +47,7 @@ class Test(TestCase):
         self.assertEqual(response.template_name, 'viewflow/site_tasks.html')
 
     def test_all_queuelist_view(self):
-        view = views.AllQueueListView.as_view(flows={'listviewtest': ListViewTestFlow})
+        view = views.AllQueueListView.as_view(ns_map={'listviewtest': ListViewTestFlow})
 
         request = RequestFactory().get('/queues/')
         request.user = User(username='test', is_superuser=True)
@@ -57,7 +57,7 @@ class Test(TestCase):
         self.assertEqual(response.template_name, 'viewflow/site_queue.html')
 
     def test_all_archivelist_view(self):
-        view = views.AllArchiveListView.as_view(flows={'listviewtest': ListViewTestFlow})
+        view = views.AllArchiveListView.as_view(ns_map={'listviewtest': ListViewTestFlow})
 
         request = RequestFactory().get('/archives/')
         request.user = User(username='test', is_superuser=True)

@@ -58,3 +58,19 @@ class MessageUserMixin(object):
 
     def error(self, message, fail_silently=True, **kwargs):
         self.report(message, level=messages.ERROR, fail_silently=fail_silently, **kwargs)
+
+
+class FlowListMixin(object):
+    """
+    Mixin for list view contains multiple flows
+    """
+
+    ns_map = None
+
+    def __init__(self, *args, **kwargs):
+        self.ns_map = kwargs.get('ns_map', {})
+        super(FlowListMixin, self).__init__(*args, **kwargs)
+
+    @property
+    def flows(self):
+        return self.ns_map.values()

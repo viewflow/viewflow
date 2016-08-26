@@ -21,9 +21,9 @@ flows = {
 
 
 urlpatterns = [
-    url(r'^$', viewflow.AllProcessListView.as_view(flows=flows), name="index"),
-    url(r'^tasks/$', viewflow.AllTaskListView.as_view(flows=flows), name="tasks"),
-    url(r'^queue/$', viewflow.AllQueueListView.as_view(flows=flows), name="queue"),
+    url(r'^$', viewflow.AllProcessListView.as_view(ns_map=flows), name="index"),
+    url(r'^tasks/$', viewflow.AllTaskListView.as_view(ns_map=flows), name="tasks"),
+    url(r'^queue/$', viewflow.AllQueueListView.as_view(ns_map=flows), name="queue"),
 
     url(r'^helloworld/', include('demo.helloworld.urls', namespace='helloworld')),
     url(r'^shipment/', include('demo.shipment.urls', namespace='shipment')),

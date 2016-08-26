@@ -6,7 +6,7 @@ from django_filters import FilterSet, ChoiceFilter, DateRangeFilter, ModelChoice
 
 from ... import activation, models
 from ...fields import import_task_by_ref
-from .mixins import LoginRequiredMixin, FlowViewPermissionMixin
+from .mixins import LoginRequiredMixin, FlowViewPermissionMixin, FlowListMixin
 
 
 class TaskFilter(FilterSet):
@@ -33,12 +33,9 @@ class TaskFilter(FilterSet):
         model = models.Task
 
 
-class AllProcessListView(LoginRequiredMixin, generic.ListView):
+class AllProcessListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
 
     """All process instances list available for current user."""
-
-    flows = []
-
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'process_list'
@@ -48,15 +45,13 @@ class AllProcessListView(LoginRequiredMixin, generic.ListView):
 
     def get_queryset(self):
         return models.Process.objects \
-            .filter_available(self.flows.values(), self.request.user) \
+            .filter_available(self.flows, self.request.user) \
             .order_by('-created')
 
 
-class AllTaskListView(generic.ListView):
+class AllTaskListView(FlowListMixin, generic.ListView):
 
     """All tasks from all processes assigned to current user."""
-
-    flows = []
 
     paginate_by = 15
     paginate_orphans = 5
@@ -74,7 +69,7 @@ class AllTaskListView(generic.ListView):
         return self.filter.qs
 
     def get_base_queryset(self, user):
-        return models.Task.objects.inbox(self.flows.values(), user).order_by('-created')
+        return models.Task.objects.inbox(self.flows, user).order_by('-created')
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -82,11 +77,9 @@ class AllTaskListView(generic.ListView):
         return super(AllTaskListView, self).dispatch(request, *args, **kwargs)
 
 
-class AllQueueListView(generic.ListView):
+class AllQueueListView(FlowListMixin, generic.ListView):
 
     """All unassigned tasks available for current user."""
-
-    flows = []
 
     paginate_by = 15
     paginate_orphans = 5
@@ -104,7 +97,7 @@ class AllQueueListView(generic.ListView):
         return self.filter.qs
 
     def get_base_queryset(self, user):
-        return models.Task.objects.queue(self.flows.values(), user).order_by('-created')
+        return models.Task.objects.queue(self.flows, user).order_by('-created')
 
     @method_decorator(login_required)
     def dispatch(self, request, *args, **kwargs):
@@ -112,11 +105,9 @@ class AllQueueListView(generic.ListView):
         return super(AllQueueListView, self).dispatch(request, *args, **kwargs)
 
 
-class AllArchiveListView(LoginRequiredMixin, generic.ListView):
+class AllArchiveListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
 
     """All tasks from all processes assigned to current user."""
-
-    flows = {}
 
     paginate_by = 15
     paginate_orphans = 5
@@ -130,7 +121,7 @@ class AllArchiveListView(LoginRequiredMixin, generic.ListView):
         return context
 
     def get_queryset(self):
-        return models.Task.objects.archive(self.flows.values(), self.request.user).order_by('-created')
+        return models.Task.objects.archive(self.flows, self.request.user).order_by('-created')
 
 
 class ProcessFilter(FilterSet):
