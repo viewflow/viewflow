@@ -8,7 +8,7 @@ from django.views import generic
 from viewflow import flow
 from viewflow.activation import STATUS
 from viewflow.base import Flow, this
-from viewflow.flow import views
+from viewflow.flow import views, routers
 
 
 class Test(TestCase):
@@ -77,14 +77,7 @@ class StartViewFlowEntity(models.Model):
 
 
 urlpatterns = [
-    url(r'^test/', include([
-        StartViewTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(flow_class=StartViewTestFlow), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(flow_class=StartViewTestFlow), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(flow_class=StartViewTestFlow), name='queue'),
-        url('^detail/(?P<process_pk>\d+)/$',
-            views.DetailProcessView.as_view(flow_class=StartViewTestFlow), name='detail'),
-    ], namespace='startviewtest'))
+    url(r'^test/', include(routers.FlowRouter(StartViewTestFlow).urls, namespace='startviewtest'))
 ]
 
 try:

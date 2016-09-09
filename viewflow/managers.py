@@ -158,6 +158,20 @@ class TaskQuerySet(QuerySet):
 
         return queryset
 
+    def user_archive(self, user, flow_class=None):
+        """
+        List of tasks completed by user
+        """
+        queryset = self.filter(flow_task_type='HUMAN')
+
+        if flow_class is not None:
+            if not isinstance(flow_class, ClassValueWrapper):
+                flow_class = ClassValueWrapper(flow_class)
+
+            queryset = queryset.filter(process__flow_class=flow_class)
+
+        return queryset.filter(owner=user, finished__isnull=False)
+
     def filter_available(self, flow_classes, user):
         return self.model.objects.coerce_for(_available_flows(flow_classes, user))
 

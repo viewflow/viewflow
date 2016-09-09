@@ -5,7 +5,7 @@ from .actions import (
 from .detail import DetailTaskView, DetailProcessView
 from .list import (
     AllProcessListView, AllTaskListView, AllQueueListView, AllArchiveListView,
-    ProcessListView, TaskListView, QueueListView,
+    ProcessListView, TaskListView, QueueListView, ArchiveListView,
 )
 from .start import StartFlowMixin, CreateProcessView
 from .task import (
@@ -23,5 +23,5 @@ __all__ = [
     'FlowViewMixin', 'PerformTaskView', 'ProcessListView',
     'QueueListView', 'StartFlowMixin', 'CreateProcessView',
     'TaskListView', 'UnassignTaskView', 'UndoTaskView',
-    'get_next_task_url',
+    'ArchiveListView', 'get_next_task_url',
 ]

@@ -6,7 +6,7 @@ from django.test import TestCase, RequestFactory
 
 from viewflow import flow
 from viewflow.base import Flow, this
-from viewflow.flow import views
+from viewflow.flow import views, routers
 
 
 class Test(TestCase):
@@ -25,7 +25,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         next_url = views.get_next_task_url(request, process)
-        self.assertEqual(next_url, '/test/detail/{}/'.format(process.pk))
+        self.assertEqual(next_url, '/test/{}/'.format(process.pk))
 
     def test_get_next_task_url_back(self):
         request = RequestFactory().get('/test/', {'back': '/test_back_url/'})
@@ -98,14 +98,7 @@ class BaseViewTestFlow(Flow):
 
 
 urlpatterns = [
-    url(r'^test/', include([
-        BaseViewTestFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(flow_class=BaseViewTestFlow), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(flow_class=BaseViewTestFlow), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(flow_class=BaseViewTestFlow), name='queue'),
-        url('^detail/(?P<process_pk>\d+)/$',
-            views.DetailProcessView.as_view(flow_class=BaseViewTestFlow), name='detail'),
-    ], namespace='baseviewtest'))
+    url(r'^test/', include(routers.FlowRouter(BaseViewTestFlow).urls, namespace='baseviewtest'))
 ]
 
 try:

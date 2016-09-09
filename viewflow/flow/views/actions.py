@@ -12,11 +12,13 @@ from django.utils.translation import ugettext_lazy as _
 from ...activation import STATUS
 from ...decorators import flow_view
 from ...exceptions import FlowRuntimeError
-from .mixins import FlowManagePermissionMixin, MessageUserMixin
+from .mixins import (
+    FlowManagePermissionMixin, FlowTaskManagePermissionMixin,
+    MessageUserMixin
+)
 
 
 class BaseTaskActionView(MessageUserMixin, generic.TemplateView):
-    flow_class = None
     action_name = None
 
     def can_proceed(self):
@@ -67,7 +69,7 @@ class BaseTaskActionView(MessageUserMixin, generic.TemplateView):
         return super(BaseTaskActionView, self).dispatch(request, **kwargs)
 
 
-class UndoTaskView(FlowManagePermissionMixin, BaseTaskActionView):
+class UndoTaskView(FlowTaskManagePermissionMixin, BaseTaskActionView):
     action_name = 'undo'
 
     def can_proceed(self):
@@ -78,7 +80,7 @@ class UndoTaskView(FlowManagePermissionMixin, BaseTaskActionView):
         self.success('Task {task} has been undone.')
 
 
-class CancelTaskView(FlowManagePermissionMixin, BaseTaskActionView):
+class CancelTaskView(FlowTaskManagePermissionMixin, BaseTaskActionView):
     action_name = 'cancel'
 
     def can_proceed(self):
@@ -89,7 +91,7 @@ class CancelTaskView(FlowManagePermissionMixin, BaseTaskActionView):
         self.success('Task {task} has been canceled.')
 
 
-class PerformTaskView(FlowManagePermissionMixin, BaseTaskActionView):
+class PerformTaskView(FlowTaskManagePermissionMixin, BaseTaskActionView):
     """Non-interactive task that cancelled and need to be started manually."""
 
     action_name = 'execute'
@@ -102,7 +104,7 @@ class PerformTaskView(FlowManagePermissionMixin, BaseTaskActionView):
         self.error('Task {task} has been executed.')
 
 
-class ActivateNextTaskView(FlowManagePermissionMixin, BaseTaskActionView):
+class ActivateNextTaskView(FlowTaskManagePermissionMixin, BaseTaskActionView):
     """Activate next task without interactive task redone."""
 
     action_name = 'activate_next'
@@ -115,7 +117,6 @@ class ActivateNextTaskView(FlowManagePermissionMixin, BaseTaskActionView):
 
 
 class CancelProcessView(FlowManagePermissionMixin, generic.DetailView):
-    flow_class = None
     context_object_name = 'process'
     pk_url_kwarg = 'process_pk'
 
@@ -173,7 +174,7 @@ class CancelProcessView(FlowManagePermissionMixin, generic.DetailView):
             return self.get(request, *args, **kwargs)
 
     def dispatch(self, request, *args, **kwargs):
-        self.flow_class = kwargs.pop('flow_class', None)
+        self.flow_class = kwargs['flow_class']
 
         lock = self.flow_class.lock_impl(self.flow_class.instance)
         with lock(self.flow_class, kwargs['process_pk']):

@@ -7,7 +7,7 @@ from django.test import TestCase, RequestFactory
 
 from viewflow import flow
 from viewflow.base import this, Flow
-from viewflow.flow import views
+from viewflow.flow import views, routers
 
 
 class Test(TestCase):
@@ -84,14 +84,6 @@ class TestTemplateTagsFlow(Flow):
 
 
 urlpatterns = [
-    url(r'^test/', include([
-        TestTemplateTagsFlow.instance.urls,
-        url('^$', views.ProcessListView.as_view(flow_class=TestTemplateTagsFlow), name='index'),
-        url('^tasks/$', views.TaskListView.as_view(flow_class=TestTemplateTagsFlow), name='tasks'),
-        url('^queue/$', views.QueueListView.as_view(flow_class=TestTemplateTagsFlow), name='queue'),
-        url('^detail/(?P<process_pk>\d+)/$',
-            views.DetailProcessView.as_view(flow_class=TestTemplateTagsFlow), name='detail'),
-        url('^action/cancel/(?P<process_pk>\d+)/$',
-            views.CancelProcessView.as_view(flow_class=TestTemplateTagsFlow), name='action_cancel'),
-    ], namespace='testtemplatetags')),
+    url(r'^test/', include(routers.FlowRouter(TestTemplateTagsFlow).urls,
+                           namespace='testtemplatetags')),
 ]

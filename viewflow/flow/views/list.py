@@ -6,7 +6,10 @@ from django_filters import FilterSet, ChoiceFilter, DateRangeFilter, ModelChoice
 
 from ... import activation, models
 from ...fields import import_task_by_ref
-from .mixins import LoginRequiredMixin, FlowViewPermissionMixin, FlowListMixin
+from .mixins import (
+    LoginRequiredMixin, FlowViewPermissionMixin,
+    FlowListMixin
+)
 
 
 class TaskFilter(FilterSet):
@@ -57,24 +60,24 @@ class AllTaskListView(FlowListMixin, generic.ListView):
     paginate_orphans = 5
     context_object_name = 'task_list'
 
+    def __init__(self, *args, **kwargs):
+        self._filter = None
+        super(AllTaskListView, self).__init__(*args, **kwargs)
+
     def get_template_names(self):
         return 'viewflow/site_tasks.html'
-
-    def get_context_data(self, **kwargs):
-        context = super(AllTaskListView, self).get_context_data(**kwargs)
-        context['filter'] = self.filter
-        return context
 
     def get_queryset(self):
         return self.filter.qs
 
+    @property
+    def filter(self):
+        if self._filter is None:
+            self._filter = TaskFilter(self.request.GET, self.get_base_queryset(self.request.user))
+        return self._filter
+
     def get_base_queryset(self, user):
         return models.Task.objects.inbox(self.flows, user).order_by('-created')
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        self.filter = TaskFilter(request.GET, self.get_base_queryset(request.user))
-        return super(AllTaskListView, self).dispatch(request, *args, **kwargs)
 
 
 class AllQueueListView(FlowListMixin, generic.ListView):
@@ -84,6 +87,10 @@ class AllQueueListView(FlowListMixin, generic.ListView):
     paginate_by = 15
     paginate_orphans = 5
     context_object_name = 'queue'
+
+    def __init__(self, *args, **kwargs):
+        self._filter = None
+        super(AllQueueListView, self).__init__(*args, **kwargs)
 
     def get_template_names(self):
         return 'viewflow/site_queue.html'
@@ -96,13 +103,14 @@ class AllQueueListView(FlowListMixin, generic.ListView):
     def get_queryset(self):
         return self.filter.qs
 
+    @property
+    def filter(self):
+        if self._filter is None:
+            self._filter = TaskFilter(self.request.GET, self.get_base_queryset(self.request.user))
+        return self._filter
+
     def get_base_queryset(self, user):
         return models.Task.objects.queue(self.flows, user).order_by('-created')
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        self.filter = TaskFilter(request.GET, self.get_base_queryset(request.user))
-        return super(AllQueueListView, self).dispatch(request, *args, **kwargs)
 
 
 class AllArchiveListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
@@ -140,6 +148,10 @@ class ProcessListView(FlowViewPermissionMixin, generic.ListView):
     paginate_orphans = 5
     context_object_name = 'process_list'
 
+    def __init__(self, *args, **kwargs):
+        self._filter = None
+        super(ProcessListView, self).__init__(*args, **kwargs)
+
     def get_template_names(self):
         opts = self.flow_class._meta
 
@@ -155,16 +167,16 @@ class ProcessListView(FlowViewPermissionMixin, generic.ListView):
     def get_queryset(self):
         return self.filter.qs
 
+    @property
+    def filter(self):
+        if self._filter is None:
+            self._filter = ProcessFilter(self.request.GET, self.get_base_queryset(self.request.user))
+        return self._filter
+
     def get_base_queryset(self, user):
         return self.flow_class.process_class.objects \
             .filter(flow_class=self.flow_class) \
             .order_by('-created')
-
-    @method_decorator(login_required)
-    def dispatch(self, request, *args, **kwargs):
-        self.flow_class = kwargs.get('flow_class', self.flow_class)
-        self.filter = ProcessFilter(request.GET, self.get_base_queryset(request.user))
-        return super(ProcessListView, self).dispatch(request, *args, **kwargs)
 
 
 class TaskListView(FlowViewPermissionMixin, generic.ListView):
@@ -220,3 +232,32 @@ class QueueListView(FlowViewPermissionMixin, generic.ListView):
             .filter(status=activation.STATUS.NEW).order_by('-created')
 
         return queryset
+
+
+class ArchiveListView(FlowViewPermissionMixin, generic.ListView):
+
+    """All tasks from all processes assigned to current user."""
+
+    paginate_by = 15
+    paginate_orphans = 5
+    context_object_name = 'task_list'
+
+    def get_template_names(self):
+        opts = self.flow_class._meta
+
+        return (
+            '{}/{}/archive.html'.format(opts.app_label, opts.flow_label),
+            'viewflow/flow/archive.html')
+
+    def get_context_data(self, **kwargs):
+        context = super(QueueListView, self).get_context_data(**kwargs)
+        context['flow_class'] = self.flow_class
+        return context
+
+    def get_queryset(self):
+        manager = self.flow_class.task_class._default_manager
+
+        return manager.user_archive(
+            self.request.user,
+            flow_class=self.flow_class
+        ).order_by('-created')

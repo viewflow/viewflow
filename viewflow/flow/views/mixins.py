@@ -13,21 +13,34 @@ class LoginRequiredMixin(object):
 
 
 class FlowViewPermissionMixin(object):
-    flow_class = None
-
+    """
+    Mixin for flow views, check the view permission.
+    """
     def dispatch(self, *args, **kwargs):
-        self.flow_class = kwargs.get('flow_class', self.flow_class)
+        self.flow_class = kwargs['flow_class']
         return permission_required(self.flow_class.instance.view_permission_name)(
             super(FlowViewPermissionMixin, self).dispatch)(*args, **kwargs)
 
 
 class FlowManagePermissionMixin(object):
-    flow_class = None
-
+    """
+    Mixin for flow flow views, check flow manage permission.
+    """
     def dispatch(self, *args, **kwargs):
-        self.flow_class = kwargs.get('flow_class', self.flow_class)
+        self.flow_class = kwargs['flow_class']
         return permission_required(self.flow_class.instance.manage_permission_name)(
             super(FlowManagePermissionMixin, self).dispatch)(*args, **kwargs)
+
+
+class FlowTaskManagePermissionMixin(object):
+    """
+    Mixin for flow task views, check flow manage permission.
+    """
+    def dispatch(self, *args, **kwargs):
+        self.flow_task = kwargs['flow_task']
+        self.flow_class = self.flow_task.flow_class
+        return permission_required(self.flow_class.instance.manage_permission_name)(
+            super(FlowTaskManagePermissionMixin, self).dispatch)(*args, **kwargs)
 
 
 class MessageUserMixin(object):
