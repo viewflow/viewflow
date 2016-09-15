@@ -27,7 +27,7 @@ class JobActivation(AbstractJobActivation):
         """
         apply_kwargs = {}
         if self.flow_task._eta is not None:
-            apply_kwargs['eta'] = self.flow_Task._eta(self.task)
+            apply_kwargs['eta'] = self.flow_task._eta(self.task)
         elif self.flow_task._delay is not None:
             delay = self.flow_task._delay
             if callable(delay):
