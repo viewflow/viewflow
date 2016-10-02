@@ -52,7 +52,7 @@ class AllProcessListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
             .order_by('-created')
 
 
-class AllTaskListView(FlowListMixin, generic.ListView):
+class AllTaskListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
 
     """All tasks from all processes assigned to current user."""
 
@@ -80,7 +80,7 @@ class AllTaskListView(FlowListMixin, generic.ListView):
         return models.Task.objects.inbox(self.flows, user).order_by('-created')
 
 
-class AllQueueListView(FlowListMixin, generic.ListView):
+class AllQueueListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
 
     """All unassigned tasks available for current user."""
 

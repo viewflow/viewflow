@@ -77,7 +77,6 @@ class Test(TestCase):
         request = RequestFactory().get('/detail/')
         request.user = User(username='test', is_superuser=True)
         request.resolver_match = resolve('/test/')
-
         response = view(
             request, flow_class=BaseViewTestFlow, flow_task=BaseViewTestFlow.test_task,
             process_pk=act.process.pk, task_pk=task.pk)

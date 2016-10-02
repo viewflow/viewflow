@@ -1,9 +1,9 @@
 from django.views import generic
 from django.utils.decorators import method_decorator
 from django.core.exceptions import PermissionDenied
-from .mixins import FlowViewPermissionMixin
 
 from ...decorators import flow_view
+from .mixins import FlowViewPermissionMixin
 
 
 class DetailTaskView(generic.TemplateView):
