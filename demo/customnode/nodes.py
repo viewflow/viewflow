@@ -1,5 +1,8 @@
-from viewflow.activation import AbstractGateActivation
+from copy import copy
+
 from viewflow import Gateway, mixins
+from viewflow.exceptions import FlowRuntimeError
+from viewflow.activation import AbstractGateActivation
 from viewflow.token import Token
 from viewflow.flow import views
 
@@ -13,6 +16,10 @@ class DynamicSplitActivation(AbstractGateActivation):
             token_source = Token.split_token_source(self.task.token, self.task.pk)
             for _ in range(self._split_count):
                 self.flow_task._next.activate(prev_activation=self, token=next(token_source))
+        elif self.flow_task._ifnone_next_node is not None:
+            self.flow_task._ifnone_next_node.activate(prev_activation=self, token=self.task.token)
+        else:
+            raise FlowRuntimeError("{} activated with zero and no IfNone nodes specified".format(self.flow_task.name))
 
 
 class DynamicSplit(mixins.NextNodeMixin,
@@ -47,3 +54,13 @@ class DynamicSplit(mixins.NextNodeMixin,
     def __init__(self, callback):
         super(DynamicSplit, self).__init__()
         self._task_count_callback = callback
+        self._ifnone_next_node = None
+
+    def _resolve(self, resolver):
+        super(DynamicSplit, self)._resolve(resolver)
+        self._ifnone_next_node = resolver.get_implementation(self._ifnone_next_node)
+
+    def IfNone(self, node):
+        result = copy(self)
+        result._ifnone_next_node = node
+        return result

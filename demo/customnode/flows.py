@@ -30,6 +30,7 @@ class DynamicSplitFlow(Flow):
 
     spit_on_decision = (
         DynamicSplit(lambda p: p.split_count)
+        .IfNone(this.end)
         .Next(this.make_decision)
     )
 
