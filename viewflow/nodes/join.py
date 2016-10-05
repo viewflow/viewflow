@@ -78,6 +78,7 @@ class JoinActivation(Activation):
         """
         super(JoinActivation, self).cancel.original()
 
+    @Activation.status.transition(source=STATUS.DONE)
     def activate_next(self):
         """
         Activate all outgoing edges

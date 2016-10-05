@@ -1,7 +1,7 @@
 from django.utils.timezone import now
 
 from .. import Event, ThisObject, mixins, signals
-from ..activation import Activation, STATUS
+from ..activation import Activation, STATUS, all_leading_canceled
 
 
 class HandlerActivation(Activation):
@@ -39,7 +39,7 @@ class HandlerActivation(Activation):
         """
         super(HandlerActivation, self).undo.original()
 
-    @Activation.status.transition(source=STATUS.DONE)
+    @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
         """Activate all outgoing edges."""
         if self.flow_task._next:

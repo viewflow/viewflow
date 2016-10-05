@@ -1,7 +1,7 @@
 from copy import copy
 
 from .. import Gateway, Edge, mixins
-from ..activation import AbstractGateActivation
+from ..activation import Activation, AbstractGateActivation
 
 
 class IfActivation(AbstractGateActivation):
@@ -12,6 +12,7 @@ class IfActivation(AbstractGateActivation):
     def calculate_next(self):
         self.condition_result = self.flow_task.condition(self)
 
+    @Activation.status.super()
     def activate_next(self):
         if self.condition_result:
             self.flow_task._on_true.activate(prev_activation=self, token=self.task.token)

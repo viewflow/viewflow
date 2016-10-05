@@ -263,7 +263,7 @@ class StartActivation(Activation):
 
         self.activate_next()
 
-    @Activation.status.transition(source=STATUS.DONE)
+    @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
         """
         Activate all outgoing edges.
@@ -376,7 +376,7 @@ class ViewActivation(Activation):
         self.task.owner = None
         super(ViewActivation, self).undo.original()
 
-    @Activation.status.transition(source=STATUS.DONE)
+    @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
         """
         Activate all outgoing edges.
@@ -426,7 +426,7 @@ class FuncActivation(Activation):
 
         self.activate_next()
 
-    @Activation.status.transition(source=STATUS.DONE)
+    @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
         """Activate all outgoing edges."""
         if self.flow_task._next:
@@ -475,6 +475,7 @@ class AbstractGateActivation(Activation):
         """
         raise NotImplementedError
 
+    @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
         """
         Activate next tasks
@@ -684,7 +685,7 @@ class AbstractJobActivation(Activation):
         """
         super(AbstractJobActivation, self).cancel.original()
 
-    @Activation.status.transition(source=STATUS.DONE)
+    @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
         """
         Activate all outgoing edges.

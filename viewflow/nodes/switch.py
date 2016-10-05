@@ -1,7 +1,7 @@
 from copy import copy
 
 from .. import Gateway, Edge, mixins
-from ..activation import AbstractGateActivation
+from ..activation import Activation, AbstractGateActivation
 from ..exceptions import FlowRuntimeError
 
 
@@ -22,6 +22,7 @@ class SwitchActivation(AbstractGateActivation):
         if not self.next_task:
             raise FlowRuntimeError('No next task available for {}'.format(self.flow_task.name))
 
+    @Activation.status.super()
     def activate_next(self):
         self.next_task.activate(prev_activation=self, token=self.task.token)
 

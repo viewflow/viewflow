@@ -1,7 +1,7 @@
 from copy import copy
 
 from .. import Gateway, Edge, mixins
-from ..activation import AbstractGateActivation
+from ..activation import Activation, AbstractGateActivation
 from ..exceptions import FlowRuntimeError
 from ..token import Token
 
@@ -22,6 +22,7 @@ class SplitActivation(AbstractGateActivation):
         if not self.next_tasks:
             raise FlowRuntimeError('No next task available for {}'.format(self.flow_task.name))
 
+    @Activation.status.super()
     def activate_next(self):
         token_source = Token.split_token_source(self.task.token, self.task.pk)
 
