@@ -31,22 +31,24 @@ def select_for_update_lock(flow, nowait=True, attempts=5):
     Recommended for use with PostgreSQL.
     """
     @contextmanager
-    def lock(flow_class, process_pk):
-        with transaction.atomic():
-            for i in range(attempts):
-                try:
-                    process = flow_class.process_class._default_manager.filter(pk=process_pk)
+    def lock(flow_cls, process_pk):
+        done = False
+        for i in range(attempts):
+            if done:
+                break
+            try:
+                with transaction.atomic():
+                    process = flow_cls.process_cls._default_manager.filter(pk=process_pk)
                     if not process.select_for_update(nowait=nowait).exists():
-                        raise DatabaseError('Process not exists')
-                    break
-                except DatabaseError:
-                    if i != attempts - 1:
-                        sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
-                        time.sleep(sleep_time)
-                    else:
-                        raise FlowLockFailed('Lock failed for {}'.format(flow_class))
-
-            yield
+                        raise DatabaseError('Process does not exist.')
+                    done = True
+                    yield
+            except DatabaseError:
+                if i != attempts - 1:
+                    sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
+                    time.sleep(sleep_time)
+                else:
+                    raise FlowLockFailed('Lock failed for {}'.format(flow_cls))
 
     return lock
 
