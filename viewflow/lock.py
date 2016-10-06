@@ -32,23 +32,20 @@ def select_for_update_lock(flow, nowait=True, attempts=5):
     """
     @contextmanager
     def lock(flow_class, process_pk):
-        done = False
         for i in range(attempts):
-            if done:
-                break
-            try:
-                with transaction.atomic():
+            with transaction.atomic():
+                try:
                     process = flow_class.process_class._default_manager.filter(pk=process_pk)
                     if not process.select_for_update(nowait=nowait).exists():
-                        raise DatabaseError('Process does not exist.')
-                    done = True
+                        raise DatabaseError('Process not exists')
                     yield
-            except DatabaseError:
-                if i != attempts - 1:
-                    sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
-                    time.sleep(sleep_time)
-                else:
-                    raise FlowLockFailed('Lock failed for {}'.format(flow_class))
+                    break
+                except DatabaseError:
+                    if i != attempts - 1:
+                        sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
+                        time.sleep(sleep_time)
+                    else:
+                        raise FlowLockFailed('Lock failed for {}'.format(flow_class))
 
     return lock
 
