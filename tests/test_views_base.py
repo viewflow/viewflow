@@ -6,7 +6,7 @@ from django.test import TestCase, RequestFactory
 
 from viewflow import flow
 from viewflow.base import Flow, this
-from viewflow.flow import views, routers
+from viewflow.flow import views, viewset
 
 
 class Test(TestCase):
@@ -97,7 +97,7 @@ class BaseViewTestFlow(Flow):
 
 
 urlpatterns = [
-    url(r'^test/', include(routers.FlowRouter(BaseViewTestFlow).urls, namespace='baseviewtest'))
+    url(r'^test/', include(viewset.FlowViewSet(BaseViewTestFlow).urls, namespace='baseviewtest'))
 ]
 
 try:

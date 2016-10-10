@@ -8,7 +8,7 @@ from viewflow import flow
 from viewflow.base import Flow, this
 from viewflow.activation import STATUS
 from viewflow.models import Task
-from viewflow.flow import views, routers
+from viewflow.flow import views, viewset
 
 
 class Test(TestCase):
@@ -251,7 +251,7 @@ class ActionsTestFlow(Flow):
 
 
 urlpatterns = [
-    url(r'^test/', include(routers.FlowRouter(ActionsTestFlow).urls, namespace='actionstest'))
+    url(r'^test/', include(viewset.FlowViewSet(ActionsTestFlow).urls, namespace='actionstest'))
 ]
 
 try:

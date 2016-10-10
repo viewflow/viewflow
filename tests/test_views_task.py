@@ -8,7 +8,7 @@ from django.views import generic
 from viewflow import flow
 from viewflow.activation import STATUS
 from viewflow.base import Flow, this
-from viewflow.flow import views, routers
+from viewflow.flow import views, viewset
 
 
 class Test(TestCase):
@@ -142,7 +142,7 @@ class TaskViewFlowEntity(models.Model):
 
 
 urlpatterns = [
-    url(r'^test/', include(routers.FlowRouter(TaskViewTestFlow).urls, namespace='taskviewtest'))
+    url(r'^test/', include(viewset.FlowViewSet(TaskViewTestFlow).urls, namespace='taskviewtest'))
 ]
 
 try:

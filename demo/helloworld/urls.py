@@ -1,4 +1,5 @@
-from viewflow.flow import routers
+from viewflow.flow.viewset import FlowViewSet
 from .flows import HelloWorldFlow
 
-urlpatterns = routers.FlowRouter(HelloWorldFlow).urls
+
+urlpatterns = FlowViewSet(HelloWorldFlow).urls

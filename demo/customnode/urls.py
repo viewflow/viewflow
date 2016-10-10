@@ -1,5 +1,5 @@
-from viewflow.flow import routers
+from viewflow.flow.viewset import FlowViewSet
 from .flows import DynamicSplitFlow
 
 
-urlpatterns = routers.FlowRouter(DynamicSplitFlow).urls
+urlpatterns = FlowViewSet(DynamicSplitFlow).urls

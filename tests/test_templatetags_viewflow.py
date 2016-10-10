@@ -7,7 +7,7 @@ from django.test import TestCase, RequestFactory
 
 from viewflow import flow
 from viewflow.base import this, Flow
-from viewflow.flow import views, routers
+from viewflow.flow import views, viewset
 
 
 class Test(TestCase):
@@ -84,6 +84,6 @@ class TestTemplateTagsFlow(Flow):
 
 
 urlpatterns = [
-    url(r'^test/', include(routers.FlowRouter(TestTemplateTagsFlow).urls,
+    url(r'^test/', include(viewset.FlowViewSet(TestTemplateTagsFlow).urls,
                            namespace='testtemplatetags')),
 ]

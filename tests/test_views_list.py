@@ -7,7 +7,7 @@ from django.utils import timezone
 from viewflow import flow
 from viewflow.base import Flow, this
 from viewflow.models import Task, Process
-from viewflow.flow import views, routers
+from viewflow.flow import views, viewset
 from viewflow.flow.views.list import TaskFilter
 
 
@@ -128,7 +128,7 @@ class ListViewTestFlow(Flow):
 
 
 urlpatterns = [
-    url(r'^test/', include(routers.FlowRouter(ListViewTestFlow).urls, namespace='listviewtest'))
+    url(r'^test/', include(viewset.FlowViewSet(ListViewTestFlow).urls, namespace='listviewtest'))
 ]
 
 try:

@@ -6,14 +6,14 @@ from .views import (
 )
 
 
-class FlowRouter(object):
+class FlowViewSet(object):
     """
     Shortcut for flow urls routing
 
     Usage::
 
         urlpatterns = [
-            url(r'/helloworld/', FlowSite(HelloWorldFlow).urls)
+            url(r'/helloworld/', FlowViewSet(HelloWorldFlow).urls)
         ]
     """
 

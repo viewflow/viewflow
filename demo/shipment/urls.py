@@ -1,4 +1,4 @@
-from viewflow.flow import routers
+from viewflow.flow.viewset import FlowViewSet
 from .flows import ShipmentFlow
 
-urlpatterns = routers.FlowRouter(ShipmentFlow).urls
+urlpatterns = FlowViewSet(ShipmentFlow).urls
