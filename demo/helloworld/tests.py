@@ -1,7 +1,7 @@
 from django.conf.urls import include, url
 from django.test import TestCase
 
-from viewflow.flow import routers
+from viewflow.flow import viewset
 from viewflow.test import FlowTest
 
 from .flows import HelloWorldFlow
@@ -29,7 +29,7 @@ class Test(TestCase):
 
 
 urlpatterns = [
-    url(r'^helloworld/', include(routers.FlowRouter(HelloWorldFlow).urls, namespace='helloworld')),
+    url(r'^helloworld/', include(viewset.FlowViewSet(HelloWorldFlow).urls, namespace='helloworld')),
 ]
 
 try:

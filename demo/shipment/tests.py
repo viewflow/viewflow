@@ -2,7 +2,7 @@ from django.conf.urls import include, url
 from django.test import TestCase
 
 from viewflow.models import Task
-from viewflow.flow import routers
+from viewflow.flow import viewset
 from viewflow.test import FlowTest
 
 from .flows import ShipmentFlow
@@ -98,7 +98,7 @@ class Test(TestCase):
 
 urlpatterns = [
     # shipment
-    url(r'^shipment/', include(routers.FlowRouter(ShipmentFlow).urls, namespace='shipment')),
+    url(r'^shipment/', include(viewset.FlowViewSet(ShipmentFlow).urls, namespace='shipment')),
 ]
 
 
