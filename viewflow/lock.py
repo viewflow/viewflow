@@ -15,10 +15,6 @@ class DatabaseLockError(Exception):
     pass
 
 
-class ProcessDoesNotExist(Exception):
-    pass
-
-
 def no_lock(flow):
     """
     No pessimistic locking, just execute flow task in transaction.
@@ -46,7 +42,7 @@ def select_for_update_lock(flow, nowait=True, attempts=5):
                     process = flow_class.process_class._default_manager.filter(pk=process_pk)
                     try:
                         if not process.select_for_update(nowait=nowait).exists():
-                            raise ProcessDoesNotExist
+                            raise DatabaseLockError
                     except DatabaseError:
                         raise DatabaseLockError
                     yield
