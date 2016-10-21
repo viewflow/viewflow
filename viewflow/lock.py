@@ -11,6 +11,10 @@ from django.db import transaction, DatabaseError
 from viewflow.exceptions import FlowLockFailed
 
 
+class DatabaseLockError(Exception):
+    pass
+
+
 def no_lock(flow):
     """
     No pessimistic locking, just execute flow task in transaction.
@@ -36,11 +40,14 @@ def select_for_update_lock(flow, nowait=True, attempts=5):
             with transaction.atomic():
                 try:
                     process = flow_class.process_class._default_manager.filter(pk=process_pk)
-                    if not process.select_for_update(nowait=nowait).exists():
-                        raise DatabaseError('Process not exists')
+                    try:
+                        if not process.select_for_update(nowait=nowait).exists():
+                            raise DatabaseLockError
+                    except DatabaseError:
+                        raise DatabaseLockError
                     yield
                     break
-                except DatabaseError:
+                except DatabaseLockError:
                     if i != attempts - 1:
                         sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
                         time.sleep(sleep_time)
