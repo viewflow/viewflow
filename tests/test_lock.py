@@ -4,7 +4,7 @@ import threading
 import time
 import unittest
 
-from django.db import connection
+from django.db import connection, DatabaseError
 from django.test import skipUnlessDBFeature, TransactionTestCase
 
 from viewflow import flow, lock
@@ -80,6 +80,20 @@ class Test(TransactionTestCase):
             self.fail('Thread was blocked')
         except queue.Empty:
             pass
+
+    @skipUnlessDBFeature('has_select_for_update')
+    def test_select_for_update_lock_ignores_user_exceptions(self):
+        """
+        Check fix for RuntimeError: generator didn't stop after throw().
+
+        https://github.com/viewflow/viewflow/pull/164
+        """
+        def test_func():
+            lock_impl = lock.select_for_update_lock(Test.TestFlow, attempts=4)
+            with lock_impl(Test.TestFlow, self.process.pk):
+                raise DatabaseError('Test')
+        with self.assertRaises(DatabaseError):
+            test_func()
 
     def test_cache_lock(self):
         thread1 = threading.Thread(target=self.run_with_lock, args=[lock.cache_lock(Test.TestFlow, attempts=1)])
