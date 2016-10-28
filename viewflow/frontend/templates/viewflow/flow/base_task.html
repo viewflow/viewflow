@@ -3,9 +3,9 @@
 
 {% block breadcrumbs_items %}
 {% include 'viewflow/includes/breadcrumb_category.html' %}
-<a href="{% flowurl activation.flow_class 'index' %}?{{ request|query_back:'copy' }}">{{ activation.flow_class.process_title }}</a>  &rang;
-<a href="{% flowurl activation.process 'detail' %}?{{ request|query_back:'copy' }}">#{{ activation.process.pk }}</a>  &rang;
-<a href="{% flowurl activation.task 'detail' %}?{{ request|query_back:'copy' }}">{{ activation.flow_task }} #{{ activation.task.pk }}</a>
+<a href="{% flowurl activation.flow_class 'index' %}?{{ request|query_back:'copy' }}">{{ activation.flow_class.process_title }}</a>
+<a href="{% flowurl activation.process 'detail' %}?{{ request|query_back:'copy' }}">#{{ activation.process.pk }}</a>
+<a {% block prevbreadcrumb_class %}{% endblock %} href="{% flowurl activation.task 'detail' %}?{{ request|query_back:'copy' }}">{{ activation.flow_task }} #{{ activation.task.pk }}</a>
 {% block breadcrumbs_items_extra %}{% endblock %}
 {% endblock %}
 
@@ -13,15 +13,14 @@
 {% block content %}
 <div class="row">
     <div class="col s12 m6 l8">
-        <div class="card data-card">
+        <div class="card form-card">
             <div class="card-content">
                 <div class="card-bend center-align {% if activation.task.finished %}disabled{% endif %}">
                     <h5>{{ activation.flow_class.process_title }}</h5>
                     <h6>{{ activation.task.flow_task }} #{{ activation.task.process.id }}/{{ activation.task.id }}</h6>
                 </div>
-                <div class="card-title black-text">
+                <div class="form-title">
                     {{ activation.task.summary|default:activation.task.flow_task }}
-                    <h6><a href="{% flowurl activation.process 'detail' %}?{{ request|query_back:'copy' }}">{{ activation.process.summary }}</a></h6>
                 </div>
                 <div class="row">
                     <div class="col s12 m8 l8">
@@ -89,9 +88,9 @@
                     </div>
                 </div>
             </div>
-            <div class="card-action row">
-                {% block task_actions %}
-                {% endblock %}
+            <div class="card-action">
+                {% block task_actions %} {% endblock %}
+                <div style="clear:both"></div>
             </div>
         </div>
     </div>

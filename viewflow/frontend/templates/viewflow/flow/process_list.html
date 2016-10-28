@@ -3,8 +3,7 @@
 
 {% block breadcrumbs_items %}
 {% include 'viewflow/includes/breadcrumb_category.html' %}
-<a href="{% flowurl flow_class 'index' %}?{{ request|query_back:'copy' }}">{{ flow_class.process_title }}</a>  &rang;
-<a class="active">All</a>
+<a class="active" href="{% flowurl flow_class 'index' %}?{{ request|query_back:'copy' }}">{{ flow_class.process_title }}</a>
 {% endblock %}
 
 
@@ -63,7 +62,7 @@
     </div>
     <div class="col s12 m4 l3">
         <form action="{% flowurl view.flow_class 'index' %}" method="get" data-pjax-get>
-            <div class="card filters">
+            <div class="card filters-card" data-control-form>
                 <div class="card-content">
                     <span class="card-title black-text" style="margin-bottom:20px">Filters</span>
                     <div id="changelist-filter row">

@@ -3,20 +3,24 @@
     <li><a href="{% url 'viewflow:index' %}">Inbox <span class="badge">{{ current_module.flows|inbox_count:user }}</span></a></li>
     <li><a href="{% url 'viewflow:queue' %}">Unassigned <span class="badge">{{ current_module.flows|queue_count:user }}</span></a></li>
     <li><a href="{% url 'viewflow:archive' %}">Participated</a></li>
-    <li>
-        <ul class="collapsible" data-collapsible="expandable">
-            <li class="header">
+    <li class="submenu">
+        <ul class="collapsible">
+            <li>
                 <a class="collapsible-header">Processes</a>
                 <div class="collapsible-body">
                     <ul>
                         {% for title, flow_class in module.sites %}
                         {% if flow_class.view_permission_name in perms %}
-                        <li><a href="{% flowurl flow_class 'index' ns='viewflow' ns_map=current_module.ns_map %}">{{ title }}</a></li>
+                        <li>
+                            <a href="{% flowurl flow_class 'index' ns='viewflow' ns_map=current_module.ns_map %}">
+                                {{ title }}
+                            </a>
+                        </li>
                         {% endif %}
                         {% endfor %}
                     </ul>
                 </div>
             </li>
-        </ul>
+        </ul>        
     </li>
 </ul>

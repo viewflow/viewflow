@@ -86,6 +86,7 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
 
     Get confirmation from user, assigns task and redirects to task pages
     """
+    action_name = 'assign'
 
     def get_template_names(self):
         flow_task = self.activation.flow_task

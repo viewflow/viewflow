@@ -1,6 +1,9 @@
 from .activation import STATUS
 
 
+default_app_config = 'viewflow.apps.ViewflowConfig'
+
+
 class ThisObject(object):
 
     """Helper for forward references on flow tasks."""

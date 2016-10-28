@@ -2,7 +2,7 @@
 {% load viewflow viewflow_frontend %}
 
 {% block breadcrumbs_items_extra %}
-&rang; <a>{{ view.action_name }}</a>
+<a class="active">{{ view.action_name|title }}</a>
 {% endblock %}
 
 

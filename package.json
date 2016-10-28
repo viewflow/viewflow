@@ -1,0 +1,21 @@
+{
+  "name": "django-material",
+  "private": true,
+  "scripts": {
+    "gulp": "gulp"
+  },
+  "devDependencies": {
+    "autoprefixer": "^6.4.0",
+    "babel": "^6.5.2",
+    "babel-preset-node5": "^11.1.0",
+    "cssnano": "^3.8.0",
+    "gulp": "^3.9.1",
+    "gulp-babel": "^6.1.2",
+    "gulp-concat": "^2.6.0",
+    "gulp-postcss": "^6.1.1",
+    "gulp-sass": "^2.3.2",
+    "gulp-uglify": "^2.0.0",
+    "merge-stream": "^1.0.0",
+    "pump": "^1.0.1"
+  }
+}

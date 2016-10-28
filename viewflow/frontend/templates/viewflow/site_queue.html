@@ -3,8 +3,7 @@
 
 
 {% block breadcrumbs_items %}
-<a href="{% url 'viewflow:index' %}">Unassigned</a> &rang;
-<a class="active">All</a>
+<a class="active" href="{% url 'viewflow:index' %}">Unassigned</a>
 {% endblock %}
 
 
@@ -72,17 +71,16 @@
                 </div>
                 {% endif %}
             </div>
-            <div class="card-action row">
-                <div class="col s3">&nbsp;</div>
-                <div class="col s9 right-align">
+            <div class="card-action">
+                <div class="right-align">
                     <a href="{% url 'viewflow:assign'%}?{{ request|query_back:'here' }}" class="btn-flat grey black-text lighten-4 disabled selectable-action">Assign</a>
                 </div>
             </div>
         </div>
     </div>
     <div class="col s12 m4 l3">
-        <form action="/workflow/queue/" method="get" data-pjax-get>
-            <div class="card filters">
+        <form action="/workflow/queue/" method="get" data-control-form>
+            <div class="card filters-card">
                 <div class="card-content">
                     <span class="card-title black-text" style="margin-bottom:20px">Filters</span>
                     <div id="changelist-filter row">

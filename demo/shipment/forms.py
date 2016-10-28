@@ -1,9 +1,9 @@
-from material.forms import SuperModelForm, InlineFormSetField
+from material.forms import ModelForm, InlineFormSetField
 
 from .models import Shipment, ShipmentItem
 
 
-class ShipmentForm(SuperModelForm):
+class ShipmentForm(ModelForm):
     items = InlineFormSetField(
         Shipment, ShipmentItem,
         fields=['name', 'quantity'], can_delete=False)

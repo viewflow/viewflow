@@ -2,15 +2,15 @@
 {% load viewflow viewflow_frontend %}
 
 {% block breadcrumbs_items_extra %}
-&rang; <a>ASSIGN</a>
+<a class="active">{{ view.action_name|title }}</a>
 {% endblock %}
 
 
 {% block task_actions %}
-<div class="col s3">
+<div class="left">
     <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back:'copy' }}">detail</a>
 </div>
-<div class="col s9 right-align">
+<div class="right">
     <form role="form" method="POST">
         {% csrf_token %}
         <button type="submit" name="_continue" class="btn btn-flat">Assign and continue on this process</button>

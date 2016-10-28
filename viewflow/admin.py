@@ -5,10 +5,8 @@ from viewflow.models import Process, Task
 class TaskInline(admin.TabularInline):
     model = Task
     fields = ['flow_task', 'flow_task_type', 'status',
-              'owner', 'owner_permission', 'token',
-              'started', 'finished']
-    readonly_fields = ['flow_task', 'flow_task_type', 'status',
-                       'token', 'started', 'finished']
+              'token', 'owner']
+    readonly_fields = ['flow_task', 'flow_task_type', 'status', 'token']
 
     def has_add_permission(self, request):
         return False
@@ -21,13 +19,15 @@ class ProcessAdmin(admin.ModelAdmin):
     """
     List all of viewflow process
     """
+    icon = '<i class="material-icons">assignment</i>'
+
     actions = None
     date_hierarchy = 'created'
     list_display = ['pk', 'created', 'flow_class', 'status', 'participants']
     list_display_links = ['pk', 'created', 'flow_class']
     list_filter = ['status']
     readonly_fields = ['flow_class', 'status', 'finished']
-    # inlines = [TaskInline]
+    inlines = [TaskInline]
 
     def has_add_permission(self, request):
         return False
@@ -44,6 +44,8 @@ class TaskAdmin(admin.ModelAdmin):
     """
     List all of viewflow tasks
     """
+    icon = '<i class="material-icons">assignment_turned_in</i>'
+
     actions = None
     date_hierarchy = 'created'
     list_display = ['pk', 'created', 'process', 'status',
@@ -55,16 +57,6 @@ class TaskAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return False
-
-    @property
-    def change_form_template(self):
-        opts = self.model._meta
-
-        return [
-            "admin/%s/%s/change_form.html" % (opts.app_label, opts.model_name),
-            "admin/%s/change_form.html" % opts.app_label,
-            'admin/viewflow/task/change_form.html'
-        ]
 
     def save_model(self, request, obj, form, change):
         result = super(TaskAdmin, self).save_model(request, obj, form, change)

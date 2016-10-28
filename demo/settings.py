@@ -16,6 +16,9 @@ TEMPLATE_DEBUG = True
 
 ALLOWED_HOSTS = []
 
+INTERNAL_IPS = [
+    '127.0.0.1'
+]
 
 # Application definition
 
@@ -38,7 +41,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'demo.customnode',
     'demo.helloworld',
-    'demo.shipment',
+    # 'demo.shipment',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -53,10 +56,11 @@ MIDDLEWARE_CLASSES = (
 
 ROOT_URLCONF = 'demo.urls'
 
+LOGIN_REDIRECT_URL = '/workflow/'
 
 # Database
 # https://docs.djangoproject.com/en/1.6/ref/settings/#databases
-import dj_database_url
+import dj_database_url  # NOQA
 
 DATABASES = {
     'default': dj_database_url.config() or {

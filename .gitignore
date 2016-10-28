@@ -7,5 +7,6 @@ reports
 django_viewflow.egg-info
 MANIFEST
 db*.sqlite3
+node_modules/
 docs/_build/**
 tests/local_settings.py

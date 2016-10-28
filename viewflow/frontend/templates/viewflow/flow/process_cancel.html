@@ -3,8 +3,8 @@
 
 {% block breadcrumbs_items %}
 {% include 'viewflow/includes/breadcrumb_category.html' %}
-<a href="{% flowurl flow_class 'index' %}?{{ request|query_back:'copy' }}">{{ flow_class.process_title }}</a> &rang;
-<a href="{% flowurl process 'detail' %}?{{ request|query_back:'copy' }}">#{{ process.pk }}</a>  &rang;
+<a href="{% flowurl flow_class 'index' %}?{{ request|query_back:'copy' }}">{{ flow_class.process_title }}</a>
+<a href="{% flowurl process 'detail' %}?{{ request|query_back:'copy' }}">#{{ process.pk }}</a>
 <a class="active">Cancel</a>
 {% endblock %}
 
@@ -13,7 +13,7 @@
     <div class="col s12 m6 l8">
         <form role="form" method="POST">
             {% csrf_token %}
-            <div class="card data-card">
+            <div class="card form-card">
                 <div class="card-content">
                     <div class="card-bend center-align {% if process.finished %}disabled{% endif %}">
                         <h5>{{ flow_class.process_title }}</h5>
@@ -57,8 +57,8 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="card-action row">
-                    <div class="col s12 right-align">
+                <div class="card-action">
+                    <div class="right-align">
                         <button type="submit" name="_cancel_process" class="btn  btn-flat {% if uncancelable_tasks %}disabled{% endif %}" {% if uncancelable_tasks %}disabled{% endif %}>Cancel</button>
                     </div>
                 </div>

@@ -6,6 +6,9 @@ class HelloWorldProcess(Process):
     text = models.CharField(max_length=50)
     approved = models.BooleanField(default=False)
 
+    class Meta:
+        verbose_name = "Hello Request"
+
 
 class HelloWorldTask(Task):
     class Meta:

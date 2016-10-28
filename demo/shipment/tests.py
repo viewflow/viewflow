@@ -1,6 +1,8 @@
 from django.conf.urls import include, url
 from django.test import TestCase
 
+from material.frontend import urls as frontend_urls
+
 from viewflow.models import Task
 from viewflow.flow import viewset
 from viewflow.test import FlowTest
@@ -99,6 +101,7 @@ class Test(TestCase):
 urlpatterns = [
     # shipment
     url(r'^shipment/', include(viewset.FlowViewSet(ShipmentFlow).urls, namespace='shipment')),
+    url(r'', include(frontend_urls)),
 ]
 
 

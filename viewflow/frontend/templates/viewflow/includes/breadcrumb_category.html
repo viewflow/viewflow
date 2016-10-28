@@ -1,4 +1,4 @@
 {% load viewflow_frontend %}
-{% if request.GET.back|url == '/viewflow/' %}<a href="/viewflow/">Inbox</a> &rang;{% endif %}
-{% if request.GET.back|url == '/viewflow/queue/' %}<a href="/viewflow/queue/">Unassigned</a> &rang;{% endif %}
-{% if request.GET.back|url == '/viewflow/archive/' %}<a href="/viewflow/archive/">Participated</a> &rang;{% endif %}
+{% if request.GET.back|url == '/workflow/' %}<a href="/workflow/">Inbox</a>{% endif %}
+{% if request.GET.back|url == '/workflow/queue/' %}<a href="/workflow/queue/">Unassigned</a>{% endif %}
+{% if request.GET.back|url == '/workflow/archive/' %}<a href="/workflow/archive/">Participated</a>{% endif %}

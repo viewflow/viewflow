@@ -21,6 +21,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
+    'material.frontend',
+    'material',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -32,7 +34,7 @@ INSTALLED_APPS = (
     'tests',
     'demo.customnode',
     'demo.helloworld',
-    'demo.shipment',
+    # 'demo.shipment',
 )
 
 MIDDLEWARE_CLASSES = (

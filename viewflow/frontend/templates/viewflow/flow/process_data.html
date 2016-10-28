@@ -1,12 +1,13 @@
 {% load viewflow viewflow_frontend %}
+
+{% for root, fields, root_url in process_data %}
 <div class="row">
-    {% for root, fields, root_url in process_data %}
     <div class="col s12">
-        <div class="card">
-            <div class="card-content" style="padding-top:5px">
-                <div class="card-title black-text">{{ root }} #{{ process.pk }}</div>
+        <div class="card detail-card">
+            <div class="card-content">
+                <span class="card-title">{{ root }} #{{ process.pk }}</span>
                 {% if root_url %}
-                <a href="{{ root_url }}" class="card-edit no-pjax" target="_blank">(edit)</a>
+                <a href="{{ root_url }}" class="card-edit" target="_blank" data-turbolinks="false" style="float:right">(edit)</a>
                 {% endif %}
                 <dl class="dl-horizontal">
                     {% for name, value in fields %}
@@ -19,9 +20,9 @@
     </div>
     {% if not hide_active_tasks and forloop.counter == 1 and process.active_tasks %}
     <div class="col s12">
-        <div class="card data-card">
+        <div class="card detail-card">
             <div class="card-content">
-                <div class="card-title black-text">Active tasks</div>
+                <span class="card-title">Active tasks</span>
                 <table>
                     <thead>
                         <tr>
@@ -46,5 +47,5 @@
         </div>
     </div>
     {% endif %}
-    {% endfor %}
 </div>
+{% endfor %}

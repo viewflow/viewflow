@@ -1,6 +1,8 @@
 from django.conf.urls import include, url
 from django.test import TestCase
 
+from material.frontend import urls as frontend_urls
+
 from viewflow.flow import viewset
 from viewflow.test import FlowTest
 
@@ -30,6 +32,7 @@ class Test(TestCase):
 
 urlpatterns = [
     url(r'^helloworld/', include(viewset.FlowViewSet(HelloWorldFlow).urls, namespace='helloworld')),
+    url(r'', include(frontend_urls)),
 ]
 
 try:
