@@ -39,6 +39,11 @@ main .row .row {
   .detail-card, .filters-card {
     margin-left: -10px; } }
 
+.card .pagination {
+  padding-top: 15px; }
+  .card .pagination > .col {
+    line-height: 36px; }
+
 /* DETAIL PAGE */
 .detail-card {
   overflow: initial;

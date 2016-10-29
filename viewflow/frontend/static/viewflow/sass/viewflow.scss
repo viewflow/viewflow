@@ -65,6 +65,15 @@ main .row .row {
     }
 }
 
+.card .pagination {
+    padding-top: 15px;
+
+    >.col {
+        line-height: 36px;
+    }
+}
+
+
 /* DETAIL PAGE */
 .detail-card {
     overflow:initial;

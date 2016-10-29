@@ -34,9 +34,8 @@
                     </tbody>
                 </table>
             </div>
-            <div class="card-action row">
-                <div class="col s3">&nbsp;</div>
-                <div class="col s9 right-align">
+            <div class="card-action">
+                <div class="right-align">
                     <form method="POST">
                         {% csrf_token %}
                         <button class="btn green white-text btn-flat">{{ view.action_name }}</button>
