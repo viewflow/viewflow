@@ -7,12 +7,15 @@ from ..token import Token
 
 
 class SplitActivation(AbstractGateActivation):
-    def __init__(self, **kwargs):
+    """Parallel split gateway activation."""
+
+    def __init__(self, **kwargs):   # noqa D102
         self.next_tasks = []
         super(SplitActivation, self).__init__(**kwargs)
 
     def calculate_next(self):
-        for node, cond in self.flow_task.branches:
+        """Calculate nodes list to activate."""
+        for node, cond in self.flow_task._branches:
             if cond:
                 if cond(self):
                     self.next_tasks.append(node)
@@ -24,6 +27,11 @@ class SplitActivation(AbstractGateActivation):
 
     @Activation.status.super()
     def activate_next(self):
+        """Activate next tasks for parallel execution.
+
+        Each task would have a new execution token attached,
+        the Split task token as a common prefix.
+        """
         token_source = Token.split_token_source(self.task.token, self.task.pk)
 
         for n, next_task in enumerate(self.next_tasks, 1):
@@ -36,11 +44,29 @@ class Split(mixins.TaskDescriptionMixin,
             mixins.CancelViewMixin,
             mixins.PerformViewMixin,
             Gateway):
+    """Parallel split gateway.
+
+    Activates outgoing tasks to execute concurently. Assumes that all
+    outgoing path converges at the same Join node.
+
+    If Split has no nodes to activate, FlowRuntimeError would be
+    raised.
+
+    Example::
+
+        split_clerk_warehouse = (
+            flow.Split()
+            .Next(
+                this.package_goods,
+                cond=lambda a: a.process.need_packaging)
+            .Always(this.shipment_type)
+        )
+    """
 
     task_type = 'SPLIT'
     activation_class = SplitActivation
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs):   # noqa D102
         super(Split, self).__init__(**kwargs)
         self._activate_next = []
 
@@ -55,15 +81,24 @@ class Split(mixins.TaskDescriptionMixin,
              for node, cond in self._activate_next]
 
     @property
-    def branches(self):
+    def _branches(self):
         return self._activate_next
 
     def Next(self, node, cond=None):
+        """Node to activate if condition is true.
+
+        :param cond: Callable[activation] -> bool
+
+        """
         result = copy(self)
         result._activate_next.append((node, cond))
         return result
 
     def Always(self, node):
+        """Activate that node unconditionally.
+
+        Shortcut for `.Next` without a condition
+        """
         result = copy(self)
         result._activate_next.append((node, None))
         return result
