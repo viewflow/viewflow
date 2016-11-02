@@ -1,13 +1,13 @@
+import os
 from viewflow import flow, frontend, lock
 from viewflow.base import this, Flow
-from viewflow.contrib import celery
 from viewflow.flow import views as flow_views
 
 
 from .models import HelloWorldProcess
-from .tasks import send_hello_world_request
 
 
+@frontend.register
 class HelloWorldFlow(Flow):
     """
     Hello world
@@ -42,9 +42,13 @@ class HelloWorldFlow(Flow):
         .Else(this.end)
     )
 
-    send = celery.Job(send_hello_world_request).Next(this.end)
+    send = (
+        flow.Handler(this.send_hello_world_request)
+        .Next(this.end)
+    )
 
     end = flow.End()
 
-
-frontend.register(HelloWorldFlow)
+    def send_hello_world_request(self, activation):
+        with open(os.devnull, "w") as world:
+            world.write(activation.process.text)

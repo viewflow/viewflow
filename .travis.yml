@@ -28,5 +28,5 @@ install:
   - pip install coveralls
 
 script:
-  - tox -- coverage run --append --branch --source=viewflow manage.py test tests demo.helloworld
+  - tox -- coverage run --append --branch --source=viewflow manage.py test tests
   - coveralls
