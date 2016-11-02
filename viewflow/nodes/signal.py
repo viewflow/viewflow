@@ -9,11 +9,38 @@ class StartSignal(mixins.TaskDescriptionMixin,
                   mixins.UndoViewMixin,
                   mixins.CancelViewMixin,
                   Event):
+    """
+    Start flow on a django signal receive.
+
+    Example::
+
+        class MyFlow(Flow):
+            start = (
+                flow.StartSignal(
+                    post_save, this.start_flow,
+                    sender=MyModelCls)
+                .Next(this.approve)
+            )
+
+            ...
+
+            @flow_start_signal
+            def start_flow(self, activation, **signal_kwargs):
+                activation.prepare()
+                activation.done()
+    """
 
     task_type = 'START'
     activation_class = StartActivation
 
     def __init__(self, signal, receiver, sender=None, **kwargs):
+        """
+        Instantiate a StartSignal task.
+
+        :param signal: A django signal to connect
+        :param receiver: Callable[activation, **kwargs]
+        :param sender: Optional signal sender
+        """
         self.signal = signal
         self.receiver = receiver
         self.sender = sender
@@ -21,9 +48,11 @@ class StartSignal(mixins.TaskDescriptionMixin,
         super(StartSignal, self).__init__(**kwargs)
 
     def on_signal(self, sender, **signal_kwargs):
+        """Signal handler."""
         return self.receiver(sender=sender, flow_task=self, **signal_kwargs)
 
     def ready(self):
+        """Resolve internal `this`-referencies. and subscribe to the signal."""
         if isinstance(self.receiver, ThisObject):
             self.receiver = getattr(self.flow_class.instance, self.receiver.name)
 
@@ -39,11 +68,43 @@ class Signal(mixins.TaskDescriptionMixin,
              mixins.UndoViewMixin,
              mixins.CancelViewMixin,
              Event):
+    """
+    Execute a callback on a django signal receive.
+
+    Example::
+
+        class MyFlow(Flow):
+            wait_for_receipt = (
+                flow.Signal(
+                    post_create, this.receipt_created,
+                    sender=MyModelCls)
+                .Next(this.approve)
+
+            ...
+
+            def receipt_created(self, activation, **signal_kwargs):
+                activation.prepare()
+                activation.process.receipt = signal_kwargs['instance']
+                activation.done()
+    """
 
     task_type = 'FUNC'
     activation_class = FuncActivation
 
     def __init__(self, signal, receiver, sender=None, task_loader=None, allow_skip=False, **kwargs):
+        """
+        Instantiate a Signal task.
+
+        :param signal: A django signal to connect
+        :param receiver: Callable[activation, **kwargs]
+        :param sender: Optional signal sender
+        :param task_loader: Callable[**kwargs] -> Task
+        :param allow_skip: If True task_loader can return None if
+                           signal could be skipped.
+
+        You can skip a `task_loader` if the signal going to be
+        sent with Task instance.
+        """
         self.signal = signal
         self.receiver = receiver
         self.sender = sender
@@ -52,6 +113,7 @@ class Signal(mixins.TaskDescriptionMixin,
         super(Signal, self).__init__(**kwargs)
 
     def on_signal(self, sender, **signal_kwargs):
+        """Signal handler."""
         if self.task_loader is None:
             if 'task' not in signal_kwargs:
                 raise FlowRuntimeError('{} have no task_loader and got signal without task instance', self.name)
@@ -66,6 +128,7 @@ class Signal(mixins.TaskDescriptionMixin,
                 return self.receiver(sender=sender, task=task, **signal_kwargs)
 
     def ready(self):
+        """Resolve internal `this`-referencies. and subscribe to the signal."""
         if isinstance(self.receiver, ThisObject):
             self.receiver = getattr(self.flow_class.instance, self.receiver.name)
         if isinstance(self.task_loader, ThisObject):

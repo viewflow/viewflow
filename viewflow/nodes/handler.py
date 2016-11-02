@@ -5,11 +5,19 @@ from ..activation import Activation, STATUS, all_leading_canceled
 
 
 class HandlerActivation(Activation):
+    """
+    Handler  Activation.
+
+    Executes a callback immediately.
+    """
+
     def execute(self):
+        """Run the callback."""
         self.flow_task.handler(self)
 
     @Activation.status.transition(source=STATUS.NEW)
     def perform(self):
+        """Perform the callback within current exception propagation strategy."""
         with self.exception_guard():
             self.task.started = now()
 
@@ -27,16 +35,12 @@ class HandlerActivation(Activation):
 
     @Activation.status.transition(source=STATUS.ERROR)
     def retry(self):
-        """
-        Retry the next node calculation and activation
-        """
+        """Retry the next node calculation and activation."""
         self.perform.original()
 
     @Activation.status.transition(source=[STATUS.ERROR, STATUS.DONE], target=STATUS.NEW)
     def undo(self):
-        """
-        Undo the task
-        """
+        """Undo the task."""
         super(HandlerActivation, self).undo.original()
 
     @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
@@ -70,14 +74,36 @@ class Handler(mixins.TaskDescriptionMixin,
               mixins.CancelViewMixin,
               mixins.PerformViewMixin,
               Event):
+    """
+    Callback executed synchronously on a task activation.
+
+    Example::
+
+        class MyFlow(Flow):
+            calc_total = (
+                flow.Handler(this.calc_order_total)
+            )
+
+            ...
+
+            def calc_order_total(self, activation):
+                total = [
+                    sum(item.price)
+                    for item in activation.process.items.all()
+                ]
+
+                activation.process.total_amount = total
+                activation.process.save()
+    """
 
     task_type = 'FUNC'
     activation_class = HandlerActivation
 
-    def __init__(self, handler, **kwargs):
+    def __init__(self, handler, **kwargs):  # noqa D102
         self.handler = handler
         super(Handler, self).__init__(**kwargs)
 
     def ready(self):
+        """Resolve internal `this`-referencies."""
         if isinstance(self.handler, ThisObject):
             self.handler = getattr(self.flow_class.instance, self.handler.name)

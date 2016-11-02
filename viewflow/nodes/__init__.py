@@ -10,8 +10,8 @@ from .switch import Switch
 from .view import Start, View
 
 
-__all__ = [
+__all__ = (
     'End', 'StartFunction', 'Function', 'Handler',
     'If', 'AbstractJob', 'Join', 'StartSignal', 'Signal',
     'Split', 'Switch', 'Start', 'View'
-]
+)
