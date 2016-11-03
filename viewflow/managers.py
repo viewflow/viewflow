@@ -21,9 +21,7 @@ def _available_flows(flow_classes, user):
 
 
 def _get_related_path(model, base_model):
-    """
-    Return path suitable for select related for sublcass
-    """
+    """Return path suitable for select related for sublcass."""
     ancestry = []
 
     if model._meta.proxy:
@@ -64,6 +62,7 @@ def _get_sub_obj(obj, query):
 
 
 def coerce_to_related_instance(instance, target_model):
+    """Return subclass of the base object."""
     related = _get_related_path(target_model, instance.__class__)
     if related:
         instance = _get_sub_obj(instance, related)
@@ -74,7 +73,10 @@ def coerce_to_related_instance(instance, target_model):
 
 
 class ProcessQuerySet(QuerySet):
+    """Base manager for the flow Process."""
+
     def filter(self, *args, **kwargs):
+        """Queryset filter allows to use `flow_class` class values."""
         flow_class = kwargs.pop('flow_class', None)
         if flow_class and not isinstance(flow_class, ClassValueWrapper):
             kwargs['flow_class'] = ClassValueWrapper(flow_class)
@@ -82,6 +84,7 @@ class ProcessQuerySet(QuerySet):
         return super(ProcessQuerySet, self).filter(*args, **kwargs)
 
     def coerce_for(self, flow_classes):
+        """Return subclass instancess of the Task."""
         self._coerced = True
 
         flow_classes = list(flow_classes)
@@ -94,6 +97,7 @@ class ProcessQuerySet(QuerySet):
         return self.filter(flow_class__in=flow_classes).select_related(*related)
 
     def filter_available(self, flow_classes, user):
+        """List of processes available to view for the user."""
         return self.model.objects.coerce_for(_available_flows(flow_classes, user))
 
     def _clone(self, *args, **kwargs):
@@ -104,9 +108,7 @@ class ProcessQuerySet(QuerySet):
         return super(ProcessQuerySet, self)._clone(*args, **kwargs)
 
     def iterator(self):
-        """
-        Coerce queryset results to process subclasses depends onf flow_class.process_class
-        """
+        """Coerce queryset results to process subclasses."""
         base_itererator = super(ProcessQuerySet, self).iterator()
         if getattr(self, '_coerced', False):
             for process in base_itererator:
@@ -119,7 +121,10 @@ class ProcessQuerySet(QuerySet):
 
 
 class TaskQuerySet(QuerySet):
+    """Base manager for the Task."""
+
     def filter(self, *args, **kwargs):
+        """Queryset filter allows to use `process__flow_class` class values."""
         flow_class = kwargs.pop('process__flow_class', None)
         if flow_class and not isinstance(flow_class, ClassValueWrapper):
             kwargs['process__flow_class'] = ClassValueWrapper(flow_class)
@@ -127,6 +132,7 @@ class TaskQuerySet(QuerySet):
         return super(TaskQuerySet, self).filter(*args, **kwargs)
 
     def coerce_for(self, flow_classes):
+        """Return subclass instancess of the Task."""
         self._coerced = True
         flow_classes = list(flow_classes)
 
@@ -138,9 +144,7 @@ class TaskQuerySet(QuerySet):
         return self.filter(process__flow_class__in=flow_classes).select_related('process', *related)
 
     def user_queue(self, user, flow_class=None):
-        """
-        List of tasks permitted for user
-        """
+        """List of tasks of the flow_class permitted for user."""
         queryset = self.filter(flow_task_type='HUMAN')
 
         if flow_class is not None:
@@ -159,9 +163,7 @@ class TaskQuerySet(QuerySet):
         return queryset
 
     def user_archive(self, user, flow_class=None):
-        """
-        List of tasks completed by user
-        """
+        """List of tasks of the flow_class completed by the user."""
         queryset = self.filter(flow_task_type='HUMAN')
 
         if flow_class is not None:
@@ -173,27 +175,22 @@ class TaskQuerySet(QuerySet):
         return queryset.filter(owner=user, finished__isnull=False)
 
     def filter_available(self, flow_classes, user):
+        """List of task available to view for the user."""
         return self.model.objects.coerce_for(_available_flows(flow_classes, user))
 
     def inbox(self, flow_classes, user):
-        """
-        Tasks for user execution
-        """
+        """List of tasks assigned to the user."""
         return self.filter_available(flow_classes, user) \
                    .filter(owner=user, status=STATUS.ASSIGNED)
 
     def queue(self, flow_classes, user):
-        """
-        Unassigned tasks for permitter for the user
-        """
+        """List of tasks permitted to assign for the user."""
         return self.filter_available(flow_classes, user) \
                    .user_queue(user) \
                    .filter(status=STATUS.NEW)
 
     def archive(self, flow_classes, user):
-        """
-        Finished by user tasks
-        """
+        """List of tasks finished by the user."""
         return self.filter_available(flow_classes, user) \
             .filter(owner=user, finished__isnull=False)
 
@@ -205,9 +202,7 @@ class TaskQuerySet(QuerySet):
         return super(TaskQuerySet, self)._clone(*args, **kwargs)
 
     def iterator(self):
-        """
-        Coerce queryset results to process subclasses depends onf flow_class.task_class
-        """
+        """Coerce queryset results to process subclasses."""
         base_itererator = super(TaskQuerySet, self).iterator()
         if getattr(self, '_coerced', False):
             for task in base_itererator:

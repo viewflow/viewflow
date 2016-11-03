@@ -3,22 +3,25 @@ from viewflow.models import Process, Task
 
 
 class TaskInline(admin.TabularInline):
+    """Task inline."""
+
     model = Task
     fields = ['flow_task', 'flow_task_type', 'status',
               'token', 'owner']
     readonly_fields = ['flow_task', 'flow_task_type', 'status', 'token']
 
     def has_add_permission(self, request):
+        """Disable manually task creation."""
         return False
 
     def has_delete_permission(self, request, obj=None):
+        """Disable task deletion in the process inline."""
         return False
 
 
 class ProcessAdmin(admin.ModelAdmin):
-    """
-    List all of viewflow process
-    """
+    """List all of viewflow process."""
+
     icon = '<i class="material-icons">assignment</i>'
 
     actions = None
@@ -30,9 +33,11 @@ class ProcessAdmin(admin.ModelAdmin):
     inlines = [TaskInline]
 
     def has_add_permission(self, request):
+        """Disable manually process creation."""
         return False
 
     def participants(self, obj):
+        """List of users performed tasks on the process."""
         user_ids = obj.task_set.exclude(owner__isnull=True).values('owner')
         USER_MODEL = auth.get_user_model()
         username_field = USER_MODEL.USERNAME_FIELD
@@ -41,9 +46,8 @@ class ProcessAdmin(admin.ModelAdmin):
 
 
 class TaskAdmin(admin.ModelAdmin):
-    """
-    List all of viewflow tasks
-    """
+    """List all of viewflow tasks."""
+
     icon = '<i class="material-icons">assignment_turned_in</i>'
 
     actions = None
@@ -56,25 +60,8 @@ class TaskAdmin(admin.ModelAdmin):
     readonly_fields = ['process', 'status', 'flow_task', 'started', 'finished', 'previous', 'token']
 
     def has_add_permission(self, request):
+        """Disable manually task creation."""
         return False
-
-    def save_model(self, request, obj, form, change):
-        result = super(TaskAdmin, self).save_model(request, obj, form, change)
-
-        status_action = next((action[len('_change_status_'):]
-                              for action in request.POST.keys()
-                              if action.startswith('_change_status_')), None)
-        if status_action:
-            activation = obj.activate()
-            activation_class = activation.__class__
-            transition = next((transition for transition in activation_class.status.get_available_transtions(activation)
-                               if transition.name == status_action), None)
-            if transition:
-                transition(activation)
-                request.POST['_continue'] = True
-
-        return result
-
 
 admin.site.register(Process, ProcessAdmin)
 admin.site.register(Task, TaskAdmin)

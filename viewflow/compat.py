@@ -1,6 +1,5 @@
-"""
-Django compatibility utils
-"""
+"""Django compatibility utils."""
+
 try:
     from unittest import mock  # NOQA
 except ImportError:
@@ -18,13 +17,21 @@ except:
     from django.template.base import TemplateSyntaxError, Node, parse_bits  # NOQA
 
     class TagHelperNode(Node):
-        def __init__(self, func, takes_context, args, kwargs):
+        """
+        Base class for tag helper nodes such as SimpleNode and InclusionNode.
+
+        Manages the positional and keyword arguments to be passed to the decorated
+        function.
+        """
+
+        def __init__(self, func, takes_context, args, kwargs):  # noqa D102
             self.func = func
             self.takes_context = takes_context
             self.args = args
             self.kwargs = kwargs
 
         def get_resolved_arguments(self, context):
+            """Resolve all args from the template context."""
             resolved_args = [var.resolve(context) for var in self.args]
             if self.takes_context:
                 resolved_args = [context] + resolved_args
@@ -38,24 +45,21 @@ try:
     from django.utils.module_loading import autodiscover_modules  # NOQA
 
     def get_app_package(app_label):
-        """
-        Return app package string
-        """
+        """Return app package string."""
         app_config = apps.get_app_config(app_label)
         if not app_config:
             return None
         return app_config.module.__name__
 
     def get_containing_app_data(module):
-        """
-        Return app label and package string
-        """
+        """Return app label and package string."""
         app_config = apps.get_containing_app_config(module)
         if not app_config:
             return None, None
         return app_config.label, app_config.module.__name__
 
     def manager_from_queryset(manager_class, queryset_class, class_name=None):
+        """Return a subclass of your base Manager with a copy of the custom QuerySet methods."""
         return manager_class.from_queryset(queryset_class, class_name=class_name)
 
 except ImportError:
@@ -65,6 +69,7 @@ except ImportError:
     from django.utils import six
 
     def get_app_package(app_label):
+        """Get package by app_label."""
         app_config = loading.get_app(app_label)
         if not app_config:
             return None
@@ -93,18 +98,18 @@ except ImportError:
             return sorted(candidates, key=lambda ac: -len(ac))[0]
 
     def get_containing_app_data(object_name):
+        """Return pair (app_label, package)."""
         package = _get_containing_app_package(object_name)
         if package:
             return package.rsplit('.', 1)[-1], package
         return None, None
 
     def deconstructible(cls):
-        """
-        Deconstructible decorator stub
-        """
+        """Deconstructible decorator stub."""
         return cls
 
     def autodiscover_modules(*args, **kwargs):
+        """Auto-discover INSTALLED_APPS modules ."""
         import copy
         from django.conf import settings
         from django.utils.importlib import import_module
@@ -160,6 +165,7 @@ except ImportError:
         return new_methods
 
     def manager_from_queryset(manager_class, queryset_class, class_name=None):
+        """Return a subclass of your base Manager with a copy of the custom QuerySet methods."""
         if class_name is None:
             class_name = '%sFrom%s' % (manager_class.__name__, queryset_class.__name__)
         class_dict = {
@@ -170,6 +176,7 @@ except ImportError:
 
 
 def get_all_related_objects(obj):
+    """Backward releations to a model."""
     if hasattr(obj._meta, 'get_fields'):
         from django.db.models.fields.related import ForeignObjectRel
         return [field for field in obj._meta.get_fields() if isinstance(field, ForeignObjectRel)]
