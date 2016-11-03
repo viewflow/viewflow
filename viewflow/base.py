@@ -1,6 +1,3 @@
-"""
-Flow definition
-"""
 import re
 from collections import defaultdict
 from textwrap import dedent
@@ -12,10 +9,9 @@ from .compat import get_containing_app_data
 
 
 class _Resolver(object):
-    """
-    Resolver of task inter-links
-    """
-    def __init__(self, nodes):
+    """Resolver this-references over flow nodes."""
+
+    def __init__(self, nodes):  # noqa
         self.nodes = nodes  # map name -> node instance
 
     def get_implementation(self, link):
@@ -36,16 +32,16 @@ class _Resolver(object):
 
 
 class FlowMeta(object):
-    """
-    Flow options
-    """
-    def __init__(self, app_label, flow_class, nodes):
+    """Flow meta options."""
+
+    def __init__(self, app_label, flow_class, nodes):  # noqa D102
         self.app_label = app_label
         self.flow_class = flow_class
         self._nodes_by_name = nodes
 
     @property
     def flow_label(self):
+        """Unique flow label."""
         module = "{}.{}".format(self.flow_class.__module__, self.flow_class.__name__)
         app_label, app_package = get_containing_app_data(module)
 
@@ -58,20 +54,18 @@ class FlowMeta(object):
         return subpath.lower().replace('.', '/')
 
     def nodes(self):
-        """
-        Nodes iterator
-        """
+        """Iterator over all flow nodes."""
         return self._nodes_by_name.values()
 
     def node(self, name):
-        """
-        Get node by name
-        """
+        """Get node by name."""
         return self._nodes_by_name.get(name, None)
 
 
 class FlowInstanceDescriptor(object):
-    def __init__(self):
+    """Singleton flow instance descriptior."""
+
+    def __init__(self):  # noqa D102
         self.flow_instance = None
 
     def __get__(self, instance=None, owner=None):
@@ -81,7 +75,10 @@ class FlowInstanceDescriptor(object):
 
 
 class FlowMetaClass(type):
+    """Metaclass for all flows."""
+
     def __new__(cls, class_name, bases, attrs):
+        """Construct new flow class."""
         new_class = super(FlowMetaClass, cls).__new__(cls, class_name, bases, attrs)
 
         # singleton instance
@@ -164,7 +161,7 @@ class FlowMetaClass(type):
 
 class Flow(object, metaclass=FlowMetaClass):
     """
-    Base class for flow definition
+    Base class for flow definition.
 
     :keyword process_class: Defines model class for Process
     :keyword task_class: Defines model class for Task
@@ -172,6 +169,7 @@ class Flow(object, metaclass=FlowMetaClass):
     :keyword lock_impl: Locking implementation for flow
 
     """
+
     process_class = models.Process
     task_class = models.Task
     management_form_class = forms.ActivationDataForm
@@ -184,9 +182,7 @@ class Flow(object, metaclass=FlowMetaClass):
 
     @property
     def urls(self):
-        """
-        Provides ready to include urlpatterns required for this flow
-        """
+        """Buold urlpatterns list for all flow nodes."""
         node_urls = []
         for node in self._meta.nodes():
             node_urls += node.urls()
@@ -195,11 +191,13 @@ class Flow(object, metaclass=FlowMetaClass):
 
     @property
     def view_permission_name(self):
+        """Name of the permission to view flow instances."""
         opts = self.process_class._meta
         return "{}.view_{}".format(opts.app_label, opts.model_name)
 
     @property
     def manage_permission_name(self):
+        """Name of the permission to administer flow instances."""
         opts = self.process_class._meta
         return "{}.manage_{}".format(opts.app_label, opts.model_name)
 

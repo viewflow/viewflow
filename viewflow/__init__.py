@@ -5,15 +5,14 @@ default_app_config = 'viewflow.apps.ViewflowConfig'
 
 
 class ThisObject(object):
-
     """Helper for forward references on flow tasks."""
 
-    def __init__(self, name):
+    def __init__(self, name):  # noqa D102
         self.name = name
 
     @property
     def owner(self):
-        """Return same process finished task owner."""
+        """Return user that was assogned to the task."""
         def get_task_owner(activation):
             flow_class = activation.process.flow_class
             task_node = flow_class._meta.node(self.name)
@@ -26,41 +25,76 @@ class ThisObject(object):
 
 
 class This(object):
-    """Helper for building forward referenced flow task."""
+    """Helper for building forward referenced flow task.
+
+    Therationaly is ability to specify referencies to the class
+    attribute and methods before they declated.
+
+    `this` is like a `self` but for the class body.
+
+    The referencies are resolved by the metaclass at the end of the
+    flow construction.
+
+    Example::
+
+        class MyFlow(Flow):
+            start = (
+                flow.StartFunction(this.start_flow)
+                .Next(this.task)
+            )
+
+            task = (
+                flow.View(MyView)
+                .Assign(this.start.owner)
+                .Next(this.end)
+            )
+
+            end = flow.End()
+
+            def start_flow(self, activation):
+                activation.prepare()
+                activation.done()
+
+    """
+
     def __getattr__(self, name):
         return ThisObject(name)
 
 
 class Edge(object):
+    """Edge of the Flow graph."""
+
     __slots__ = ('_src', '_dst', '_edge_class', '_label')
 
-    def __init__(self, src, dst, edge_class, label=None):
+    def __init__(self, src, dst, edge_class):  # noqa D102
         self._src = src
         self._dst = dst
         self._edge_class = edge_class
-        self._label = label
 
     @property
     def src(self):
+        """Edge source node."""
         return self._src
 
     @property
     def dst(self):
+        """Edge destination node."""
         return self._dst
 
     @property
     def edge_class(self):
+        """Type of the edge.
+
+        Viewfow uses `next`, 'cond_true', `cond_false` and `defailt`
+        edge classes.
+
+        Edge class could be used as a hint for edge visualization.
+        """
         return self._edge_class
 
-    @property
-    def label(self):
-        return self._label
-
     def __str__(self):
-        edge = "[%s] %s ---> %s" % (self._edge_class, self._src, self._dst)
-        if self._label:
-            edge += " (%s)" % self._label
-        return edge
+        return "[%s] %s ---> %s".format(
+            self._edge_class, self._src, self._dst)
 
 
 class Node(object):
@@ -70,10 +104,11 @@ class Node(object):
     :keyword task_type: Human readable task type
     :keyword activation_class: Activation implementation specific for this node
     """
+
     task_type = None
     activation_class = None
 
-    def __init__(self, activation_class=None, **kwargs):
+    def __init__(self, activation_class=None, **kwargs):  # noqa D102
         self._incoming_edges = []
 
         self.flow_class = None
@@ -115,21 +150,17 @@ class Node(object):
         """Return url for the task."""
 
     def activate(self, prev_activation, token):
-        """Creates task activation."""
+        """Create task activation."""
         return self.activation_class.activate(self, prev_activation, token)
 
 
 class Event(Node):
-
     """Base class for event-based tasks."""
 
 
 class Task(Node):
-
     """Base class for tasks."""
 
 
 class Gateway(Node):
-    """
-    Base class for task gateways
-    """
+    """Base class for task gateways."""

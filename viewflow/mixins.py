@@ -7,14 +7,14 @@ from . import Edge
 
 
 class NextNodeMixin(object):
-    """
-    Single next node mixin
-    """
-    def __init__(self, *args, **kwargs):
+    """Mixin for nodes that have only one outgoing path."""
+
+    def __init__(self, *args, **kwargs):  # noqa D102
         self._next = None
         super(NextNodeMixin, self).__init__(*args, **kwargs)
 
     def Next(self, node):
+        """Next node to activate."""
         result = copy(self)
         result._next = node
         return result
@@ -29,17 +29,21 @@ class NextNodeMixin(object):
 
 
 class DetailViewMixin(object):
+    """Task details."""
+
     detail_view_class = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa D102
         self._detail_view = kwargs.pop('detail_view', None)
         super(DetailViewMixin, self).__init__(*args, **kwargs)
 
     @property
     def detail_view(self):
+        """View for a task detail."""
         return self._detail_view if self._detail_view else self.detail_view_class.as_view()
 
     def urls(self):
+        """Add `/<process_pk>/<task_pk>/detail/` url."""
         urls = super(DetailViewMixin, self).urls()
         urls.append(
             url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/detail/$'.format(self.name),
@@ -48,27 +52,37 @@ class DetailViewMixin(object):
         return urls
 
     def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
+        """Handle for url_type='detail'.
+
+        The end of url_type=`guess` chain. If all previous mixins does
+        not return a value, the details page would be used.
+        """
         if url_type in ['detail', 'guess']:
             url_name = '{}:{}__detail'.format(namespace, self.name)
             return reverse(url_name, args=[task.process_id, task.pk])
         return super(DetailViewMixin, self).get_task_url(task, url_type, namespace=namespace, **kwargs)
 
     def can_view(self, user, task):
+        """Check if user has a view task detail permission."""
         return user.has_perm(self.flow_class.instance.view_permission_name)
 
 
 class UndoViewMixin(object):
+    """Undo a completd task."""
+
     undo_view_class = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa D102
         self._undo_view = kwargs.pop('undo_view', None)
         super(UndoViewMixin, self).__init__(*args, **kwargs)
 
     @property
     def undo_view(self):
+        """View for the admin to undo a task."""
         return self._undo_view if self._undo_view else self.undo_view_class.as_view()
 
     def urls(self):
+        """Add `/<process_pk>/<task_pk>/undo/` url."""
         urls = super(UndoViewMixin, self).urls()
         urls.append(
             url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/undo/$'.format(self.name),
@@ -77,6 +91,7 @@ class UndoViewMixin(object):
         return urls
 
     def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
+        """Handle for url_type='undo'."""
         if url_type in ['undo']:
             url_name = '{}:{}__undo'.format(namespace, self.name)
             return reverse(url_name, args=[task.process_id, task.pk])
@@ -84,17 +99,21 @@ class UndoViewMixin(object):
 
 
 class CancelViewMixin(object):
+    """Cancel a task action."""
+
     cancel_view_class = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa D102
         self._cancel_view = kwargs.pop('cancel_view', None)
         super(CancelViewMixin, self).__init__(*args, **kwargs)
 
     @property
     def cancel_view(self):
+        """View for the admin to cancel a task."""
         return self._cancel_view if self._cancel_view else self.cancel_view_class.as_view()
 
     def urls(self):
+        """Add `/<process_pk>/<task_pk>/cancel/` url."""
         urls = super(CancelViewMixin, self).urls()
         urls.append(
             url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/cancel/$'.format(self.name),
@@ -103,6 +122,7 @@ class CancelViewMixin(object):
         return urls
 
     def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
+        """Handle for url_type='cancel'."""
         if url_type in ['cancel']:
             url_name = '{}:{}__cancel'.format(namespace, self.name)
             return reverse(url_name, args=[task.process_id, task.pk])
@@ -110,23 +130,28 @@ class CancelViewMixin(object):
 
 
 class PerformViewMixin(object):
+    """Re-execute a gate manually."""
+
     perform_view_class = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa D102
         self._perform_view = kwargs.pop('perform_view', None)
         super(PerformViewMixin, self).__init__(*args, **kwargs)
 
     @property
     def perform_view(self):
+        """View for the admin to re-execute a gate."""
         return self._perform_view if self._perform_view else self.perform_view_class.as_view()
 
     def urls(self):
+        """Add `/<process_pk>/<task_pk>/perform/` url."""
         urls = super(PerformViewMixin, self).urls()
         urls.append(url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/perform/$'.format(self.name),
                     self.perform_view, {'flow_task': self}, name="{}__perform".format(self.name)))
         return urls
 
     def get_task_url(self, task, url_type='guess', namespace='',  **kwargs):
+        """Handle for url_type='perform'."""
         if url_type in ['perform']:
             url_name = '{}:{}__perform'.format(namespace, self.name)
             return reverse(url_name, args=[task.process_id, task.pk])
@@ -134,17 +159,21 @@ class PerformViewMixin(object):
 
 
 class ActivateNextMixin(object):
+    """Mixing allows administrator manually activate outgoing nodes."""
+
     activate_next_view_class = None
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa D102
         self._activate_next_view = kwargs.pop('activate_next_view', None)
         super(ActivateNextMixin, self).__init__(*args, **kwargs)
 
     @property
     def activate_next_view(self):
+        """View for the admin to perform activate action."""
         return self._activate_next_view if self._activate_next_view else self.activate_next_view_class.as_view()
 
     def urls(self):
+        """Add `/<process_pk>/<task_pk>/activate_next/` url."""
         urls = super(ActivateNextMixin, self).urls()
         urls.append(
             url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/activate_next/$'.format(self.name),
@@ -153,6 +182,7 @@ class ActivateNextMixin(object):
         return urls
 
     def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
+        """Handle url_type='activate_next'."""
         if url_type in ['activate_next']:
             url_name = '{}:{}__activate_next'.format(namespace, self.name)
             return reverse(url_name, args=[task.process_id, task.pk])
@@ -160,10 +190,9 @@ class ActivateNextMixin(object):
 
 
 class PermissionMixin(object):
-    """
-    Node mixing with permission restricted access
-    """
-    def __init__(self, *args, **kwargs):
+    """Node mixin to restrict access using django permissions."""
+
+    def __init__(self, *args, **kwargs):  # noqa D102
         self._owner = None
         self._owner_permission = None
         self._owner_permission_auto_create = False
@@ -173,15 +202,16 @@ class PermissionMixin(object):
 
     def Permission(self, permission=None, auto_create=False, obj=None, help_text=None):
         """
-        Make task available for users with specific permission,
-        aceps permissions name of callable :: Activation -> permission_name::
+        Make task available for users with specific permission.
+
+        Accespts permissions name or callable :: Callable[Activation] -> string::
 
             .Permission('my_app.can_approve')
             .Permission(lambda process: 'my_app.department_manager_{}'.format(process.depratment.pk))
 
         Task specific permission could be auto created during migration::
 
-            # Creates `processcls_app.can_do_task_processcls` permission
+            # Creates `process_class.can_do_task_process_class` permission
             do_task = View().Permission(auto_create=True)
 
             # You can specify permission codename and description right here
@@ -199,6 +229,11 @@ class PermissionMixin(object):
         return result
 
     def ready(self):
+        """Insert additional flow permissions to the meta of the process model.
+
+        Permissions itself are created as usual during django database
+        migration process.
+        """
         if self._owner_permission_auto_create:
             if self._owner_permission and '.' in self._owner_permission:
                 raise ValueError('Non qualified permission name expected')
@@ -224,11 +259,25 @@ class PermissionMixin(object):
 
 
 class TaskDescriptionMixin(object):
+    """Task explanation for the end user.
+
+    :keyword task_title: The task brief
+    :keyword task_description: Details what should be done
+    :keyword task_result_summary: Details how task was executed.
+
+    `task_result_summary` could be a django template string. The
+    template is rendered with following context variables::
+
+        ['process', 'task', 'flow_class', 'flow_task']
+    """
+
     task_title = None
     task_description = None
     task_result_summary = None
 
-    def __init__(self, view_or_class=None, task_title=None, task_description=None, task_result_summary=None, **kwargs):
+    def __init__(self, view_or_class=None, task_title=None,
+                 task_description=None, task_result_summary=None,
+                 **kwargs):  # noqa 102
         if task_title:
             self.task_title = task_title
         if task_description:
@@ -240,11 +289,9 @@ class TaskDescriptionMixin(object):
 
 
 class TaskDescriptionViewMixin(TaskDescriptionMixin):
-    """
-    Extract task desctiption from view docstring
-    """
+    """Extract task desctiption from the view docstring."""
 
-    def __init__(self, view_or_class=None, **kwargs):
+    def __init__(self, view_or_class=None, **kwargs):  # noqa D102
         super(TaskDescriptionViewMixin, self).__init__(**kwargs)
 
         if view_or_class:
@@ -261,7 +308,9 @@ class TaskDescriptionViewMixin(TaskDescriptionMixin):
 class ViewArgsMixin(object):
     """
     Capture rest of kwargs as view kwargs.
+
     Put this mixing always the last in inheritance order
     """
-    def __init__(self, **kwargs):
+
+    def __init__(self, **kwargs):  # noqa D102
         self._view_args = kwargs
