@@ -15,21 +15,22 @@ class BaseStart(mixins.TaskDescriptionViewMixin,
                 mixins.CancelViewMixin,
                 Event,
                 mixins.ViewArgsMixin):
+    """Base for Start nodes with a django view."""
+
     task_type = 'START'
     start_view_class = None
 
     def __init__(self, view_or_class=None, **kwargs):
         """
-        Accepts view callable or CBV View class with view kwargs,
-        if CBV view implements StartActivation, it used as activation_class
+        Instantiate a start node.
+
+        :keyword view_or_class: function based view or CBV class
+        :keyword **kwargs: Additional kwargs for the class base view
         """
         self._view, self._view_class, self._view_args = None, None, None
 
         if isinstance(view_or_class, type):
             self._view_class = view_or_class
-
-            if issubclass(view_or_class, StartActivation):
-                kwargs.setdefault('activation_class', view_or_class)
         else:
             self._view = view_or_class
 
@@ -37,6 +38,7 @@ class BaseStart(mixins.TaskDescriptionViewMixin,
 
     @property
     def view(self):
+        """View to perform flow start."""
         if not self._view:
             if not self._view_class:
                 return self.start_view_class.as_view()
@@ -46,6 +48,7 @@ class BaseStart(mixins.TaskDescriptionViewMixin,
         return self._view
 
     def urls(self):
+        """Start view url."""
         urls = super(BaseStart, self).urls()
         urls.append(
             url(r'^{}/$'.format(self.name), self.view, {'flow_task': self}, name=self.name))
@@ -53,12 +56,15 @@ class BaseStart(mixins.TaskDescriptionViewMixin,
 
 
 class Start(mixins.PermissionMixin, BaseStart):
+    """User task that starts flow from a django view."""
+
     activation_class = StartActivation
 
     def Available(self, owner=None, **owner_kwargs):
         """
-        Make process start action available for the User
-        accepts user lookup kwargs or callable predicate :: User -> bool::
+        Make process start action available for the User.
+
+        Accepts user lookup kwargs or callable predicate :: User -> bool::
 
             .Available(username='employee')
             .Available(lambda user: user.is_super_user)
@@ -70,6 +76,11 @@ class Start(mixins.PermissionMixin, BaseStart):
         return self
 
     def get_task_url(self, task, url_type='guess', namespace='',  **kwargs):
+        """"Handle url_Type='execute'.
+
+        If url_type is 'guess' and task can be executed by user, the
+        'execute' url is returned.
+        """
         if url_type in ['execute', 'guess']:
             if 'user' in kwargs and self.can_execute(kwargs['user'], task):
                 url_name = '{}:{}'.format(namespace, self.name)
@@ -78,6 +89,7 @@ class Start(mixins.PermissionMixin, BaseStart):
         return super(BaseStart, self).get_task_url(task, url_type=url_type, namespace=namespace, **kwargs)
 
     def can_execute(self, user, task=None):
+        """Check user permission to start a flow."""
         if task and task.status != STATUS.NEW:
             return False
 
@@ -115,24 +127,19 @@ class BaseView(mixins.TaskDescriptionViewMixin,
                mixins.CancelViewMixin,
                Task,
                mixins.ViewArgsMixin):
-    """
-    Base class for ViewTasks
-    """
+    """Base class for user Task."""
+
     task_type = 'HUMAN'
     task_view_class = None
 
-    def __init__(self, view_or_class, **kwargs):
+    def __init__(self, view_or_class, **kwargs):  # noqa D102
         """
-        Accepts view callable or CBV View class with view kwargs,
-        if CBV view implements ViewActivation, it used as activation_class
+        Accepts view callable or CBV View class with view kwargs.
         """
         self._view, self._view_class, self._view_args = None, None, None
 
         if isinstance(view_or_class, type):
             self._view_class = view_or_class
-
-            if issubclass(view_or_class, ViewActivation):
-                kwargs.setdefault('activation_class', view_or_class)
         else:
             self._view = view_or_class
 
@@ -140,11 +147,13 @@ class BaseView(mixins.TaskDescriptionViewMixin,
 
     @property
     def view(self):
+        """View to perform user task."""
         if not self._view:
             self._view = self._view_class.as_view(**self._view_args)
         return self._view
 
     def urls(self):
+        """Add `/<process_pk>/<task_pk>/` url."""
         urls = super(BaseView, self).urls()
         urls.append(
             url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/$'.format(self.name),
@@ -154,19 +163,39 @@ class BaseView(mixins.TaskDescriptionViewMixin,
 
 
 class View(mixins.PermissionMixin, BaseView):
+    """
+    User Task that can be executed in a django view.
+
+    Example::
+
+        class MyFlow(Flow):
+            task = (
+                flow.View(some_view)
+                .Permission('my_app.can_do_task')
+                .Next(this.next_task)
+            )
+    """
+
     activation_class = ViewActivation
     assign_view_class = None
     unassign_view_class = None
 
     def __init__(self, *args, **kwargs):
+        """
+        Instantiate a View node.
+
+        :keyword assign_view: Overides default AssgnView for the node
+        :keyword unassign_view: Overides default UnassignView for the node
+        """
         self._assign_view = kwargs.pop('assign_view', None)
         self._unassign_view = kwargs.pop('unassign_view', None)
         super(View, self).__init__(*args, **kwargs)
 
     def Assign(self, owner=None, **owner_kwargs):
         """
-        Assign task to the User immediately on activation,
-        accepts user lookup kwargs or callable :: Process -> User::
+        Assign task to the User immediately on activation.
+
+        Accepts user lookup kwargs or callable :: Process -> User::
 
             .Assign(username='employee')
             .Assign(lambda process: process.created_by)
@@ -181,13 +210,16 @@ class View(mixins.PermissionMixin, BaseView):
 
     @property
     def assign_view(self):
+        """View to assign task to the user."""
         return self._assign_view if self._assign_view else self.assign_view_class.as_view()
 
     @property
     def unassign_view(self):
+        """View to unassign task from the user."""
         return self._unassign_view if self._unassign_view else self.unassign_view_class.as_view()
 
     def urls(self):
+        """Add /assign/ and /unassign/ task urls."""
         urls = super(View, self).urls()
         urls.append(url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/assign/$'.format(self.name),
                     self.assign_view, {'flow_task': self}, name="{}__assign".format(self.name)))
@@ -196,6 +228,11 @@ class View(mixins.PermissionMixin, BaseView):
         return urls
 
     def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
+        """Handle `assign`, `unassign` and `execute` url_types.
+
+        If url_type is `guess` task check is it can be assigned, unassigned or executed.
+        If true, the action would be returned as guess result url.
+        """
         user = kwargs.get('user', None)
 
         # assign
@@ -219,6 +256,7 @@ class View(mixins.PermissionMixin, BaseView):
         return super(View, self).get_task_url(task, url_type, namespace=namespace, **kwargs)
 
     def calc_owner(self, activation):
+        """Determine a user to auto-assign the task."""
         from django.contrib.auth import get_user_model
 
         owner = self._owner
@@ -229,12 +267,14 @@ class View(mixins.PermissionMixin, BaseView):
         return owner
 
     def calc_owner_permission(self, activation):
+        """Determine required permission to assign and execute this task."""
         owner_permission = self._owner_permission
         if callable(owner_permission):
             owner_permission = owner_permission(activation)
         return owner_permission
 
     def can_assign(self, user, task):
+        """Check if user can assign the task."""
         # already assigned
         if task.owner_id:
             return False
@@ -258,6 +298,7 @@ class View(mixins.PermissionMixin, BaseView):
         return user.has_perm(task.owner_permission, obj=obj)
 
     def can_unassign(self, user, task):
+        """Check if user can unassign the task."""
         # not assigned
         if task.owner_id is None:
             return False
@@ -274,6 +315,7 @@ class View(mixins.PermissionMixin, BaseView):
         return user.has_perm(self.flow_class.instance.manage_permission_name)
 
     def can_execute(self, user, task):
+        """Check user premition to execute the task."""
         if task.owner_permission is None and task.owner is None:
             return True
 
