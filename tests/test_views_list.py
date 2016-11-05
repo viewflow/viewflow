@@ -34,7 +34,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(request)
-        self.assertEqual(response.template_name, 'viewflow/site_index.html')
+        self.assertEqual(response.template_name, ['viewflow/site_index.html', 'viewflow/process_list.html'])
 
     def test_all_tasklist_view(self):
         view = views.AllTaskListView.as_view(ns_map={'listviewtest': ListViewTestFlow})
@@ -44,7 +44,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(request)
-        self.assertEqual(response.template_name, 'viewflow/site_tasks.html')
+        self.assertEqual(response.template_name, ['viewflow/site_tasks.html', 'viewflow/task_list.html'])
 
     def test_all_queuelist_view(self):
         view = views.AllQueueListView.as_view(ns_map={'listviewtest': ListViewTestFlow})
@@ -54,7 +54,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(request)
-        self.assertEqual(response.template_name, 'viewflow/site_queue.html')
+        self.assertEqual(response.template_name, ['viewflow/site_queue.html', 'viewflow/task_list.html'])
 
     def test_all_archivelist_view(self):
         view = views.AllArchiveListView.as_view(ns_map={'listviewtest': ListViewTestFlow})
@@ -64,7 +64,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         response = view(request)
-        self.assertEqual(response.template_name, 'viewflow/site_archive.html')
+        self.assertEqual(response.template_name, ['viewflow/site_archive.html', 'viewflow/task_list.html'])
 
     def test_processlist_view(self):
         view = views.ProcessListView.as_view()

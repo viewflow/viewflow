@@ -15,7 +15,7 @@ from .task import (
 from .utils import get_next_task_url
 
 
-__all__ = [
+__all__ = (
     'ActivateNextTaskView', 'AllArchiveListView',
     'AllProcessListView', 'AllQueueListView', 'AllTaskListView',
     'AssignTaskView', 'CancelProcessView', 'CancelTaskView',
@@ -24,4 +24,4 @@ __all__ = [
     'QueueListView', 'StartFlowMixin', 'CreateProcessView',
     'TaskListView', 'UnassignTaskView', 'UndoTaskView',
     'ArchiveListView', 'get_next_task_url',
-]
+)

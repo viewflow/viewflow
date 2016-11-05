@@ -6,23 +6,21 @@ from ..exceptions import FlowRuntimeError
 
 
 class JoinActivation(Activation):
-    def initialize(self, flow_task, task):
-        self.flow_task, self.flow_class = flow_task, flow_task.flow_class
+    """Activation for parallel Join node."""
 
-        self.process = self.flow_class.process_class._default_manager.get(flow_class=self.flow_class, pk=task.process_id)
-        self.task = task
-
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs):  # noqa D102
         self.next_task = None
         super(JoinActivation, self).__init__(**kwargs)
 
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.STARTED)
     def start(self):
+        """Create Join task on the first incoming node complete."""
         self.task.save()
         signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
     @Activation.status.transition(source=STATUS.STARTED)
     def done(self):
+        """Complete the join within current exception propagation strategy."""
         with self.exception_guard():
             self.task.finished = now()
             self.set_status(STATUS.DONE)
@@ -33,6 +31,12 @@ class JoinActivation(Activation):
             self.activate_next()
 
     def is_done(self):
+        """Check that process can be continued futher.
+
+        Join check the all task state in db with the common token prefix.
+
+        Join node would continue execution if all incoming tasks are DONE or CANCELED.
+        """
         if not self.flow_task._wait_all:
             return True
 
@@ -53,6 +57,7 @@ class JoinActivation(Activation):
 
     @Activation.status.transition(source=STATUS.ERROR)
     def retry(self):
+        """Manual join gateway reactivation after an error."""
         if self.is_done():
             self.done.original()
 
@@ -61,33 +66,34 @@ class JoinActivation(Activation):
         target=STATUS.STARTED,
         conditions=[all_leading_canceled])
     def undo(self):
-        """
-        Undo the task
-        """
+        """Undo the task."""
         super(JoinActivation, self).undo.original()
 
     @Activation.status.transition(source=[STATUS.NEW, STATUS.STARTED])
     def perform(self):
+        """Manual gateway activation."""
         if self.is_done():
             self.done.original()
 
     @Activation.status.transition(source=[STATUS.NEW, STATUS.STARTED], target=STATUS.CANCELED)
     def cancel(self):
-        """
-        Cancel existing task
-        """
+        """Cancel existing join."""
         super(JoinActivation, self).cancel.original()
 
     @Activation.status.transition(source=STATUS.DONE)
     def activate_next(self):
-        """
-        Activate all outgoing edges
-        """
+        """Activate all outgoing edges."""
         for outgoing in self.flow_task._outgoing():
             outgoing.dst.activate(prev_activation=self, token=self.task.token)
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
+        """Join and if all incoming path completed, continue execution.
+
+        Join task is created on the first activation. Subsequent
+        activations would lookup for the Join Task instance.
+
+        """
         flow_class, flow_task = flow_task.flow_class, flow_task
         process = prev_activation.process
 
@@ -134,10 +140,37 @@ class Join(mixins.TaskDescriptionMixin,
            mixins.CancelViewMixin,
            mixins.PerformViewMixin,
            Gateway):
+    """Wait for one or all incoming links and activates next path.
+
+    Without a Join, subsequent task would be activated as many times
+    as it have parallel incoming links.
+
+    Example::
+
+        class MyFlow(Flow):
+            prepare_item = (
+                flow.Split()
+                .Next(this.make_box)
+                .Next(this.make_label)
+            )
+
+            make_box = (
+                flow.View(ConfirmView, fields=['box_done'])
+                .Next(this.item_prepared)
+            )
+
+            make_label = (
+                flow.View(ConfirmView, fields=['label_done'])
+                .Next(this.item_prepared)
+            )
+
+            item_prepared = flow.Join().Next(this.end)
+
+    """
 
     task_type = 'JOIN'
     activation_class = JoinActivation
 
-    def __init__(self, wait_all=True, **kwargs):
+    def __init__(self, wait_all=True, **kwargs):  # noqa D102
         super(Join, self).__init__(**kwargs)
         self._wait_all = wait_all

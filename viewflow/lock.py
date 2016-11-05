@@ -1,6 +1,5 @@
-"""
-Prevents inconsistent db updates for flow.
-"""
+"""Prevents inconsistent db updates for flow."""
+
 import time
 import random
 from contextlib import contextmanager
@@ -14,6 +13,7 @@ from viewflow.exceptions import FlowLockFailed
 def no_lock(flow):
     """
     No pessimistic locking, just execute flow task in transaction.
+
     Not suitable when you have Join nodes in your flow.
     """
     @contextmanager
@@ -25,10 +25,9 @@ def no_lock(flow):
 
 def select_for_update_lock(flow, nowait=True, attempts=5):
     """
-    Uses `select ... for update` on process instance row for locking,
-    bound to database transaction.
+    Databace lock uses `select ... for update` on the process instance row.
 
-    Recommended for use with PostgreSQL.
+    Recommended to use with PostgreSQL.
     """
     @contextmanager
     def lock(flow_class, process_pk):
@@ -54,6 +53,9 @@ class CacheLock(object):
     """
     Task lock based on Django's cache.
 
+    Use it if primary cache backend has transactional `add` functionality,
+    like `memcached`.
+
     Example::
 
         class MyFlow(Flow):
@@ -63,10 +65,10 @@ class CacheLock(object):
     is Django's ``default`` cache configuration.
     """
 
-    def __init__(self, cache=default_cache):
+    def __init__(self, cache=default_cache):  # noqa D102
         self.cache = cache
 
-    def __call__(self, flow, attempts=5, expires=120):
+    def __call__(self, flow, attempts=5, expires=120):  # noqa D102
         cache = self.cache
 
         @contextmanager
@@ -95,7 +97,3 @@ class CacheLock(object):
 
 
 cache_lock = CacheLock()
-"""
-Use it if primary cache backend has transactional `add` functionality,
-like `memcached`.
-"""

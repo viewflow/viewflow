@@ -14,29 +14,44 @@ from .utils import get_next_task_url
 
 
 class BaseFlowViewMixin(object):
-    """
-    Mixin for task views, that do not implement activation interface.
-    """
+    """Mixin for a task views."""
 
     def get_context_data(self, **kwargs):
+        """Context for a task view.
+
+        :keyword activation: the task activation instance
+        """
         context = super(BaseFlowViewMixin, self).get_context_data(**kwargs)
         context['activation'] = self.activation
         return context
 
     def get_success_url(self):
+        """Continue on task or redirect back to task list."""
         return get_next_task_url(self.request, self.activation.process)
 
     def get_template_names(self):
-        flow_task = self.activation.flow_task
-        opts = self.activation.flow_task.flow_class._meta
+        """List of template names to be used for a task view.
 
-        return (
-            '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
-            '{}/{}/task.html'.format(opts.app_label, opts.flow_label),
-            'viewflow/flow/task.html')
+        If `template_name` is None, default value is::
+
+            [<app_label>/<flow_label>/<task_name>.html,
+             <app_label>/<flow_label>/task.html,
+             'viewflow/flow/task.html']
+        """
+        if self.template_name is None:
+            flow_task = self.activation.flow_task
+            opts = self.activation.flow_task.flow_class._meta
+
+            return (
+                '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
+                '{}/{}/task.html'.format(opts.app_label, opts.flow_label),
+                'viewflow/flow/task.html')
+        else:
+            return [self.template_name]
 
     @method_decorator(flow_view)
     def dispatch(self, request, **kwargs):
+        """Lock the process, initialize `self.activation`, check permission and execute."""
         self.activation = request.activation
 
         if not self.activation.prepare.can_proceed():
@@ -53,30 +68,37 @@ class BaseFlowViewMixin(object):
 
 
 class FlowViewMixin(MessageUserMixin, BaseFlowViewMixin):
+    """Mixin for flow views copletes activation on a form submit."""
+
     def activation_done(self, *args, **kwargs):
-        """Finish activation."""
+        """Finish the task activation."""
         self.activation.done()
         self.success('Task {task} has been completed.')
         if self.activation.process.finished:
             self.success('Process {process} has been completed.')
 
     def form_valid(self, *args, **kwargs):
+        """If the form is valid, save the associated model and finish the task."""
         super(FlowViewMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         return HttpResponseRedirect(self.get_success_url())
 
 
 class UpdateProcessView(FlowViewMixin, generic.UpdateView):
-    def __init__(self, *args, **kwargs):
+    """Generic view to update a process fields."""
+
+    def __init__(self, *args, **kwargs):  # noqa D102
         super(UpdateProcessView, self).__init__(*args, **kwargs)
         if self.form_class is None and self.fields is None:
             self.fields = []
 
     @property
     def model(self):
+        """Process class."""
         return self.activation.flow_class.process_class
 
     def get_object(self, queryset=None):
+        """Return the process for the task activation."""
         return self.activation.process
 
 
@@ -86,18 +108,34 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
 
     Get confirmation from user, assigns task and redirects to task pages
     """
+
     action_name = 'assign'
 
     def get_template_names(self):
-        flow_task = self.activation.flow_task
-        opts = self.activation.flow_class._meta
+        """List of template names to be used for a process detail page.
 
-        return (
-            '{}/{}/{}_assign.html'.format(opts.app_label, opts.flow_label, flow_task.name),
-            '{}/{}/task_assign.html'.format(opts.app_label, opts.flow_label),
-            'viewflow/flow/task_assign.html')
+        If `template_name` is None, default value is::
+
+            [<app_label>/<flow_label>/<task_name>_assign.html,
+             <app_label>/<flow_label>/task_assign.html,
+             'viewflow/flow/task_assign.html']
+        """
+        if self.template_name is None:
+            flow_task = self.activation.flow_task
+            opts = self.activation.flow_class._meta
+
+            return (
+                '{}/{}/{}_assign.html'.format(opts.app_label, opts.flow_label, flow_task.name),
+                '{}/{}/task_assign.html'.format(opts.app_label, opts.flow_label),
+                'viewflow/flow/task_assign.html')
+        else:
+            return [self.template_name]
 
     def get_context_data(self, **kwargs):
+        """Context for a detail view.
+
+        :keyword activation: the task activation instance
+        """
         context = super(AssignTaskView, self).get_context_data(**kwargs)
         context['activation'] = self.activation
         return context
@@ -120,6 +158,14 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
         return url
 
     def post(self, request, *args, **kwargs):
+        """
+        Assign task to the current user.
+
+        Expect that form submitted with `_continue` or `_assign` button::
+
+            <button type="submit" name="_continue">Assign and continue on this process</button>
+            <button type="submit" name="_assign">Assign</button>
+        """
         if '_assign' or '_continue' in request.POST:
             self.activation.assign(self.request.user)
             self.success('Task {task} has been assigned')
@@ -129,6 +175,7 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
 
     @method_decorator(flow_view)
     def dispatch(self, request, *args, **kwargs):
+        """Check permisions and assign task to the current user."""
         self.activation = request.activation
 
         if request.user is None or request.user.is_anonymous():
@@ -147,13 +194,17 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
 
 
 class UnassignTaskView(BaseTaskActionView):
+    """Unassign task from the current owner."""
+
     action_name = 'unassign'
 
     def can_proceed(self):
+        """Check that task is assigned and user has rights to unassign it."""
         if self.activation.unassign.can_proceed():
             return self.activation.flow_task.can_unassign(self.request.user, self.activation.task)
         return False
 
     def perform(self):
+        """Unassign the task from the current owner."""
         self.activation.unassign()
         self.success('Task {task} has been unassigned.')
