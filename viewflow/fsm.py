@@ -2,42 +2,52 @@ import inspect
 
 
 class TransitionNotAllowed(Exception):
-    """Raised when a transition is not allowed"""
+    """Raised when a transition is not allowed."""
 
 
 class Transition(object):
+    """Allowed state change."""
+
     __slots__ = ('source', 'target', 'conditions')
 
-    def __init__(self, source, target, conditions):
+    def __init__(self, source, target, conditions):  # noqa D102
         self.source = source
         self.target = target
         self.conditions = conditions if conditions else []
 
     def conditions_met(self, instance):
+        """Check that all assotioated conditions is True."""
         return all(map(lambda condition: condition(instance), self.conditions))
 
 
 class TransitionMethod(object):
+    """Instance method wrapper that performs the transition."""
+
     do_not_call_in_templates = True
 
-    def __init__(self, descriptor, instance):
+    def __init__(self, descriptor, instance):  # noqa D102
         self.descriptor = descriptor
         self.instance = instance
 
     def can_proceed(self, check_conditions=True):
+        """Check is transition available."""
         return self.descriptor.can_proceed(self.instance, check_conditions=check_conditions)
 
     def original(self, *args, **kwargs):
+        """Call the unwrapped class method."""
         return self.descriptor.func(self.instance, *args, **kwargs)
 
     def __call__(self, *args, **kwargs):
+        """Perform the transition."""
         return self.descriptor(self.instance, *args, **kwargs)
 
 
 class TransitionDescriptor(object):
+    """Base transition definition descriptor."""
+
     do_not_call_in_templates = True
 
-    def __init__(self, state, func):
+    def __init__(self, state, func):  # noqa D102
         self.state = state
         self.func = func
         self.__doc__ = func.__doc__
@@ -45,24 +55,37 @@ class TransitionDescriptor(object):
 
     @property
     def name(self):
+        """Transition name."""
         return self.func.__name__
 
     def get_descriptor(self, instance):
+        """Return a descriptor with transitions definitions.
+
+        In this case it is `self`. The super class descriptor
+        would lookup and return this object.
+        """
         return self
 
     def add_transition(self, transition):
+        """Register a new transition."""
         self.transitions[transition.source] = transition
 
     def get_transitions(self, instance):
+        """List of all transitions."""
         return self.transitions
 
     def get_transition(self, source_state, instance=None):
+        """Get a transtion of a source_state.
+
+        Returns None if there is no outgoing transitions.
+        """
         transition = self.transitions.get(source_state, None)
         if transition is None:
             transition = self.transitions.get('*', None)
         return transition
 
     def can_proceed(self, instance, check_conditions=True):
+        """Check is transition available."""
         current_state = self.state.get(instance)
         transition = self.get_transition(current_state, instance)
         if transition:
@@ -70,6 +93,7 @@ class TransitionDescriptor(object):
         return False
 
     def __call__(self, instance, *args, **kwargs):
+        """Perform the transition."""
         current_state = self.state.get(instance)
         transition = self.get_transition(current_state, instance)
 
@@ -95,7 +119,10 @@ class TransitionDescriptor(object):
 
 
 class SuperTransitionDescriptor(TransitionDescriptor):
+    """Descriptor that performs the transition descrived in the base class."""
+
     def get_descriptor(self, instance):
+        """Lookup for the transition descriptor in the base classes."""
         for cls in instance.__class__.__mro__:
             if hasattr(cls, self.name):
                 super_descriptor = getattr(cls, self.name)
@@ -107,18 +134,22 @@ class SuperTransitionDescriptor(TransitionDescriptor):
         return super_descriptor
 
     def get_transition(self, source_state, instance):
+        """Get transition from the base class."""
         descriptor = self.get_descriptor(instance)
         return descriptor.get_transition(source_state, instance)
 
     def get_transitions(self, instance):
+        """List of all transitions from the base class."""
         descriptor = self.get_descriptor(instance)
         return descriptor.transitions
 
     def can_proceed(self, instance, check_conditions=True):
+        """Check is transition available."""
         descriptor = self.get_descriptor(instance)
         return descriptor.can_proceed(instance, check_conditions=check_conditions)
 
     def __call__(self, instance, *args, **kwargs):
+        """Perform the transition."""
         descriptor = self.get_descriptor(instance)
         current_state = self.state.get(instance)
         transition = descriptor.get_transition(current_state, instance)
@@ -142,7 +173,9 @@ class SuperTransitionDescriptor(TransitionDescriptor):
 
 
 class State(object):
-    def __init__(self, default=None):
+    """A descriptor that handles state."""
+
+    def __init__(self, default=None):  # noqa D102
         self._default = default
         self._setter = None
         self._getter = None
@@ -158,11 +191,13 @@ class State(object):
         self.set(instance, value)
 
     def get(self, instance):
+        """Get the state from the underline class instance."""
         if self._getter:
             return self._getter(instance)
         return getattr(instance, self.propname, self._default)
 
     def set(self, instance, value):
+        """Get the state of the underline class instance."""
         if self._setter:
             self._setter(instance, value)
         else:
@@ -170,9 +205,11 @@ class State(object):
 
     @property
     def propname(self):
+        """Default class attribute name to store the state."""
         return '_fsm{}'.format(id(self))
 
     def transition(self, source=None, target=None, conditions=None):
+        """Decorator to mark transition methods."""
         def _wrapper(func):
             transition_wrapper = getattr(func, '_transition', None)
             if transition_wrapper is None:
@@ -191,6 +228,7 @@ class State(object):
         return _wrapper
 
     def super(self):
+        """Decorator to perform the same transition as in the base class."""
         def _wrapper(func):
             transition_wrapper = SuperTransitionDescriptor(self, func)
             func._transition = transition_wrapper
@@ -198,18 +236,21 @@ class State(object):
         return _wrapper
 
     def setter(self):
+        """Decorator to mark a way to set a state from a custom storage."""
         def _wrapper(func):
             self._setter = func
             return func
         return _wrapper
 
     def getter(self):
+        """Decorator to mark a way to get a state from a custom storage."""
         def _wrapper(func):
             self._getter = func
             return func
         return _wrapper
 
     def get_available_transtions(self, instance):
+        """List of transitions available from the current state."""
         transitions_cache = instance.__class__.__dict__.get('_transitions{}'.format(self.propname), None)
         if transitions_cache is None:
             transitions_cache = {}
