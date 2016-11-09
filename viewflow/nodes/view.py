@@ -75,7 +75,7 @@ class Start(mixins.PermissionMixin, BaseStart):
             self._owner = owner_kwargs
         return self
 
-    def get_task_url(self, task, url_type='guess', namespace='',  **kwargs):
+    def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
         """"Handle url_Type='execute'.
 
         If url_type is 'guess' and task can be executed by user, the

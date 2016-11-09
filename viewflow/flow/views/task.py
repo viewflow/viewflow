@@ -68,7 +68,7 @@ class BaseFlowViewMixin(object):
 
 
 class FlowViewMixin(MessageUserMixin, BaseFlowViewMixin):
-    """Mixin for flow views copletes activation on a form submit."""
+    """Mixin for flow views completes activation on a form submit."""
 
     def activation_done(self, *args, **kwargs):
         """Finish the task activation."""

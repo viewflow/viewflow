@@ -56,7 +56,7 @@ class MessageUserMixin(object):
         A `message_template` prepared by python `.format()`
         function. In addition to `kwargs`, the `{process}` and `{task}`
         parametes passed.
-        
+
         Example::
 
             self.report('Task {task} from {process} has been completed.')
@@ -88,7 +88,7 @@ class MessageUserMixin(object):
         self.report(message, level=messages.SUCCESS, fail_silently=fail_silently, **kwargs)
 
     def error(self, message, fail_silently=True, **kwargs):
-        """Notification about error."""
+        """Notification about an error."""
         self.report(message, level=messages.ERROR, fail_silently=fail_silently, **kwargs)
 
 

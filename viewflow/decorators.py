@@ -10,6 +10,7 @@ from .fields import import_task_by_ref
 
 
 def flow_start_func(func):
+    """Decorator for flow functions."""
     @transaction.atomic
     @functools.wraps(func)
     def _wrapper(flow_task, *args, **kwargs):
@@ -47,7 +48,7 @@ def flow_func(func):
 
 def flow_job(func):
     """
-    Decorator that prepares celery task for execution
+    Decorator that prepares celery task for execution.
 
     Makes celery job function with the following signature
     `(flow_task-strref, process_pk, task_pk, **kwargs)`
@@ -111,6 +112,7 @@ def flow_job(func):
 
 
 def flow_start_signal(handler):
+    """Decorator provides a flow signal receiver with the activation."""
     @transaction.atomic
     @functools.wraps(handler)
     def _wrapper(sender, flow_task=None, **signal_kwargs):
@@ -125,9 +127,7 @@ def flow_start_signal(handler):
 
 
 def flow_signal(handler):
-    """
-    Decorator providing a flow signal receiver with the activation.
-    """
+    """Decorator provides a flow signal receiver with the activation."""
     @transaction.atomic
     @functools.wraps(handler)
     def _wrapper(sender, task=None, **signal_kwargs):
@@ -145,12 +145,11 @@ def flow_signal(handler):
 
 def flow_start_view(view):
     """
-    Decorator for start views, creates and initializes start activation
+    Decorator for start views, creates and initializes start activation.
 
     Expects view with the signature `(request, **kwargs)`
     Returns view with the signature `(request, flow_class, flow_task, **kwargs)`
     """
-
     @transaction.atomic
     @functools.wraps(view)
     def _wrapper(request, flow_class, flow_task, **kwargs):
@@ -175,7 +174,6 @@ def flow_view(view):
     Expects view with the signature `(request, **kwargs)`
     Returns view with the signature `(request, flow_class, flow_task, process_pk, task_pk, **kwargs)
     """
-
     @transaction.atomic
     @functools.wraps(view)
     def _wrapper(request, flow_class, flow_task, process_pk, task_pk, **kwargs):

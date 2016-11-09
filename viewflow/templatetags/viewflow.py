@@ -2,7 +2,6 @@ from collections import OrderedDict
 from inspect import getargspec
 
 from django import template
-from django.contrib.admin.templatetags.admin_modify import submit_row
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.template.loader import select_template
@@ -21,7 +20,7 @@ register = template.Library()
 @register.tag
 def flowurl(parser, token):
     """
-    Return flow url.
+    Return a flow url.
 
     Usage::
 
@@ -135,9 +134,10 @@ def flow_perms(user, task):
 @register.assignment_tag
 def flow_start_actions(flow_class, user=None):
     """
-    List of actions to start flow available for the user
+    List of actions to start flow available for the user.
 
-    {% flow_start_actions view.flow_class request.user as flow_start_actions %}
+    Example::
+        {% flow_start_actions view.flow_class request.user as flow_start_actions %}
     """
     actions = [
         node for node in flow_class._meta.nodes()
@@ -150,9 +150,11 @@ def flow_start_actions(flow_class, user=None):
 @register.assignment_tag
 def flows_start_actions(flow_classes, user=None):
     """
-    List of actions to start each flow available for the user
+    List of actions to start each flow available for the user.
 
-    {% flows_start_actions view.flows request.user as flow_start_actions %}
+    Example::
+
+        {% flows_start_actions view.flows request.user as flow_start_actions %}
     """
     actions = OrderedDict()
     for flow_class in sorted(flow_classes, key=lambda flow_class: flow_class.process_title):
@@ -182,17 +184,3 @@ def include_process_data(context, process):
         return template.render(context.flatten() if hasattr(context, 'flatten') else context)
     finally:
         context.pop()
-
-
-@register.inclusion_tag('admin/viewflow/task/submit_line.html', takes_context=True)
-def viewflow_task_submit_row(context):
-    task = context.get('original', None)
-    activation = task.activate()
-    activation_class = activation.__class__
-
-    transitions = [(transition.name.replace('_', ' ').capitalize(), transition.name)
-                   for transition in activation_class.status.get_available_transtions(activation)]
-
-    row_context = submit_row(context)
-    row_context['transitions'] = transitions
-    return row_context

@@ -1,14 +1,14 @@
 from django.conf.urls import url, include
 
 from .views import (
-      CancelProcessView, DetailProcessView, ProcessListView,
-      QueueListView, ArchiveListView, TaskListView
+    CancelProcessView, DetailProcessView, ProcessListView,
+    QueueListView, ArchiveListView, TaskListView
 )
 
 
 class FlowViewSet(object):
     """
-    Shortcut for flow urls routing
+    Shortcut for a flow urls routing.
 
     Usage::
 
@@ -53,22 +53,24 @@ class FlowViewSet(object):
         'tasks'
     ]
 
-    def __init__(self, flow_class):
+    def __init__(self, flow_class):  # noqa D102
         self.flow_class = flow_class
 
-    def create_url_entry(self, url_entry):
+    def _create_url_entry(self, url_entry):
         regexp, view, name = url_entry
         return url(regexp, view, name=name)
 
     def get_list_urls(self):
+        """Collect urls from viewset class."""
         attrs = (getattr(self, attr) for attr in self.__dir__() if attr.endswith('_view'))
         return [
-            self.create_url_entry(value)
+            self._create_url_entry(value)
             for value in attrs if isinstance(value, (list, tuple))
         ]
 
     @property
     def urls(self):
+        """Collect the viewset and flow urls."""
         return [
             url('', include(self.get_list_urls()), {'flow_class': self.flow_class}),
             self.flow_class.instance.urls

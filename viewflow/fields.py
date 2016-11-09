@@ -7,11 +7,13 @@ from .token import Token
 
 
 def import_flow_by_ref(flow_strref):
+    """Return flow class by flow string refernece."""
     app_label, flow_path = flow_strref.split('/')
     return import_string('{}.{}'.format(get_app_package(app_label), flow_path))
 
 
 def get_flow_ref(flow_class):
+    """Convert flow class to string reference."""
     module = "{}.{}".format(flow_class.__module__, flow_class.__name__)
     app_label, app_package = get_containing_app_data(module)
     if app_label is None:
@@ -22,9 +24,7 @@ def get_flow_ref(flow_class):
 
 
 def import_task_by_ref(task_strref):
-    """
-    Return flow task by reference like `app_label/path.to.Flowcls.task_name`
-    """
+    """Return flow task by reference like `app_label/path.to.Flowcls.task_name`."""
     app_label, flow_path = task_strref.split('/')
     flow_path, task_name = flow_path.rsplit('.', 1)
     flow_class = import_string('{}.{}'.format(get_app_package(app_label), flow_path))
@@ -32,6 +32,7 @@ def import_task_by_ref(task_strref):
 
 
 def get_task_ref(flow_task):
+    """Convert task to the string reference suitable to store in the db."""
     module = flow_task.flow_class.__module__
     app_label, app_package = get_containing_app_data(module)
     if app_label is None:
@@ -43,16 +44,15 @@ def get_task_ref(flow_task):
 
 
 class ClassValueWrapper(object):
-    """
-    Wrapper to get around of passing cls objects callable to django
-    queryset
-    """
-    def __init__(self, cls):
+    """Wrapper to get around of passing cls objects callable to django queryset."""
+
+    def __init__(self, cls):  # noqa D102
         self.cls = cls
 
 
 class _SubfieldBase(type):
-    """backpoort from django 1.8"""
+    """Backpoort from django 1.8."""
+
     def __new__(cls, name, bases, attrs):
         new_class = super(_SubfieldBase, cls).__new__(cls, name, bases, attrs)
         new_class.contribute_to_class = _make_contrib(
@@ -62,7 +62,8 @@ class _SubfieldBase(type):
 
 
 class _Creator(object):
-    """backpoort from django 1.8"""
+    """Backpoort from django 1.8."""
+
     def __init__(self, field):
         self.field = field
 
@@ -76,7 +77,7 @@ class _Creator(object):
 
 
 def _make_contrib(superclass, func=None):
-    """backport from django 1.8"""
+    """Backport from django 1.8."""
     def contribute_to_class(self, cls, name, **kwargs):
         if func:
             func(self, cls, name, **kwargs)
@@ -87,20 +88,22 @@ def _make_contrib(superclass, func=None):
 
 
 class FlowReferenceField(models.CharField, metaclass=_SubfieldBase):
+    """Flow class."""
+
     description = """Flow class reference field,
     stores flow as app_label/flows.FlowName> to
     avoid possible collisions with app name changes"""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):  # noqa D1o2
         kwargs.setdefault('max_length', 250)
         super(FlowReferenceField, self).__init__(*args, **kwargs)
 
-    def to_python(self, value):
+    def to_python(self, value):  # noqa D1o2
         if isinstance(value, str) and value:
             return import_flow_by_ref(value)
         return value
 
-    def get_prep_value(self, value):
+    def get_prep_value(self, value):  # noqa D1o2
         if value is None or value == '':
             return value
         elif isinstance(value, str):
@@ -115,35 +118,39 @@ class FlowReferenceField(models.CharField, metaclass=_SubfieldBase):
 
         return get_flow_ref(value)
 
-    def value_to_string(self, obj):
+    def value_to_string(self, obj):  # noqa D1o2
         value = self._get_val_from_obj(obj)
         return self.get_prep_value(value)
 
 
 class TaskReferenceField(models.CharField, metaclass=_SubfieldBase):
-    def __init__(self, *args, **kwargs):
+    """Flow node instance."""
+
+    def __init__(self, *args, **kwargs):  # noqa D102
         kwargs.setdefault('max_length', 255)
         super(TaskReferenceField, self).__init__(*args, **kwargs)
 
-    def to_python(self, value):
+    def to_python(self, value):  # noqa D102
         if isinstance(value, str) and value:
             return import_task_by_ref(value)
         return value
 
-    def get_prep_value(self, value):
+    def get_prep_value(self, value):  # noqa D102
         if value is None or value == '':
             return value
         elif not isinstance(value, str):
             return get_task_ref(value)
         return value
 
-    def value_to_string(self, obj):
+    def value_to_string(self, obj):  # noqa D102
         value = self._get_val_from_obj(obj)
         return self.get_prep_value(value)
 
 
 class TokenField(models.CharField, metaclass=_SubfieldBase):
-    def __init__(self, *args, **kwargs):
+    """Wrapper for `viewflow.token.Token` around string values."""
+
+    def __init__(self, *args, **kwargs):  # noqa D102
         kwargs.setdefault('max_length', 150)
         if 'default' in kwargs:
             default = kwargs['default']
@@ -151,12 +158,12 @@ class TokenField(models.CharField, metaclass=_SubfieldBase):
                 kwargs['default'] = Token(default)
         super(TokenField, self).__init__(*args, **kwargs)
 
-    def to_python(self, value):
+    def to_python(self, value):  # noqa D102
         if isinstance(value, str) and value:
             return Token(value)
         return value
 
-    def get_prep_value(self, value):
+    def get_prep_value(self, value):  # noqa D102
         if not isinstance(value, str) and value:
             return value.token
         return super(TokenField, self).get_prep_value(value)
@@ -164,7 +171,7 @@ class TokenField(models.CharField, metaclass=_SubfieldBase):
 
 try:
     """
-    Django 1.6 migrations
+    Django 1.6 migrations.
     """
     from south.modelsinspector import add_introspection_rules
     add_introspection_rules([], ["^viewflow\.fields\.FlowReferenceField"])

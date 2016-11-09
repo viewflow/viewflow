@@ -7,7 +7,7 @@ try:
     from django.db.models.signals import pre_migrate, post_migrate
 
     def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
-        """Create permissions on django 1.10+ """
+        """Create permissions on django 1.10+."""
         if not app_config.models_module:
             return
 
@@ -65,7 +65,7 @@ except ImportError:
         from south.signals import pre_migrate, post_migrate
         from ..compat import get_app_package
 
-        def import_flows(app, **kwargs):
+        def import_flows(app, **kwargs):  # noqa D102
             try:
                 __import__('{}.flows'.format(get_app_package(app)))
             except ImportError:
@@ -75,7 +75,7 @@ except ImportError:
 
         from django.conf import settings
         if 'django.contrib.auth' in settings.INSTALLED_APPS:
-            def create_permissions_compat(app, **kwargs):
+            def create_permissions_compat(app, **kwargs):  # noqa D102
                 from django.db.models import get_app
                 from django.contrib.auth.management import create_permissions
                 create_permissions(get_app(app), (), 0)

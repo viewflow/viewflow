@@ -11,6 +11,12 @@ from . import fsm, signals
 
 
 class STATUS(object):
+    """Activation status constants used in the viewflow.
+
+    3d party code can use any other strings in addition to build in
+    status codes.
+    """
+
     ASSIGNED = 'ASSIGNED'
     CANCELED = 'CANCELED'
     DONE = 'DONE'
@@ -26,12 +32,13 @@ _context_stack = threading.local()
 
 
 def all_leading_canceled(activation):
+    """Condition to check that there are no outgoing tasks or all of them was cancelled."""
     non_canceled_count = activation.task.leading.exclude(status=STATUS.CANCELED).count()
     return non_canceled_count == 0
 
 
 class Context(object):
-    """Thread-local activation context, dynamically scoped
+    """Thread-local activation context, dynamically scoped.
 
     :keyword propagate_exception: If True on activation fails
                                   exception would be propagated to
@@ -47,7 +54,8 @@ class Context(object):
         print(context.propagate_exception)  # prints default 'True'
 
     """
-    def __init__(self, default=None, **kwargs):
+
+    def __init__(self, default=None, **kwargs):  # noqa D102
         self.default = default
         self.current_context_data = kwargs
 
@@ -75,7 +83,7 @@ class Context(object):
         _context_stack.data.pop()
 
     @staticmethod
-    def create(**kwargs):
+    def create(**kwargs):  # noqa D102
         return Context(default=kwargs)
 
 
@@ -102,12 +110,14 @@ class Activation(object):
        }
 
     """
+
     status = fsm.State()
 
     def __init__(self, *args, **kwargs):
-        """
-        Activation should be available for instantiate without any
-        constructor parameters
+        """Instanciate an activation.
+
+        The activation should be avaliable to instantiate without
+        any agruments.
         """
         self.flow_class, self.flow_task = None, None
         self.process, self.task = None, None
@@ -116,21 +126,25 @@ class Activation(object):
 
     @status.setter()
     def set_status(self, value):
+        """Set the status to the underline task."""
         if self.task:
             self.task.status = value
 
     @status.getter()
     def get_status(self):
+        """Get the status of the activated task."""
         if self.task:
             return self.task.status
         return STATUS.UNRIPE
 
     def get_available_transtions(self):
+        """List of all available activation transitions."""
         return self.__class__.status.get_available_transtions(self)
 
     def exception_guard(self):
         """
         Perform activation action inside a transaction.
+
         Handle and propagate exception depends on actvation context state
         """
         @contextmanager
@@ -151,21 +165,18 @@ class Activation(object):
 
     @status.transition(source=STATUS.UNRIPE)
     def initialize(self, flow_task, task):
-        """
-        Activations could be created any time by django framework.
-        For example, if activation is a django view or celery task instance.
-
-        This method does additional viewflow specific initilization,
-        and bounds activation and task instances.  """
+        """Initialize the activation instance."""
         self.flow_task, self.flow_class = flow_task, flow_task.flow_class
 
-        self.process = self.flow_class.process_class._default_manager.get(flow_class=self.flow_class, pk=task.process_id)
+        self.process = self.flow_class.process_class._default_manager.get(
+            flow_class=self.flow_class,
+            pk=task.process_id)
         self.task = task
 
     @status.transition(source=STATUS.DONE, target=STATUS.NEW, conditions=[all_leading_canceled])
     def undo(self):
         """
-        Undo the task
+        Undo the task.
 
         If flow class have `[task_name]_undo(self, activation)` method it would be called
         """
@@ -180,23 +191,19 @@ class Activation(object):
 
     @status.transition(source=STATUS.NEW, target=STATUS.CANCELED)
     def cancel(self):
-        """
-        Cancel existing task
-        """
+        """Cancel existing task."""
         self.task.finished = now()
         self.task.save()
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
-        """
-        Instantiate and persist new flow task.
-        """
+        """Instantiate and persist new flow task."""
         raise NotImplementedError
 
 
 class StartActivation(Activation):
     """
-    Base class for task activations that creates new process instance
+    Base class for task activations that creates new process instance.
 
     .. graphviz::
 
@@ -212,6 +219,7 @@ class StartActivation(Activation):
 
     @Activation.status.super()
     def initialize(self, flow_task, task):
+        """Initialize an activation."""
         self.lock = None
         self.flow_task, self.flow_class = flow_task, flow_task.flow_class
 
@@ -234,7 +242,7 @@ class StartActivation(Activation):
     @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
     def done(self):
         """
-        Creates and starts new process instance.
+        Create and start new process instance.
 
         .. seealso::
             :data:`viewflow.signals.task_started`
@@ -265,17 +273,13 @@ class StartActivation(Activation):
 
     @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
-        """
-        Activate all outgoing edges.
-        """
+        """Activate all outgoing edges."""
         if self.flow_task._next:
             self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @Activation.status.transition(source=STATUS.DONE, target=STATUS.CANCELED, conditions=[all_leading_canceled])
     def undo(self):
-        """
-        Undo the task
-        """
+        """Undo the task."""
         self.process.status = STATUS.CANCELED
         self.process.finished = now()
         self.process.save()
@@ -290,12 +294,13 @@ class StartActivation(Activation):
             handler(self)
 
     def has_perm(self, user):
+        """Check user permission to execute the task."""
         return self.flow_task.can_execute(user)
 
 
 class ViewActivation(Activation):
     """
-    Base class for activations for django views tasks
+    Base class for activations for django views tasks.
 
     .. graphviz::
 
@@ -314,26 +319,20 @@ class ViewActivation(Activation):
 
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.ASSIGNED)
     def assign(self, user=None):
-        """
-        Assign user to the task
-        """
+        """Assign user to the task."""
         if user:
             self.task.owner = user
         self.task.save()
 
     @Activation.status.transition(source=STATUS.ASSIGNED, target=STATUS.NEW)
     def unassign(self):
-        """
-        Remove user from the task assignment
-        """
+        """Remove user from the task assignment."""
         self.task.owner = None
         self.task.save()
 
     @Activation.status.transition(source=STATUS.ASSIGNED)
     def reassign(self, user=None):
-        """
-        Reassign another user
-        """
+        """Reassign to another user."""
         if user:
             self.task.owner = user
         self.task.save()
@@ -351,7 +350,7 @@ class ViewActivation(Activation):
     @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
     def done(self):
         """
-        Mark task as finished
+        Mark task as finished.
 
         .. seealso::
             :data:`viewflow.signals.task_started`
@@ -370,22 +369,19 @@ class ViewActivation(Activation):
 
     @Activation.status.super()
     def undo(self):
-        """
-        Undo the task
-        """
+        """Undo the task."""
         self.task.owner = None
         super(ViewActivation, self).undo.original()
 
     @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
-        """
-        Activate all outgoing edges.
-        """
+        """Activate all outgoing edges."""
         if self.flow_task._next:
             self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @classmethod
     def create_task(cls, flow_task, prev_activation, token):
+        """Create a task instance."""
         return flow_task.flow_class.task_class(
             process=prev_activation.process,
             flow_task=flow_task,
@@ -393,9 +389,7 @@ class ViewActivation(Activation):
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
-        """
-        Instantiate new task
-        """
+        """Instantiate new task."""
         task = cls.create_task(flow_task, prev_activation, token)
 
         task.save()
@@ -407,18 +401,23 @@ class ViewActivation(Activation):
         return activation
 
     def has_perm(self, user):
+        """Check user permission to execute the task."""
         return self.flow_task.can_execute(user, self.task)
 
 
 class FuncActivation(Activation):
+    """Function activate."""
+
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.PREPARED)
     def prepare(self):
+        """Set the task.started time."""
         if self.task.started is None:
             self.task.started = now()
         signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
     @Activation.status.transition(source=STATUS.PREPARED, target=STATUS.DONE)
     def done(self):
+        """Should be the last call in the function."""
         self.task.finished = now()
         self.task.save()
 
@@ -451,7 +450,7 @@ class FuncActivation(Activation):
 
 class AbstractGateActivation(Activation):
     """
-    Base class for flow gates tasks
+    Base class for flow gates activation.
 
     .. graphviz::
 
@@ -470,22 +469,18 @@ class AbstractGateActivation(Activation):
     """
 
     def calculate_next(self):
-        """
-        Calculate next tasks for activation
-        """
+        """Calculate next tasks for activation."""
         raise NotImplementedError
 
     @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
-        """
-        Activate next tasks
-        """
+        """Activate next tasks."""
         raise NotImplementedError
 
     @Activation.status.transition(source=STATUS.NEW)
     def perform(self):
         """
-        Calculate the next codes and activates it
+        Calculate the next codes and activates it.
 
         .. seealso::
             :data:`viewflow.signals.task_started`
@@ -515,9 +510,7 @@ class AbstractGateActivation(Activation):
 
     @Activation.status.transition(source=STATUS.ERROR)
     def retry(self):
-        """
-        Retry the next node calculation and activation
-        """
+        """Retry the next node calculation and activation."""
         self.perform.original()
 
     @Activation.status.transition(
@@ -525,9 +518,7 @@ class AbstractGateActivation(Activation):
         target=STATUS.NEW,
         conditions=[all_leading_canceled])
     def undo(self):
-        """
-        Undo the task
-        """
+        """Undo the task."""
         super(AbstractGateActivation, self).undo.original()
 
     @classmethod
@@ -558,7 +549,7 @@ class AbstractGateActivation(Activation):
 
 class AbstractJobActivation(Activation):
     """
-    Base class for background script tasks
+    Base class for background script tasks.
 
     .. graphviz::
 
@@ -589,7 +580,7 @@ class AbstractJobActivation(Activation):
 
     def async(self):
         """
-        Run task asynchronously
+        Run task asynchronously.
 
         Subclasses should override that method
         """
@@ -597,18 +588,14 @@ class AbstractJobActivation(Activation):
 
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.ASSIGNED)
     def assign(self):
-        """
-        Assign scheduled background task id
-        """
+        """Assign scheduled background task id."""
         self.task.started = now()
         self.task.external_task_id = str(uuid.uuid4())
         self.task.save()
 
     @Activation.status.transition(source=STATUS.ASSIGNED)
     def schedule(self):
-        """
-        Schedule task for execution
-        """
+        """Schedule task for execution."""
         with self.exception_guard():
             self.async()
             self.set_status(STATUS.SCHEDULED)
@@ -617,7 +604,7 @@ class AbstractJobActivation(Activation):
     @Activation.status.transition(source=STATUS.SCHEDULED, target=STATUS.STARTED)
     def start(self):
         """
-        Mark task as started
+        Mark task as started.
 
         .. seealso::
             :data:`viewflow.signals.task_started`
@@ -629,6 +616,7 @@ class AbstractJobActivation(Activation):
 
     @Activation.status.transition(source=[STATUS.SCHEDULED, STATUS.STARTED, STATUS.ERROR], target=STATUS.STARTED)
     def restart(self):
+        """Restart the task excecution after error."""
         if not self.task.started:
             self.task.started = now()
         self.task.save()
@@ -637,7 +625,7 @@ class AbstractJobActivation(Activation):
     @Activation.status.transition(source=STATUS.STARTED, target=STATUS.DONE)
     def done(self):
         """
-        Mark task as done
+        Mark task as done.
 
         .. seealso::
             :data:`viewflow.signals.task_finished`
@@ -654,7 +642,7 @@ class AbstractJobActivation(Activation):
     @Activation.status.transition(source=STATUS.STARTED, target=STATUS.ERROR)
     def error(self, comments=""):
         """
-        Mark task as failed
+        Mark task as failed.
 
         .. seealso::
             :data:`viewflow.signals.task_failed`
@@ -667,29 +655,24 @@ class AbstractJobActivation(Activation):
 
     @Activation.status.transition(source=[STATUS.SCHEDULED, STATUS.STARTED, STATUS.ERROR])
     def retry(self):
+        """Put the task into schedule again."""
         self.schedule.original()
 
     @Activation.status.transition(
         source=[STATUS.SCHEDULED, STATUS.STARTED, STATUS.ERROR, STATUS.DONE],
         target=STATUS.ASSIGNED)
     def undo(self):
-        """
-        Undo the task
-        """
+        """Undo the task."""
         super(AbstractJobActivation, self).undo.original()
 
     @Activation.status.transition(source=[STATUS.NEW, STATUS.ASSIGNED], target=STATUS.CANCELED)
     def cancel(self):
-        """
-        Cancel existing task
-        """
+        """Cancel existing task."""
         super(AbstractJobActivation, self).cancel.original()
 
     @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
-        """
-        Activate all outgoing edges.
-        """
+        """Activate all outgoing edges."""
         self.flow_task._next.activate(prev_activation=self, token=self.task.token)
 
     @classmethod
@@ -721,7 +704,7 @@ class AbstractJobActivation(Activation):
 
 class EndActivation(Activation):
     """
-    Activation that finishes the flow process
+    Activation that finishes the flow process.
 
     .. graphviz::
 
@@ -734,10 +717,11 @@ class EndActivation(Activation):
        }
 
     """
+
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.DONE)
     def perform(self):
         """
-        Finalize the flow. Cancels all active tasks
+        Finalize the flow. If there is no active task, process marked as finished.
 
         .. seealso::
             :data:`viewflow.signals.task_started`
@@ -770,9 +754,7 @@ class EndActivation(Activation):
 
     @Activation.status.super()
     def undo(self):
-        """
-        Undo the task
-        """
+        """Undo the task."""
         self.process.status = STATUS.NEW
         self.process.finished = None
         self.process.save()
@@ -780,9 +762,7 @@ class EndActivation(Activation):
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
-        """
-        Mark process as done, and cancel all other active tasks.
-        """
+        """Mark process as done, and cancel all other active tasks."""
         flow_class, flow_task = flow_task.flow_class, flow_task
         process = prev_activation.process
 

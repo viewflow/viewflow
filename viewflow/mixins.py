@@ -150,7 +150,7 @@ class PerformViewMixin(object):
                     self.perform_view, {'flow_task': self}, name="{}__perform".format(self.name)))
         return urls
 
-    def get_task_url(self, task, url_type='guess', namespace='',  **kwargs):
+    def get_task_url(self, task, url_type='guess', namespace='', **kwargs):
         """Handle for url_type='perform'."""
         if url_type in ['perform']:
             url_name = '{}:{}__perform'.format(namespace, self.name)
@@ -253,7 +253,9 @@ class PermissionMixin(object):
                 self.flow_class.process_class._meta.permissions.append(
                     (self._owner_permission, self._owner_permission_help_text))
 
-            self._owner_permission = '{}.{}'.format(self.flow_class.process_class._meta.app_label, self._owner_permission)
+            self._owner_permission = '{}.{}'.format(
+                self.flow_class.process_class._meta.app_label,
+                self._owner_permission)
 
         super(PermissionMixin, self).ready()
 

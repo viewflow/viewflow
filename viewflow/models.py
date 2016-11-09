@@ -10,9 +10,8 @@ from .managers import ProcessManager, TaskManager, coerce_to_related_instance
 
 
 class AbstractProcess(models.Model):
-    """
-    Base class for Process data object
-    """
+    """Base class for Process data object."""
+
     flow_class = FlowReferenceField()
     status = models.CharField(max_length=50, default=STATUS.NEW)
 
@@ -23,18 +22,18 @@ class AbstractProcess(models.Model):
 
     @property
     def created_by(self):
+        """Lookup for the owner of the task that started the flow."""
         return self.flow_class.task_class._default_manager \
             .get(process=self, flow_task_type='START').owner
 
     def active_tasks(self):
+        """List of non finished tasks."""
         return self.flow_class.task_class._default_manager \
             .filter(process=self, finished__isnull=True) \
             .order_by('created')
 
     def get_task(self, flow_task, status=None):
-        """
-        Return task instance
-        """
+        """Lookup for task instance in the db."""
         if status is None:
             status = [STATUS.NEW, STATUS.ASSIGNED, STATUS.STARTED]
         elif not isinstance(status, (list, tuple)):
@@ -44,11 +43,13 @@ class AbstractProcess(models.Model):
             process=self, flow_task=flow_task, status__in=status)
 
     def summary(self):
-        """
-        Quick textual process state representation for end user
-        """
+        """Quick textual process state representation for end user."""
         if self.flow_class and self.flow_class.process_class == type(self):
-            return Template(self.flow_class.summary_template).render(Context({'process': self, 'flow_class': self.flow_class}))
+            return Template(
+                self.flow_class.summary_template
+            ).render(
+                Context({'process': self, 'flow_class': self.flow_class})
+            )
 
         return "{} - {}".format(self.flow_class.process_title, self.status)
 
@@ -58,6 +59,7 @@ class AbstractProcess(models.Model):
         return "<Process {}> - {}".format(self.pk, self.status)
 
     def refresh_from_db(self, using=None, fields=None, **kwargs):
+        """Backport for django 1.6."""
         if hasattr(models.Model, 'refresh_from_db'):
             super(AbstractProcess, self).refresh_from_db(using=using, fields=fields, **kwargs)
         else:
@@ -68,7 +70,7 @@ class AbstractProcess(models.Model):
             for field in self._meta.concrete_fields:
                 setattr(self, field.attname, getattr(db_instance, field.attname))
 
-    class Meta:
+    class Meta:  # noqa D101
         abstract = True
 
 
@@ -81,6 +83,7 @@ class AbstractTask(models.Model):
         process = models.ForeignKey(Process)
 
     """
+
     flow_task = TaskReferenceField()
     flow_task_type = models.CharField(max_length=50)
     status = models.CharField(max_length=50, default=STATUS.NEW, db_index=True)
@@ -95,16 +98,12 @@ class AbstractTask(models.Model):
 
     @property
     def flow_process(self):
-        """
-        Returns process instance of flow_class type
-        """
+        """Return process instance of flow_class type."""
         if self.flow_task is not None:
             return coerce_to_related_instance(self.process, self.flow_task.flow_class.process_class)
 
     def summary(self):
-        """
-        Quick textual task result representation for end user
-        """
+        """Quick textual task result representation for end user."""
         if self.flow_task:
             if self.finished:
                 if hasattr(self.flow_task, 'task_result_summary'):
@@ -119,7 +118,7 @@ class AbstractTask(models.Model):
 
         return ""
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, **kwargs):  # noqa D102
         if self.status == STATUS.PREPARED:
             raise FlowRuntimeError("Can't save task with intermediate status - PREPARED")
 
@@ -129,9 +128,7 @@ class AbstractTask(models.Model):
         super(AbstractTask, self).save(*args, **kwargs)
 
     def activate(self):
-        """
-        Instantiate and configure new task activation
-        """
+        """Instantiate and configure new task activation."""
         activation = self.flow_task.activation_class()
         activation.initialize(self.flow_task, self)
         return activation
@@ -146,6 +143,7 @@ class AbstractTask(models.Model):
         return "<Task {}> - {}".format(self.pk, self.status)
 
     def refresh_from_db(self, using=None, fields=None, **kwargs):
+        """Backport for django 1.6."""
         if hasattr(models.Model, 'refresh_from_db'):
             super(AbstractTask, self).refresh_from_db(using=using, fields=fields, **kwargs)
         else:
@@ -156,16 +154,20 @@ class AbstractTask(models.Model):
             for field in self._meta.concrete_fields:
                 setattr(self, field.attname, getattr(db_instance, field.attname))
 
-    class Meta:
+    class Meta:  # noqa D101
         abstract = True
 
 
 class Process(AbstractProcess):
-    class Meta:
+    """Default viewflow Process model."""
+
+    class Meta:  # noqa D101
         verbose_name_plural = 'Process list'
 
 
 class Task(AbstractTask):
+    """Default viewflow Task model."""
+
     process = models.ForeignKey(Process)
 
     owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, db_index=True)

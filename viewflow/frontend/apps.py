@@ -11,16 +11,19 @@ from ..compat import autodiscover_modules
 
 
 class ViewflowFrontendConfig(ModuleMixin, AppConfig):
+    """Application config for the viewflow fronend."""
+
     name = 'viewflow.frontend'
     label = 'viewflow_frontend'
     verbose_name = "Workflow"
     icon = '<i class="material-icons">assignment</i>'
 
-    def __init__(self, app_name, app_module):
+    def __init__(self, app_name, app_module):  # noqa D102
         super(ViewflowFrontendConfig, self).__init__(app_name, app_module)
         self._registry = {}
 
     def register(self, flow_class, viewset_class=None):
+        """Register a flow class at the frontend."""
         from ..flow.viewset import FlowViewSet
 
         if flow_class not in self._registry:
@@ -30,13 +33,15 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
             self._registry[flow_class] = viewset_class(flow_class=flow_class)
 
     def has_perm(self, user):
+        """Any authenticated user has a permission for the viewflow."""
         return user.is_authenticated()
 
     def ready(self):
+        """Import all <app>/flows.py modules."""
         autodiscover_modules('flows', register_to=self)
 
     @property
-    def urls(self):
+    def urls(self):  # noqa D102
         from . import views
         from viewflow.flow import views as viewflow_views
 
@@ -64,9 +69,11 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
             base_url, patterns, module=self, app_name=self.label)
 
     def index_url(self):
+        """Base view for the viewflow frontend."""
         return reverse('viewflow:index')
 
     def menu(self):
+        """Module menu."""
         try:
             return get_template('viewflow/menu.html')
         except TemplateDoesNotExist:
@@ -74,16 +81,19 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
 
     @property
     def ns_map(self):
+        """List of namespace for flows."""
         return {
             flow_class._meta.app_label: flow_class for flow_class, flow_site in self._registry.items()
         }
 
     @property
     def flows(self):
+        """List of all registred flows."""
         return self._registry.keys()
 
     @property
     def sites(self):
+        """List of all flows with a title."""
         return sorted(
             [
                 (flow_class.process_title, flow_class)

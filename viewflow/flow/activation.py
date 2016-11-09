@@ -3,17 +3,20 @@ from ..exceptions import FlowRuntimeError
 
 
 class ManagedStartViewActivation(StartActivation):
-    """
-    Tracks task statistics in activation form
-    """
+    """Tracks task statistics in activation form."""
+
     management_form_class = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs):  # noqa D102
         super(ManagedStartViewActivation, self).__init__(**kwargs)
         self.management_form = None
         self.management_form_class = kwargs.pop('management_form_class', None)
 
     def get_management_form_class(self):
+        """Activation management form class.
+
+        Form used as intermediate storage before GET/POST task requests.
+        """
         if self.management_form_class:
             return self.management_form_class
         else:
@@ -21,6 +24,7 @@ class ManagedStartViewActivation(StartActivation):
 
     @Activation.status.super()
     def prepare(self, data=None, user=None):
+        """Prepare activation for excecution."""
         super(ManagedStartViewActivation, self).prepare.original()
         self.task.owner = user
 
@@ -34,17 +38,20 @@ class ManagedStartViewActivation(StartActivation):
 
 
 class ManagedViewActivation(ViewActivation):
-    """
-    Tracks task statistics in activation form
-    """
+    """Tracks task statistics in activation form."""
+
     management_form_class = None
 
-    def __init__(self, **kwargs):
+    def __init__(self, **kwargs):  # noqa D102
         super(ManagedViewActivation, self).__init__(**kwargs)
         self.management_form = None
         self.management_form_class = kwargs.pop('management_form_class', None)
 
     def get_management_form_class(self):
+        """Activation management form class.
+
+        Form used as intermediate storage before GET/POST task requests.
+        """
         if self.management_form_class:
             return self.management_form_class
         else:
@@ -52,6 +59,7 @@ class ManagedViewActivation(ViewActivation):
 
     @Activation.status.super()
     def prepare(self, data=None, user=None):
+        """Prepare activation for excecution."""
         super(ManagedViewActivation, self).prepare.original()
 
         if user:
@@ -67,6 +75,7 @@ class ManagedViewActivation(ViewActivation):
 
     @classmethod
     def create_task(cls, flow_task, prev_activation, token):
+        """Create a task, calucate owner and permissions."""
         task = ViewActivation.create_task(flow_task, prev_activation, token)
 
         activation = task.activate()

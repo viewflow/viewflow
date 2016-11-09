@@ -69,18 +69,15 @@ class Handler(nodes.Handler):
 
     Example::
 
-        def my_handler(activation):
-            # Your custom code
-            pass
-
         class MyFlow(Flow):
-            previous_task = flow.View(ProcessView) \
-                .Next(this.my_task)
-
-            my_task = flow.Function(my_handler) \
+            my_task = (
+                flow.Handler(this.handler_proc)
                 .Next(this.End)
+            )
 
-            end = flow.End()
+            def my_handler(self. activation):
+                # Your custom code
+                pass
 
     .. note::
 
@@ -98,14 +95,18 @@ class Handler(nodes.Handler):
 
 class If(nodes.If):
     """
-    Activates one of paths based on condition
+    Activates one of paths based on condition.
 
     Example::
 
-       check_decision = flow.If(lambda p: p.approved) \\
-           .OnTrue(this.approved) \\
-           .OnFalse(this.end)
+        class MyFlow(Flow):
+            check_approve = (
+                flow.If(lambda activation: activation.process.is_approved)
+                .Then(this.send_message)
+                .Else(this.end_rejected)
+            )
     """
+
     cancel_view_class = views.CancelTaskView
     detail_view_class = views.DetailTaskView
     perform_view_class = views.PerformTaskView
@@ -113,9 +114,7 @@ class If(nodes.If):
 
 
 class Switch(nodes.Switch):
-    """
-    Activates first path with matched condition
-    """
+    """Activates first path with matched condition."""
 
     cancel_view_class = views.CancelTaskView
     detail_view_class = views.DetailTaskView
@@ -131,8 +130,7 @@ class Join(nodes.Join):
 
     Example::
 
-        join_on_warehouse = flow.Join() \\
-            .Next(this.next_task)
+        join_on_warehouse = flow.Join().Next(this.next_task)
 
     """
 
@@ -148,9 +146,11 @@ class Split(nodes.Split):
 
     Example::
 
-        split_on_decision = flow.Split() \\
-            .Next(check_post, cond=lambda p: p,is_check_post_required) \\
+        split_on_decision = (
+            flow.Split()
+            .Next(check_post, cond=lambda p: p,is_check_post_required)
             .Next(this.perform_task_always)
+        )
     """
 
     cancel_view_class = views.CancelTaskView
@@ -160,9 +160,7 @@ class Split(nodes.Split):
 
 
 class AbstractJob(nodes.AbstractJob):
-    """
-    Base task fro background jobs
-    """
+    """Base task for background jobs."""
 
     cancel_view_class = views.CancelTaskView
     detail_view_class = views.DetailTaskView
@@ -218,13 +216,15 @@ class Signal(nodes.Signal):
 
 class Start(nodes.Start):
     """
-    Start process event
+    Start process event.
 
     Example::
 
-        start = flow.Start(StartView, fields=["some_process_field"]) \\
-            .Available(lambda user: user.is_super_user) \\
-            .Activate(this.first_start)
+        start = (
+            flow.Start(StartView, fields=["some_process_field"])
+            .Available(lambda user: user.is_super_user)
+            .Next(this.next_task)
+        )
 
     In case of function based view::
 
@@ -253,6 +253,7 @@ class Start(nodes.Start):
                   <button type="submit"/>
              </form>
     """
+
     activate_next_view_class = views.ActivateNextTaskView
     cancel_view_class = views.CancelTaskView
     detail_view_class = views.DetailTaskView
@@ -264,13 +265,15 @@ class Start(nodes.Start):
 
 class View(nodes.View):
     """
-    View task
+    View task.
 
     Example::
 
-        task = flow.View(some_view) \\
-            .Permission('my_app.can_do_task') \\
-            .Next(this.next_task)
+        task = (
+            flow.View(some_view)
+                .Permission('my_app.can_do_task')
+                .Next(this.next_task)
+        )
 
     In case of function based view::
 
@@ -299,6 +302,7 @@ class View(nodes.View):
                   <button type="submit"/>
              </form>
     """
+
     activate_next_view_class = views.ActivateNextTaskView
     cancel_view_class = views.CancelTaskView
     detail_view_class = views.DetailTaskView
@@ -310,9 +314,7 @@ class View(nodes.View):
 
 
 class End(nodes.End):
-    """
-    End process event.
-    """
+    """End process event."""
 
     cancel_view_class = views.CancelTaskView
     detail_view_class = views.DetailTaskView
