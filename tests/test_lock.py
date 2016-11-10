@@ -26,7 +26,7 @@ class Test(TransactionTestCase):
 
     def run_with_lock(self, lock_impl):
         try:
-            with lock_impl(Test.TestFlow, self.process.pk):
+            with lock_impl(Test.TestFlow)(Test.TestFlow, self.process.pk):
                 while not self.finished:
                     time.sleep(0.001)
         except FlowLockFailed as e:
@@ -36,7 +36,7 @@ class Test(TransactionTestCase):
 
     def run_with_lock_and_release(self, lock_impl):
         try:
-            with lock_impl(Test.TestFlow, self.process.pk):
+            with lock_impl(Test.TestFlow)(Test.TestFlow, self.process.pk):
                 time.sleep(0.5)
         except FlowLockFailed as e:
             self.exception_queue.put(e)
@@ -45,8 +45,9 @@ class Test(TransactionTestCase):
 
     @skipUnlessDBFeature('has_select_for_update')
     def test_select_for_update_locks(self):
-        thread1 = threading.Thread(target=self.run_with_lock, args=[lock.select_for_update_lock(Test.TestFlow, attempts=1)])
-        thread2 = threading.Thread(target=self.run_with_lock, args=[lock.select_for_update_lock(Test.TestFlow, attempts=1)])
+        lock_impl = lock.SelectForUpdateLock(attempts=1)
+        thread1 = threading.Thread(target=self.run_with_lock, args=[lock_impl])
+        thread2 = threading.Thread(target=self.run_with_lock, args=[lock_impl])
 
         thread1.start()
         thread2.start()
@@ -63,12 +64,13 @@ class Test(TransactionTestCase):
 
     @skipUnlessDBFeature('has_select_for_update')
     def test_select_for_update_locks_released(self):
+        lock_impl = lock.SelectForUpdateLock(attempts=4)
         thread1 = threading.Thread(
             target=self.run_with_lock_and_release,
-            args=[lock.select_for_update_lock(Test.TestFlow, attempts=4)])
+            args=[lock_impl])
         thread2 = threading.Thread(
             target=self.run_with_lock_and_release,
-            args=[lock.select_for_update_lock(Test.TestFlow, attempts=4)])
+            args=[lock_impl])
 
         thread1.start()
         thread2.start()
@@ -89,15 +91,16 @@ class Test(TransactionTestCase):
         https://github.com/viewflow/viewflow/pull/164
         """
         def test_func():
-            lock_impl = lock.select_for_update_lock(Test.TestFlow, attempts=4)
-            with lock_impl(Test.TestFlow, self.process.pk):
+            lock_impl = lock.SelectForUpdateLock(attempts=4)
+            with lock_impl(Test.TestFlow)(Test.TestFlow, self.process.pk):
                 raise DatabaseError('Test')
         with self.assertRaises(DatabaseError):
             test_func()
 
     def test_cache_lock(self):
-        thread1 = threading.Thread(target=self.run_with_lock, args=[lock.cache_lock(Test.TestFlow, attempts=1)])
-        thread2 = threading.Thread(target=self.run_with_lock, args=[lock.cache_lock(Test.TestFlow, attempts=1)])
+        lock_impl = lock.CacheLock(attempts=1)
+        thread1 = threading.Thread(target=self.run_with_lock, args=[lock_impl])
+        thread2 = threading.Thread(target=self.run_with_lock, args=[lock_impl])
 
         thread1.start()
         thread2.start()
