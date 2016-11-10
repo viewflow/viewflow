@@ -16,12 +16,18 @@ main .row .row {
 
 /* SIDEBAR */
 .side-nav.fixed {
+
     .collapsible-body {
         // 2d level
         li.active a {
             span.badge {
                 color: white;
             }
+        }
+
+        // 2d level - header
+        li .collapsible li.active > a {
+            color: white;
         }
     }
 }

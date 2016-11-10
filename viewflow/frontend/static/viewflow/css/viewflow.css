@@ -14,6 +14,9 @@ main .row .row {
 .side-nav.fixed .collapsible-body li.active a span.badge {
   color: white; }
 
+.side-nav.fixed .collapsible-body li .collapsible li.active > a {
+  color: white; }
+
 /* LIST PAGE */
 .filters-card {
   overflow: initial; }
