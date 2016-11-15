@@ -35,7 +35,7 @@ django forms and views code.
 Documentation
 =============
 
-Read the documentation at the `http://docs.viewflow.io/ <http://docs.viewflow.io/introduction.html>`_
+Read the documentation at the `http://docs.viewflow.io/ <http://docs.viewflow.io/>`_
 
 License
 =======
