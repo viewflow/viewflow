@@ -29,7 +29,7 @@ class Insurance(models.Model):
 
 class Shipment(models.Model):
     shipment_no = models.CharField(max_length=50)
-    carrier = models.ForeignKey(Carrier, null=True)
+    carrier = models.ForeignKey(Carrier, null=True, on_delete=models.CASCADE)
 
     # customer
     first_name = models.CharField(max_length=150)
@@ -46,7 +46,7 @@ class Shipment(models.Model):
 
     # shipment data
     need_insurance = models.BooleanField(default=False)
-    insurance = models.ForeignKey('Insurance', null=True)
+    insurance = models.ForeignKey('Insurance', null=True, on_delete=models.CASCADE)
 
     carrier_quote = models.IntegerField(default=0)
     post_label = models.TextField(blank=True, null=True)
@@ -55,13 +55,13 @@ class Shipment(models.Model):
 
 
 class ShipmentItem(models.Model):
-    shipment = models.ForeignKey(Shipment)
+    shipment = models.ForeignKey(Shipment, on_delete=models.CASCADE)
     name = models.CharField(max_length=250)
     quantity = models.IntegerField(default=1)
 
 
 class ShipmentProcess(Process):
-    shipment = models.ForeignKey(Shipment, blank=True, null=True)
+    shipment = models.ForeignKey(Shipment, blank=True, null=True, on_delete=models.CASCADE)
 
     def is_normal_post(self):
         try:

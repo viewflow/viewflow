@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 from django.conf import settings
-
+import django.db.models.deletion
 
 class Migration(migrations.Migration):
 
@@ -47,8 +47,8 @@ class Migration(migrations.Migration):
                 ('carrier_quote', models.IntegerField(default=0)),
                 ('post_label', models.TextField(blank=True, null=True)),
                 ('package_tag', models.CharField(max_length=50)),
-                ('carrier', models.ForeignKey(to='shipment.Carrier', null=True)),
-                ('insurance', models.ForeignKey(to='shipment.Insurance', null=True)),
+                ('carrier', models.ForeignKey(to='shipment.Carrier', null=True, on_delete=django.db.models.deletion.CASCADE)),
+                ('insurance', models.ForeignKey(to='shipment.Insurance', null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
         ),
         migrations.CreateModel(
@@ -57,14 +57,14 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(serialize=False, auto_created=True, primary_key=True, verbose_name='ID')),
                 ('name', models.CharField(max_length=250)),
                 ('quantity', models.IntegerField(default=1)),
-                ('shipment', models.ForeignKey(to='shipment.Shipment')),
+                ('shipment', models.ForeignKey(to='shipment.Shipment', on_delete=django.db.models.deletion.CASCADE)),
             ],
         ),
         migrations.CreateModel(
             name='ShipmentProcess',
             fields=[
-                ('process_ptr', models.OneToOneField(to='viewflow.Process', primary_key=True, parent_link=True, serialize=False, auto_created=True)),
-                ('shipment', models.ForeignKey(blank=True, to='shipment.Shipment', null=True)),
+                ('process_ptr', models.OneToOneField(to='viewflow.Process', primary_key=True, parent_link=True, serialize=False, auto_created=True, on_delete=django.db.models.deletion.CASCADE)),
+                ('shipment', models.ForeignKey(blank=True, to='shipment.Shipment', null=True, on_delete=django.db.models.deletion.CASCADE)),
             ],
             options={
                 'permissions': [('can_start_request', 'Can start shipment request'), ('can_take_extra_insurance', 'Can take extra insurance'), ('can_package_goods', 'Can package goods'), ('can_move_package', 'Can move package')],

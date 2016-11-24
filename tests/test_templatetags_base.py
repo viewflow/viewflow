@@ -89,7 +89,7 @@ class TemplateTagProcessRelated(models.Model):
 
 class TemplateTagProcess(models.Model):
     content = models.CharField(max_length=50)
-    related = models.ForeignKey(TemplateTagProcessRelated)
+    related = models.ForeignKey(TemplateTagProcessRelated, on_delete=models.CASCADE)
 
 
 class ChildTemplateTagProcess(TemplateTagProcess):
@@ -98,8 +98,9 @@ class ChildTemplateTagProcess(TemplateTagProcess):
 
 class TemplateTagProcessEntity(models.Model):
     content = models.CharField(max_length=50)
-    process = models.ForeignKey(TemplateTagProcess)
-    circled_link = models.ForeignKey('TemplateTagProcessEntity', null=True)
+    process = models.ForeignKey(TemplateTagProcess, on_delete=models.CASCADE)
+    circled_link = models.ForeignKey(
+        'TemplateTagProcessEntity', null=True, on_delete=models.CASCADE)
 
 
 admin.site.register(TemplateTagProcessRelated)
