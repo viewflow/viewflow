@@ -79,7 +79,7 @@ class AbstractTask(models.Model):
 
     In addition, you have to define at least process foreign key field::
 
-        process = models.ForeignKey(Process)
+        process = models.ForeignKey(Process, on_delete=models.CASCADE)
 
     """
 
@@ -167,9 +167,11 @@ class Process(AbstractProcess):
 class Task(AbstractTask):
     """Default viewflow Task model."""
 
-    process = models.ForeignKey(Process)
+    process = models.ForeignKey(Process, on_delete=models.CASCADE)
 
-    owner = models.ForeignKey(settings.AUTH_USER_MODEL, blank=True, null=True, db_index=True)
+    owner = models.ForeignKey(
+        settings.AUTH_USER_MODEL, blank=True, null=True, db_index=True,
+        on_delete=models.CASCADE)
     external_task_id = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     owner_permission = models.CharField(max_length=255, blank=True, null=True)
 
