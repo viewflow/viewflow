@@ -100,7 +100,8 @@ class BaseTaskActionView(MessageUserMixin, generic.TemplateView):
             self.error("Task {task} Can't execute action {action}.", action=self.action_name.title)
 
             return redirect(self.activation.flow_task.get_task_url(
-                self.activation.task, url_type='detail', user=request.user))
+                self.activation.task, url_type='detail', user=request.user,
+                namespace=self.request.resolver_match.namespace))
 
         return super(BaseTaskActionView, self).dispatch(request, **kwargs)
 
