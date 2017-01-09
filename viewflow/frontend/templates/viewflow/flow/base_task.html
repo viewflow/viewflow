@@ -15,7 +15,7 @@
     <div class="col s12 m6 l8">
         <div class="card form-card">
             <div class="card-content">
-                <div class="card-bend center-align {% if activation.task.finished %}disabled{% endif %}">
+                <div class="card-bend primary center-align {% if activation.task.finished %}disabled{% endif %}">
                     <h5>{{ activation.flow_class.process_title }}</h5>
                     <h6>{{ activation.task.flow_task }} #{{ activation.task.process.id }}/{{ activation.task.id }}</h6>
                 </div>

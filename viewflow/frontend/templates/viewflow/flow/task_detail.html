@@ -12,7 +12,7 @@
 <div class="right">
     {% flowurl activation.task 'assign' user=request.user as assign_url %}
     {% if assign_url %}
-    <a href="{{ assign_url }}?{{ request|query_back:'copy' }}" class="btn green white-text">Assign</a>
+    <a href="{{ assign_url }}?{{ request|query_back:'copy' }}" class="btn primary white-text">Assign</a>
     {% endif %}
 
     {% flowurl activation.task 'unassign' user=request.user as unassign_url %}
@@ -22,7 +22,7 @@
 
     {% flowurl activation.task 'execute' user=request.user as execute_url %}
     {% if execute_url %}
-    <a href="{{ execute_url }}?{{ request|query_back:'copy' }}" class="btn green white-text">Execute</a>
+    <a href="{{ execute_url }}?{{ request|query_back:'copy' }}" class="btn primary white-text">Execute</a>
     {% endif %}
 </div>
 {% endblock %}

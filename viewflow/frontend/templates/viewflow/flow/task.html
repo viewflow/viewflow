@@ -14,7 +14,7 @@
     <div class="col s12 m6 l8">
         <form role="form" method="POST">
             <div class="card form-card">
-                <div class="card-bend center-align">
+                <div class="card-bend primary center-align">
                     <h5>{{ activation.flow_class.process_title }}</h5>
                     <h6>{{ activation.flow_task }} #{{ activation.task.process.id }}/{{ activation.task.id }}</h6>
                 </div>
@@ -37,7 +37,7 @@
                         </div>
                         <div class="col s9 right-align">
                             <button type="submit" name="_continue" class="btn btn-flat">Done and continue on this process</button>
-                            <button type="submit" name="_done" class="btn green white-text btn-flat">Done</button>
+                            <button type="submit" name="_done" class="btn primary white-text btn-flat">Done</button>
                         </div>
                         {% endblock %}
                     </div>

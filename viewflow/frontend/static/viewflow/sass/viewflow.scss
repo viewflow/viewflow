@@ -14,24 +14,6 @@ main .row .row {
     }
 }
 
-/* SIDEBAR */
-.side-nav.fixed {
-
-    .collapsible-body {
-        // 2d level
-        li.active a {
-            span.badge {
-                color: white;
-            }
-        }
-
-        // 2d level - header
-        li .collapsible li.active > a {
-            color: white;
-        }
-    }
-}
-
 /* LIST PAGE */
 .filters-card {
     overflow:initial;
@@ -106,7 +88,6 @@ main .row .row {
     position: absolute;
     right: 0px;
     top: 0px;
-    background-color: #4CAF50;
     color: #fff;
     padding-right: 30px;
     padding-left: 30px;
@@ -138,7 +119,6 @@ table span.badge {
     font-weight: 300;
     font-size: 0.8rem;
     color: #fff;
-    background-color: #26a69a;
     border-radius: 2px;
     text-transform: uppercase
 }
@@ -186,7 +166,6 @@ table span.badge {
     font-weight: 300;
     font-size: 0.8rem;
     color: #fff;
-    background-color: #26a69a;
     border-radius: 2px;
     text-transform: uppercase
 }
