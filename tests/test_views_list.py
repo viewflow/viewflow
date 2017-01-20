@@ -2,32 +2,16 @@ from django.core.urlresolvers import resolve
 from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
-from django.utils import timezone
 
 from viewflow import flow
 from viewflow.base import Flow, this
-from viewflow.models import Task, Process
 from viewflow.flow import views, viewset
-from viewflow.flow.views.list import TaskFilter
+from viewflow.models import Process
 
 
 class Test(TestCase):
-    def test_task_filter(self):
-        process = Process.objects.create(flow_class=ListViewTestFlow)
-        task1 = Task.objects.create(process=process, flow_task=ListViewTestFlow.start1)
-        task1.created = timezone.now().replace(year=1900)
-        task1.save()
-        task2 = Task.objects.create(process=process, flow_task=ListViewTestFlow.start2)
-
-        # filter by current year
-        with self.assertNumQueries(2):
-            task_filter = TaskFilter({'created': 4}, Task.objects.all())
-            str(task_filter.form)
-
-        self.assertEqual([task for task in task_filter.qs], [task2])
-
     def test_all_processlist_view(self):
-        view = views.AllProcessListView.as_view(ns_map={'listviewtest': ListViewTestFlow})
+        view = views.AllProcessListView.as_view(ns_map={ListViewTestFlow: 'listviewtest'})
 
         request = RequestFactory().get('/processes/')
         request.user = User(username='test', is_superuser=True)
@@ -37,7 +21,7 @@ class Test(TestCase):
         self.assertEqual(response.template_name, ['viewflow/site_index.html', 'viewflow/process_list.html'])
 
     def test_all_tasklist_view(self):
-        view = views.AllTaskListView.as_view(ns_map={'listviewtest': ListViewTestFlow})
+        view = views.AllTaskListView.as_view(ns_map={ListViewTestFlow: 'listviewtest'})
 
         request = RequestFactory().get('/tasks/')
         request.user = User(username='test', is_superuser=True)
@@ -47,7 +31,7 @@ class Test(TestCase):
         self.assertEqual(response.template_name, ['viewflow/site_tasks.html', 'viewflow/task_list.html'])
 
     def test_all_queuelist_view(self):
-        view = views.AllQueueListView.as_view(ns_map={'listviewtest': ListViewTestFlow})
+        view = views.AllQueueListView.as_view(ns_map={ListViewTestFlow: 'listviewtest'})
 
         request = RequestFactory().get('/queues/')
         request.user = User(username='test', is_superuser=True)
@@ -57,7 +41,7 @@ class Test(TestCase):
         self.assertEqual(response.template_name, ['viewflow/site_queue.html', 'viewflow/task_list.html'])
 
     def test_all_archivelist_view(self):
-        view = views.AllArchiveListView.as_view(ns_map={'listviewtest': ListViewTestFlow})
+        view = views.AllArchiveListView.as_view(ns_map={ListViewTestFlow: 'listviewtest'})
 
         request = RequestFactory().get('/archives/')
         request.user = User(username='test', is_superuser=True)

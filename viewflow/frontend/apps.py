@@ -24,7 +24,7 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
 
     def register(self, flow_class, viewset_class=None):
         """Register a flow class at the frontend."""
-        from ..flow.viewset import FlowViewSet
+        from .viewset import FlowViewSet
 
         if flow_class not in self._registry:
             if viewset_class is None:
@@ -43,14 +43,14 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
     @property
     def urls(self):  # noqa D102
         from . import views
-        from viewflow.flow import views as viewflow_views
+        from viewflow.frontend import views as frontend_views
 
         base_url = '^workflow/'
 
         module_views = [
-            url('^$', viewflow_views.AllTaskListView.as_view(ns_map=self.ns_map), name="index"),
-            url('^queue/$', viewflow_views.AllQueueListView.as_view(ns_map=self.ns_map), name="queue"),
-            url('^archive/$', viewflow_views.AllArchiveListView.as_view(ns_map=self.ns_map), name="archive"),
+            url('^$', frontend_views.AllTaskListView.as_view(ns_map=self.ns_map), name="index"),
+            url('^queue/$', frontend_views.AllQueueListView.as_view(ns_map=self.ns_map), name="queue"),
+            url('^archive/$', frontend_views.AllArchiveListView.as_view(ns_map=self.ns_map), name="archive"),
             url('^action/unassign/$', views.TasksUnAssignView.as_view(ns_map=self.ns_map), name="unassign"),
             url('^action/assign/$', views.TasksAssignView.as_view(ns_map=self.ns_map), name="assign"),
         ]
@@ -81,9 +81,9 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
 
     @property
     def ns_map(self):
-        """List of namespace for flows."""
+        """Mapping flows to registred namespaces."""
         return {
-            flow_class._meta.app_label: flow_class for flow_class, flow_site in self._registry.items()
+            flow_class: flow_class._meta.app_label for flow_class, flow_site in self._registry.items()
         }
 
     @property

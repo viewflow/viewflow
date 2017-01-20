@@ -1,9 +1,9 @@
 {% extends 'viewflow/base_module.html' %}
-{% load viewflow viewflow_frontend %}
+{% load viewflow material_frontend viewflow_frontend %}
 
 {% block breadcrumbs_items %}
 {% include 'viewflow/includes/breadcrumb_category.html' %}
-<a href="{% flowurl view.flow_class 'index' %}?{{ request|query_back:'copy' }}">{{ view.flow_class.process_title }}</a>
+<a href="{% flowurl view.flow_class 'index' %}?{{ request|query_back }}">{{ view.flow_class.process_title }}</a>
 <a class="active">#{{ process.pk }}</a>
 {% endblock %}
 
@@ -55,7 +55,7 @@
                 <div class="right-align">
                     {% if view.flow_class.manage_permission_name in perms %}
                     <a class="btn-flat black-text {% if process.status != 'NEW' %}disabled{% endif %}"
-                       href="{% flowurl process 'action_cancel' %}?{{ request|query_back:'copy' }}">Cancel</a>
+                       href="{% flowurl process 'action_cancel' %}?{{ request|query_back }}">Cancel</a>
                     {% endif %}
                 </div>
             </div>

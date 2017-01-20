@@ -8,7 +8,7 @@
 
 {% block task_actions %}
 <div class="col s3">
-    <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back:'copy' }}">detail</a>
+    <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">detail</a>
 </div>
 <div class="col s9 right-align">
     <form role="form" method="POST" style="display:inline-block">

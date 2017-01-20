@@ -5,6 +5,8 @@ from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
 
+from ...exceptions import FlowRuntimeError
+
 
 class LoginRequiredMixin(object):
     """Mixin to check that user is authenticated."""
@@ -96,6 +98,7 @@ class FlowListMixin(object):
     """Mixin for list view contains multiple flows."""
 
     ns_map = None
+    ns_map_absolute = False
 
     def __init__(self, *args, **kwargs):
         """
@@ -109,4 +112,22 @@ class FlowListMixin(object):
     @property
     def flows(self):
         """List of flow classes."""
-        return self.ns_map.values()
+        return self.ns_map.keys()
+
+    def get_flow_namespace(self, flow_class):
+        namespace = self.ns_map.get(flow_class)
+        if namespace is None:
+            raise FlowRuntimeError("{} are not registred in {}".format(flow_class))
+        if not self.ns_map_absolute:
+            return "{}:{}".format(self.request.resolver_match.namespace, namespace)
+
+    def get_process_url(self, process, url_type='detail'):
+        namespace = self.get_flow_namespace(process.flow_class)
+        return reverse('{}:{}'.format(namespace, url_type), args=[process.pk])
+
+    def get_task_url(self, task, url_type=None):
+        namespace = self.get_flow_namespace(task.process.flow_class)
+        return task.flow_task.get_task_url(
+            task, url_type=url_type if url_type else 'guess',
+            user=self.request.user,
+            namespace=namespace)

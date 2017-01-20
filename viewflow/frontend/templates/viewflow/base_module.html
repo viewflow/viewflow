@@ -1,5 +1,5 @@
 {% extends 'material/frontend/base_module.html' %}
-{% load static viewflow_frontend %}
+{% load static material_frontend viewflow_frontend %}
 
 {% block extrahead %}
 <link href="{% static 'viewflow/css/viewflow.css' %}" rel="stylesheet">
@@ -14,7 +14,7 @@
         var url_re = /href=\"([:\/\w+\.]+)\"/g
 
         {% for message in messages %}
-        var message = '{{ message|capfirst }}'.replace(url_re, 'href="$1?{{ request|query_back:"copy" }}"');
+        var message = '{{ message|capfirst }}'.replace(url_re, 'href="$1?{{ request|query_back }}"');
         Materialize.toast(message, 10000, 'alert-{{ message.tags }}');
         {% endfor %}
     });

@@ -1,11 +1,11 @@
 {% extends 'viewflow/base_module.html' %}
-{% load viewflow viewflow_frontend %}
+{% load viewflow material_frontend viewflow_frontend %}
 
 {% block breadcrumbs_items %}
 {% include 'viewflow/includes/breadcrumb_category.html' %}
-<a href="{% flowurl activation.flow_class 'index' %}?{{ request|query_back:'copy' }}">{{ activation.flow_class.process_title }}</a>
-<a href="{% flowurl activation.process 'detail' %}?{{ request|query_back:'copy' }}">#{{ activation.process.pk }}</a>
-<a {% block prevbreadcrumb_class %}{% endblock %} href="{% flowurl activation.task 'detail' %}?{{ request|query_back:'copy' }}">{{ activation.flow_task }} #{{ activation.task.pk }}</a>
+<a href="{% flowurl activation.flow_class 'index' %}?{{ request|query_back }}">{{ activation.flow_class.process_title }}</a>
+<a href="{% flowurl activation.process 'detail' %}?{{ request|query_back }}">#{{ activation.process.pk }}</a>
+<a {% block prevbreadcrumb_class %}{% endblock %} href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">{{ activation.flow_task }} #{{ activation.task.pk }}</a>
 {% block breadcrumbs_items_extra %}{% endblock %}
 {% endblock %}
 

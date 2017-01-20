@@ -1,11 +1,11 @@
 {% extends 'viewflow/base_module.html' %}
-{% load viewflow  viewflow_frontend material_form %}
+{% load viewflow viewflow_frontend material_form material_frontend %}
 
 {% block breadcrumbs_items %}
 {% include 'viewflow/includes/breadcrumb_category.html' %}
-<a href="{% flowurl activation.flow_class 'index' %}?{{ request|query_back:'copy' }}">{{ activation.flow_class.process_title }}</a>
-<a href="{% flowurl activation.process 'detail' %}?{{ request|query_back:'copy' }}">#{{ activation.process.pk }}</a>
-<a class="active" href="{% flowurl activation.task 'detail' %}?{{ request|query_back:'copy' }}">{{ activation.flow_task }} / #{{ activation.task.pk }}</a>
+<a href="{% flowurl activation.flow_class 'index' %}?{{ request|query_back }}">{{ activation.flow_class.process_title }}</a>
+<a href="{% flowurl activation.process 'detail' %}?{{ request|query_back }}">#{{ activation.process.pk }}</a>
+<a class="active" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">{{ activation.flow_task }} / #{{ activation.task.pk }}</a>
 {% endblock %}
 
 
@@ -33,7 +33,7 @@
                     <div class="row">
                         {% block task_actions %}
                         <div class="col s3">
-                            <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back:'copy' }}">detail</a>
+                            <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">detail</a>
                         </div>
                         <div class="col s9 right-align">
                             <button type="submit" name="_continue" class="btn btn-flat">Done and continue on this process</button>

@@ -3,50 +3,7 @@ from __future__ import unicode_literals
 from django import template
 from viewflow.models import Task
 
-try:
-    from urllib.parse import quote
-except:
-    from urllib import quote
-
-
 register = template.Library()
-
-
-@register.filter
-def query_back(request, back):
-    """
-    Set the `back` url GET parameter.
-
-    Usage::
-
-        <a href="{{ url }}?{{ request|query_back:"here" }}>
-        <a href="{{ url }}?{{ request|query_back:"here_if_none" }}>
-        <a href="{{ url }}?{{ request|query_back:"copy" }}>
-    """
-    if back not in ['here', 'copy', 'here_if_none']:
-        raise template.TemplateSyntaxError(
-            'query_back tag accepts `here`, `copy` or `here_if_none` as parameter. Got {}'.format(back))
-
-    params = request.GET.copy()
-    params.pop('_pjax', None)
-
-    if back == 'here_if_none' and 'back' in params:
-        """
-        Do nothing
-        """
-    elif back == 'copy':
-        """
-        Do nothing
-        """
-    else:
-        params.pop('back', None)
-        if params:
-            back = "{}?{}".format(quote(request.path), quote(params.urlencode()))
-        else:
-            back = "{}".format(quote(request.path))
-        params['back'] = back
-
-    return params.urlencode()
 
 
 @register.filter

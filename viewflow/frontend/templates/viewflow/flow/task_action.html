@@ -1,5 +1,5 @@
 {% extends 'viewflow/flow/base_task.html' %}
-{% load viewflow viewflow_frontend %}
+{% load material_frontend viewflow viewflow_frontend %}
 
 {% block breadcrumbs_items_extra %}
 <a class="active">{{ view.action_name|title }}</a>
@@ -8,7 +8,7 @@
 
 {% block task_actions %}
 <div class="col s3">
-    <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back:'copy' }}">detail</a>
+    <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">detail</a>
 </div>
 <div class="col s9 right-align">
     <form role="form" method="POST" style="display:inline-block">

@@ -1,4 +1,4 @@
-{% load viewflow viewflow_frontend %}
+{% load viewflow material_frontend viewflow_frontend %}
 
 {% for root, fields, root_url in process_data %}
 <div class="row">
@@ -35,7 +35,7 @@
                         {% if task.flow_task.task_type == 'HUMAN' or task.flow_task.task_type == 'JOB' %}
                         <tr>
                             <td>
-                                <a href="{% flowurl task user=request.user %}?{{ request|query_back:'copy' }}">{{ task.flow_task }}/#{{ task.pk}}</a>
+                                <a href="{% flowurl task user=request.user %}?{{ request|query_back }}">{{ task.flow_task }}/#{{ task.pk}}</a>
                             </td>
                             <td>{{ task.owner|default:"" }}</td>
                         </tr>

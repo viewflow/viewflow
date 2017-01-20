@@ -1,86 +1,9 @@
-{% extends 'viewflow/base_module.html' %}
-{% load material_form viewflow viewflow_frontend %}
+{% extends 'material/frontend/views/list.html' %}
+{% load material_frontend viewflow viewflow_frontend %}
 
 {% block breadcrumbs_items %}
 {% include 'viewflow/includes/breadcrumb_category.html' %}
-<a class="active" href="{% flowurl flow_class 'index' %}?{{ request|query_back:'copy' }}">{{ flow_class.process_title }}</a>
+<a class="active" href="{% flowurl view.flow_class 'index' %}?{{ request|query_back }}">{{ view.flow_class.process_title }}</a>
 {% endblock %}
 
-
-{% block content %}
-<div class="row">
-    <div class="col s12 m8 l9">
-        <div class="card data-card">
-            <div class="card-content">
-                <table class="table bordered">
-                    <thead>
-                        <th>#</th>
-                        <th>Summary</th>
-                        <th class="span1">Started</th>
-                        <th class="span1">Finished</th>
-                        <th style="width:400px">Active Tasks</th>
-                    </thead>
-                    <tbody>
-                        {% for process in process_list %}
-                        <tr>
-                            <td><a href="{% flowurl process 'detail' %}?{{ request|query_back:'here_if_none' }}">{{ process.id }}</a></td>
-                            <td><a href="{% flowurl process 'detail' %}?{{ request|query_back:'here_if_none' }}">{{ process.summary }}</a></td>
-                            <td>{{ process.created }}</td>
-                            <td>{{ process.finished|default:"" }}</td>
-                            <td>{% if not process.finished %}<a href="{% flowurl process 'detail' %}?{{ request|query_back:'here_if_none' }}">{{ process.active_tasks|length }} active tasks</a>{% endif %}</td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="3">No process yet</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-                {% if page_obj.has_previous or page_obj.has_next %}
-                <div class="row pagination">
-                    <div class="col s12 right-align">
-                        {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ paginator.count }}
-                        <span style="padding-left:30px" class="right">
-                        {% if page_obj.has_previous %}
-                        <a href="?page={{ page_obj.previous_page_number }}"><i class="material-icons small">navigate_before</i></a>
-                        {% else %}
-                        <i class="material-icons small grey-text">navigate_before</i>
-                        {% endif %}
-                        &nbsp;
-                        {% if page_obj.has_next %}
-                        <a href="?page={{ page_obj.next_page_number }}"><i class="material-icons small">navigate_next</i></a>
-                        {% else %}
-                        <i class="material-icons small grey-text">navigate_next</i></i>
-                        {% endif %}
-                        </span>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-            <div class="card-action row"></div>
-        </div>
-    </div>
-    <div class="col s12 m4 l3">
-        <form action="{% flowurl view.flow_class 'index' %}" method="get" data-pjax-get>
-            <div class="card filters-card" data-control-form>
-                <div class="card-content">
-                    <span class="card-title black-text" style="margin-bottom:20px">Filters</span>
-                    <div id="changelist-filter row">
-                        {% with form_select_empty_label='All' %}
-                        {% form form=view.filter.form %}
-                            {% part form.created label %} <label for="id_created">By create date</label> {% endpart %}
-                        {% endform %}
-                        {% endwith %}
-                    </div>
-                    <div class="s12 right-align">
-                        <button  type="submit" class="btn btn-default">Filter</button>
-                    </div>
-                </div>
-            </div>
-        </form>
-    </div>    
-</div>
-
-{% include 'viewflow/includes/flow_start_actions.html' %}
-
-{% endblock %}
+{% block action_btn %}{% include 'viewflow/includes/flow_start_actions.html' %}{% endblock %}
