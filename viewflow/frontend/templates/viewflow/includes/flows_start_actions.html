@@ -8,34 +8,33 @@
     </a>
 </div>
 
-<div id="start_actions" class="modal">
+<div id="start_actions" class="modal bottom-sheet">
     <div class="modal-content">
         <h4>New Process</h4>
 
-        <table class="bordered">
+        <table>
             <tbody>
                 {% for flow_class, actions in start_actions.items %}
                 {% if actions %}
                 <tr>
                     <td>
-                        <h5>{{ flow_class.process_title }}</h5>
-                        {{ flow_class.process_description|default:"" }}
-                    </td>
-                    <td>
-                        {% for action in actions %}
-                        <a class="btn waves-effect waves-light" onclick="$('#start_actions').closeModal();" href="{% flowurl flow_class action.name ns=request.resolver_match.namespace ns_map=view.ns_map %}?{{ request|query_back:'here' }}">
-                            <i class="left material-icons">add</i>{{ action.task_title|default:action.name|title }}
-                        </a><br/>
-                        {% endfor %}
+                        <div class="left">
+                            <h5>{{ flow_class.process_title }}</h5>
+                            {{ flow_class.process_description|default:"" }}
+                        </div>
+                        <div class="right">
+                            {% for action in actions %}
+                            <a class="btn waves-effect waves-light" onclick="$('#start_actions').closeModal();" href="{% flowurl flow_class action.name ns=request.resolver_match.namespace ns_map=view.ns_map %}?{{ request|query_back:'here' }}">
+                                <i class="left material-icons">add</i>{{ action.task_title|default:action.name|title }}
+                            </a><br/>
+                            {% endfor %}
+                        </div>
                     </td>
                 </tr>
                 {% endif %}
                 {% endfor %}
             </tbody>
         </table>
-    </div>
-    <div class="modal-footer">
-        <a href="#!" class="modal-action modal-close waves-effect btn-flat">Cancel</a>
     </div>
 </div>
 {% endif %}

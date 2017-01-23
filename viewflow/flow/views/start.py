@@ -70,7 +70,11 @@ class StartFlowMixin(MessageUserMixin, BaseStartFlowMixin):
 
 
 class CreateProcessView(StartFlowMixin, generic.UpdateView):
-    """Generic view to create a process."""
+    """
+    Start
+
+    Generic view to create a process.
+    """
 
     def __init__(self, *args, **kwargs):  # noqa D102
         super(CreateProcessView, self).__init__(*args, **kwargs)
