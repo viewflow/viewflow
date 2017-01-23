@@ -147,8 +147,7 @@ class AllTaskListView(FlowListMixin,
                       DataTableMixin,
                       generic.View):
     list_display = [
-        'task_hash', 'description', 'process_summary',
-        'task_type', 'process_url', 'created'
+        'task_hash', 'description', 'process_summary', 'process_url', 'created'
     ]
     template_name = 'viewflow/site_tasks.html'
 
@@ -158,8 +157,11 @@ class AllTaskListView(FlowListMixin,
     task_hash.short_description = "#"
 
     def description(self, task):
+        summary = task.summary()
+        if not summary:
+            summary = task.flow_task
         task_url = frontend_url(self.request, self.get_task_url(task), back_link='here')
-        return mark_safe('<a href="{}">{}</a>'.format(task_url, task.summary()))
+        return mark_safe('<a href="{}">{}</a>'.format(task_url, summary))
 
     def process_summary(self, task):
         return task.flow_process.summary()
@@ -169,9 +171,6 @@ class AllTaskListView(FlowListMixin,
         return mark_safe('<a href="{}">{} #{}</a>'.format(
             process_url, task.process.flow_class.process_title, task.process.pk))
     process_url.short_description = 'Process'
-
-    def task_type(self, task):
-        return task.flow_task
 
     def get_queryset(self):
         """Filtered task list."""
@@ -192,7 +191,7 @@ class AllQueueListView(
         generic.View):
     list_display = [
         'task_hash', 'description', 'process_summary',
-        'task_type', 'process_url', 'created'
+        'process_url', 'created'
     ]
     template_name = 'viewflow/site_queue.html'
 
@@ -202,8 +201,11 @@ class AllQueueListView(
     task_hash.short_description = "#"
 
     def description(self, task):
+        summary = task.summary()
+        if not summary:
+            summary = task.flow_task
         task_url = frontend_url(self.request, self.get_task_url(task), back_link='here')
-        return mark_safe('<a href="{}">{}</a>'.format(task_url, task.summary()))
+        return mark_safe('<a href="{}">{}</a>'.format(task_url, summary))
 
     def process_summary(self, task):
         return task.flow_process.summary()
