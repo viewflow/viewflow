@@ -72,6 +72,9 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
         """Base view for the viewflow frontend."""
         return reverse('viewflow:index')
 
+    def base_template(self):
+        return get_template('viewflow/base_module.html')
+
     def menu(self):
         """Module menu."""
         try:

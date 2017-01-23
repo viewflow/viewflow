@@ -1,36 +1,7 @@
 {% extends 'material/frontend/base_module.html' %}
-{% load static material_frontend viewflow_frontend %}
+{% load static %}
 
 {% block extrahead %}
 <link href="{% static 'viewflow/css/viewflow.css' %}" rel="stylesheet">
-<script src="{% static 'viewflow/js/jquery.selectable-list.js' %}" type="text/javascript"></script>
 <script src="{% static 'viewflow/js/viewflow.js' %}" type="text/javascript"></script>
-{% endblock %}
-
-{% block messages %}
-{% if messages %}
-<script type="text/javascript">
-    $(document).ready(function() {
-        var url_re = /href=\"([:\/\w+\.]+)\"/g
-
-        {% for message in messages %}
-        var message = '{{ message|capfirst }}'.replace(url_re, 'href="$1?{{ request|query_back }}"');
-        Materialize.toast(message, 10000, 'alert-{{ message.tags }}');
-        {% endfor %}
-    });
-</script>
-{% endif %}
-{% endblock %}
-
-{% block sidebar_items %}
-    <li class="heading"><i class="fa fa-univercity"></i>Workflow</li>
-    <li> <a href="{% url 'viewflow:index' %}">All</a></li>
-    <li> <a href="{% url 'viewflow:tasks' %}">My Tasks</a></li>
-    <li> <a href="{% url 'viewflow:queue' %}">Available Tasks</a></li>
-    {% for flow_title, flow_items in module.sideitems %}
-    <li class="heading">{{ flow_title }}</li>
-    {% for link_title, link_url in flow_items %}
-    <li> <a href="{{ link_url }}">{{ link_title }}</a></li>
-    {% endfor %}
-    {% endfor %}
 {% endblock %}
