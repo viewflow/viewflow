@@ -136,21 +136,9 @@ class FlowMetaClass(type):
 
         # view process permission
         process_options = new_class.process_class._meta
-        if hasattr(process_options, 'default_permissions'):
-            # django 1.7
-            for permission in ('view', 'manage'):
-                if permission not in process_options.default_permissions:
-                    process_options.default_permissions += (permission,)
-        else:
-            # django 1.6
-            permissions = (('view_{}'.format(process_options.model_name),
-                            'View {}'.format(process_options.model_name)),
-                           ('manage_{}'.format(process_options.model_name),
-                            'Manage {}'.format(process_options.model_name)))
-
-            for permission in permissions:
-                if permission not in process_options.permissions:
-                    process_options.permissions.append(permission)
+        for permission in ('view', 'manage'):
+            if permission not in process_options.default_permissions:
+                process_options.default_permissions += (permission,)
 
         # done flow setup
         for name, node in nodes.items():

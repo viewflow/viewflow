@@ -169,24 +169,3 @@ class TokenField(models.CharField, metaclass=_SubfieldBase):
         if not isinstance(value, str) and value:
             return value.token
         return super(TokenField, self).get_prep_value(value)
-
-
-try:
-    """
-    Django 1.6 migrations.
-    """
-    from south.modelsinspector import add_introspection_rules
-    add_introspection_rules([], ["^viewflow\.fields\.FlowReferenceField"])
-    add_introspection_rules([(
-        (TaskReferenceField,),
-        [],
-        {'default': ["default", {'ignore_if': 'default'}]}  # HACK always ignore b/c south have no support for callables
-    )], ["^viewflow\.fields\.TaskReferenceField"])
-    add_introspection_rules([(
-        (TokenField,),
-        [],
-        {'default': ["default.token", {}]}
-    )], ["^viewflow\.fields\.TokenField"])
-
-except ImportError:
-    pass

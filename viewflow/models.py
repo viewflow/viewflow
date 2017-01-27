@@ -57,18 +57,6 @@ class AbstractProcess(models.Model):
             return '{} #{}'.format(self.flow_class.process_title, self.pk)
         return "<Process {}> - {}".format(self.pk, self.status)
 
-    def refresh_from_db(self, using=None, fields=None, **kwargs):
-        """Backport for django 1.6."""
-        if hasattr(models.Model, 'refresh_from_db'):
-            super(AbstractProcess, self).refresh_from_db(using=using, fields=fields, **kwargs)
-        else:
-            """
-            django 1.6, only basic fallback
-            """
-            db_instance = self.__class__._default_manager.filter(pk=self.pk).get()
-            for field in self._meta.concrete_fields:
-                setattr(self, field.attname, getattr(db_instance, field.attname))
-
     class Meta:  # noqa D101
         abstract = True
 
@@ -140,18 +128,6 @@ class AbstractTask(models.Model):
                 self.pk,
                 self.status)
         return "<Task {}> - {}".format(self.pk, self.status)
-
-    def refresh_from_db(self, using=None, fields=None, **kwargs):
-        """Backport for django 1.6."""
-        if hasattr(models.Model, 'refresh_from_db'):
-            super(AbstractTask, self).refresh_from_db(using=using, fields=fields, **kwargs)
-        else:
-            """
-            django 1.6, only basic fallback
-            """
-            db_instance = self.__class__._default_manager.filter(pk=self.pk).get()
-            for field in self._meta.concrete_fields:
-                setattr(self, field.attname, getattr(db_instance, field.attname))
 
     class Meta:  # noqa D101
         abstract = True
