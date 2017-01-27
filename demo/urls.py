@@ -22,7 +22,7 @@ class Demo(ModuleMixin):
         index_view = generic.TemplateView.as_view(template_name='demo/index.html')
 
         return frontend.ModuleURLResolver(
-            '^$', [url('^$', index_view, name="index")],
+            '^', [url('^$', index_view, name="index")],
             module=self, app_name='demo', namespace='demo')
 
     def index_url(self):

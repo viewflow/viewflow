@@ -17,7 +17,7 @@
                 <h6>{% if process.finished %}Finished{% else %}in-progresss{% endif %}</h6>
             </div>
             <div class="card-title">{{ process.summary }}</div>
-            <table class="table bordered">
+            <table class="table bordered highlight">
                 <thead>
                     <th>#</th>
                     <th>Description</th>
@@ -39,7 +39,15 @@
                             {{ task.process.id }}/{{ task.id }}
                             {% endif %}
                         </td>
-                        <td>{{ task.summary|default:task.flow_task }}</td>
+                        <td>
+                            {% if task_url %}
+                            <a href="{{ task_url }}?{{ request|query_back:'here_if_none' }}">
+                                {{ task.summary|default:task.flow_task }}
+                            </a>
+                            {% else %}
+                            {{ task.summary|default:task.flow_task }}
+                            {% endif %}
+                        </td>
                         <td>{{ task.owner|default:"" }}</td>
                         <td class="hide-on-small-only">{{ task.created }}</td>
                         <td class="hide-on-small-only">{{ task.finished|default:"" }}</td>
