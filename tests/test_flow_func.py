@@ -1,10 +1,14 @@
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 from django.test import TestCase
 from django.utils.decorators import method_decorator
 
 from viewflow import flow, lock
 from viewflow.activation import STATUS, Context
 from viewflow.base import this
-from viewflow.compat import mock
 from viewflow.activation import FuncActivation
 from viewflow.nodes.handler import HandlerActivation
 

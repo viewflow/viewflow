@@ -1,8 +1,12 @@
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 from django.test import TestCase
 
 from viewflow import activation, flow, lock
 from viewflow.activation import STATUS
-from viewflow.compat import mock
 
 
 class Test(TestCase):

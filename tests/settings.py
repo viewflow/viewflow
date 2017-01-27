@@ -121,35 +121,3 @@ LOCALE_PATHS = (
 # https://docs.djangoproject.com/en/1.6/howto/static-files/
 
 STATIC_URL = '/static/'
-
-
-# Celery
-
-INSTALLED_APPS += ('kombu.transport.django', )
-BROKER_URL = 'django://'
-
-CELERYD_CONCURRENCY = 1
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
-
-CELERY_IMPORTS = [
-    os.path.join(root, filename)[len(BASE_DIR)+1: -3].replace('/', '.')
-    for root, dirs, files in os.walk(os.path.join(BASE_DIR, 'tests'))
-    for filename in files
-    if filename.startswith('test_') and filename.endswith('.py')]
-
-DJKOMBU_POLLING_INTERVAL = 0.05
-
-
-# Jenkins
-
-INSTALLED_APPS = ('django_jenkins',) + INSTALLED_APPS
-
-JENKINS_TASKS = (
-    'django_jenkins.tasks.run_flake8',
-)
-
-PROJECT_APPS = ('viewflow', )
-
-COVERAGE_EXCLUDES = ['tests']

@@ -2,11 +2,6 @@
 from functools import WRAPPER_ASSIGNMENTS, update_wrapper
 
 try:
-    from unittest import mock  # NOQA
-except ImportError:
-    import mock  # NOQA
-
-try:
     from django.utils.module_loading import import_string  # NOQA
 except:
     # django 1.6/1.7

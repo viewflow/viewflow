@@ -25,14 +25,8 @@ setup(
     ],
     install_requires=[
         # viewflow
-        'Django>=1.6',
-        'singledispatch>=3.0',
+        'Django>=1.8',
         'django-fsm>=2.0',
-        'django-filter>=0.10.0',
-        'mock',
-        # viewflow.test
-        'django-webtest',
-        'webtest'
     ],
     packages=['viewflow',
               'viewflow.flow',

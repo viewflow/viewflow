@@ -1,7 +1,11 @@
+try:
+    from unittest import mock
+except ImportError:
+    import mock
+
 from django.test import TestCase
 
 from viewflow import lock
-from viewflow.compat import mock
 from viewflow.activation import STATUS
 from viewflow.flow import If, Switch
 from viewflow.nodes.ifgate import IfActivation
