@@ -6,7 +6,6 @@ from django.db.models.query import QuerySet
 from django.db.models.constants import LOOKUP_SEP
 
 from .activation import STATUS
-from .compat import manager_from_queryset
 from .fields import ClassValueWrapper
 
 
@@ -214,5 +213,5 @@ class TaskQuerySet(QuerySet):
                 yield task
 
 
-ProcessManager = manager_from_queryset(models.Manager, ProcessQuerySet)
-TaskManager = manager_from_queryset(models.Manager, TaskQuerySet)
+ProcessManager = ProcessQuerySet.as_manager()
+TaskManager = TaskQuerySet.as_manager()

@@ -50,11 +50,6 @@ def get_containing_app_data(module):
     return app_config.label, app_config.module.__name__
 
 
-def manager_from_queryset(manager_class, queryset_class, class_name=None):
-    """Return a subclass of your base Manager with a copy of the custom QuerySet methods."""
-    return manager_class.from_queryset(queryset_class, class_name=class_name)
-
-
 def get_all_related_objects(obj):
     """Backward releations to a model."""
     if hasattr(obj._meta, 'get_fields'):

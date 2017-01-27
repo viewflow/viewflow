@@ -5,7 +5,7 @@ from django.template import Template, Context
 from .activation import STATUS
 from .exceptions import FlowRuntimeError
 from .fields import FlowReferenceField, TaskReferenceField, TokenField
-from .managers import ProcessManager, TaskManager, coerce_to_related_instance
+from .managers import ProcessQuerySet, TaskQuerySet, coerce_to_related_instance
 
 
 class AbstractProcess(models.Model):
@@ -17,7 +17,7 @@ class AbstractProcess(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     finished = models.DateTimeField(blank=True, null=True)
 
-    objects = ProcessManager()
+    objects = ProcessQuerySet.as_manager()
 
     @property
     def created_by(self):
@@ -93,7 +93,7 @@ class AbstractTask(models.Model):
     previous = models.ManyToManyField('self', symmetrical=False, related_name='leading')
     token = TokenField(default='start')
 
-    objects = TaskManager()
+    objects = TaskQuerySet.as_manager()
 
     @property
     def flow_process(self):

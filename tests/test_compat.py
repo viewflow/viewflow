@@ -35,23 +35,3 @@ class Test(TestCase):
     def test_get_containing_app_data_none_on_missing(self):
         self.assertEqual(compat.get_containing_app_data('unknown.module'),
                          (None, None))
-
-    def test_manager_from_queryset_succeed(self):
-        class TestQuerySet(QuerySet):
-            def shared_method(self):
-                return 'queryset'
-
-        class TestManager(models.Manager):
-            def manager_only_method(self):
-                return 'manager'
-
-        CustomManager = compat.manager_from_queryset(TestManager, TestQuerySet)
-        self.assertEqual(CustomManager.__name__, 'TestManagerFromTestQuerySet')
-
-        manager = CustomManager()
-        manager.model = Process
-
-        self.assertEqual(manager.shared_method(), 'queryset')
-        self.assertEqual(manager.manager_only_method(), 'manager')
-        self.assertEqual(manager.get_queryset().shared_method(), 'queryset')
-        self.assertFalse(hasattr(manager.get_queryset(), 'manager_only_method'))
