@@ -117,7 +117,7 @@ class FlowListMixin(object):
     def get_flow_namespace(self, flow_class):
         namespace = self.ns_map.get(flow_class)
         if namespace is None:
-            raise FlowRuntimeError("{} are not registred in {}".format(flow_class))
+            raise FlowRuntimeError("{} are not registred in {}".format(flow_class, self))
         if not self.ns_map_absolute:
             return "{}:{}".format(self.request.resolver_match.namespace, namespace)
 

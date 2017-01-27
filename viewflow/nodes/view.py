@@ -86,7 +86,7 @@ class Start(mixins.PermissionMixin, BaseStart):
                 url_name = '{}:{}'.format(namespace, self.name)
                 return reverse(url_name)
 
-        return super(BaseStart, self).get_task_url(task, url_type=url_type, namespace=namespace, **kwargs)
+        return super(Start, self).get_task_url(task, url_type=url_type, namespace=namespace, **kwargs)
 
     def can_execute(self, user, task=None):
         """Check user permission to start a flow."""

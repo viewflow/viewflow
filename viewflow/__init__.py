@@ -93,7 +93,7 @@ class Edge(object):
         return self._edge_class
 
     def __str__(self):
-        return "[%s] %s ---> %s".format(
+        return "[{}] {} ---> {}".format(
             self._edge_class, self._src, self._dst)
 
 

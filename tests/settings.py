@@ -13,8 +13,6 @@ SECRET_KEY = 'ratn!684yf7ewt-%j%afwf7et9c=!oan$=w6#)fn#4u$ie4!as'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-TEMPLATE_DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -70,17 +68,6 @@ class DisableMigrations(object):
 
 MIGRATION_MODULES = DisableMigrations()
 
-
-# Templates
-try:
-    from django.conf.global_settings import TEMPLATE_CONTEXT_PROCESSORS
-    TEMPLATE_CONTEXT_PROCESSORS = list(TEMPLATE_CONTEXT_PROCESSORS) + [
-        'django.core.context_processors.request',
-    ]
-except ImportError:
-    """
-    Ok, on django 1.10
-    """
 
 TEMPLATES = [
     {
