@@ -5,10 +5,11 @@ from django import template
 from django.core.exceptions import ImproperlyConfigured
 from django.core.urlresolvers import reverse
 from django.template.loader import select_template
+from django.utils.module_loading import import_string
 
 from .. import flow
 from ..base import Flow
-from ..compat import get_app_package, import_string, TemplateSyntaxError, TagHelperNode, parse_bits
+from ..compat import get_app_package, TemplateSyntaxError, TagHelperNode, parse_bits
 from ..models import AbstractProcess, AbstractTask
 from ..utils import get_flow_namespace
 from .base import get_model_display_data

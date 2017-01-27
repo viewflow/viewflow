@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from .compat import get_app_package, get_containing_app_data, import_string
+from django.utils.module_loading import import_string
+
+from .compat import get_app_package, get_containing_app_data
 from .exceptions import FlowRuntimeError
 from .token import Token
 

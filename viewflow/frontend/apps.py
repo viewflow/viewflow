@@ -3,11 +3,10 @@ from django.conf.urls import url, include
 from django.core.urlresolvers import reverse
 from django.template import Template, TemplateDoesNotExist
 from django.template.loader import get_template
+from django.utils.module_loading import autodiscover_modules
 
 from material import frontend
 from material.frontend.apps import ModuleMixin
-
-from ..compat import autodiscover_modules
 
 
 class ViewflowFrontendConfig(ModuleMixin, AppConfig):
