@@ -170,7 +170,7 @@ class AllTaskListView(FlowListMixin,
         process_url = frontend_url(self.request, self.get_process_url(task.process), back_link='here')
         return mark_safe('<a href="{}">{} #{}</a>'.format(
             process_url, task.process.flow_class.process_title, task.process.pk))
-    process_url.short_description = 'Process'
+    process_url.short_description = 'Process Summary'
 
     def get_queryset(self):
         """Filtered task list."""
@@ -216,9 +216,6 @@ class AllQueueListView(
             process_url, task.process.flow_class.process_title, task.process.pk))
     process_url.short_description = 'Process'
 
-    def task_type(self, task):
-        return task.flow_task
-
     def get_queryset(self):
         """Filtered task list."""
         queryset = Task.objects.queue(self.flows, self.request.user)
@@ -236,8 +233,8 @@ class AllArchiveListView(FlowListMixin,
                          DataTableMixin,
                          generic.View):
     list_display = [
-        'task_hash', 'task_type', 'description', 'process_summary',
-        'started', 'finished', 'process_url'
+        'task_hash', 'description', 'started',
+        'finished', 'process_title', 'process_summary',
     ]
     template_name = 'viewflow/site_archive.html'
 
@@ -247,20 +244,23 @@ class AllArchiveListView(FlowListMixin,
     task_hash.short_description = "#"
 
     def description(self, task):
+        summary = task.summary()
+        if not summary:
+            summary = task.flow_task
         task_url = frontend_url(self.request, self.get_task_url(task), back_link='here')
-        return mark_safe('<a href="{}">{}</a>'.format(task_url, task.summary()))
+        return mark_safe('<a href="{}">{}</a>'.format(task_url, summary))
 
-    def process_summary(self, task):
-        return task.flow_process.summary()
-
-    def process_url(self, task):
+    def process_title(self, task):
         process_url = frontend_url(self.request, self.get_process_url(task.process), back_link='here')
         return mark_safe('<a href="{}">{} #{}</a>'.format(
-            process_url, task.process.flow_class.process_title, task.process.pk))
-    process_url.short_description = 'Process'
+            process_url, task.flow_task.flow_class.process_title, task.process.pk))
+    process_title.short_description = 'Process'
 
-    def task_type(self, task):
-        return task.flow_task
+    def process_summary(self, task):
+        process_url = frontend_url(self.request, self.get_process_url(task.process), back_link='here')
+        return mark_safe('<a href="{}">{}</a>'.format(
+            process_url, task.flow_process.summary()))
+    process_summary.short_description = 'Summary'
 
     def get_queryset(self):
         """All tasks from all processes assigned to the current user."""
