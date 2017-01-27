@@ -31,10 +31,6 @@ main .row .row {
     .filters-card #changelist-search-button i.material-icons {
       font-size: 18px; }
 
-@media only screen and (min-width: 601px) {
-  .detail-card, .filters-card {
-    margin-left: -10px; } }
-
 .card .pagination {
   padding-top: 15px; }
   .card .pagination > .col {
@@ -47,7 +43,7 @@ main .row .row {
   .detail-card .card-title {
     font-size: 18px;
     text-transform: uppercase;
-    font-weight: 100;
+    font-weight: 300;
     margin-top: -10px; }
   .detail-card .card-content {
     padding: 20px;

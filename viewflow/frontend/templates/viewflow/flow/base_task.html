@@ -11,93 +11,95 @@
 
 
 {% block content %}
-<div class="row">
-    <div class="col s12 m6 l8">
-        <div class="card form-card">
-            <div class="card-content">
-                <div class="card-bend primary center-align {% if activation.task.finished %}disabled{% endif %}">
-                    <h5>{{ activation.flow_class.process_title }}</h5>
-                    <h6>{{ activation.task.flow_task }} #{{ activation.task.process.id }}/{{ activation.task.id }}</h6>
-                </div>
-                <div class="form-title">
-                    {{ activation.task.summary|default:activation.task.flow_task }}
-                </div>
-                <div class="row">
-                    <div class="col s12 m8 l8">
-                        <table class="table">
-                            <tr>
-                                <th width="200px">Description</th>
-                                <td>{{ activation.task.summary|default:activation.task.flow_task }}</td>
-                            </tr>
-                            <tr>
-                                <th>Status</th>
-                                <td>{{ activation.task.status }}</td>
-                            </tr>
-                            <tr>
-                                <th>Created</th>
-                                <td>{{ activation.task.created }}</td>
-                            </tr>
-                            {% if activation.task.started %}
-                            <tr>
-                                <th>Started</th>
-                                <td>{{ activation.task.started|default:"" }}</td>
-                            </tr>
-                            {% endif %}{% if activation.task.finished %}
-                            <tr>
-                                <th>Finished</th>
-                                <td>{{ activation.task.finished|default:"" }}</td>
-                            </tr>
-                            {% endif %}{% if activation.task.owner %}
-                            <tr>
-                                <th>Owner</th>
-                                <td>{{ activation.task.owner|default:"" }}</td>
-                            </tr>
-                            {% endif %}{% if activation.task.owner_permission %}
-                            <tr>
-                                <th>Permission</th>
-                                <td>{{ activation.task.owner_permission|default:"" }}</td>
-                            </tr>
-                            {% endif %}
-                        </table>
-                    </div>
-                    <div class="col s12 m4 l4">
-                        <h5>Previous tasks</h5>
-                        <ul>
-                            {% for prev_task in activation.task.previous.all %}
-                            <li>
-                                <a href="{% flowurl prev_task 'detail' %}">
-                                    {{ prev_task.task_title|default:prev_task.flow_task }} / #{{ prev_task.pk }}
-                                </a> &mdash; {{ prev_task.status }}
-                            </li>
-                            {% empty %}
-                            <li class="grey-text">No previous tasks</li>
-                            {% endfor %}
-                        </ul>
-                        <h5>Next tasks</h5>
-                        <ul>
-                            {% for next_task in activation.task.leading.all %}
-                            <li>
-                                <a href="{% flowurl next_task 'detail' %}">
-                                    {{ next_task.task_title|default:next_task.flow_task }} / #{{ next_task.pk}}
-                                </a> &mdash; {{ next_task.status }}
-                            </li>
-                            {% empty %}
-                            <li class="grey-text">No next tasks</li>
-                            {% endfor %}
-                        </ul>
-                    </div>
-                </div>
+{% block left-panel %}
+<div class="left-panel">
+    <div class="card">
+        <div class="card-content">
+            <div class="card-bend primary center-align hide-on-med-and-down {% if activation.task.finished %}disabled{% endif %}">
+                <h5>{{ activation.flow_class.process_title }}</h5>
+                <h6>{{ activation.task.flow_task }} #{{ activation.task.process.id }}/{{ activation.task.id }}</h6>
             </div>
-            <div class="card-action">
-                {% block task_actions %} {% endblock %}
-                <div style="clear:both"></div>
+            <div class="card-title">
+                {{ activation.task.summary|default:activation.task.flow_task }}
+            </div>
+            <div class="row">
+                <div class="col s12 m8 l8">
+                    <table class="table">
+                        <tr>
+                            <th width="200px">Description</th>
+                            <td>{{ activation.task.summary|default:activation.task.flow_task }}</td>
+                        </tr>
+                        <tr>
+                            <th>Status</th>
+                            <td>{{ activation.task.status }}</td>
+                        </tr>
+                        <tr>
+                            <th>Created</th>
+                            <td>{{ activation.task.created }}</td>
+                        </tr>
+                        {% if activation.task.started %}
+                        <tr>
+                            <th>Started</th>
+                            <td>{{ activation.task.started|default:"" }}</td>
+                        </tr>
+                        {% endif %}{% if activation.task.finished %}
+                        <tr>
+                            <th>Finished</th>
+                            <td>{{ activation.task.finished|default:"" }}</td>
+                        </tr>
+                        {% endif %}{% if activation.task.owner %}
+                        <tr>
+                            <th>Owner</th>
+                            <td>{{ activation.task.owner|default:"" }}</td>
+                        </tr>
+                        {% endif %}{% if activation.task.owner_permission %}
+                        <tr>
+                            <th>Permission</th>
+                            <td>{{ activation.task.owner_permission|default:"" }}</td>
+                        </tr>
+                        {% endif %}
+                    </table>
+                </div>
+                <div class="col s12 m4 l4">
+                    <h5>Previous tasks</h5>
+                    <ul>
+                        {% for prev_task in activation.task.previous.all %}
+                        <li>
+                            <a href="{% flowurl prev_task 'detail' %}">
+                                {{ prev_task.task_title|default:prev_task.flow_task }} / #{{ prev_task.pk }}
+                            </a> &mdash; {{ prev_task.status }}
+                        </li>
+                        {% empty %}
+                        <li class="grey-text">No previous tasks</li>
+                        {% endfor %}
+                    </ul>
+                    <h5>Next tasks</h5>
+                    <ul>
+                        {% for next_task in activation.task.leading.all %}
+                        <li>
+                            <a href="{% flowurl next_task 'detail' %}">
+                                {{ next_task.task_title|default:next_task.flow_task }} / #{{ next_task.pk}}
+                            </a> &mdash; {{ next_task.status }}
+                        </li>
+                        {% empty %}
+                        <li class="grey-text">No next tasks</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col s12 m6 l4">
-        {% include_process_data activation.process %}
+        <div class="card-action">
+            {% block task_actions %} {% endblock %}
+            <div style="clear:both"></div>
+        </div>
     </div>
 </div>
+{% endblock %}
+{% block right-panel %}
+<div class="right-panel">
+    {% include_process_data activation.process %}
+</div>
+{% endblock %}
 
 {% task_management_menu activation request %}
 

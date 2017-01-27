@@ -8,63 +8,61 @@
 {% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col s12 m6 l8">
-        <div class="card form-card">
-            <div class="card-content">
-                <div class="card-bend primary center-align {% if process.finished %}disabled{% endif %}">
-                    <h5>{{ view.flow_class.process_title }}</h5>
-                    <h6>{% if process.finished %}Finished{% else %}in-progresss{% endif %}</h6>
-                </div>
-                <div class="form-title">{{ process.summary }}</div>
-                <table class="table bordered">
-                    <thead>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th>Owner</th>
-                        <th class="span1">Started</th>
-                        <th class="span1">Finished</th>
-                        <th class="span1">Description</th>
-                        <th>Status</th>
-                    </thead>
-                    <tbody>
-                        {% for task in task_list %}
-                        <tr>
-                            <td>
-                                {% flowurl task user=request.user as task_url %}
-                                {% if task_url %}
-                                <a href="{{ task_url }}?{{ request|query_back:'here_if_none' }}">
-                                    {{ task.process.id }}/{{ task.id }}
-                                </a>
-                                {% else %}
+{% block left-panel %}
+<div class="left-panel">
+    <div class="card">
+        <div class="card-content">
+            <div class="card-bend primary center-align hide-on-med-and-down {% if process.finished %}disabled{% endif %}">
+                <h5>{{ view.flow_class.process_title }}</h5>
+                <h6>{% if process.finished %}Finished{% else %}in-progresss{% endif %}</h6>
+            </div>
+            <div class="card-title">{{ process.summary }}</div>
+            <table class="table bordered">
+                <thead>
+                    <th>#</th>
+                    <th>Description</th>
+                    <th>Owner</th>
+                    <th class="hide-on-small-only">Started</th>
+                    <th class="hide-on-small-only">Finished</th>
+                    <th>Status</th>
+                </thead>
+                <tbody>
+                    {% for task in task_list %}
+                    <tr>
+                        <td>
+                            {% flowurl task user=request.user as task_url %}
+                            {% if task_url %}
+                            <a href="{{ task_url }}?{{ request|query_back:'here_if_none' }}">
                                 {{ task.process.id }}/{{ task.id }}
-                                {% endif %}
-                            </td>
-                            <td>{{ task.flow_task }}</td>
-                            <td>{{ task.owner|default:"" }}</td>
-                            <td>{{ task.created }}</td>
-                            <td>{{ task.finished|default:"" }}</td>
-                            <td>{{ task.summary }}</td>
-                            <td>{{ task.status }}</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div class="card-action">
-                <div class="right-align">
-                    {% if view.flow_class.manage_permission_name in perms %}
-                    <a class="btn-flat black-text {% if process.status != 'NEW' %}disabled{% endif %}"
-                       href="{% flowurl process 'action_cancel' %}?{{ request|query_back }}">Cancel</a>
-                    {% endif %}
-                </div>
-            </div>
+                            </a>
+                            {% else %}
+                            {{ task.process.id }}/{{ task.id }}
+                            {% endif %}
+                        </td>
+                        <td>{{ task.summary|default:task.flow_task }}</td>
+                        <td>{{ task.owner|default:"" }}</td>
+                        <td class="hide-on-small-only">{{ task.created }}</td>
+                        <td class="hide-on-small-only">{{ task.finished|default:"" }}</td>
+                        <td>{{ task.status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-action right-align">
+            {% if view.flow_class.manage_permission_name in perms %}
+            <a class="btn-flat black-text {% if process.status != 'NEW' %}disabled{% endif %}"
+               href="{% flowurl process 'action_cancel' %}?{{ request|query_back }}">Cancel</a>
+            {% endif %}
         </div>
     </div>
-    <div class="col s12 m6 l4">
-        {% with hide_active_tasks=True %}
-            {% include_process_data process %}
-        {% endwith %}
-    </div>
 </div>
+{% endblock %}
+{% block right-panel %}
+<div class="right-panel">
+    {% with hide_active_tasks=True %}
+    {% include_process_data process %}
+    {% endwith %}
+</div>
+{% endblock %}
 {% endblock %}
