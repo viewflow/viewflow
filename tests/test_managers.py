@@ -16,7 +16,8 @@ class Test(TestCase):
         self.assertEqual(str(queryset.query).strip(),
                          'SELECT "viewflow_process"."id", "viewflow_process"."flow_class", "viewflow_process"."status",'
                          ' "viewflow_process"."created", "viewflow_process"."finished" FROM "viewflow_process"'
-                         ' WHERE "viewflow_process"."flow_class" = tests/test_managers.ChildFlow')
+                         ' WHERE "viewflow_process"."flow_class" = tests/test_managers.ChildFlow'
+                         ' ORDER BY "viewflow_process"."created" DESC')
 
     def test_process_queryset_cource_for_query(self):
         queryset = managers.ProcessQuerySet(model=Process).coerce_for([ChildFlow])
@@ -32,7 +33,8 @@ class Test(TestCase):
             '       "tests_childprocess"."comment"\n'
             'FROM "viewflow_process"\n'
             'LEFT OUTER JOIN "tests_childprocess" ON ("viewflow_process"."id" = "tests_childprocess"."process_ptr_id")\n'
-            'WHERE "viewflow_process"."flow_class" IN (tests/test_managers.ChildFlow)')
+            'WHERE "viewflow_process"."flow_class" IN (tests/test_managers.ChildFlow)\n'
+            'ORDER BY "viewflow_process"."created" DESC')
 
     def test_process_queryset_coerce_classes(self):
         process1 = Process.objects.create(flow_class=Flow)
