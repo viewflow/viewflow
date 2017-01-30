@@ -137,6 +137,7 @@ class Process(AbstractProcess):
     """Default viewflow Process model."""
 
     class Meta:  # noqa D101
+        ordering = ['-created']
         verbose_name_plural = 'Process list'
 
 
