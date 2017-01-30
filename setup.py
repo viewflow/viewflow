@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='django-viewflow',
-    version='0.10.1',
+    version='0.12.0',
     author='Mikhail Podgurskiy',
     author_email='kmmbvnr@gmail.com',
     description='Reusable workflow library for django',
@@ -34,7 +34,6 @@ setup(
               'viewflow.management',
               'viewflow.migrations',
               'viewflow.nodes',
-              'viewflow.south_migrations',
               'viewflow.templatetags',
               'viewflow.frontend',
               'viewflow.frontend.templatetags'],
