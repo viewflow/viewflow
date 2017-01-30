@@ -7,10 +7,10 @@
 
 
 {% block task_actions %}
-<div class="col s3">
+<div class="left">
     <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">detail</a>
 </div>
-<div class="col s9 right-align">
+<div class="right">
     <form role="form" method="POST" style="display:inline-block">
         {% csrf_token %}
         <button type="submit" name="run_action" class="btn btn-flat">Confirm {{ view.action_name }}</button>
