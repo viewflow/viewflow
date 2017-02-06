@@ -1,6 +1,6 @@
 from copy import copy
 
-from .. import Gateway, Edge, mixins
+from .. import Gateway, Edge, ThisObject, mixins
 from ..activation import Activation, AbstractGateActivation
 
 
@@ -63,6 +63,9 @@ class If(mixins.TaskDescriptionMixin,
     def _resolve(self, resolver):
         self._on_true = resolver.get_implementation(self._on_true)
         self._on_false = resolver.get_implementation(self._on_false)
+
+        if isinstance(self._condition, ThisObject):
+            self._condition = getattr(self.flow_class.instance, self._condition.name)
 
     def Then(self, node):
         """Node activated if condition is True."""
