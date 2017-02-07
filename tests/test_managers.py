@@ -60,7 +60,8 @@ class Test(TestCase):
                          ' "viewflow_task"."finished", "viewflow_task"."token", "viewflow_task"."process_id",'
                          ' "viewflow_task"."owner_id", "viewflow_task"."external_task_id",'
                          ' "viewflow_task"."owner_permission", "viewflow_task"."comments" FROM "viewflow_task"'
-                         ' WHERE "viewflow_task"."flow_task" = tests/test_managers.ChildFlow.start')
+                         ' WHERE "viewflow_task"."flow_task" = tests/test_managers.ChildFlow.start'
+                         ' ORDER BY "viewflow_task"."created" DESC')
 
     def test_task_queryset_cource_for_query(self):
         queryset = managers.TaskQuerySet(model=Task).coerce_for([ChildFlow])
