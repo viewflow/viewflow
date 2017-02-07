@@ -153,3 +153,6 @@ class Task(AbstractTask):
     owner_permission = models.CharField(max_length=255, blank=True, null=True)
 
     comments = models.TextField(blank=True, null=True)
+
+    class Meta:  # noqa D101
+        ordering = ['-created']

@@ -18,9 +18,7 @@ class Migration(migrations.Migration):
                 ('text', models.CharField(max_length=50)),
                 ('approved', models.BooleanField(default=False)),
             ],
-            options={
-                'abstract': False,
-            },
+            options={'verbose_name': 'Hello Request'},
             bases=('viewflow.process',),
         ),
         migrations.CreateModel(

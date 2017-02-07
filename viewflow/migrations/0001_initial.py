@@ -24,9 +24,7 @@ class Migration(migrations.Migration):
                 ('created', models.DateTimeField(auto_now_add=True)),
                 ('finished', models.DateTimeField(blank=True, null=True)),
             ],
-            options={
-                'verbose_name_plural': 'Process list',
-            },
+            options={'ordering': ['-created'], 'verbose_name_plural': 'Process list'},
         ),
         migrations.CreateModel(
             name='Task',
@@ -45,8 +43,6 @@ class Migration(migrations.Migration):
                 ('previous', models.ManyToManyField(to='viewflow.Task', related_name='leading')),
                 ('process', models.ForeignKey(to='viewflow.Process', on_delete=django.db.models.deletion.CASCADE)),
             ],
-            options={
-                'abstract': False,
-            },
+            options={'ordering': ['-created']},
         ),
     ]
