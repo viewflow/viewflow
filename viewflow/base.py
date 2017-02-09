@@ -191,7 +191,8 @@ class Flow(object, metaclass=FlowMetaClass):
 
     @property
     def urls(self):
-        """Build URL patterns list for all flow nodes::
+        """
+        Build URL patterns list for all flow nodes::
 
             urlpatterns = [
                 url(r'^admin/', include('admin.site.urls')),
