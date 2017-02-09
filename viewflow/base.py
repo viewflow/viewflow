@@ -165,9 +165,7 @@ class FlowMetaClass(type):
 
 class Flow(object, metaclass=FlowMetaClass):
     """
-    Base class for flow definition.
-
-    ..code-block:: python
+    Base class for flow definition::
 
         class MyFlow(Flow):
             start = flow.StartFunction().Next(this.end)
@@ -193,9 +191,7 @@ class Flow(object, metaclass=FlowMetaClass):
 
     @property
     def urls(self):
-        """Build URL patterns list for all flow nodes.
-
-        .. code-block:: python
+        """Build URL patterns list for all flow nodes::
 
             urlpatterns = [
                 url(r'^admin/', include('admin.site.urls')),
