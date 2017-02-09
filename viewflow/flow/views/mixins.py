@@ -21,7 +21,7 @@ class FlowViewPermissionMixin(object):
 
     def dispatch(self, *args, **kwargs):  # noqa D102
         self.flow_class = kwargs['flow_class']
-        return permission_required(self.flow_class.instance.view_permission_name)(
+        return permission_required(self.flow_class._meta.view_permission_name)(
             super(FlowViewPermissionMixin, self).dispatch)(*args, **kwargs)
 
 
@@ -30,7 +30,7 @@ class FlowManagePermissionMixin(object):
 
     def dispatch(self, *args, **kwargs):  # noqa D102
         self.flow_class = kwargs['flow_class']
-        return permission_required(self.flow_class.instance.manage_permission_name)(
+        return permission_required(self.flow_class._meta.manage_permission_name)(
             super(FlowManagePermissionMixin, self).dispatch)(*args, **kwargs)
 
 
@@ -40,7 +40,7 @@ class FlowTaskManagePermissionMixin(object):
     def dispatch(self, *args, **kwargs):  # noqa D102
         self.flow_task = kwargs['flow_task']
         self.flow_class = self.flow_task.flow_class
-        return permission_required(self.flow_class.instance.manage_permission_name)(
+        return permission_required(self.flow_class._meta.manage_permission_name)(
             super(FlowTaskManagePermissionMixin, self).dispatch)(*args, **kwargs)
 
 

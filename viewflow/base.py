@@ -58,8 +58,20 @@ class FlowMeta(object):
         return self._nodes_by_name.values()
 
     def node(self, name):
-        """Get node by name."""
+        """Return a node by name."""
         return self._nodes_by_name.get(name, None)
+
+    @property
+    def view_permission_name(self):
+        """Name of the permission to view flow instances."""
+        opts = self.flow_class.process_class._meta
+        return "{}.view_{}".format(opts.app_label, opts.model_name)
+
+    @property
+    def manage_permission_name(self):
+        """Name of the permission to administer flow instances."""
+        opts = self.flow_class.process_class._meta
+        return "{}.manage_{}".format(opts.app_label, opts.model_name)
 
 
 class FlowInstanceDescriptor(object):
@@ -75,7 +87,11 @@ class FlowInstanceDescriptor(object):
 
 
 class FlowMetaClass(type):
-    """Metaclass for all flows."""
+    """The metaclass for all flows.
+
+    Instantiate a flow class singleton, and resolves all flow nodes
+    interlinks.
+    """
 
     def __new__(cls, class_name, bases, attrs):
         """Construct new flow class."""
@@ -151,10 +167,17 @@ class Flow(object, metaclass=FlowMetaClass):
     """
     Base class for flow definition.
 
+    ..code-block: python
+
+        class MyFlow(Flow):
+            start = flow.StartFunction().Next(this.end)
+            end = flow.End()
+
     :keyword process_class: Defines model class for Process
     :keyword task_class: Defines model class for Task
     :keyword management_form_class: Defines form class for task state tracking over GET requests
     :keyword lock_impl: Locking implementation for flow
+    :keyword instance: the singleton instance"
 
     """
 
@@ -170,24 +193,20 @@ class Flow(object, metaclass=FlowMetaClass):
 
     @property
     def urls(self):
-        """Buold urlpatterns list for all flow nodes."""
+        """Build URL patterns list for all flow nodes.
+
+        ..code-block: python
+
+            urlpatterns = [
+                url(r'^admin/', include('admin.site.urls')),
+                MyFlow.instance.urls,
+            ]
+        """
         node_urls = []
         for node in self._meta.nodes():
             node_urls += node.urls()
 
         return url('^', include(node_urls), {'flow_class': self})
-
-    @property
-    def view_permission_name(self):
-        """Name of the permission to view flow instances."""
-        opts = self.process_class._meta
-        return "{}.view_{}".format(opts.app_label, opts.model_name)
-
-    @property
-    def manage_permission_name(self):
-        """Name of the permission to administer flow instances."""
-        opts = self.process_class._meta
-        return "{}.manage_{}".format(opts.app_label, opts.model_name)
 
     def __str__(self):
         return self.process_title

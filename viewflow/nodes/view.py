@@ -312,7 +312,7 @@ class View(mixins.PermissionMixin, BaseView):
             return True
 
         # User have flow management permissions
-        return user.has_perm(self.flow_class.instance.manage_permission_name)
+        return user.has_perm(self.flow_class._meta.manage_permission_name)
 
     def can_execute(self, user, task):
         """Check user premition to execute the task."""

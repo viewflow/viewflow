@@ -64,7 +64,7 @@ class DetailViewMixin(object):
 
     def can_view(self, user, task):
         """Check if user has a view task detail permission."""
-        return user.has_perm(self.flow_class.instance.view_permission_name)
+        return user.has_perm(self.flow_class._meta.view_permission_name)
 
 
 class UndoViewMixin(object):
