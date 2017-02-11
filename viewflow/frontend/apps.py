@@ -1,3 +1,5 @@
+import itertools
+
 from django.apps import AppConfig
 from django.conf.urls import url, include
 from django.core.urlresolvers import reverse
@@ -54,10 +56,19 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
             url('^action/assign/$', views.TasksAssignView.as_view(ns_map=self.ns_map), name="assign"),
         ]
 
-        for flow_class, flow_router in self._registry.items():
-            flow_label = flow_class._meta.app_label
+        app_flows = itertools.groupby(
+            self._registry.items(),
+            lambda item: item[0]._meta.app_label)
+        for app_label, items in app_flows:
+            app_views = []
+            for flow_class, flow_router in items:
+                flow_label = flow_class._meta.flow_label
+                app_views.append(
+                    url('^{}/'.format(flow_label), include(flow_router.urls, namespace=flow_label))
+                )
+
             module_views.append(
-                url('^{}/'.format(flow_label), include(flow_router.urls, namespace=flow_label))
+                url('^{}/'.format(app_label), include(app_views, namespace=app_label))
             )
 
         patterns = [
@@ -85,7 +96,8 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
     def ns_map(self):
         """Mapping flows to registred namespaces."""
         return {
-            flow_class: flow_class._meta.app_label for flow_class, flow_site in self._registry.items()
+            flow_class: "{}:{}".format(flow_class._meta.app_label, flow_class._meta.flow_label)
+            for flow_class, flow_site in self._registry.items()
         }
 
     @property

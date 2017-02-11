@@ -10,7 +10,7 @@
                 <div class="collapsible-body">
                     <ul>
                         {% for title, flow_class in module.sites %}
-                        {% if flow_class.view_permission_name in perms %}
+                        {% if flow_class|view_permission_name in perms %}
                         <li>
                             <a href="{% flowurl flow_class 'index' ns='viewflow' ns_map=current_module.ns_map %}">
                                 {{ title }}
