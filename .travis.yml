@@ -30,3 +30,7 @@ install:
 script:
   - tox -- coverage run --append --branch --source=viewflow manage.py test tests
   - coveralls
+
+branches:
+  only:
+    - master
