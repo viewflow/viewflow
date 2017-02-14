@@ -1,4 +1,5 @@
 """Prevents inconsistent db updates for flow."""
+from __future__ import unicode_literals
 
 import time
 import random
@@ -42,8 +43,7 @@ class SelectForUpdateLock(object):
                 with transaction.atomic():
                     try:
                         process = flow_class.process_class._default_manager.filter(pk=process_pk)
-                        if not process.select_for_update(nowait=self.nowait).exists():
-                            raise DatabaseError('Process not exists')
+                        process.select_for_update(nowait=self.nowait).exists()
                     except DatabaseError:
                         if i != self.attempts - 1:
                             sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
@@ -83,11 +83,8 @@ class CacheLock(object):
             key = 'django-viewflow-lock-{}/{}'.format(flow_class._meta.flow_label, process_pk)
 
             for i in range(self.attempts):
-                process = flow_class.process_class._default_manager.filter(pk=process_pk)
-                if process.exists():
-                    stored = self.cache.add(key, 1, self.expires)
-                    if stored:
-                        break
+                if self.cache.add(key, 1, self.expires):
+                    break
                 if i != self.attempts - 1:
                     sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
                     time.sleep(sleep_time)
