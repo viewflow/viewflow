@@ -13,7 +13,7 @@ class FlowViewSet(object):
     Usage::
 
         urlpatterns = [
-            url(r'/helloworld/', FlowViewSet(HelloWorldFlow).urls)
+            url(r'/helloworld/', include(FlowViewSet(HelloWorldFlow).urls))
         ]
     """
 
