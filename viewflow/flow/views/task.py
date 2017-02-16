@@ -13,7 +13,7 @@ from .mixins import MessageUserMixin
 from .utils import get_next_task_url
 
 
-class BaseFlowViewMixin(object):
+class BaseFlowMixin(object):
     """Mixin for a task views."""
 
     def get_context_data(self, **kwargs):
@@ -21,7 +21,7 @@ class BaseFlowViewMixin(object):
 
         :keyword activation: the task activation instance
         """
-        context = super(BaseFlowViewMixin, self).get_context_data(**kwargs)
+        context = super(BaseFlowMixin, self).get_context_data(**kwargs)
         context['activation'] = self.activation
         return context
 
@@ -64,10 +64,10 @@ class BaseFlowViewMixin(object):
             raise PermissionDenied
 
         self.activation.prepare(request.POST or None)
-        return super(BaseFlowViewMixin, self).dispatch(request, **kwargs)
+        return super(BaseFlowMixin, self).dispatch(request, **kwargs)
 
 
-class FlowViewMixin(MessageUserMixin, BaseFlowViewMixin):
+class FlowMixin(MessageUserMixin, BaseFlowMixin):
     """Mixin for flow views completes activation on a form submit."""
 
     def activation_done(self, *args, **kwargs):
@@ -79,12 +79,15 @@ class FlowViewMixin(MessageUserMixin, BaseFlowViewMixin):
 
     def form_valid(self, *args, **kwargs):
         """If the form is valid, save the associated model and finish the task."""
-        super(FlowViewMixin, self).form_valid(*args, **kwargs)
+        super(FlowMixin, self).form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         return HttpResponseRedirect(self.get_success_url())
 
 
-class UpdateProcessView(FlowViewMixin, generic.UpdateView):
+FlowViewMixin = FlowMixin  # TODO Remove
+
+
+class UpdateProcessView(FlowMixin, generic.UpdateView):
     """Generic view to update a process fields."""
 
     def __init__(self, *args, **kwargs):  # noqa D102
