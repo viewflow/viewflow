@@ -22,6 +22,9 @@ describe all real life business process scenarios. Viewflow helps you
 to build a bpmn diagram in code and keep business logic separate from
 django forms and views code.
 
+.. image:: https://img.shields.io/pypi/v/django-viewflow.svg
+    :target: https://pypi.python.org/pypi/django-viewflow
+
 .. image:: https://travis-ci.org/viewflow/viewflow.svg
    :target: https://travis-ci.org/viewflow/viewflow
 
