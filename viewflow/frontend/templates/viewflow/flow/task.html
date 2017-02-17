@@ -25,7 +25,7 @@
                 </div>
                 {% block task_form %}
                 {% csrf_token %}
-                {% form form=form layout=view.layout %}{% endform %}
+                {% form form=form %}{% endform %}
                 {{ activation.management_form }}
                 {% endblock %}
             </div>

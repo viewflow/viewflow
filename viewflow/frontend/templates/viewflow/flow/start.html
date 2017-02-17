@@ -15,7 +15,7 @@
             <div class="card-content">                   
                 <div class="card-title black-text">{{ activation.flow_class.process_title }} - {{ activation.flow_task.task_title|default:activation.task.flow_task.name|title }}</div>
                 {% csrf_token %}
-                {% form form=form layout=view.layout %} {% endform %}
+                {% form form=form %} {% endform %}
                 {{ activation.management_form }}
             </div>
             <div class="card-action row">
