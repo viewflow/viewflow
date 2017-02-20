@@ -26,7 +26,7 @@ class StartFunction(mixins.TaskDescriptionMixin,
 
            ....
 
-           @flow.flow_start_func
+           @method_decorator(flow.flow_start_func)
            def on_shipment_receive(self, activation, shipment):
                 activation.prepare()
                 activation.process.shipment = shipment
@@ -90,7 +90,7 @@ class Function(mixins.TaskDescriptionMixin,
 
            ....
 
-           @flow.flow_func
+           @method_decorator(flow.flow_func)
            def on_shipment_receive(self, activation, shipment):
                 activation.prepare()
                 activation.done()
