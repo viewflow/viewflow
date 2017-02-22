@@ -116,7 +116,7 @@ class Signal(mixins.TaskDescriptionMixin,
         """Signal handler."""
         if self.task_loader is None:
             if 'task' not in signal_kwargs:
-                raise FlowRuntimeError('{} have no task_loader and got signal without task instance', self.name)
+                raise FlowRuntimeError('{} have no task_loader and got signal without task instance'.format(self.name))
             return self.receiver(sender=sender, **signal_kwargs)
         else:
             task = self.task_loader(self, sender=sender, **signal_kwargs)
