@@ -4,6 +4,7 @@ from .. import Gateway, Edge, mixins
 from ..activation import Activation, AbstractGateActivation
 from ..exceptions import FlowRuntimeError
 from ..token import Token
+from .join import Join
 
 
 class SplitActivation(AbstractGateActivation):
@@ -34,7 +35,12 @@ class SplitActivation(AbstractGateActivation):
         """
         token_source = Token.split_token_source(self.task.token, self.task.pk)
 
-        for n, next_task in enumerate(self.next_tasks, 1):
+        next_tasks = (
+            [task for task in self.next_tasks if not isinstance(task, Join)] +
+            [task for task in self.next_tasks if isinstance(task, Join)]
+        )
+
+        for n, next_task in enumerate(next_tasks, 1):
             next_task.activate(prev_activation=self, token=next(token_source))
 
 
