@@ -250,8 +250,10 @@ class PermissionMixin(object):
                 if codename == self._owner_permission:
                     break
             else:
-                self.flow_class.process_class._meta.permissions.append(
-                    (self._owner_permission, self._owner_permission_help_text))
+                self.flow_class.process_class._meta.permissions = (
+                    tuple(self.flow_class.process_class._meta.permissions) +
+                    ((self._owner_permission, self._owner_permission_help_text), )
+                )
 
             self._owner_permission = '{}.{}'.format(
                 self.flow_class.process_class._meta.app_label,
