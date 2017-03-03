@@ -144,9 +144,9 @@ class FrontendViewSet(object):
     def collect_flows_urls(self):
         result = []
 
+        items = sorted(self.registry.items(), key=lambda item: item[0]._meta.app_label)
         app_flows = itertools.groupby(
-            self.registry.items(),
-            lambda item: item[0]._meta.app_label)
+            items, lambda item: item[0]._meta.app_label)
 
         for app_label, items in app_flows:
             app_views = []
