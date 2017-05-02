@@ -15,10 +15,6 @@
 <div class="left-panel">
     <div class="card">
         <div class="card-content">
-            <div class="card-bend primary center-align hide-on-med-and-down {% if activation.task.finished %}disabled{% endif %}">
-                <h5>{{ activation.flow_class.process_title }}</h5>
-                <h6>{{ activation.task.flow_task }} #{{ activation.task.process.id }}/{{ activation.task.id }}</h6>
-            </div>
             <div class="card-title">
                 {{ activation.task.summary|default:activation.task.flow_task }}
             </div>

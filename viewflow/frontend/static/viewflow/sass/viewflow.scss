@@ -3,124 +3,18 @@ main .row .row {
     margin-right: -0.75rem;
 }
 
-.data-card {
-    overflow:initial;
-
-    .card-title {
-        font-size: 18px;
-        text-transform: uppercase;
-        font-weight: 100;
-        margin-top: -10px;
-    }
+.side-nav li>a>span.badge {
+    min-width: 3rem;
+    padding: 0 6px;
+    margin-left: 14px;
+    text-align: center;
+    font-size: 1rem;
+    line-height: inherit;
+    color: #757575;
+    float: right;
+    box-sizing: border-box;
 }
 
-/* LIST PAGE */
-.filters-card {
-    overflow:initial;
-
-    .card-title {
-        font-size: 18px;
-        text-transform: uppercase;
-        font-weight: 100;
-        margin-top: -10px;
-    }
-
-    .card-content {
-        padding: 20px;
-        padding-top: 10px;
-    }
-
-    a {
-        margin-right: 0;
-    }
-
-
-    #changelist-search-button {
-        z-index:1000;
-        position:absolute;
-        right:15px;
-        top:15px;
-
-        i.material-icons {
-            font-size: 18px;
-        }
-    }
-}
-
-.card .pagination {
-    padding-top: 15px;
-
-    >.col {
-        line-height: 36px;
-    }
-}
-
-
-/* DETAIL PAGE */
-.detail-card {
-    overflow:initial;
-    margin-bottom: 5px;
-
-    .card-title {
-        font-size: 18px;
-        text-transform: uppercase;
-        font-weight: 300;
-        margin-top: -10px;
-    }
-
-    .card-content {
-        padding: 20px;
-        padding-top: 10px;
-    }
-
-    a {
-        margin-right: 0;
-    }
-}
-
-.card .card-bend {
-    position: absolute;
-    right: 0px;
-    top: 0px;
+.side-nav li.active>a>span.badge {
     color: #fff;
-    padding-right: 30px;
-    padding-left: 30px;
-    padding-top: 0px;
-    padding-bottom: 10px;
-    text-transform: uppercase;
-
-    &.disabled {
-        color: #444;
-        background-color: #e0e0e0;
-    }
-
-    h5 {
-        font-size: 0.8rem;
-        line-height: 1rem;
-    }
-
-    h6 {
-        font-size: 0.7rem;
-        line-height: 0.3rem;
-    }
-}
-
-table span.badge {
-    position: relative;
-    right: auto;
-    display: inline-block;
-    width: 60px;
-    font-weight: 300;
-    font-size: 0.8rem;
-    color: #fff;
-    border-radius: 2px;
-    text-transform: uppercase
-}
-
-.card.data-card .card-content table span.badge.badge-high {
-    background-color: #F44336;
-}
-
-.card.data-card .card-content table span.badge.badge-low {
-    background-color: #616161;
 }

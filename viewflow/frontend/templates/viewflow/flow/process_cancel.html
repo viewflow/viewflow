@@ -14,10 +14,6 @@
         <form role="form" method="POST">
             {% csrf_token %}
             <div class="card-content">
-                <div class="card-bend primary center-align hide-on-med-and-down {% if process.finished %}disabled{% endif %}">
-                    <h5>{{ flow_class.process_title }}</h5>
-                    <h6>{% if process.finished %}Finished{% else %}in-progresss{% endif %}</h6>
-                </div>
                 <div class="card-title black-text">Cancel {{ flow_class.process_title }} #{{ process.pk }} and {{ active_tasks|length }} tasks</div>
                 <div class="card-title black-text"><h6>{{ process.summary }}</h6></div>
                 <table class="table bordered">
