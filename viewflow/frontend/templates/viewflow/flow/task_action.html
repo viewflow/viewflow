@@ -7,13 +7,16 @@
 
 
 {% block task_actions %}
-<div class="left">
-    <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">detail</a>
-</div>
-<div class="right">
-    <form role="form" method="POST" style="display:inline-block">
-        {% csrf_token %}
-        <button type="submit" name="run_action" class="btn btn-flat">Confirm {{ view.action_name }}</button>
-    </form>
+<div class="card-action">
+    <div class="left">
+        <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">detail</a>
+    </div>
+    <div class="right">
+        <form role="form" method="POST" style="display:inline-block">
+            {% csrf_token %}
+            <button type="submit" name="run_action" class="btn btn-flat">Confirm {{ view.action_name }}</button>
+        </form>
+    </div>
+    <div style="clear:both"></div>
 </div>
 {% endblock %}

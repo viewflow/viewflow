@@ -6,16 +6,21 @@
 {% endblock %}
 
 
+{% block task_title %}{{ block.super }} :: Assign{% endblock %}
+
 {% block task_actions %}
-<div class="left">
-    <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">detail</a>
-</div>
-<div class="right">
-    <form role="form" method="POST">
-        {% csrf_token %}
-        <button type="submit" name="_continue" class="btn btn-flat hide-on-small-only">Assign and continue on this process</button>
-        <button type="submit" name="_assign" class="btn primary btn-lg">Assign</button>
-    </form>
+<div class="card-action">
+    <div class="left">
+        <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">detail</a>
+    </div>
+    <div class="right">
+        <form role="form" method="POST">
+            {% csrf_token %}
+            <button type="submit" name="_continue" class="btn btn-flat hide-on-small-only">Assign and continue on this process</button>
+            <button type="submit" name="_assign" class="btn primary btn-lg">Assign</button>
+        </form>
+    </div>
+    <div style="clear:both"></div>
 </div>
 {% endblock %}
 

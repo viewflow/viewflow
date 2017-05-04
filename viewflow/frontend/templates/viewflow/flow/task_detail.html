@@ -3,26 +3,31 @@
 
 {% block prevbreadcrumb_class %}class='active'{% endblock %}
 
+{% block task_title %}{{ block.super }} :: Detail{% endblock %}
+
 {% block task_actions %}
-<div class="left">&nbsp;
-    {% if activation.flow_class.manage_permission_name in perms %}
-    <button class="btn btn-flat dropdown-button black-text" href="#" data-activates="task_management_dropdown">Admin<i class="material-icons" style="vertical-align:middle;line-height:15px">arrow_drop_down</i></button>
-    {% endif %}
-</div>
-<div class="right">
-    {% flowurl activation.task 'assign' user=request.user as assign_url %}
-    {% if assign_url %}
-    <a href="{{ assign_url }}?{{ request|query_back }}" class="btn primary white-text">Assign</a>
-    {% endif %}
-
-    {% flowurl activation.task 'unassign' user=request.user as unassign_url %}
-    {% if unassign_url %}
-    <a href="{{ unassign_url }}?{{ request|query_back }}" class="btn red white-text">Unassign</a>
-    {% endif %}
-
-    {% flowurl activation.task 'execute' user=request.user as execute_url %}
-    {% if execute_url %}
-    <a href="{{ execute_url }}?{{ request|query_back }}" class="btn primary white-text">Execute</a>
-    {% endif %}
+<div class="card-action">
+    <div class="left">&nbsp;
+        {% if activation.flow_class.manage_permission_name in perms %}
+        <button class="btn btn-flat dropdown-button black-text" href="#" data-activates="task_management_dropdown">Admin<i class="material-icons" style="vertical-align:middle;line-height:15px">arrow_drop_down</i></button>
+        {% endif %}
+    </div>
+    <div class="right">
+        {% flowurl activation.task 'assign' user=request.user as assign_url %}
+        {% if assign_url %}
+        <a href="{{ assign_url }}?{{ request|query_back }}" class="btn primary white-text">Assign</a>
+        {% endif %}
+        
+        {% flowurl activation.task 'unassign' user=request.user as unassign_url %}
+        {% if unassign_url %}
+        <a href="{{ unassign_url }}?{{ request|query_back }}" class="btn red white-text">Unassign</a>
+        {% endif %}
+        
+        {% flowurl activation.task 'execute' user=request.user as execute_url %}
+        {% if execute_url %}
+        <a href="{{ execute_url }}?{{ request|query_back }}" class="btn primary white-text">Execute</a>
+        {% endif %}
+    </div>
+    <div style="clear:both"></div>
 </div>
 {% endblock %}

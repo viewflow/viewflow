@@ -15,3 +15,10 @@ main .row .row {
 
 .side-nav li.active > a > span.badge {
   color: #fff; }
+
+.task-detail {
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+  padding-top: 1rem; }
+  .task-detail .input-field {
+    margin-top: 0; }
