@@ -8,8 +8,8 @@
 {% block task_actions %}
 <div class="card-action">
     <div class="left">&nbsp;
-        {% if activation.flow_class.manage_permission_name in perms %}
-        <button class="btn btn-flat dropdown-button black-text" href="#" data-activates="task_management_dropdown">Admin<i class="material-icons" style="vertical-align:middle;line-height:15px">arrow_drop_down</i></button>
+        {% if activation.flow_class|manage_permission_name in perms %}
+        <button class="btn btn-flat dropdown-button black-text" href="#" data-activates="task_management_dropdown" data-constrainwidth>Admin<i class="material-icons" style="vertical-align:middle;line-height:15px">arrow_drop_down</i></button>
         {% endif %}
     </div>
     <div class="right">

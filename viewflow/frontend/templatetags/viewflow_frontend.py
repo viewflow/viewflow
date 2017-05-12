@@ -36,6 +36,11 @@ def view_permission_name(flow_class):
 
 
 @register.filter
+def manage_permission_name(flow_class):
+    return flow_class._meta.manage_permission_name
+
+
+@register.filter
 def inbox_count(flows, user):
     """List of tasks assigned for the user."""
     return Task.objects.inbox(flows, user).count()
