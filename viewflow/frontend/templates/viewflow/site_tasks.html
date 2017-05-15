@@ -1,9 +1,9 @@
 {% extends 'material/frontend/views/list.html' %}
 
-{% load viewflow viewflow_frontend material_form %}
+{% load i18n viewflow viewflow_frontend material_form %}
 
 {% block breadcrumbs_items %}
-<a class="active" href="{% url 'viewflow:index' %}">Inbox</a>
+<a class="active" href="{% url 'viewflow:index' %}">{% trans 'Inbox' %}</a>
 {% endblock %}
 
 {% block action_btn %}

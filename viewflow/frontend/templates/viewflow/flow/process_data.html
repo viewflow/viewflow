@@ -1,16 +1,20 @@
-{% load viewflow material_frontend viewflow_frontend %}
+{% load i18n viewflow material_frontend viewflow_frontend %}
 
 {% for root, fields, root_url in process_data %}
 <div class="card detail-card">
     <div class="card-content">
         <span class="card-title">{{ root }} #{{ process.pk }}</span>
         {% if root_url %}
-        <a href="{{ root_url }}" class="card-edit" target="_blank" data-turbolinks="false" style="float:right">(edit)</a>
+        <a href="{{ root_url }}" class="card-edit" target="_blank" data-turbolinks="false" style="float:right">({% trans 'edit' %})</a>
         {% endif %}
         <dl class="dl-horizontal">
             {% for name, value in fields %}
             <dt>{{ name }}:</dt> 
-            <dd>{{ value }}</dd>
+            <dd>
+                {% if value == True %}{% trans 'Yes' %}{% else %}
+                {% if value == False %}{% trans 'No' %}{% else %}
+                {{ value }}{% endif %}{% endif %}
+            </dd>
             {% endfor %}
         </dl>
     </div>
@@ -20,12 +24,12 @@
 <div class="col s12">
     <div class="card detail-card">
         <div class="card-content">
-            <span class="card-title">Active tasks</span>
+            <span class="card-title">{% trans 'Active tasks' %}</span>
             <table>
                 <thead>
                     <tr>
-                        <th>Task</th>
-                        <th>Owner</th>
+                        <th>{% trans 'Task' %}</th>
+                        <th>{% trans 'Owner' %}</th>
                     </tr>
                 </thead>
                 <tbody>

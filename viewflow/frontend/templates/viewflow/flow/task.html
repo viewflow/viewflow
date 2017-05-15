@@ -1,5 +1,5 @@
 {% extends 'viewflow/base_module.html' %}
-{% load viewflow viewflow_frontend material_form material_frontend %}
+{% load i18n viewflow viewflow_frontend material_form material_frontend %}
 
 {% block breadcrumbs_items %}
 {% include 'viewflow/includes/breadcrumb_category.html' %}
@@ -29,11 +29,11 @@
                 <div class="row">
                     {% block task_actions %}
                     <div class="col s3">
-                        <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">detail</a>
+                        <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">{% trans 'Detail' %}</a>
                     </div>
                     <div class="col s9 right-align">
-                        <button type="submit" name="_continue" class="btn btn-flat">Done and continue on this process</button>
-                        <button type="submit" name="_done" class="btn primary white-text btn-flat">Done</button>
+                        <button type="submit" name="_continue" class="btn btn-flat">{% trans 'Done and continue on this process' %}</button>
+                        <button type="submit" name="_done" class="btn primary white-text btn-flat">{% trans 'Done' %}</button>
                     </div>
                     {% endblock %}
                 </div>

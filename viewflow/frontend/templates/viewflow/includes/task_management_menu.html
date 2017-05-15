@@ -1,8 +1,8 @@
-{% load material_frontend %}
+{% load i18n material_frontend %}
 <ul id="task_management_dropdown" class="dropdown-content">
     {% for action_name, action_url in actions %}
-    <li><a href="{{ action_url }}?{{ request|query_back }}" class="black-text">{{ action_name }}</a></li>
+    <li><a href="{{ action_url }}?{{ request|query_back }}" class="black-text">{% trans action_name %}</a></li>
     {% empty %}
-    <li><a class="black-text" style="text-transform:none">No actions available</a></li>
+    <li><a class="black-text" style="text-transform:none">{% trans 'No actions available' %}</a></li>
     {% endfor %}
 </ul>

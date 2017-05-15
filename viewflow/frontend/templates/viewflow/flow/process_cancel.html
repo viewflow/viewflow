@@ -1,5 +1,5 @@
 {% extends 'viewflow/base_module.html' %}
-{% load material_frontend viewflow viewflow_frontend %}
+{% load i18n material_frontend viewflow viewflow_frontend %}
 
 {% block breadcrumbs_items %}
 {% include 'viewflow/includes/breadcrumb_category.html' %}
@@ -14,15 +14,15 @@
         <form role="form" method="POST">
             {% csrf_token %}
             <div class="card-content">
-                <div class="card-title black-text">Cancel {{ flow_class.process_title }} #{{ process.pk }} and {{ active_tasks|length }} tasks</div>
+                <div class="card-title black-text">{% trans 'Cancel' %} {{ flow_class.process_title }} #{{ process.pk }} and {{ active_tasks|length }} tasks</div>
                 <div class="card-title black-text"><h6>{{ process.summary }}</h6></div>
                 <table class="table bordered">
                     <thead>
-                        <th>#</th>
-                        <th>Name</th>
-                        <th >Description</th>
-                        <th class="hide-on-small-only">Started</th>
-                        <th>Status</th>
+                        <th>{% trans '#' %}</th>
+                        <th>{% trans 'Name' %}</th>
+                        <th >{% trans 'Description' %}</th>
+                        <th class="hide-on-small-only">{% trans 'Started' %}</th>
+                        <th>{% trans 'Status' %}</th>
                         <th>&nbsp;</th>
                     </thead>
                     <tbody>
@@ -41,10 +41,10 @@
                             <td>{{ task.flow_task }}</td>
                             <td>{{ task.summary }}</td>
                             <td class="hide-on-small-only">{{ task.created }}</td>
-                            <td> {{ task.status }} </td>
+                            <td> {% trans task.status %} </td>
                             <td>
                                 {% if task in uncancelable_tasks %}
-                                <span class="badge red" style="width:100px">UNCANCELABLE</span>
+                                <span class="badge red" style="width:100px">{% trans 'UNCANCELABLE' %}</span>
                                 {% endif %}
                             </td>
                         </tr>

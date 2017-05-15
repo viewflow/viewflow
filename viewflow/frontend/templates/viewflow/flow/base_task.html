@@ -1,11 +1,11 @@
 {% extends 'viewflow/base_module.html' %}
-{% load viewflow material_frontend viewflow_frontend %}
+{% load i18n viewflow material_frontend viewflow_frontend %}
 
 {% block breadcrumbs_items %}
 {% include 'viewflow/includes/breadcrumb_category.html' %}
 <a href="{% flowurl activation.flow_class 'index' %}?{{ request|query_back }}">{{ activation.flow_class.process_title }}</a>
 <a href="{% flowurl activation.process 'detail' %}?{{ request|query_back }}">#{{ activation.process.pk }}</a>
-<a {% block prevbreadcrumb_class %}{% endblock %} href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">{{ activation.flow_task }} #{{ activation.task.pk }}</a>
+<a {% block prevbreadcrumb_class %}{% endblock %} href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">{{ activation.flow_task.task_title|default:activation.flow_task }} #{{ activation.task.pk }}</a>
 {% block breadcrumbs_items_extra %}{% endblock %}
 {% endblock %}
 
@@ -20,25 +20,25 @@
 <div class="left-panel">
     <div class="card">
         <div class="card-content">
-            <div class="card-title">{% block task_title %}{{ activation.task.flow_task }}{% endblock %}</div>
+            <div class="card-title">{% block task_title %}{{ activation.task.flow_task.task_title|default:activation.task.flow_task }}{% endblock %}</div>
             <div class="task-detail">
                 <div class="row">
                     <div class="input-field col s12">
                         <i class="material-icons prefix">description</i>
                         <input type="text" disabled value="{{ activation.task.summary|default:activation.task.flow_task }}" />
-                        <label class="active">Description</label>
+                        <label class="active">{% trans 'Description' %}</label>
                     </div>
                 </div>
                 <div class="row">
                     <div class="input-field col s4">
                         <i class="material-icons prefix">account_circle</i>
                         <input type="text" disabled value="{{ activation.task.owner|default:'----------' }}" />
-                        <label class="active">Owner</label>
+                        <label class="active">{% trans 'Owner' %}</label>
                     </div>
                     {% if activation.task.owner_permission %}
                     <div class="input-field col s8">
                         <input type="text" disabled value="{{ activation.task.owner_permission }}" />
-                        <label class="active">Permission</label>
+                        <label class="active">{% trans 'Permission' %}</label>
                     </div>
                     {% endif %}
                 </div>            
@@ -46,15 +46,15 @@
                     <div class="input-field col s4">
                         <i class="material-icons prefix">access_time</i>
                         <input type="text" disabled value="{{ activation.task.created }}" />
-                        <label class="active">Created</label>
+                        <label class="active">{% trans 'Created' %}</label>
                     </div>
                     <div class="input-field col s4">
                         <input type="text" disabled value="{{ activation.task.started|default:'----------' }}" />
-                        <label class="active">Started</label>
+                        <label class="active">{% trans 'Started' %}</label>
                     </div>
                     <div class="input-field col s4">
                         <input type="text" disabled value="{{ activation.task.finished|default:'----------' }}" />
-                        <label class="active">Finished</label>
+                        <label class="active">{% trans 'Finished' %}</label>
                     </div>
                 </div>
                 <div class="row" style="margin-top:-1rem">
@@ -62,23 +62,23 @@
                         <div class="left" style="margin-right:1rem;padding-top:1.7rem">
                             <i class="material-icons prefix" style="font-size:2rem">assignment</i>
                         </div>
-                        <label class="active" style="display:block;margin-bottom:0.5rem">Previous tasks</label>
+                        <label class="active" style="display:block;margin-bottom:0.5rem">{% trans 'Previous tasks' %}</label>
                         {% for prev_task in activation.task.previous.all %}
                         <a href="{% flowurl prev_task 'detail' %}">
-                            {{ prev_task.task_title|default:prev_task.flow_task }} / #{{ prev_task.pk }}</a>{% if not forloop.last %},{% endif %}
+                            {{ prev_task.flow_task.task_title|default:prev_task.flow_task }} / #{{ prev_task.pk }}</a>{% if not forloop.last %},{% endif %}
                         {% empty %}
                         ----------
                         {% endfor %}
-                    </div>                    
+                    </div>
                     <div class="col s12 m6">
-                        <label class="active" style="display:block;margin-bottom:0.5rem">Next tasks</label>
+                        <label class="active" style="display:block;margin-bottom:0.5rem">{% trans 'Next tasks' %}</label>
                         {% for next_task in activation.task.leading.all %}
                         <a href="{% flowurl next_task 'detail' %}">
-                            {{ next_task.task_title|default:next_task.flow_task }} / #{{ next_task.pk }}</a>{% if not forloop.last %},{% endif %}
+                            {{ next_task.flow_task.task_title|default:next_task.flow_task }} / #{{ next_task.pk }}</a>{% if not forloop.last %},{% endif %}
                         {% empty %}
                         ----------
                         {% endfor %}
-                    </div>                
+                    </div>
                 </div>
             </div>
         </div>

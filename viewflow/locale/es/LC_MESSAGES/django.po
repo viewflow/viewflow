@@ -1,0 +1,379 @@
+# distributed under the same license as the Viewflow package.
+msgid ""
+msgstr ""
+"Project-Id-Version: viewflow\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-05-09 09:52+0000\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: viewflow/activation.py:33
+msgctxt "STATUS"
+msgid "Assigned"
+msgstr "Asignado"
+
+#: viewflow/activation.py:34
+msgctxt "STATUS"
+msgid "Canceled"
+msgstr "Cancelado"
+
+#: viewflow/activation.py:35
+msgctxt "STATUS"
+msgid "Done"
+msgstr "Hecho"
+
+#: viewflow/activation.py:36
+msgctxt "STATUS"
+msgid "Error"
+msgstr "Error"
+
+#: viewflow/activation.py:37
+msgctxt "STATUS"
+msgid "New"
+msgstr "Nuevo"
+
+#: viewflow/activation.py:38
+msgctxt "STATUS"
+msgid "Prepared"
+msgstr "Preparado"
+
+#: viewflow/activation.py:39
+msgctxt "STATUS"
+msgid "Scheduled"
+msgstr "Programado"
+
+#: viewflow/activation.py:40
+msgctxt "STATUS"
+msgid "Started"
+msgstr "Empezado"
+
+#: viewflow/activation.py:41
+msgctxt "STATUS"
+msgid "Unripe"
+msgstr ""
+
+#: viewflow/flow/views/actions.py:114
+msgid "Undo"
+msgstr "Deshacer"
+
+#: viewflow/flow/views/actions.py:123
+#, python-brace-format
+msgid "Task {task} has been undone."
+msgstr "Se ha deshecho task {task}."
+
+#: viewflow/flow/views/actions.py:130
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:17
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:59
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: viewflow/flow/views/actions.py:139
+#, python-brace-format
+msgid "Task {task} has been canceled."
+msgstr "Se ha cancelado la tarea {task}."
+
+#: viewflow/flow/views/actions.py:146
+msgid "Perform"
+msgstr "Realizar"
+
+#: viewflow/flow/views/actions.py:162
+msgid "Activate Next"
+msgstr "Activar siguientes"
+
+#: viewflow/flow/views/actions.py:252
+#, python-brace-format
+msgid "Process {process} can not be canceled."
+msgstr "El proceso {process} no se puede cancelar."
+
+#: viewflow/flow/views/actions.py:257
+#, python-brace-format
+msgid "Process {process} has been canceled."
+msgstr "El proceso {process} ha sido cancelado."
+
+#: viewflow/flow/views/start.py:64
+#, python-brace-format
+msgid "Process {process} has been started."
+msgstr "Se ha iniciado process {process}."
+
+#: viewflow/flow/views/task.py:59
+#, python-brace-format
+msgid "Task {task} cannot be executed."
+msgstr "La tarea {task} no se puede ejecutar."
+
+#: viewflow/flow/views/task.py:77
+#, python-brace-format
+msgid "Task {task} has been completed."
+msgstr "Se ha completado la tarea {task}."
+
+#: viewflow/flow/views/task.py:79
+#, python-brace-format
+msgid "Process {process} has been completed."
+msgstr "El proceso {process} se ha completado."
+
+#: viewflow/flow/views/task.py:173
+#, python-brace-format
+msgid "Task {task} has been assigned"
+msgstr "Se ha asignado la tarea {task}"
+
+#: viewflow/flow/views/task.py:187
+#, python-brace-format
+msgid "Task {task} cannot be assigned to you"
+msgstr "No se puede asignar la tarea {task}"
+
+#: viewflow/flow/views/task.py:212
+#, python-brace-format
+msgid "Task {task} has been unassigned."
+msgstr "La tarea {task} no ha sido asignada."
+
+#: viewflow/frontend/apps.py:18
+msgid "Workflow"
+msgstr "Flujo de trabajo"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:29
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:23
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:19
+#: viewflow/frontend/templates/viewflow/site_task_action.html:16
+msgid "Description"
+msgstr "Descripción"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:36
+#: viewflow/frontend/templates/viewflow/flow/process_data.html:32
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:20
+#: viewflow/models.py:156
+msgid " Owner"
+msgstr "Propietario"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:41
+#: viewflow/models.py:158
+msgid "Permission"
+msgstr "Permiso"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:49
+#: viewflow/models.py:18 viewflow/models.py:79
+msgid "Created"
+msgstr "Creado"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:53
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:24
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:21
+#: viewflow/frontend/templates/viewflow/flow/queue.html:13
+#: viewflow/models.py:80
+msgid "Started"
+msgstr "Empezado"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:57
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:22
+#: viewflow/frontend/templates/viewflow/flow/queue.html:14
+#: viewflow/models.py:19 viewflow/models.py:81
+msgid "Finished"
+msgstr "Terminado"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:65
+msgid "Previous tasks"
+msgstr "Tareas anteriores"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:74
+msgid "Next tasks"
+msgstr "Próximas tareas"
+
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:21
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:18
+#: viewflow/frontend/templates/viewflow/flow/queue.html:11
+#: viewflow/frontend/templates/viewflow/site_task_action.html:15
+#: viewflow/frontend/views.py:157 viewflow/frontend/views.py:203
+#: viewflow/frontend/views.py:248
+msgid "#"
+msgstr ""
+
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:22
+#: viewflow/frontend/templates/viewflow/flow/queue.html:12
+msgid "Name"
+msgstr "Nombre"
+
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:25
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:23
+#: viewflow/frontend/templates/viewflow/flow/queue.html:16
+#: viewflow/models.py:16 viewflow/models.py:77
+msgid "Status"
+msgstr "Estado"
+
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:47
+msgid "UNCANCELABLE"
+msgstr "INCONDICIONAL"
+
+#: viewflow/frontend/templates/viewflow/flow/process_data.html:8
+msgid "edit"
+msgstr "editar"
+
+#: viewflow/frontend/templates/viewflow/flow/process_data.html:14
+msgid "Yes"
+msgstr "Sí"
+
+#: viewflow/frontend/templates/viewflow/flow/process_data.html:15
+msgid "No"
+msgstr "No"
+
+#: viewflow/frontend/templates/viewflow/flow/process_data.html:27
+msgid "Active tasks"
+msgstr "Tareas activas"
+
+#: viewflow/frontend/templates/viewflow/flow/process_data.html:31
+#: viewflow/models.py:75 viewflow/models.py:163
+msgid "Task"
+msgstr "Tarea"
+
+#: viewflow/frontend/templates/viewflow/flow/queue.html:7
+msgid "Queue"
+msgstr "Cola"
+
+#: viewflow/frontend/templates/viewflow/flow/queue.html:15
+#: viewflow/frontend/templates/viewflow/site_task_action.html:18
+#: viewflow/frontend/views.py:262 viewflow/models.py:145 viewflow/models.py:152
+msgid "Process"
+msgstr "Proceso"
+
+#: viewflow/frontend/templates/viewflow/flow/start.html:23
+msgid "Start and continue on this process"
+msgstr "Comenzar y continuar en este proceso"
+
+#: viewflow/frontend/templates/viewflow/flow/start.html:24
+msgid "Start"
+msgstr "Comienzo"
+
+#: viewflow/frontend/templates/viewflow/flow/task.html:32
+#: viewflow/frontend/templates/viewflow/flow/task_action.html:12
+#: viewflow/frontend/templates/viewflow/flow/task_assign.html:14
+#: viewflow/frontend/templates/viewflow/flow/task_detail.html:6
+#: viewflow/frontend/templates/viewflow/flow/task_unassign.html:13
+msgid "Detail"
+msgstr "Detalle"
+
+#: viewflow/frontend/templates/viewflow/flow/task.html:35
+msgid "Done and continue on this process"
+msgstr "Hecho y continuar en este proceso"
+
+#: viewflow/frontend/templates/viewflow/flow/task.html:36
+msgid "Done"
+msgstr "Hecho"
+
+#: viewflow/frontend/templates/viewflow/flow/task_action.html:17
+#: viewflow/frontend/templates/viewflow/flow/task_unassign.html:18
+#: viewflow/frontend/templates/viewflow/site_task_action.html:6
+msgid "Confirm"
+msgstr "Confirmar"
+
+#: viewflow/frontend/templates/viewflow/flow/task_assign.html:5
+#: viewflow/frontend/templates/viewflow/flow/task_assign.html:9
+#: viewflow/frontend/templates/viewflow/flow/task_assign.html:20
+#: viewflow/frontend/templates/viewflow/flow/task_detail.html:18
+msgid "Assign"
+msgstr "Asignar"
+
+#: viewflow/frontend/templates/viewflow/flow/task_assign.html:19
+msgid "Assign and continue on this process"
+msgstr "Asignar y continuar en este proceso"
+
+#: viewflow/frontend/templates/viewflow/flow/task_detail.html:12
+msgid "Administration"
+msgstr "Administración"
+
+#: viewflow/frontend/templates/viewflow/flow/task_detail.html:23
+#: viewflow/frontend/templates/viewflow/flow/task_unassign.html:5
+#: viewflow/frontend/templates/viewflow/flow/task_unassign.html:8
+msgid "Unassign"
+msgstr "Cancelar la asignación"
+
+#: viewflow/frontend/templates/viewflow/flow/task_detail.html:28
+msgid "Execute"
+msgstr "Ejecutar"
+
+#: viewflow/frontend/templates/viewflow/includes/breadcrumb_category.html:2
+#: viewflow/frontend/templates/viewflow/menu.html:3
+#: viewflow/frontend/templates/viewflow/site_tasks.html:6
+msgid "Inbox"
+msgstr "Entrante"
+
+#: viewflow/frontend/templates/viewflow/includes/breadcrumb_category.html:3
+#: viewflow/frontend/templates/viewflow/menu.html:4
+#: viewflow/frontend/templates/viewflow/site_queue.html:6
+msgid "Unassigned"
+msgstr "Sin asignar"
+
+#: viewflow/frontend/templates/viewflow/includes/breadcrumb_category.html:4
+#: viewflow/frontend/templates/viewflow/menu.html:5
+#: viewflow/frontend/templates/viewflow/site_archive.html:5
+msgid "Participated"
+msgstr "Participado"
+
+#: frontend/templates/viewflow/includes/flows_start_actions.html:13
+msgid "New process"
+msgstr "Nuevo proceso"
+
+#: viewflow/frontend/templates/viewflow/includes/task_management_menu.html:6
+msgid "No actions available"
+msgstr "No hay acciones disponibles"
+
+#: viewflow/frontend/templates/viewflow/menu.html:9
+msgid "Processes"
+msgstr "Procesos"
+
+#: viewflow/frontend/templates/viewflow/site_task_action.html:17
+msgid "Summary"
+msgstr "Resumen"
+
+#: viewflow/frontend/templates/viewflow/site_task_action.html:29
+msgid "No task selected"
+msgstr "Ninguna tarea seleccionada"
+
+#: viewflow/frontend/views.py:165 viewflow/frontend/views.py:211
+#: viewflow/frontend/views.py:256
+msgid "Task Description"
+msgstr "Descripción de la tarea"
+
+#: viewflow/frontend/views.py:169 viewflow/frontend/views.py:215
+#: viewflow/frontend/views.py:268
+msgid "Process Summary"
+msgstr "Resumen del proceso"
+
+#: viewflow/frontend/views.py:175 viewflow/frontend/views.py:221
+msgid "Process URL"
+msgstr "URL del proceso"
+
+#: viewflow/frontend/views.py:316
+msgid "Active Tasks"
+msgstr "Tareas activas"
+
+#: viewflow/models.py:15
+msgid "Flow"
+msgstr "Fluir"
+
+#: viewflow/models.py:76
+msgid "Type"
+msgstr "Tipo"
+
+#: viewflow/models.py:82
+msgid "Previous"
+msgstr "Anterior"
+
+#: viewflow/models.py:83
+msgid "Token"
+msgstr "Simbólico"
+
+#: viewflow/models.py:146
+msgid "Process list"
+msgstr "Lista de procesos"
+
+#: viewflow/models.py:157
+msgid "External Task ID"
+msgstr "ID de tarea externa"
+
+#: viewflow/models.py:160
+msgid "Comments"
+msgstr "Comentarios"
+
+#: viewflow/models.py:164
+msgid "Tasks"
+msgstr "Tareas"

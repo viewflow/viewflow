@@ -1,19 +1,19 @@
 {% extends 'viewflow/base.html' %}
-{% load viewflow %}
+{% load i18n viewflow %}
 
 {% block title %}{{ block.super}} | {{ flow_class.process_title }}{% endblock %}
 
 {% block content %}
-<h1>{{ flow_class.process_title }} queue</h1>
+<h1>{{ flow_class.process_title }} {% trans 'Queue' %}</h1>
 
 <table class="table bordered">
     <thead>
-        <th>#</th>
-        <th>Name</th>
-        <th class="span1">Started</th>
-        <th class="span1">Finished</th>
-        <th>Process</th>
-        <th>Status</th>
+        <th>{% trans '#' %}</th>
+        <th>{% trans 'Name' %}</th>
+        <th class="span1">{% trans 'Started' %}</th>
+        <th class="span1">{% trans 'Finished' %}</th>
+        <th>{% trans 'Process' %}</th>
+        <th>{% trans 'Status' %}</th>
     </thead>
     <tbody>
         {% for task in queue %}
@@ -23,7 +23,7 @@
             <td>{{ task.created }}</td>
             <td>{{ task.finished|default:"" }}</td>
             <td><a href="{% flowurl task.process 'detail' %}">{{ task.process }}</td>
-            <td>{{ task.get_status_display }}</td>
+            <td>{% trans task.status %}</td>
         </tr>
         {% endfor %}
     </tbody>

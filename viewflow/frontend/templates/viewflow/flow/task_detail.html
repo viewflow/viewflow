@@ -1,31 +1,31 @@
 {% extends 'viewflow/flow/base_task.html' %}
-{% load viewflow material_frontend viewflow_frontend %}
+{% load i18n viewflow material_frontend viewflow_frontend %}
 
 {% block prevbreadcrumb_class %}class='active'{% endblock %}
 
-{% block task_title %}{{ block.super }} :: Detail{% endblock %}
+{% block task_title %}{{ block.super }} :: {% trans 'Detail' %}{% endblock %}
 
 {% block task_actions %}
 <div class="card-action">
-    <div class="left">&nbsp;
+    <div class="left" style="margin-left:-20px">&nbsp;
         {% if activation.flow_class|manage_permission_name in perms %}
-        <button class="btn btn-flat dropdown-button black-text" href="#" data-activates="task_management_dropdown" data-constrainwidth>Admin<i class="material-icons" style="vertical-align:middle;line-height:15px">arrow_drop_down</i></button>
+        <button class="btn btn-flat dropdown-button black-text" href="#" data-activates="task_management_dropdown" data-constrainwidth>{% trans 'Administration' %}<i class="material-icons" style="vertical-align:middle;line-height:15px">arrow_drop_down</i></button>
         {% endif %}
     </div>
     <div class="right">
         {% flowurl activation.task 'assign' user=request.user as assign_url %}
         {% if assign_url %}
-        <a href="{{ assign_url }}?{{ request|query_back }}" class="btn primary white-text">Assign</a>
+        <a href="{{ assign_url }}?{{ request|query_back }}" class="btn primary white-text">{% trans 'Assign' %}</a>
         {% endif %}
-        
+
         {% flowurl activation.task 'unassign' user=request.user as unassign_url %}
         {% if unassign_url %}
-        <a href="{{ unassign_url }}?{{ request|query_back }}" class="btn red white-text">Unassign</a>
+        <a href="{{ unassign_url }}?{{ request|query_back }}" class="btn red white-text">{% trans 'Unassign' %}</a>
         {% endif %}
-        
+
         {% flowurl activation.task 'execute' user=request.user as execute_url %}
         {% if execute_url %}
-        <a href="{{ execute_url }}?{{ request|query_back }}" class="btn primary white-text">Execute</a>
+        <a href="{{ execute_url }}?{{ request|query_back }}" class="btn primary white-text">{% trans 'Execute' %}</a>
         {% endif %}
     </div>
     <div style="clear:both"></div>

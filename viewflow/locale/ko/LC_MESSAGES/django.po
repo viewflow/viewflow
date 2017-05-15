@@ -1,0 +1,379 @@
+# distributed under the same license as the Viewflow package.
+msgid ""
+msgstr ""
+"Project-Id-Version: viewflow\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-05-09 09:52+0000\n"
+"Language: ko\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: viewflow/activation.py:33
+msgctxt "STATUS"
+msgid "Assigned"
+msgstr "할당 됨"
+
+#: viewflow/activation.py:34
+msgctxt "STATUS"
+msgid "Canceled"
+msgstr "취소 된"
+
+#: viewflow/activation.py:35
+msgctxt "STATUS"
+msgid "Done"
+msgstr "끝난"
+
+#: viewflow/activation.py:36
+msgctxt "STATUS"
+msgid "Error"
+msgstr "오류"
+
+#: viewflow/activation.py:37
+msgctxt "STATUS"
+msgid "New"
+msgstr "새로운"
+
+#: viewflow/activation.py:38
+msgctxt "STATUS"
+msgid "Prepared"
+msgstr "준비된"
+
+#: viewflow/activation.py:39
+msgctxt "STATUS"
+msgid "Scheduled"
+msgstr "예정"
+
+#: viewflow/activation.py:40
+msgctxt "STATUS"
+msgid "Started"
+msgstr "시작됨"
+
+#: viewflow/activation.py:41
+msgctxt "STATUS"
+msgid "Unripe"
+msgstr "설득력없는"
+
+#: viewflow/flow/views/actions.py:114
+msgid "Undo"
+msgstr "끄르다"
+
+#: viewflow/flow/views/actions.py:123
+#, python-brace-format
+msgid "Task {task} has been undone."
+msgstr "작업 {task}이 취소되었습니다."
+
+#: viewflow/flow/views/actions.py:130
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:17
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:59
+msgid "Cancel"
+msgstr "취소"
+
+#: viewflow/flow/views/actions.py:139
+#, python-brace-format
+msgid "Task {task} has been canceled."
+msgstr "작업 {task}이 취소되었습니다."
+
+#: viewflow/flow/views/actions.py:146
+msgid "Perform"
+msgstr "행하다"
+
+#: viewflow/flow/views/actions.py:162
+msgid "Activate Next"
+msgstr "다음 활성화"
+
+#: viewflow/flow/views/actions.py:252
+#, python-brace-format
+msgid "Process {process} can not be canceled."
+msgstr "프로세스 {process}을 취소 할 수 없습니다."
+
+#: viewflow/flow/views/actions.py:257
+#, python-brace-format
+msgid "Process {process} has been canceled."
+msgstr "{process} 프로세스가 취소되었습니다."
+
+#: viewflow/flow/views/start.py:64
+#, python-brace-format
+msgid "Process {process} has been started."
+msgstr "프로세스 {process}가 시작되었습니다."
+
+#: viewflow/flow/views/task.py:59
+#, python-brace-format
+msgid "Task {task} cannot be executed."
+msgstr "작업 {task}을 (를) 실행할 수 없습니다."
+
+#: viewflow/flow/views/task.py:77
+#, python-brace-format
+msgid "Task {task} has been completed."
+msgstr "작업 {task}이 완료되었습니다."
+
+#: viewflow/flow/views/task.py:79
+#, python-brace-format
+msgid "Process {process} has been completed."
+msgstr "프로세스 {process}가 완료되었습니다."
+
+#: viewflow/flow/views/task.py:173
+#, python-brace-format
+msgid "Task {task} has been assigned"
+msgstr "작업 {task}이 할당되었습니다."
+
+#: viewflow/flow/views/task.py:187
+#, python-brace-format
+msgid "Task {task} cannot be assigned to you"
+msgstr "작업 {task}을 할당 할 수 없습니다."
+
+#: viewflow/flow/views/task.py:212
+#, python-brace-format
+msgid "Task {task} has been unassigned."
+msgstr "작업 {task}이 (가) 할당 해제되었습니다."
+
+#: viewflow/frontend/apps.py:18
+msgid "Workflow"
+msgstr "워크 플로"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:29
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:23
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:19
+#: viewflow/frontend/templates/viewflow/site_task_action.html:16
+msgid "Description"
+msgstr "기술"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:36
+#: viewflow/frontend/templates/viewflow/flow/process_data.html:32
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:20
+#: viewflow/models.py:156
+msgid "Owner"
+msgstr "소유자"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:41
+#: viewflow/models.py:158
+msgid "Permission"
+msgstr "허가"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:49
+#: viewflow/models.py:18 viewflow/models.py:79
+msgid "Created"
+msgstr "만들어진"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:53
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:24
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:21
+#: viewflow/frontend/templates/viewflow/flow/queue.html:13
+#: viewflow/models.py:80
+msgid "Started"
+msgstr "시작됨"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:57
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:22
+#: viewflow/frontend/templates/viewflow/flow/queue.html:14
+#: viewflow/models.py:19 viewflow/models.py:81
+msgid "Finished"
+msgstr "끝마친"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:65
+msgid "Previous tasks"
+msgstr "이전 작업"
+
+#: viewflow/frontend/templates/viewflow/flow/base_task.html:74
+msgid "Next tasks"
+msgstr "다음 작업들"
+
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:21
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:18
+#: viewflow/frontend/templates/viewflow/flow/queue.html:11
+#: viewflow/frontend/templates/viewflow/site_task_action.html:15
+#: viewflow/frontend/views.py:157 viewflow/frontend/views.py:203
+#: viewflow/frontend/views.py:248
+msgid "#"
+msgstr ""
+
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:22
+#: viewflow/frontend/templates/viewflow/flow/queue.html:12
+msgid "Name"
+msgstr "이름"
+
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:25
+#: viewflow/frontend/templates/viewflow/flow/process_detail.html:23
+#: viewflow/frontend/templates/viewflow/flow/queue.html:16
+#: viewflow/models.py:16 viewflow/models.py:77
+msgid "Status"
+msgstr "지위"
+
+#: viewflow/frontend/templates/viewflow/flow/process_cancel.html:47
+msgid "UNCANCELABLE"
+msgstr "취소 불가"
+
+#: viewflow/frontend/templates/viewflow/flow/process_data.html:8
+msgid "edit"
+msgstr "편집하다"
+
+#: viewflow/frontend/templates/viewflow/flow/process_data.html:14
+msgid "Yes"
+msgstr "예"
+
+#: viewflow/frontend/templates/viewflow/flow/process_data.html:15
+msgid "No"
+msgstr "아니"
+
+#: viewflow/frontend/templates/viewflow/flow/process_data.html:27
+msgid "Active tasks"
+msgstr "활성 작업"
+
+#: viewflow/frontend/templates/viewflow/flow/process_data.html:31
+#: viewflow/models.py:75 viewflow/models.py:163
+msgid "Task"
+msgstr "태스크"
+
+#: viewflow/frontend/templates/viewflow/flow/queue.html:7
+msgid "Queue"
+msgstr "열"
+
+#: viewflow/frontend/templates/viewflow/flow/queue.html:15
+#: viewflow/frontend/templates/viewflow/site_task_action.html:18
+#: viewflow/frontend/views.py:262 viewflow/models.py:145 viewflow/models.py:152
+msgid "Process"
+msgstr "방법"
+
+#: viewflow/frontend/templates/viewflow/flow/start.html:23
+msgid "Start and continue on this process"
+msgstr "이 과정을 시작하고 계속하십시오."
+
+#: viewflow/frontend/templates/viewflow/flow/start.html:24
+msgid "Start"
+msgstr "스타트"
+
+#: viewflow/frontend/templates/viewflow/flow/task.html:32
+#: viewflow/frontend/templates/viewflow/flow/task_action.html:12
+#: viewflow/frontend/templates/viewflow/flow/task_assign.html:14
+#: viewflow/frontend/templates/viewflow/flow/task_detail.html:6
+#: viewflow/frontend/templates/viewflow/flow/task_unassign.html:13
+msgid "Detail"
+msgstr "세부 묘사"
+
+#: viewflow/frontend/templates/viewflow/flow/task.html:35
+msgid "Done and continue on this process"
+msgstr "이 과정을 완료하고 계속하기"
+
+#: viewflow/frontend/templates/viewflow/flow/task.html:36
+msgid "Done"
+msgstr "끝난"
+
+#: viewflow/frontend/templates/viewflow/flow/task_action.html:17
+#: viewflow/frontend/templates/viewflow/flow/task_unassign.html:18
+#: viewflow/frontend/templates/viewflow/site_task_action.html:6
+msgid "Confirm"
+msgstr "확인"
+
+#: viewflow/frontend/templates/viewflow/flow/task_assign.html:5
+#: viewflow/frontend/templates/viewflow/flow/task_assign.html:9
+#: viewflow/frontend/templates/viewflow/flow/task_assign.html:20
+#: viewflow/frontend/templates/viewflow/flow/task_detail.html:18
+msgid "Assign"
+msgstr "양수인"
+
+#: viewflow/frontend/templates/viewflow/flow/task_assign.html:19
+msgid "Assign and continue on this process"
+msgstr "이 프로세스에 할당하고 계속하기"
+
+#: viewflow/frontend/templates/viewflow/flow/task_detail.html:12
+msgid "Administration"
+msgstr "관리"
+
+#: viewflow/frontend/templates/viewflow/flow/task_detail.html:23
+#: viewflow/frontend/templates/viewflow/flow/task_unassign.html:5
+#: viewflow/frontend/templates/viewflow/flow/task_unassign.html:8
+msgid "Unassign"
+msgstr "할당 해제"
+
+#: viewflow/frontend/templates/viewflow/flow/task_detail.html:28
+msgid "Execute"
+msgstr "실행"
+
+#: viewflow/frontend/templates/viewflow/includes/breadcrumb_category.html:2
+#: viewflow/frontend/templates/viewflow/menu.html:3
+#: viewflow/frontend/templates/viewflow/site_tasks.html:6
+msgid "Inbox"
+msgstr "받은 편지함"
+
+#: viewflow/frontend/templates/viewflow/includes/breadcrumb_category.html:3
+#: viewflow/frontend/templates/viewflow/menu.html:4
+#: viewflow/frontend/templates/viewflow/site_queue.html:6
+msgid "Unassigned"
+msgstr "할당되지 않은"
+
+#: viewflow/frontend/templates/viewflow/includes/breadcrumb_category.html:4
+#: viewflow/frontend/templates/viewflow/menu.html:5
+#: viewflow/frontend/templates/viewflow/site_archive.html:5
+msgid "Participated"
+msgstr "참가"
+
+#: frontend/templates/viewflow/includes/flows_start_actions.html:13
+msgid "New process"
+msgstr "새로운 프로세스"
+
+#: viewflow/frontend/templates/viewflow/includes/task_management_menu.html:6
+msgid "No actions available"
+msgstr "사용할 수있는 작업이 없습니다."
+
+#: viewflow/frontend/templates/viewflow/menu.html:9
+msgid "Processes"
+msgstr "프로세스"
+
+#: viewflow/frontend/templates/viewflow/site_task_action.html:17
+msgid "Summary"
+msgstr "개요"
+
+#: viewflow/frontend/templates/viewflow/site_task_action.html:29
+msgid "No task selected"
+msgstr "선택한 작업이 없습니다."
+
+#: viewflow/frontend/views.py:165 viewflow/frontend/views.py:211
+#: viewflow/frontend/views.py:256
+msgid "Task Description"
+msgstr "작업 설명"
+
+#: viewflow/frontend/views.py:169 viewflow/frontend/views.py:215
+#: viewflow/frontend/views.py:268
+msgid "Process Summary"
+msgstr "프로세스 요약"
+
+#: viewflow/frontend/views.py:175 viewflow/frontend/views.py:221
+msgid "Process URL"
+msgstr "프로세스 URL"
+
+#: viewflow/frontend/views.py:316
+msgid "Active Tasks"
+msgstr "활성 작업"
+
+#: viewflow/models.py:15
+msgid "Flow"
+msgstr "흐름"
+
+#: viewflow/models.py:76
+msgid "Type"
+msgstr "유형"
+
+#: viewflow/models.py:82
+msgid "Previous"
+msgstr "너무 이른"
+
+#: viewflow/models.py:83
+msgid "Token"
+msgstr "토큰"
+
+#: viewflow/models.py:146
+msgid "Process list"
+msgstr "프로세스 목록"
+
+#: viewflow/models.py:157
+msgid "External Task ID"
+msgstr "외부 작업 ID"
+
+#: viewflow/models.py:160
+msgid "Comments"
+msgstr "댓글"
+
+#: viewflow/models.py:164
+msgid "Tasks"
+msgstr "할 일 목록"

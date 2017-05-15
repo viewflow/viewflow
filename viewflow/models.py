@@ -1,8 +1,9 @@
 from django.conf import settings
 from django.db import models
 from django.template import Template, Context
+from django.utils.translation import gettext_lazy as _
 
-from .activation import STATUS
+from .activation import STATUS, STATUS_CHOICES
 from .exceptions import FlowRuntimeError
 from .fields import FlowReferenceField, TaskReferenceField, TokenField
 from .managers import ProcessQuerySet, TaskQuerySet, coerce_to_related_instance
@@ -11,11 +12,11 @@ from .managers import ProcessQuerySet, TaskQuerySet, coerce_to_related_instance
 class AbstractProcess(models.Model):
     """Base class for Process data object."""
 
-    flow_class = FlowReferenceField()
-    status = models.CharField(max_length=50, default=STATUS.NEW)
+    flow_class = FlowReferenceField(_('Flow'))
+    status = models.CharField(_('Status'), max_length=50, default=STATUS.NEW)
 
-    created = models.DateTimeField(auto_now_add=True)
-    finished = models.DateTimeField(blank=True, null=True)
+    created = models.DateTimeField(_('Created'), auto_now_add=True)
+    finished = models.DateTimeField(_('Finished'), blank=True, null=True)
 
     objects = ProcessQuerySet.as_manager()
 
@@ -71,17 +72,20 @@ class AbstractTask(models.Model):
 
     """
 
-    flow_task = TaskReferenceField()
-    flow_task_type = models.CharField(max_length=50)
-    status = models.CharField(max_length=50, default=STATUS.NEW, db_index=True)
+    flow_task = TaskReferenceField(_('Task'))
+    flow_task_type = models.CharField(_('Type'), max_length=50)
+    status = models.CharField(_('Status'), max_length=50, default=STATUS.NEW, db_index=True)
 
-    created = models.DateTimeField(auto_now_add=True)
-    started = models.DateTimeField(blank=True, null=True)
-    finished = models.DateTimeField(blank=True, null=True)
-    previous = models.ManyToManyField('self', symmetrical=False, related_name='leading')
-    token = TokenField(default='start')
+    created = models.DateTimeField(_('Created'), auto_now_add=True)
+    started = models.DateTimeField(_('Started'), blank=True, null=True)
+    finished = models.DateTimeField(_('Finished'), blank=True, null=True)
+    previous = models.ManyToManyField('self', symmetrical=False, related_name='leading', verbose_name=_('Previous'))
+    token = TokenField(_('Token'), default='start')
 
     objects = TaskQuerySet.as_manager()
+
+    def get_status_display(self):
+        return dict(STATUS_CHOICES).get(self.status, self.status)
 
     @property
     def flow_process(self):
@@ -138,21 +142,24 @@ class Process(AbstractProcess):
 
     class Meta:  # noqa D101
         ordering = ['-created']
-        verbose_name_plural = 'Process list'
+        verbose_name = _('Process')
+        verbose_name_plural = _('Process list')
 
 
 class Task(AbstractTask):
     """Default viewflow Task model."""
 
-    process = models.ForeignKey(Process, on_delete=models.CASCADE)
+    process = models.ForeignKey(Process, on_delete=models.CASCADE, verbose_name=_('Process'))
 
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True, db_index=True,
-        on_delete=models.CASCADE)
-    external_task_id = models.CharField(max_length=50, blank=True, null=True, db_index=True)
-    owner_permission = models.CharField(max_length=255, blank=True, null=True)
+        on_delete=models.CASCADE, verbose_name=_('Owner'))
+    external_task_id = models.CharField(_('External Task ID'), max_length=50, blank=True, null=True, db_index=True)
+    owner_permission = models.CharField(_('Permission'), max_length=255, blank=True, null=True)
 
-    comments = models.TextField(blank=True, null=True)
+    comments = models.TextField(_('Comments'), blank=True, null=True)
 
     class Meta:  # noqa D101
+        verbose_name = _('Task')
+        verbose_name_plural = _('Tasks')
         ordering = ['-created']

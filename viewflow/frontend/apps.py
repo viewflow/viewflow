@@ -1,12 +1,10 @@
-import itertools
-
 from django.apps import AppConfig
-from django.conf.urls import url, include
 from django.core.urlresolvers import reverse
 from django.template import Template, TemplateDoesNotExist
 from django.template.loader import get_template
 from django.utils.module_loading import import_string
 from django.utils.module_loading import autodiscover_modules
+from django.utils.translation import gettext_lazy as _
 
 from material import frontend
 from material.frontend.apps import ModuleMixin
@@ -17,7 +15,7 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
 
     name = 'viewflow.frontend'
     label = 'viewflow_frontend'
-    verbose_name = "Workflow"
+    verbose_name = _("Workflow")
     icon = '<i class="material-icons">assignment</i>'
     viewset = 'viewflow.frontend.viewset.FrontendViewSet'
 

@@ -1,0 +1,67 @@
+# distributed under the same license as the Viewflow package.
+msgid ""
+msgstr ""
+"Project-Id-Version: viewflow\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-05-09 09:52+0000\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: flows.py:20
+msgid "Hello world"
+msgstr "Bonjour le monde"
+
+#: flows.py:21
+msgid "This process demonstrates hello world approval request flow."
+msgstr "Ce processus démontre le flux de demande d'approbation de message."
+
+#: flows.py:25
+msgid "'{{ process.text }}' message to the world"
+msgstr "'{{process.text}} message au monde"
+
+#: flows.py:31
+msgid "New message"
+msgstr "Nouveau message"
+
+#: flows.py:39
+msgid "Approve"
+msgstr "Approuver"
+
+#: flows.py:40
+msgid "Message approvement required"
+msgstr "Besoin de message requis"
+
+#: flows.py:41
+msgid "Messsage was {{ process.approved|yesno:'Approved,Rejected' }}"
+msgstr "Messsage a été {{process.approved|yesno:'Approved,Rejected'}}"
+
+#: flows.py:49
+msgid "Approvement check"
+msgstr "Vérification approfondie"
+
+#: flows.py:58
+msgid "Send message"
+msgstr "Envoyer le message"
+
+#: flows.py:64
+msgid "End"
+msgstr "Fin"
+
+#: models.py:7
+msgid "Message"
+msgstr "Message"
+
+#: models.py:8
+msgid "Approved"
+msgstr "Approuvé"
+
+#: models.py:11
+msgid "World Request"
+msgstr "Demande mondiale"
+
+#: models.py:12
+msgid "World Requests"
+msgstr "Demandes mondiales"

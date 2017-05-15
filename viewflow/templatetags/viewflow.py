@@ -177,7 +177,6 @@ def include_process_data(context, process):
         '{}/{}/process_data.html'.format(opts.app_label, opts.flow_label),
         'viewflow/flow/process_data.html')
     template = select_template(template_names)
-
     context.push()
     try:
         context['process_data'] = get_model_display_data(process, context['request'].user)

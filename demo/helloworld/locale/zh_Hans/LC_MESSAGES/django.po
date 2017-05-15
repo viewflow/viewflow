@@ -1,0 +1,67 @@
+# distributed under the same license as the Viewflow package.
+msgid ""
+msgstr ""
+"Project-Id-Version: viewflow\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-05-09 09:52+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: zh_CN\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: flows.py:20
+msgid "Hello world"
+msgstr "안녕 세상"
+
+#: flows.py:21
+msgid "This process demonstrates hello world approval request flow."
+msgstr "이 프로세스는 안녕하세요 세계 승인 요청 흐름을 보여줍니다."
+
+#: flows.py:25
+msgid "'{{ process.text }}' message to the world"
+msgstr "'{{process.text}}'메시지"
+
+#: flows.py:31
+msgid "New message"
+msgstr "새로운 메시지"
+
+#: flows.py:39
+msgid "Approve"
+msgstr "승인하다"
+
+#: flows.py:40
+msgid "Message approvement required"
+msgstr "메시지 요청이 필요합니다"
+
+#: flows.py:41
+msgid "Messsage was {{ process.approved|yesno:'Approved,Rejected' }}"
+msgstr "{{ process.approved|yesno:'메시지가 승인되었습니다,메시지가 거부되었습니다'}}"
+
+#: flows.py:49
+msgid "Approvement check"
+msgstr "승인 확인"
+
+#: flows.py:58
+msgid "Send message"
+msgstr "문자 보내"
+
+#: flows.py:64
+msgid "End"
+msgstr "종료"
+
+#: models.py:7
+msgid "Message"
+msgstr "메시지"
+
+#: models.py:8
+msgid "Approved"
+msgstr "승인 됨"
+
+#: models.py:11
+msgid "World Request"
+msgstr "세계 요청"
+
+#: models.py:12
+msgid "World Requests"
+msgstr "세계 요청"

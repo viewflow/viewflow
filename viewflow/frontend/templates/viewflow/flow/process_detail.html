@@ -1,5 +1,5 @@
 {% extends 'viewflow/base_module.html' %}
-{% load viewflow material_frontend viewflow_frontend %}
+{% load i18n viewflow material_frontend viewflow_frontend %}
 
 {% block breadcrumbs_items %}
 {% include 'viewflow/includes/breadcrumb_category.html' %}
@@ -15,12 +15,12 @@
             <div class="card-title">{{ process.summary }}</div>
             <table class="table bordered highlight">
                 <thead>
-                    <th>#</th>
-                    <th>Description</th>
-                    <th>Owner</th>
-                    <th class="hide-on-small-only">Started</th>
-                    <th class="hide-on-small-only">Finished</th>
-                    <th>Status</th>
+                    <th>{% trans '#' %}</th>
+                    <th>{% trans 'Description' %}</th>
+                    <th>{% trans 'Owner' %}</th>
+                    <th class="hide-on-small-only">{% trans 'Started' %}</th>
+                    <th class="hide-on-small-only">{% trans 'Finished' %}</th>
+                    <th>{% trans 'Status' %}</th>
                 </thead>
                 <tbody>
                     {% for task in task_list %}
@@ -47,7 +47,7 @@
                         <td>{{ task.owner|default:"" }}</td>
                         <td class="hide-on-small-only">{{ task.created }}</td>
                         <td class="hide-on-small-only">{{ task.finished|default:"" }}</td>
-                        <td>{{ task.status }}</td>
+                        <td>{{ task.get_status_display }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
@@ -56,7 +56,7 @@
         <div class="card-action right-align">
             {% if view.flow_class|manage_permission_name in perms %}
             <a class="btn-flat black-text {% if process.status != 'NEW' %}disabled{% endif %}"
-               href="{% flowurl process 'action_cancel' %}?{{ request|query_back }}">Cancel</a>
+               href="{% flowurl process 'action_cancel' %}?{{ request|query_back }}">{% trans 'Cancel' %}</a>
             {% endif %}
         </div>
     </div>

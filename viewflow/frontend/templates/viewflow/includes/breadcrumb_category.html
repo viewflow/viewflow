@@ -1,4 +1,4 @@
-{% load viewflow_frontend %}
-{% if request.GET.back|url == '/workflow/' %}<a href="/workflow/">Inbox</a>{% endif %}
-{% if request.GET.back|url == '/workflow/queue/' %}<a href="/workflow/queue/">Unassigned</a>{% endif %}
-{% if request.GET.back|url == '/workflow/archive/' %}<a href="/workflow/archive/">Participated</a>{% endif %}
+{% load i18n viewflow_frontend %}
+{% if request.GET.back|url == '/workflow/' %}<a href="/workflow/">{% trans 'Inbox' %}</a>{% endif %}
+{% if request.GET.back|url == '/workflow/queue/' %}<a href="/workflow/queue/">{% trans 'Unassigned' %}</a>{% endif %}
+{% if request.GET.back|url == '/workflow/archive/' %}<a href="/workflow/archive/">{% trans 'Participated' %}</a>{% endif %}

@@ -1,12 +1,12 @@
-{% load viewflow viewflow_frontend %}
+{% load i18n viewflow viewflow_frontend %}
 <ul>
-    <li><a href="{% url 'viewflow:index' %}">Inbox <span class="badge">{{ current_module.flows|inbox_count:user }}</span></a></li>
-    <li><a href="{% url 'viewflow:queue' %}">Unassigned <span class="badge">{{ current_module.flows|queue_count:user }}</span></a></li>
-    <li><a href="{% url 'viewflow:archive' %}">Participated</a></li>
+    <li><a href="{% url 'viewflow:index' %}">{% trans 'Inbox' %} <span class="badge">{{ current_module.flows|inbox_count:user }}</span></a></li>
+    <li><a href="{% url 'viewflow:queue' %}">{% trans 'Unassigned' %} <span class="badge">{{ current_module.flows|queue_count:user }}</span></a></li>
+    <li><a href="{% url 'viewflow:archive' %}">{% trans 'Participated' %}</a></li>
     <li class="submenu">
         <ul class="collapsible">
             <li>
-                <a class="collapsible-header">Processes</a>
+                <a class="collapsible-header">{% trans 'Processes' %}</a>
                 <div class="collapsible-body">
                     <ul>
                         {% for title, flow_class in module.sites %}
@@ -21,6 +21,6 @@
                     </ul>
                 </div>
             </li>
-        </ul>        
+        </ul>
     </li>
 </ul>

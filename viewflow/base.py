@@ -206,7 +206,7 @@ class Flow(object, metaclass=FlowMetaClass):
         return url('^', include(node_urls), {'flow_class': self})
 
     def __str__(self):
-        return self.process_title
+        return str(self.process_title)
 
 
 this = This()

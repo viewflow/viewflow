@@ -289,6 +289,9 @@ class TaskDescriptionMixin(object):
         if task_result_summary:
             self.task_result_summary = task_result_summary
 
+        if self.task_result_summary is None:
+            self.task_result_summary = self.task_title
+
         super(TaskDescriptionMixin, self).__init__(**kwargs)
 
 
@@ -307,6 +310,9 @@ class TaskDescriptionViewMixin(TaskDescriptionMixin):
                     self.task_description = dedent(docstring[1]).strip()
             if hasattr(view_or_class, 'task_result_summary') and self.task_result_summary is None:
                 self.task_result_summary = view_or_class.task_result_summary
+
+        if self.task_result_summary is None:
+            self.task_result_summary = self.task_title
 
 
 class ViewArgsMixin(object):

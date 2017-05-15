@@ -1,4 +1,4 @@
-{% load material_frontend viewflow viewflow_frontend %}
+{% load i18n material_frontend viewflow viewflow_frontend %}
 {% flows_start_actions view.flows request.user as start_actions %}
 
 {% if start_actions %}
@@ -10,7 +10,7 @@
 
 <div id="start_actions" class="modal bottom-sheet">
     <div class="modal-content">
-        <h4>New Process</h4>
+        <h4>{% trans 'New process' %}</h4>
 
         <table>
             <tbody>

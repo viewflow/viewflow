@@ -154,7 +154,7 @@ class AllTaskListView(FlowListMixin,
     def task_hash(self, task):
         task_url = frontend_url(self.request, self.get_task_url(task), back_link='here')
         return mark_safe('<a href="{}">{}/{}</a>'.format(task_url, task.process.id, task.pk))
-    task_hash.short_description = "#"
+    task_hash.short_description = _("#")
 
     def description(self, task):
         summary = task.summary()
@@ -162,15 +162,17 @@ class AllTaskListView(FlowListMixin,
             summary = task.flow_task
         task_url = frontend_url(self.request, self.get_task_url(task), back_link='here')
         return mark_safe('<a href="{}">{}</a>'.format(task_url, summary))
+    description.short_description = _('Task Description')
 
     def process_summary(self, task):
         return task.flow_process.summary()
+    process_summary.short_description = _('Process Summary')
 
     def process_url(self, task):
         process_url = frontend_url(self.request, self.get_process_url(task.process), back_link='here')
         return mark_safe('<a href="{}">{} #{}</a>'.format(
             process_url, task.process.flow_class.process_title, task.process.pk))
-    process_url.short_description = 'Process Summary'
+    process_url.short_description = _('Process URL')
 
     def get_queryset(self):
         """Filtered task list."""
@@ -198,7 +200,7 @@ class AllQueueListView(
     def task_hash(self, task):
         task_url = frontend_url(self.request, self.get_task_url(task), back_link='here')
         return mark_safe('<a href="{}">{}/{}</a>'.format(task_url, task.process.id, task.pk))
-    task_hash.short_description = "#"
+    task_hash.short_description = _("#")
 
     def description(self, task):
         summary = task.summary()
@@ -206,15 +208,17 @@ class AllQueueListView(
             summary = task.flow_task
         task_url = frontend_url(self.request, self.get_task_url(task), back_link='here')
         return mark_safe('<a href="{}">{}</a>'.format(task_url, summary))
+    description.short_description = _('Task Description')
 
     def process_summary(self, task):
         return task.flow_process.summary()
+    process_summary.short_description = _('Process Summary')
 
     def process_url(self, task):
         process_url = frontend_url(self.request, self.get_process_url(task.process), back_link='here')
         return mark_safe('<a href="{}">{} #{}</a>'.format(
             process_url, task.process.flow_class.process_title, task.process.pk))
-    process_url.short_description = 'Process'
+    process_url.short_description = _('Process URL')
 
     def get_queryset(self):
         """Filtered task list."""
@@ -241,7 +245,7 @@ class AllArchiveListView(FlowListMixin,
     def task_hash(self, task):
         task_url = frontend_url(self.request, self.get_task_url(task), back_link='here')
         return mark_safe('<a href="{}">{}/{}</a>'.format(task_url, task.process.id, task.pk))
-    task_hash.short_description = "#"
+    task_hash.short_description = _("#")
 
     def description(self, task):
         summary = task.summary()
@@ -249,18 +253,19 @@ class AllArchiveListView(FlowListMixin,
             summary = task.flow_task
         task_url = frontend_url(self.request, self.get_task_url(task), back_link='here')
         return mark_safe('<a href="{}">{}</a>'.format(task_url, summary))
+    description.short_description = _('Task Description')
 
     def process_title(self, task):
         process_url = frontend_url(self.request, self.get_process_url(task.process), back_link='here')
         return mark_safe('<a href="{}">{} #{}</a>'.format(
             process_url, task.flow_task.flow_class.process_title, task.process.pk))
-    process_title.short_description = 'Process'
+    process_title.short_description = _('Process')
 
     def process_summary(self, task):
         process_url = frontend_url(self.request, self.get_process_url(task.process), back_link='here')
         return mark_safe('<a href="{}">{}</a>'.format(
             process_url, task.flow_process.summary()))
-    process_summary.short_description = 'Summary'
+    process_summary.short_description = _('Process Summary')
 
     def get_queryset(self):
         """All tasks from all processes assigned to the current user."""
@@ -299,15 +304,16 @@ class ProcessListView(FlowViewPermissionMixin,
             self.get_process_link(process),
             process.summary())
         )
-    process_summary.short_description = 'summary'
+    process_summary.short_description = 'Summary'
 
     def active_tasks(self, process):
         if process.finished is None:
-            return mark_safe('<a href="{}">{} active</a>'.format(
+            return mark_safe('<a href="{}">{}</a>'.format(
                 self.get_process_link(process),
                 process.active_tasks().count())
             )
         return ''
+    active_tasks.short_description = _('Active Tasks')
 
     def get_template_names(self):
         """List of template names to be used for an queue list view.

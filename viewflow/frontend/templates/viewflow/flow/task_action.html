@@ -1,20 +1,20 @@
 {% extends 'viewflow/flow/base_task.html' %}
-{% load material_frontend viewflow viewflow_frontend %}
+{% load i18n material_frontend viewflow viewflow_frontend %}
 
 {% block breadcrumbs_items_extra %}
-<a class="active">{{ view.action_name|title }}</a>
+<a class="active">{{ view.action_title }}</a>
 {% endblock %}
 
 
 {% block task_actions %}
 <div class="card-action">
     <div class="left">
-        <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">detail</a>
+        <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">{% trans 'Detail' %}</a>
     </div>
     <div class="right">
         <form role="form" method="POST" style="display:inline-block">
             {% csrf_token %}
-            <button type="submit" name="run_action" class="btn btn-flat">Confirm {{ view.action_name }}</button>
+            <button type="submit" name="run_action" class="btn btn-flat">{% trans 'Confirm' %}</button>
         </form>
     </div>
     <div style="clear:both"></div>

@@ -1,9 +1,9 @@
 {% extends 'viewflow/base_module.html' %}
-{% load viewflow viewflow_frontend material_form %}
+{% load i18n viewflow viewflow_frontend material_form %}
 
 {% block breadcrumbs_items %}
 {% include 'viewflow/includes/breadcrumb_category.html' %}
-<a class="active">Confirm {{ view.action_name|title }}</a>
+<a class="active">{% trans 'Confirm' %} {{ view.action_name|title }}</a>
 {% endblock %}
 
 {% block content %}
@@ -12,10 +12,10 @@
         <div class="card-content">
             <table class="table selectable bordered">
                 <thead>
-                    <th>#</th>
-                    <th>Description</th>
-                    <th>Summary</th>
-                    <th>Process</th>
+                    <th>{% trans '#' %}</th>
+                    <th>{% trans 'Description' %}</th>
+                    <th>{% trans 'Summary' %}</th>
+                    <th>{% trans 'Process' %}</th>
                 </thead>
                 <tbody>
                     {% for task in view.tasks %}
@@ -26,7 +26,7 @@
                         <td><a target="_blank" href="{% flowurl task.process 'detail' ns=request.resolver_match.namespace ns_map=view.ns_map %}">{{ task.process.flow_class.process_title }} #{{task.process.pk}}</a></td>
                     </tr>
                     {% empty %}
-                    <tr><td colspan="4">No task selected</td></tr>
+                    <tr><td colspan="4">{% trans 'No task selected' %}</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

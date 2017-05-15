@@ -24,7 +24,7 @@ def task_management_menu(activation, request):
                     activation.task, transition.name, user=request.user,
                     namespace=request.resolver_match.namespace)
                 if url:
-                    actions.append((transition.name, url))
+                    actions.append((transition.name.replace('_', ' ').title(), url))
 
     return {'actions': actions,
             'request': request}
