@@ -357,7 +357,7 @@ msgstr "Токен"
 
 #: models.py:146
 msgid "Process list"
-msgstr "Списко процессов"
+msgstr "Список процессов"
 
 #: models.py:157
 msgid "External Task ID"
