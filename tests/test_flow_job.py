@@ -48,7 +48,7 @@ def job_handler(activation):
 
 
 class JobActivation(AbstractJobActivation):
-    def async(self):
+    def run_async(self):
         """Do Nothing."""
 
 

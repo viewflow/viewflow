@@ -591,7 +591,7 @@ class AbstractJobActivation(Activation):
        }
     """
 
-    def async(self):
+    def run_async(self):
         """
         Run task asynchronously.
 
@@ -610,7 +610,7 @@ class AbstractJobActivation(Activation):
     def schedule(self):
         """Schedule task for execution."""
         with self.exception_guard():
-            self.async()
+            self.run_async()
             self.set_status(STATUS.SCHEDULED)
             self.task.save()
 
