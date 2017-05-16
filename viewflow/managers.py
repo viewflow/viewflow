@@ -38,7 +38,7 @@ def _get_related_path(model, base_model):
     parent = model._meta.get_ancestor_link(base_model)
 
     while parent is not None:
-        related = parent.remote_field if hasattr(parent, 'remote_field') else parent.related
+        related = parent.remote_field if hasattr(parent, 'remote_field') else parent.rel
 
         ancestry.insert(0, related.get_accessor_name())
 
