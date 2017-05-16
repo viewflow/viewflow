@@ -1,9 +1,15 @@
 import django
-from django.db import models
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.db.models.constants import LOOKUP_SEP
+
+
+try:
+    from django.db.models.query import BaseIterable
+except ImportError:
+    # Django 1.8
+    BaseIterable = object
 
 from .activation import STATUS
 from .fields import ClassValueWrapper
@@ -71,8 +77,28 @@ def coerce_to_related_instance(instance, target_model):
     return instance
 
 
+class ProcessIterable(BaseIterable):
+    def __iter__(self):
+        from django.db.models.query import ModelIterable
+
+        base_itererator = ModelIterable(self.queryset)
+        if getattr(self.queryset, '_coerced', False):
+            for process in base_itererator:
+                if isinstance(process, self.queryset.model):
+                    process = coerce_to_related_instance(process, process.flow_class.process_class)
+                yield process
+        else:
+            for process in base_itererator:
+                yield process
+
+
 class ProcessQuerySet(QuerySet):
     """Base manager for the flow Process."""
+
+    def __init__(self, *args, **kwargs):
+        super(ProcessQuerySet, self).__init__(*args, **kwargs)
+        if django.VERSION > (1, 8):
+            self._iterable_class = ProcessIterable
 
     def filter(self, *args, **kwargs):
         """Queryset filter allows to use `flow_class` class values."""
@@ -108,6 +134,8 @@ class ProcessQuerySet(QuerySet):
 
     def iterator(self):
         """Coerce queryset results to process subclasses."""
+
+        # django 1.8 only
         base_itererator = super(ProcessQuerySet, self).iterator()
         if getattr(self, '_coerced', False):
             for process in base_itererator:
@@ -119,8 +147,28 @@ class ProcessQuerySet(QuerySet):
                 yield process
 
 
+class TaskIterable(BaseIterable):
+    def __iter__(self):
+        from django.db.models.query import ModelIterable
+
+        base_itererator = ModelIterable(self.queryset)
+        if getattr(self.queryset, '_coerced', False):
+            for task in base_itererator:
+                if isinstance(task, self.queryset.model):
+                    task = coerce_to_related_instance(task, task.flow_task.flow_class.task_class)
+                yield task
+        else:
+            for task in base_itererator:
+                yield task
+
+
 class TaskQuerySet(QuerySet):
     """Base manager for the Task."""
+
+    def __init__(self, *args, **kwargs):
+        super(TaskQuerySet, self).__init__(*args, **kwargs)
+        if django.VERSION > (1, 8):
+            self._iterable_class = TaskIterable
 
     def filter(self, *args, **kwargs):
         """Queryset filter allows to use `process__flow_class` class values."""
@@ -202,6 +250,7 @@ class TaskQuerySet(QuerySet):
 
     def iterator(self):
         """Coerce queryset results to process subclasses."""
+        # django 1.8 only
         base_itererator = super(TaskQuerySet, self).iterator()
         if getattr(self, '_coerced', False):
             for task in base_itererator:

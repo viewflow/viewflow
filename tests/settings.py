@@ -66,7 +66,25 @@ class DisableMigrations(object):
     def __getitem__(self, item):
         return "notmigrations"
 
-MIGRATION_MODULES = DisableMigrations()
+
+if django.VERSION < (1, 11):
+    MIGRATION_MODULES = DisableMigrations()
+else:
+    MIGRATION_MODULES = {
+        'frontend': None,
+        'material': None,
+        'admin': None,
+        'auth': None,
+        'contenttypes': None,
+        'sessions': None,
+        'messages': None,
+        'staticfiles': None,
+        'viewflow_frontend': None,
+        'viewflow': None,
+        'tests': None,
+        'customnode': None,
+        'helloworld': None,
+    }
 
 
 TEMPLATES = [
