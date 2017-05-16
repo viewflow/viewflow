@@ -10,7 +10,8 @@ class Test(TestCase):
     def test_signal_usecase(self):
         start_test_signal.send(sender=self)
         process = SignalFlow.process_class.objects.get()
-        task_test_signal.send(sender=self, process=process)
+        task = process.active_tasks().get()
+        task_test_signal.send(sender=self, process=process, task=task)
 
         tasks = process.task_set.all()
         self.assertEqual(3, tasks.count())
@@ -32,7 +33,7 @@ class Test(TestCase):
 
 start_test_signal = Signal()
 start_ignorable_test_signal = Signal()
-task_test_signal = Signal(providing_args=["process"])
+task_test_signal = Signal(providing_args=["process", "task"])
 ignorable_test_signal = Signal(providing_args=["process", "ignore_me"])
 
 
