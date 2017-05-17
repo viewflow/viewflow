@@ -130,7 +130,8 @@ def flow_signal(handler):
     """Decorator provides a flow signal receiver with the activation."""
     @transaction.atomic
     @functools.wraps(handler)
-    def _wrapper(sender, task=None, **signal_kwargs):
+    def _wrapper(sender, _task=None, **signal_kwargs):
+        task = _task
         flow_task = task.flow_task
         flow_class = flow_task.flow_class
 
