@@ -125,7 +125,7 @@ class Signal(mixins.TaskDescriptionMixin,
                     raise FlowRuntimeError("The task_loader didn't return any task for {}\n{}".format(
                         self.name, signal_kwargs))
             else:
-                return self.receiver(sender=sender, task=task, **signal_kwargs)
+                return self.receiver(sender=sender, _task=task, **signal_kwargs)
 
     def ready(self):
         """Resolve internal `this`-referencies. and subscribe to the signal."""
