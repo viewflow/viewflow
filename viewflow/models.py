@@ -1,7 +1,10 @@
+from __future__ import unicode_literals
+
 from django.conf import settings
 from django.db import models
 from django.template import Template, Context
 from django.utils.translation import ugettext_lazy as _
+from django.utils.encoding import python_2_unicode_compatible
 
 from .activation import STATUS, STATUS_CHOICES
 from .exceptions import FlowRuntimeError
@@ -9,6 +12,7 @@ from .fields import FlowReferenceField, TaskReferenceField, TokenField
 from .managers import ProcessQuerySet, TaskQuerySet, coerce_to_related_instance
 
 
+@python_2_unicode_compatible
 class AbstractProcess(models.Model):
     """Base class for Process data object."""
 
@@ -62,6 +66,7 @@ class AbstractProcess(models.Model):
         abstract = True
 
 
+@python_2_unicode_compatible
 class AbstractTask(models.Model):
     """
     Base class for Task state objects.

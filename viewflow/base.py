@@ -1,8 +1,14 @@
+"""
+Flow definition
+"""
+from __future__ import unicode_literals
+
 import re
 from collections import defaultdict
 from textwrap import dedent
 
 from django.conf.urls import include, url
+from django.utils.six import with_metaclass
 
 from . import Node, ThisObject, This, lock, models, forms
 from .compat import get_containing_app_data
@@ -163,7 +169,7 @@ class FlowMetaClass(type):
         return new_class
 
 
-class Flow(object, metaclass=FlowMetaClass):
+class Flow(with_metaclass(FlowMetaClass, object)):
     """
     Base class for flow definition::
 

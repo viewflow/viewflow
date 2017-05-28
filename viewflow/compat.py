@@ -30,7 +30,6 @@ except:
             return resolved_args, resolved_kwargs
 
 
-# djagno 1.7
 from django.apps import apps
 
 
@@ -48,6 +47,19 @@ def get_containing_app_data(module):
     if not app_config:
         return None, None
     return app_config.label, app_config.module.__name__
+
+    def with_metaclass(meta, *bases):
+        """Create a base class with a metaclass."""
+        class metaclass(meta):
+            __call__ = type.__call__
+            __init__ = type.__init__
+
+            def __new__(cls, name, this_bases, d):
+                if this_bases is None:
+                    return type.__new__(cls, name, (), d)
+                return meta(name, bases, d)
+
+        return metaclass('temporary_class', None, {})
 
 
 def get_all_related_objects(obj):

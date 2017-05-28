@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 from django.views import generic
 
 from ... import activation, models

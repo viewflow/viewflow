@@ -1,3 +1,5 @@
+from __future__ import unicode_literals
+
 import django
 from django.db.models import Q
 from django.core.exceptions import ObjectDoesNotExist

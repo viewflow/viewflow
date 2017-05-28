@@ -1,8 +1,12 @@
 import os
-import queue
 import threading
 import time
 import unittest
+
+try:
+    import queue
+except ImportError:
+    import Queue as queue
 
 import django
 from django.db import connection, DatabaseError

@@ -5,6 +5,7 @@ build
 dist
 reports
 django_viewflow.egg-info
+django_viewflow_pro.egg-info
 MANIFEST
 db*.sqlite3
 node_modules/

@@ -14,11 +14,11 @@
 <script src="{% static 'demo/js/jquery.cookie.js' %}" type="text/javascript"></script>
 {% endblock %}
 
-{% block top_menu_extra %}
-<li id="login_as_menu"><a class="dropdown-button" href="#!" data-activates="user-login-as-menu"><i class="mdi-navigation-arrow-drop-down right"></i>Login As</a></li>
+{% block  topbar_links %}
+<li id="login_as_menu"><a class="dropdown-button" href="#!" data-activates="user-login-as-menu"><i class="material-icons right">arrow_drop_down</i>Login As</a></li>
 <ul id="user-login-as-menu" class="dropdown-content"  style="min-width:200px">
     {% for user in users %}
-    <li><a class="no-pjax" href="{% url 'login_as' %}?user_pk={{ user.pk }}">{{ user }}</a></li>
+    <li><a data-turbolinks="false" href="{% url 'login_as' %}?user_pk={{ user.pk }}">{{ user }}</a></li>
     {% endfor %}
 </ul>
 {% endblock %}
@@ -26,5 +26,9 @@
 
 {% block main %}
 {{ block.super }}
+
+
+<!-- Yandex.Metrika counter --> <script type="text/javascript"> (function (d, w, c) { (w[c] = w[c] || []).push(function() { try { w.yaCounter44457673 = new Ya.Metrika({ id:44457673, clickmap:true, trackLinks:true, accurateTrackBounce:true }); } catch(e) { } }); var n = d.getElementsByTagName("script")[0], s = d.createElement("script"), f = function () { n.parentNode.insertBefore(s, n); }; s.type = "text/javascript"; s.async = true; s.src = "https://mc.yandex.ru/metrika/watch.js"; if (w.opera == "[object Opera]") { d.addEventListener("DOMContentLoaded", f, false); } else { f(); } })(document, window, "yandex_metrika_callbacks"); </script> <noscript><div><img src="https://mc.yandex.ru/watch/44457673" style="position:absolute; left:-9999px;" alt="" /></div></noscript> <!-- /Yandex.Metrika counter -->
+
 {% include 'demo/wizard.html' %}
 {% endblock %}

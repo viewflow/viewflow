@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils.module_loading import import_string
+from django.utils.six import string_types, with_metaclass
 
 from .compat import get_app_package, get_containing_app_data
 from .exceptions import FlowRuntimeError
@@ -89,9 +90,7 @@ def _make_contrib(superclass, func=None):
     return contribute_to_class
 
 
-class FlowReferenceField(models.CharField, metaclass=_SubfieldBase):
-    """Flow class."""
-
+class FlowReferenceField(with_metaclass(_SubfieldBase, models.CharField)):
     description = """Flow class reference field,
     stores flow as app_label/flows.FlowName> to
     avoid possible collisions with app name changes"""
@@ -100,8 +99,8 @@ class FlowReferenceField(models.CharField, metaclass=_SubfieldBase):
         kwargs.setdefault('max_length', 250)
         super(FlowReferenceField, self).__init__(*args, **kwargs)
 
-    def to_python(self, value):  # noqa D1o2
-        if isinstance(value, str) and value:
+    def to_python(self, value):  # noqa D102
+        if isinstance(value, string_types) and value:
             return import_flow_by_ref(value)
         return value
 
@@ -125,22 +124,20 @@ class FlowReferenceField(models.CharField, metaclass=_SubfieldBase):
         return self.get_prep_value(value)
 
 
-class TaskReferenceField(models.CharField, metaclass=_SubfieldBase):
-    """Flow node instance."""
-
-    def __init__(self, *args, **kwargs):  # noqa D102
+class TaskReferenceField(with_metaclass(_SubfieldBase, models.CharField)):
+    def __init__(self, *args, **kwargs):
         kwargs.setdefault('max_length', 255)
         super(TaskReferenceField, self).__init__(*args, **kwargs)
 
-    def to_python(self, value):  # noqa D102
-        if isinstance(value, str) and value:
+    def to_python(self, value):
+        if isinstance(value, string_types) and value:
             return import_task_by_ref(value)
         return value
 
     def get_prep_value(self, value):  # noqa D102
         if value is None or value == '':
             return value
-        elif not isinstance(value, str):
+        elif not isinstance(value, string_types):
             return get_task_ref(value)
         return value
 
@@ -149,23 +146,21 @@ class TaskReferenceField(models.CharField, metaclass=_SubfieldBase):
         return self.get_prep_value(value)
 
 
-class TokenField(models.CharField, metaclass=_SubfieldBase):
-    """Wrapper for `viewflow.token.Token` around string values."""
-
-    def __init__(self, *args, **kwargs):  # noqa D102
+class TokenField(with_metaclass(_SubfieldBase, models.CharField)):
+    def __init__(self, *args, **kwargs):
         kwargs.setdefault('max_length', 150)
         if 'default' in kwargs:
             default = kwargs['default']
-            if isinstance(default, str):
+            if isinstance(default, string_types):
                 kwargs['default'] = Token(default)
         super(TokenField, self).__init__(*args, **kwargs)
 
     def to_python(self, value):  # noqa D102
-        if isinstance(value, str) and value:
+        if isinstance(value, string_types) and value:
             return Token(value)
         return value
 
-    def get_prep_value(self, value):  # noqa D102
-        if not isinstance(value, str) and value:
+    def get_prep_value(self, value):
+        if not isinstance(value, string_types) and value:
             return value.token
         return super(TokenField, self).get_prep_value(value)

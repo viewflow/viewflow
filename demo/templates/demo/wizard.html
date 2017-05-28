@@ -1,5 +1,4 @@
 {% load static %}
-<!--
 <script type="text/javascript">
 var tour;
 
@@ -38,7 +37,7 @@ if($.cookie('examples.shipment/worker') === undefined) {
       text: ['You have access to Shipment Process',
              'You can work on <b>"Package goods"</b> and <b>"Move package"</b> tasks'],
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-      attachTo: {element: 'li a[href="/viewflow/"]', on: 'right'},
+      attachTo: {element: 'li a[href="/workflow/"]', on: 'right'},
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
       buttons: [{ text: 'OK', action: tour.next }],
       tetherOptions: {offset: '0px -20px 0px 0px'}
@@ -54,7 +53,7 @@ if($.cookie('examples.shipment/manager') === undefined) {
       text: ['You have access to Shipment Process',
              'You can work on <b>"Take extra insurance"</b> tasks'],
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-      attachTo: {element: 'li a[href="/viewflow/"]', on: 'right'},
+      attachTo: {element: 'li a[href="/workflow/"]', on: 'right'},
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
       buttons: [{ text: 'OK', action: tour.next }],
       tetherOptions: {offset: '0px -20px 0px 0px'}
@@ -68,11 +67,11 @@ if($.cookie('examples.shipment/clerk') === undefined) {
     tour.addStep('shipment/clerk', {
       title: 'Welcome, Shipment/Clerk',
       text: ['You have access to Shipment Process',
-             'You can <b>start</b> the Shipment process, work on <b>"Decide shipment type"</b>',.
+             'You can <b>start</b> the Shipment process, work on <b>"Decide shipment type"</b>',
              '<b>"Set delivery mode"</b>, <b>"Request quotes"</b>, <b>"Check insurance"</b>,',
              'and <b>"Fill post label"</b> tasks'],
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-      attachTo: {element: 'li a[href="/viewflow/"]', on: 'right'},
+      attachTo: {element: 'li a[href="/workflow/"]', on: 'right'},
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
       buttons: [{ text: 'OK', action: tour.next }],
       tetherOptions: {offset: '0px -20px 0px 0px'}
@@ -88,7 +87,7 @@ if($.cookie('examples.helloworld/manager') === undefined) {
       text: ['You have access to "Hello, world" Process',
              'You can <b>"Approve"</b> "Hello, world" requests'],
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-      attachTo: {element: 'li a[href="/viewflow/"]', on: 'right'},
+      attachTo: {element: 'li a[href="/workflow/"]', on: 'right'},
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
       buttons: [{ text: 'OK', action: tour.next }],
       tetherOptions: {offset: '0px -20px 0px 0px'}
@@ -104,7 +103,7 @@ if($.cookie('examples.helloworld/employee') === undefined) {
       text: ['You have access to "Hello, world" Process',
              'You can <b>start</b> "Hello, world" requests process'],
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-      attachTo: {element: 'li a[href="/viewflow/"]', on: 'right'},
+      attachTo: {element: 'li a[href="/workflow/"]', on: 'right'},
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
       buttons: [{ text: 'OK', action: tour.next }],
       tetherOptions: {offset: '0px -20px 0px 0px'}
@@ -118,9 +117,9 @@ if($.cookie('examples.admin') === undefined) {
     tour.addStep('admin', {
       title: 'Welcome, System administrator',
       text: ['You have access to any process and tasks',
-             'Also you have rights to <a href="/admin/">data administration interface</a>'],
+             'Also you have rights to the data administration interface'],
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text',
-      attachTo: {element: 'li a[href="/viewflow/"]', on: 'right'},
+      attachTo: {element: 'li a[href="/workflow/"]', on: 'right'},
       classes: 'shepherd shepherd-open shepherd-theme-arrows shepherd-transparent-text z-index-1000',
       buttons: [{ text: 'OK', action: tour.next }],
       tetherOptions: {offset: '0px -20px 0px 0px'},
@@ -130,5 +129,4 @@ if($.cookie('examples.admin') === undefined) {
 {% endif %}
 
 tour.start();
--->
 </script>

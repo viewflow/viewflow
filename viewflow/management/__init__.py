@@ -1,4 +1,5 @@
 """Import flows before auth permission setup."""
+from __future__ import unicode_literals
 
 import django
 from django.apps import apps

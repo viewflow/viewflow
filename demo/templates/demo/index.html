@@ -2,26 +2,22 @@
 
 {% block content %}
 <div class="row">    
-    <div class="col l8 m12" style="padding-left:40px">
-        <div class="card-panel">
-            <h3>Viewflow demo source code</h3>
+    <div class="col l8 m12">
+        <div class="card-panel form-card">
+            <h3>Viewflow demo</h3>
             <a href="https://github.com/viewflow/viewflow" target="_blank"><i class="glyphicon glyphicon-edit"></i> Source code on Github</a>
-            <br><br>
             <ul>
                 <li>
-                    <a href="https://github.com/viewflow/viewflow/blob/master/demo/helloworld" target="_blank">HelloWorld</a>  - Viewflow introduction sample</li>
+                    <a href="https://github.com/viewflow/viewflow/blob/master/demo/helloworld" target="_blank">HelloWorld</a>  - Viewflow introduction sample
+                </li>
                 <li>
-                    <a href="https://github.com/viewflow/viewflow/blob/master/demo/shipment" target="_blank">Shipment</a> - Automate shipment process for ecommerce website</li>
+                    <a href="https://github.com/viewflow/viewflow/blob/master/demo/shipment" target="_blank">Shipment</a> - Automate shipment process for ecommerce website
+                </li>
                 <li>
-                    <a href="https://github.com/viewflow/viewflow/blob/master/demo/customnode" target="_blank">Dynamic split</a> -  Custom flow node example</li>
+                    <a href="https://github.com/viewflow/viewflow/blob/master/demo/customnode" target="_blank">Dynamic split</a> -  Custom flow node example
+                </li>
             </ul>
-            <h4>Standalone demo projects</h4>
-            <ul>
-                <li>
-                    <a href="https://github.com/kmmbvnr/viewflow-demo/tree/master/ecommerce" target="_blank">Ecommerce</a> - Delivery department automation with viewflow and Django Cartridge Ecommerce</li>
-                <li>
-                    <a href="https://github.com/kmmbvnr/viewflow-demo/tree/master/customauth" target="_blank">Customization</a> - Custom auth model and django-guardian for object level permissions, no viewsite</li>
-            </ul>
+            {% if not user.is_authenticated %}Please, log in to continue...{% endif %}
         </div>
     </div>
     <div class="col l4 m12">
