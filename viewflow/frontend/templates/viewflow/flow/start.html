@@ -11,7 +11,7 @@
 {% block left-panel %}
 <div class="left-panel">
     <div class="card">
-        <form role="form" method="POST">
+        <form role="form" method="POST" enctype="multipart/form-data">
             <div class="card-content">
                 <div class="card-title black-text">{{ activation.flow_class.process_title }} - {{ activation.flow_task.task_title|default:activation.task.flow_task.name|title }}</div>
                 {% csrf_token %}

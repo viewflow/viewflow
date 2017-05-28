@@ -13,7 +13,7 @@
 {% block left-panel %}
 <div class="left-panel">
     <div class="card">
-        <form role="form" method="POST">
+        <form role="form" method="POST" enctype="multipart/form-data">
             <div class="card-content">
                 <div class="card-title">
                     {{ activation.task.summary|default:activation.task.flow_task }}
