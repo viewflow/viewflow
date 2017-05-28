@@ -32,7 +32,7 @@ INSTALLED_APPS = (
     'tests',
     'demo.customnode',
     'demo.helloworld',
-    'demo.shipment',
+    # 'demo.shipment',
 )
 
 MIDDLEWARE_CLASSES = (
