@@ -3,18 +3,6 @@ main .row .row {
     margin-right: -0.75rem;
 }
 
-.side-nav li>a>span.badge {
-    min-width: 3rem;
-    padding: 0 6px;
-    margin-left: 14px;
-    text-align: center;
-    font-size: 1rem;
-    line-height: inherit;
-    color: #757575;
-    float: right;
-    box-sizing: border-box;
-}
-
 .side-nav li.active>a>span.badge {
     color: #fff;
 }
