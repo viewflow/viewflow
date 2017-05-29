@@ -2,6 +2,21 @@
 Changelog
 =========
 
+1.0.0 2017-05-29
+----------------
+
+* Django 1.11 support
+* Open-sourced Python 2.7 support
+* Added APGL licence additional permissions (allows to link with commercial software)
+* Localization added: German/French/Spainish/Korean/Chinese
+* Improved task detail UI in frontend
+* Frontend - task management menu fix
+* `JobActivation.async` method renamed to `run_async`. Fix python 3.7 reserved word warning.  
+* [PRO] New process dashboard view
+* [PRO] Django-Guardian support for task object level permissions
+* [PRO] Fixes and improvements in the flow chart rendering
+
+
 0.12.0 - 2017-02-14
 -------------------
 

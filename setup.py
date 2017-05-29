@@ -4,7 +4,7 @@ from setuptools import setup
 
 
 setup(
-    name='django-viewflow-pro',
+    name='django-viewflow',
     version='1.0.0',
     author='Mikhail Podgurskiy',
     author_email='kmmbvnr@gmail.com',

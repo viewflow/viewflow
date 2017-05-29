@@ -55,8 +55,8 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-GIT VERSION
------------
+1.0.0 2017-05-29
+----------------
 
 * Django 1.11 support
 * Open-sourced Python 2.7 support
