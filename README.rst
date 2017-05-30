@@ -34,6 +34,13 @@ django forms and views code.
 .. image:: https://coveralls.io/repos/viewflow/viewflow/badge.png?branch=master
    :target: https://coveralls.io/r/viewflow/viewflow?branch=master
 
+.. image:: https://img.shields.io/pypi/pyversions/django-viewflow.svg
+    :target: https://pypi.python.org/pypi/django-viewflow
+
+Viewflow works with Django 1.8/1.9/1.10/1.11
+
+Django-Material 1.x branch going to be supported till Django 1.8 lifetime (April 2018)
+
 
 Documentation
 =============
