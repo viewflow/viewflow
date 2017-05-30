@@ -17,8 +17,6 @@ application.
 .. image:: https://raw.githubusercontent.com/viewflow/viewflow/master/demo/shipment/doc/ShipmentProcess.png
    :width: 400px
 
-Demo: http://demo.viewflow.io
-
 After over than 10 years history of the BPMN standard, it contains
 whole set of battle-proven primitives for all occasions, helps you to
 describe all real life business process scenarios. Viewflow helps you
@@ -43,6 +41,12 @@ django forms and views code.
 Viewflow works with Django 1.8/1.9/1.10/1.11
 
 Django-Material 1.x branch going to be supported till Django 1.8 lifetime (April 2018)
+
+
+Demo
+====
+
+http://demo.viewflow.io
 
 
 Documentation
