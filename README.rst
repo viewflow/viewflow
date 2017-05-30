@@ -46,6 +46,8 @@ Django-Material 1.x branch going to be supported till Django 1.8 lifetime (April
 Demo
 ====
 
+Viewflow comes with reference UI implementation on top of django-material project.
+
 http://demo.viewflow.io
 
 
@@ -53,6 +55,15 @@ Documentation
 =============
 
 Read the documentation at the `http://docs.viewflow.io/ <http://docs.viewflow.io/>`_
+
+
+Cookbook
+========
+
+Advanced customization samples
+
+https://github.com/viewflow/cookbook
+
 
 License
 =======
