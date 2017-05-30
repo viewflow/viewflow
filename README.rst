@@ -2,11 +2,14 @@
 django-viewflow
 ===============
 
-Reusable workflow library for Django http://viewflow.io.
+Reusable workflow library for Django, that helps to implement people collaboration software.
 
-Viewflow is the workflow library based on BPMN concepts. BPMN -
-business process modeling and notations - is the wide adopted industry
-standard for business process modeling. BPMN provides a standard
+http://viewflow.io.
+
+
+Viewflow takes best parts from two worlds. It is based on BPMN -
+business process modeling and notation standard. And plays well with
+django web development toolchain. BPMN provides a standard
 notation readily understandable by all business stakeholders. Viewflow
 bridging the gap between picture and executable, ready to use web
 application.
