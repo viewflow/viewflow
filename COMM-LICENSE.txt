@@ -24,6 +24,8 @@ You may not, without Our prior written consent, redistribute the Software or Mod
 
 You may redistribute the Software as part of Your own products.
 
+UNDER NO CIRCUMSTANCES MAY YOU USE THE SOFTWARE AS PART OF A PRODUCT OR SERVICE THAT PROVIDES SIMILAR FUNCTIONALITY TO THE SOFTWARE ITSELF.
+
 The Open Source version of the Software (“AGPL Version”) is licensed
 under the terms of the GNU Affero General Public License v3.0
 (“AGPL”) and not under this License Agreement. If You, or another third
