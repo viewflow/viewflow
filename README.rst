@@ -69,7 +69,7 @@ License
 =======
 
 Viewflow is an Open Source project licensed under the terms of the AGPL license - `The GNU Affero General Public License v3.0 <http://www.gnu.org/licenses/agpl-3.0.html>`_ with the Additional
-Permissions described in `LICENCE_EXCEPTION <./LICENCE_EXCEPTION>`_
+Permissions described in `LICENSE_EXCEPTION <./LICENSE_EXCEPTION>`_
 
 
 Viewflow Pro has a commercial-friendly license allowing private forks
