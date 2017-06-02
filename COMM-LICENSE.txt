@@ -20,21 +20,21 @@ You will not owe Us any royalties for Your distribution of the Software in accor
 
 4. PROHIBITED USES
 
-You may not, without Our prior written consent, redistribute the Software or Modifications other than by including the Software or a portion thereof within Your own product, which must have substantially different functionality than the Software or Modifications and must not allow any third party to use the Software or Modifications, or any portions thereof, for software development or application development purposes. You are explicitly not allowed to redistribute the Software or Modifications as part of any product that can be described as a development toolkit or library, an application builder, a website builder or any product that is intended for use by software, application, or website developers or designers. You are not allowed to redistribute any part of the Software documentation. You may not change or remove the copyright notice from any of the files included in the Software or Modifications.
+You may not, without Our prior written consent, redistribute the Software or Modifications other than by including the Software or a portion thereof within Your own product, which must have substantially different functionality than the Software or Modifications and must not allow any third party to use the Software or Modifications. You are not allowed to redistribute any part of the Software documentation. You may not change or remove the copyright notice from any of the files included in the Software or Modifications.
 
-You may not redistribute the Software as part of a product, "appliance" or "virtual server".  You may not redistribute the Software on any server which is not directly under Your control.
+You may redistribute the Software as part of Your own products.
 
-UNDER NO CIRCUMSTANCES MAY YOU USE THE SOFTWARE FOR A PRODUCT THAT IS INTENDED FOR SOFTWARE OR APPLICATION DEVELOPMENT PURPOSES.
+UNDER NO CIRCUMSTANCES MAY YOU USE THE SOFTWARE AS PART OF A PRODUCT OR SERVICE THAT PROVIDES SIMILAR FUNCTIONALITY TO THE SOFTWARE ITSELF.
 
-The Open Source version of the Software (“LGPL Version”) is licensed
-under the terms of the GNU Lesser General Public License versions 3.0
-(“LGPL”) and not under this License Agreement. If You, or another third
+The Open Source version of the Software (“AGPL Version”) is licensed
+under the terms of the GNU Affero General Public License v3.0
+(“AGPL”) and not under this License Agreement. If You, or another third
 party, has, at any time, developed all (or any portions of) the
-Application(s) using the LGPL Version, You may not combine such
+Application(s) using the AGPL Version, You may not combine such
 development work with the Software and must license such Application(s)
 (or any portions derived there from) under the terms of the GNU Lesser
 General Public License version 3, a copy of which is located at
-http://www.gnu.org/copyleft/lgpl.html.
+http://www.gnu.org/licenses/agpl-3.0.html.
 
 5. TERMINATION
 
