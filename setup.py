@@ -29,6 +29,7 @@ setup(
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
         'Topic :: Software Development :: Libraries :: Python Modules',
+        'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
     ],
     install_requires=[
         'Django>=1.8',
