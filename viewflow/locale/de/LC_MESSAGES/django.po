@@ -71,7 +71,7 @@ msgstr "Aufheben"
 
 #: viewflow/flow/views/actions.py:139
 msgid "Task {task} has been canceled."
-msgstr "Aufgabe {hyperlink} wurde abgebrochen."
+msgstr "Aufgabe {task} wurde abgebrochen."
 
 #: viewflow/flow/views/actions.py:146
 msgid "Perform"
@@ -115,10 +115,8 @@ msgstr "Aufgabe {task} kann Ihnen nicht zugewiesen werden"
 
 
 #: viewflow/flow/views/task.py:212
-#, fuzzy, python-brace-format
-#| msgid "Task {hyperlink} has been undone."
 msgid "Task {task} has been unassigned."
-msgstr "Aufgabe {hyperlink} wurde rückgängig gemacht."
+msgstr "Aufgabe {task} wurde rückgängig gemacht."
 
 #: viewflow/frontend/apps.py:18
 msgid "Workflow"
@@ -381,9 +379,6 @@ msgstr "Aufgaben"
 
 #~ msgid "Save and add another"
 #~ msgstr "Speichern und neuen Hinzufügen"
-
-#~ msgid "Task {hyperlink} has been executed."
-#~ msgstr "Aufgabe {hyperlink} wurde ausgeführt."
 
 #~ msgid "Can't execute action {}"
 #~ msgstr "Kann Aktion {} nicht ausführen"
