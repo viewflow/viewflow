@@ -675,7 +675,7 @@ class AbstractJobActivation(Activation):
 
     @Activation.status.transition(
         source=[STATUS.SCHEDULED, STATUS.STARTED, STATUS.ERROR, STATUS.DONE],
-        target=STATUS.ASSIGNED)
+        target=STATUS.ASSIGNED, conditions=[all_leading_canceled])
     def undo(self):
         """Undo the task."""
         super(AbstractJobActivation, self).undo.original()
