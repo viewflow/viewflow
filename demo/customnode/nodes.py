@@ -22,7 +22,8 @@ class DynamicSplitActivation(AbstractGateActivation):
             raise FlowRuntimeError("{} activated with zero and no IfNone nodes specified".format(self.flow_task.name))
 
 
-class DynamicSplit(mixins.NextNodeMixin,
+class DynamicSplit(mixins.TaskDescriptionMixin,
+                   mixins.NextNodeMixin,
                    mixins.UndoViewMixin,
                    mixins.CancelViewMixin,
                    mixins.PerformViewMixin,
@@ -51,8 +52,8 @@ class DynamicSplit(mixins.NextNodeMixin,
 
     activation_class = DynamicSplitActivation
 
-    def __init__(self, callback):
-        super(DynamicSplit, self).__init__()
+    def __init__(self, callback, **kwargs):
+        super(DynamicSplit, self).__init__(**kwargs)
         self._task_count_callback = callback
         self._ifnone_next_node = None
 
