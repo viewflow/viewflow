@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from django.views import generic
 
-from ... import activation, models
+from ... import activation
 from .mixins import (
     LoginRequiredMixin, FlowViewPermissionMixin,
     FlowListMixin
@@ -19,6 +19,7 @@ class AllProcessListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
 
     def get_queryset(self):
         """All process instances list available for the current user."""
+        from ... import models
         return models.Process.objects \
             .filter_available(self.flows, self.request.user) \
             .order_by('-created')
@@ -34,6 +35,7 @@ class AllTaskListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
 
     def get_queryset(self):
         """Filtered task list."""
+        from ... import models
         return models.Task.objects.inbox(self.flows, self.request.user).order_by('-created')
 
 
@@ -47,6 +49,7 @@ class AllQueueListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
 
     def get_queryset(self):
         """Filtered task list."""
+        from ... import models
         return models.Task.objects.queue(self.flows, self.request.user).order_by('-created')
 
 
@@ -60,6 +63,7 @@ class AllArchiveListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
 
     def get_queryset(self):
         """All tasks from all processes assigned to the current user."""
+        from ... import models
         return models.Task.objects.archive(self.flows, self.request.user).order_by('-created')
 
 
