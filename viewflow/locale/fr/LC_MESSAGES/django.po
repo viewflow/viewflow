@@ -53,7 +53,7 @@ msgstr "Commencé"
 #: viewflow/activation.py:41
 msgctxt "STATUS"
 msgid "Unripe"
-msgstr "Vert"
+msgstr "Pas prêt"
 
 #: viewflow/flow/views/actions.py:114
 msgid "Undo"
@@ -81,7 +81,7 @@ msgstr "Effectuer"
 
 #: viewflow/flow/views/actions.py:162
 msgid "Activate Next"
-msgstr "Activer Suivant"
+msgstr "Activer la tâche suivante"
 
 #: viewflow/flow/views/actions.py:252
 #, python-brace-format
@@ -111,7 +111,7 @@ msgstr "La tâche {task} a été complétée."
 #: viewflow/flow/views/task.py:79
 #, python-brace-format
 msgid "Process {process} has been completed."
-msgstr "Process {process} a été complété."
+msgstr "Le processus {process} a été complété."
 
 #: viewflow/flow/views/task.py:173
 #, python-brace-format
@@ -137,7 +137,7 @@ msgstr "Flux de travail"
 #: viewflow/frontend/templates/viewflow/flow/process_detail.html:19
 #: viewflow/frontend/templates/viewflow/site_task_action.html:16
 msgid "Description"
-msgstr "La description"
+msgstr "Description"
 
 #: viewflow/frontend/templates/viewflow/flow/base_task.html:36
 #: viewflow/frontend/templates/viewflow/flow/process_data.html:32
@@ -149,7 +149,7 @@ msgstr "Propriétaire"
 #: viewflow/frontend/templates/viewflow/flow/base_task.html:41
 #: viewflow/models.py:158
 msgid "Permission"
-msgstr "Autorisation"
+msgstr "Permission"
 
 #: viewflow/frontend/templates/viewflow/flow/base_task.html:49
 #: viewflow/models.py:18 viewflow/models.py:79
@@ -227,7 +227,7 @@ msgstr "Tâche"
 
 #: viewflow/frontend/templates/viewflow/flow/queue.html:7
 msgid "Queue"
-msgstr ""
+msgstr "File d'attente"
 
 #: viewflow/frontend/templates/viewflow/flow/queue.html:15
 #: viewflow/frontend/templates/viewflow/site_task_action.html:18
@@ -274,17 +274,17 @@ msgstr "Attribuer"
 
 #: viewflow/frontend/templates/viewflow/flow/task_assign.html:19
 msgid "Assign and continue on this process"
-msgstr "Affectez et poursuivez ce processus"
+msgstr "Attribuez et poursuivez ce processus"
 
 #: viewflow/frontend/templates/viewflow/flow/task_detail.html:12
 msgid "Administration"
-msgstr "Gestion"
+msgstr "Administration"
 
 #: viewflow/frontend/templates/viewflow/flow/task_detail.html:23
 #: viewflow/frontend/templates/viewflow/flow/task_unassign.html:5
 #: viewflow/frontend/templates/viewflow/flow/task_unassign.html:8
 msgid "Unassign"
-msgstr "Désassigner"
+msgstr "Désattribuer"
 
 #: viewflow/frontend/templates/viewflow/flow/task_detail.html:28
 msgid "Execute"
@@ -294,13 +294,13 @@ msgstr "Exécuter"
 #: viewflow/frontend/templates/viewflow/menu.html:3
 #: viewflow/frontend/templates/viewflow/site_tasks.html:6
 msgid "Inbox"
-msgstr "Entrant"
+msgstr "Entrants"
 
 #: viewflow/frontend/templates/viewflow/includes/breadcrumb_category.html:3
 #: viewflow/frontend/templates/viewflow/menu.html:4
 #: viewflow/frontend/templates/viewflow/site_queue.html:6
 msgid "Unassigned"
-msgstr "Non attribué"
+msgstr "Non attribués"
 
 #: viewflow/frontend/templates/viewflow/includes/breadcrumb_category.html:4
 #: viewflow/frontend/templates/viewflow/menu.html:5
@@ -340,7 +340,7 @@ msgstr "Résumé du processus"
 
 #: viewflow/frontend/views.py:175 viewflow/frontend/views.py:221
 msgid "Process URL"
-msgstr "URL de processus"
+msgstr "URL du processus"
 
 #: viewflow/frontend/views.py:316
 msgid "Active Tasks"
