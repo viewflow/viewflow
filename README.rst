@@ -2,26 +2,13 @@
 django-viewflow
 ===============
 
-Reusable workflow library for Django, that helps to implement people collaboration software.
+Viewflow is a lightweight reusable workflow library that helps to
+organize people collaboration business logic in django applications.
+
+In conjunction with django-material, they could be used as the
+framework to build ready to use business applications in minutes.
 
 http://viewflow.io.
-
-
-Viewflow takes best parts from two worlds. It is based on BPMN -
-business process modeling and notation standard. And plays well with
-django web development toolchain. BPMN provides a standard
-notation readily understandable by all business stakeholders. Viewflow
-bridging the gap between picture and executable, ready to use web
-application.
-
-.. image:: https://raw.githubusercontent.com/viewflow/viewflow/master/demo/shipment/doc/ShipmentProcess.png
-   :width: 400px
-
-After over than 10 years history of the BPMN standard, it contains
-whole set of battle-proven primitives for all occasions, helps you to
-describe all real life business process scenarios. Viewflow helps you
-to build a bpmn diagram in code and keep business logic separate from
-django forms and views code.
 
 .. image:: https://img.shields.io/pypi/v/django-viewflow.svg
     :target: https://pypi.python.org/pypi/django-viewflow
@@ -40,7 +27,40 @@ django forms and views code.
 
 Viewflow works with Django 1.8/1.9/1.10/1.11
 
-Django-Material 1.x branch going to be supported till Django 1.8 lifetime (April 2018)
+Viewflow 1.x.x  going to be supported till Django 1.8 lifetime (April 2018)
+
+
+Introduction
+============
+
+.. image:: https://raw.githubusercontent.com/viewflow/viewflow/master/demo/shipment/doc/ShipmentProcess.png
+   :width: 400px
+
+Django web framework solves only technical problems related to the
+client-server interaction on top of the stateless HTTP
+protocol. Model-View-Template separation pattern helps to maintain
+simple CRUD based logic. Viewflow is the library that offers an
+additional layer of django web framework, allows explicitly specify
+people's workflow and extracts collaboration logic from django views.
+
+Viewflow layer is based on the BPMN - business process management and
+notation standard. It is the graphical notation readily understandable
+by all business stakeholders and software developers. Viewflow bridges
+the gap between a picture as the software specification and the
+working solution.
+
+Django-Material frontend is the lightweight alternative to the django
+admin and allows you to build business applications. It’s based on
+Google Material Design, that could be easily customized to your brand
+colors. Django-Material takes care of site-wide navigation, complex
+form construction, datagrids and CRUD functionality. Ready for fast
+development of any CRM, ERP, Business Management Software.
+
+
+Quick start
+===========
+
+5 minutes introduction `tutorial <http://docs.viewflow.io/viewflow_quickstart.html>`_
 
 
 Demo
@@ -63,6 +83,15 @@ Cookbook
 Advanced customization samples
 
 https://github.com/viewflow/cookbook
+
+
+Contribution
+============
+
+Please open an issue to discuss. before pushing any new functionality.
+
+See also - `Contribution Agreement <./CONTRIBUTION.txt>`_
+
 
 
 License
