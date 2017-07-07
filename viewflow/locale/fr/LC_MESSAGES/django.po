@@ -81,7 +81,7 @@ msgstr "Effectuer"
 
 #: viewflow/flow/views/actions.py:162
 msgid "Activate Next"
-msgstr "Activer la tâche suivante"
+msgstr "Activer les tâches suivantes"
 
 #: viewflow/flow/views/actions.py:252
 #, python-brace-format
