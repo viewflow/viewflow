@@ -12,7 +12,7 @@ class ThisObject(object):
 
     @property
     def owner(self):
-        """Return user that was assogned to the task."""
+        """Return user that was assigned to the task."""
         def get_task_owner(activation):
             flow_class = activation.process.flow_class
             task_node = flow_class._meta.node(self.name)
@@ -27,7 +27,7 @@ class ThisObject(object):
 class This(object):
     """Helper for building forward referenced flow task.
 
-    Therationaly is ability to specify referencies to the class
+    The rationaly is ability to specify referencies to the class
     attribute and methods before they declated.
 
     `this` is like a `self` but for the class body.
