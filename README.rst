@@ -70,6 +70,21 @@ Viewflow comes with reference UI implementation on top of django-material projec
 
 http://demo.viewflow.io
 
+To checkout and run open source demo version localy, you need to have
+`git <https://git-scm.com/>`_ and `tox
+<https://tox.readthedocs.io/en/latest/>`_ tools installed.
+
+.. code:: bash
+
+    git clone https://github.com/viewflow/viewflow.git
+    cd viewflow
+
+    TOXENV=py34-dj111 tox -- python manage.py migrate --settings=demo.settings
+    TOXENV=py34-dj111 tox -- python manage.py loaddata demo/helloworld/fixtures/helloworld/default_data.json --settings=demo.settings
+    TOXENV=py34-dj111 tox -- python manage.py runserver --settings=demo.settings
+
+Then, you can open http://127.0.0.1:8000 and login with `admin:admin` username/password pair.
+
 
 Documentation
 =============
