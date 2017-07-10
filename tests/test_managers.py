@@ -64,6 +64,15 @@ class Test(TestCase):
         self.assertEqual([process], list(queryset))
         self.assertEqual([], list(queryset[0].participants.filter(is_staff=True)))
 
+    def test_prefetch_related_process(self):
+        process = ChildProcess.objects.create(flow_class=ChildFlow)
+
+        queryset = ChildProcess.objects.prefetch_related(
+            Prefetch('relatedprocess_set', queryset=RelatedProcess.objects.all())
+        )
+
+        self.assertEqual([process], list(queryset))
+
     def test_task_queryset_filter_by_flowcls_succeed(self):
         queryset = managers.TaskQuerySet(model=Task).filter(flow_task=ChildFlow.start)
 
@@ -120,6 +129,10 @@ class Test(TestCase):
 class ChildProcess(Process):
     comment = models.CharField(max_length=50)
     participants = models.ManyToManyField(User)
+
+
+class RelatedProcess(Process):
+    child_process = models.ForeignKey(ChildProcess)
 
 
 class ChildTask(Task):
