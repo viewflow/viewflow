@@ -1,6 +1,8 @@
 import sqlparse
 
 from django.db import models
+from django.db.models import Prefetch
+from django.contrib.auth.models import User
 from django.test import TestCase
 from viewflow import flow, managers
 from viewflow.base import Flow
@@ -51,8 +53,19 @@ class Test(TestCase):
         queryset = managers.ProcessQuerySet(model=Process).coerce_for([ChildFlow]).values_list('id')
         self.assertEqual([(process.pk,)], list(queryset))
 
+    def test_process_queryset_prefetch_related(self):
+        process = ChildProcess.objects.create(flow_class=ChildFlow)
+
+        queryset = (
+            managers.ProcessQuerySet(model=Process)
+            .coerce_for([ChildFlow])
+            .prefetch_related(Prefetch('participants', queryset=User.objects.filter(is_staff=True)))
+        )
+        self.assertEqual([process], list(queryset))
+        self.assertEqual([], list(queryset[0].participants.filter(is_staff=True)))
+
     def test_task_queryset_filter_by_flowcls_succeed(self):
-        queryset = managers.ProcessQuerySet(model=Task).filter(flow_task=ChildFlow.start)
+        queryset = managers.TaskQuerySet(model=Task).filter(flow_task=ChildFlow.start)
 
         self.assertEqual(str(queryset.query).strip(),
                          'SELECT "viewflow_task"."id", "viewflow_task"."flow_task", "viewflow_task"."flow_task_type",'
@@ -106,6 +119,7 @@ class Test(TestCase):
 
 class ChildProcess(Process):
     comment = models.CharField(max_length=50)
+    participants = models.ManyToManyField(User)
 
 
 class ChildTask(Task):
