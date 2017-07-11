@@ -8,10 +8,10 @@ from django.db.models.constants import LOOKUP_SEP
 
 
 try:
-    from django.db.models.query import BaseIterable
+    from django.db.models.query import ModelIterable
 except ImportError:
     # Django 1.8
-    BaseIterable = object
+    ModelIterable = object
 
 from .activation import STATUS
 from .fields import ClassValueWrapper
@@ -79,11 +79,9 @@ def coerce_to_related_instance(instance, target_model):
     return instance
 
 
-class ProcessIterable(BaseIterable):
+class ProcessIterable(ModelIterable):
     def __iter__(self):
-        from django.db.models.query import ModelIterable
-
-        base_itererator = ModelIterable(self.queryset)
+        base_itererator = super(ProcessIterable, self).__iter__()
         if getattr(self.queryset, '_coerced', False):
             for process in base_itererator:
                 if isinstance(process, self.queryset.model):
@@ -99,8 +97,7 @@ class ProcessQuerySet(QuerySet):
 
     def __init__(self, *args, **kwargs):
         super(ProcessQuerySet, self).__init__(*args, **kwargs)
-        if django.VERSION > (1, 8):
-            self._iterable_class = ProcessIterable
+        self._iterable_class = ProcessIterable
 
     def filter(self, *args, **kwargs):
         """Queryset filter allows to use `flow_class` class values."""
@@ -149,11 +146,9 @@ class ProcessQuerySet(QuerySet):
                 yield process
 
 
-class TaskIterable(BaseIterable):
+class TaskIterable(ModelIterable):
     def __iter__(self):
-        from django.db.models.query import ModelIterable
-
-        base_itererator = ModelIterable(self.queryset)
+        base_itererator = super(TaskIterable, self).__iter__()
         if getattr(self.queryset, '_coerced', False):
             for task in base_itererator:
                 if isinstance(task, self.queryset.model):

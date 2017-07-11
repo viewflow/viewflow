@@ -1,4 +1,6 @@
+import django
 import sqlparse
+import unittest
 
 from django.db import models
 from django.db.models import Prefetch
@@ -53,9 +55,11 @@ class Test(TestCase):
         queryset = managers.ProcessQuerySet(model=Process).coerce_for([ChildFlow]).values_list('id')
         self.assertEqual([(process.pk,)], list(queryset))
 
+    @unittest.skipIf(django.VERSION[:2] == (1, 10), reason='Django 1.10 have no support for prefetch with  custom iterable')
     def test_process_queryset_prefetch_related(self):
         process = ChildProcess.objects.create(flow_class=ChildFlow)
 
+        # process -> participatns
         queryset = (
             managers.ProcessQuerySet(model=Process)
             .coerce_for([ChildFlow])
@@ -63,6 +67,13 @@ class Test(TestCase):
         )
         self.assertEqual([process], list(queryset))
         self.assertEqual([], list(queryset[0].participants.filter(is_staff=True)))
+
+        # participants -> processes
+        queryset = (
+            User.objects.filter(is_staff=True)
+            .prefetch_related(Prefetch('childprocess', queryset=ChildProcess.objects.all()))
+        )
+        self.assertEqual([], list(queryset))
 
     def test_task_queryset_filter_by_flowcls_succeed(self):
         queryset = managers.TaskQuerySet(model=Task).filter(flow_task=ChildFlow.start)
