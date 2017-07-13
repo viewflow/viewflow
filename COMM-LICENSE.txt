@@ -32,7 +32,7 @@ under the terms of the GNU Affero General Public License v3.0
 party, has, at any time, developed all (or any portions of) the
 Application(s) using the AGPL Version, You may not combine such
 development work with the Software and must license such Application(s)
-(or any portions derived there from) under the terms of the GNU Lesser
+(or any portions derived there from) under the terms of the GNU Affero
 General Public License version 3, a copy of which is located at
 http://www.gnu.org/licenses/agpl-3.0.html.
 
