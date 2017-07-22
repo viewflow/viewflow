@@ -50,7 +50,7 @@ the gap between a picture as the software specification and the
 working solution.
 
 Django-Material frontend is the lightweight alternative to the django
-admin and allows you to build business applications. It’s based on
+admin and allows you to build business applications. It's based on
 Google Material Design, that could be easily customized to your brand
 colors. Django-Material takes care of site-wide navigation, complex
 form construction, datagrids and CRUD functionality. Ready for fast
