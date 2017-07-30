@@ -19,7 +19,7 @@ http://viewflow.io.
 .. image:: https://requires.io/github/viewflow/viewflow/requirements.svg?branch=master
    :target: https://requires.io/github/viewflow/viewflow/requirements/?branch=master
 
-.. image:: https://coveralls.io/repos/viewflow/viewflow/badge.png?branch=master
+.. image:: https://coveralls.io/repos/viewflow/viewflow/badge.svg?branch=master
    :target: https://coveralls.io/r/viewflow/viewflow?branch=master
 
 .. image:: https://img.shields.io/pypi/pyversions/django-viewflow.svg
