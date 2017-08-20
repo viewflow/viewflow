@@ -269,22 +269,23 @@ class StartActivation(Activation):
             :data:`viewflow.signals.flow_started`
 
         """
-        signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
+        with transaction.atomic(savepoint=True):
+            signals.task_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
-        self.process.save()
+            self.process.save()
 
-        lock_impl = self.flow_class.lock_impl(self.flow_class.instance)
-        self.lock = lock_impl(self.flow_class, self.process.pk)
-        self.lock.__enter__()
+            lock_impl = self.flow_class.lock_impl(self.flow_class.instance)
+            self.lock = lock_impl(self.flow_class, self.process.pk)
+            self.lock.__enter__()
 
-        self.task.process = self.process
-        self.task.finished = now()
-        self.task.save()
+            self.task.process = self.process
+            self.task.finished = now()
+            self.task.save()
 
-        signals.task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
-        signals.flow_started.send(sender=self.flow_class, process=self.process, task=self.task)
+            signals.task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
+            signals.flow_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
-        self.activate_next()
+            self.activate_next()
 
     @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
