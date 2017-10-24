@@ -108,7 +108,7 @@ class ProcessQuerySet(QuerySet):
         return super(ProcessQuerySet, self).filter(*args, **kwargs)
 
     def coerce_for(self, flow_classes):
-        """Return subclass instancess of the Task."""
+        """Return subclass instances of the Task."""
         self._coerced = True
 
         flow_classes = list(flow_classes)
@@ -176,7 +176,7 @@ class TaskQuerySet(QuerySet):
         return super(TaskQuerySet, self).filter(*args, **kwargs)
 
     def coerce_for(self, flow_classes):
-        """Return subclass instancess of the Task."""
+        """Return subclass instances of the Task."""
         self._coerced = True
         flow_classes = list(flow_classes)
 
@@ -219,7 +219,7 @@ class TaskQuerySet(QuerySet):
         return queryset.filter(owner=user, finished__isnull=False)
 
     def filter_available(self, flow_classes, user):
-        """List of task available to view for the user."""
+        """List of tasks available to view for the user."""
         return self.model.objects.coerce_for(_available_flows(flow_classes, user))
 
     def inbox(self, flow_classes, user):
