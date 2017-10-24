@@ -27,12 +27,12 @@ class ThisObject(object):
 class This(object):
     """Helper for building forward referenced flow task.
 
-    The rationaly is ability to specify referencies to the class
-    attribute and methods before they declated.
+    The rationale is ability to specify references to the class
+    attributes and methods before they are declared.
 
     `this` is like a `self` but for the class body.
 
-    The referencies are resolved by the metaclass at the end of the
+    The references are resolved by the metaclass at the end of the
     flow construction.
 
     Example::
