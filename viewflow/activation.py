@@ -55,11 +55,11 @@ def all_leading_canceled(activation):
 class Context(object):
     """Thread-local activation context, dynamically scoped.
 
-    :keyword propagate_exception: If True on activation fails
-                                  exception would be propagated to
-                                  previous activalion, if False,
-                                  current task activation would be
-                                  marked as failed
+    :keyword propagate_exception: If True, on activation failure
+                                  exception will be propagated to
+                                  previous activation. If False,
+                                  current task activation will be
+                                  marked as failed.
 
 
     Usage ::
