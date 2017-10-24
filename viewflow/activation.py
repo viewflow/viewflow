@@ -109,11 +109,11 @@ class Activation(object):
     """
     Base class for flow task activations.
 
-    Activation responsible for flow task state management and persistance
+    Activation is responsible for flow task state management and persistance.
 
-    Each activation status chages restricted by a simple finite state automata
+    Each activation status changes are restricted by a simple finite state automata.
 
-    Base class enshures that all tasks could be undone or cancelled.
+    Base class ensures that all tasks can be undone or cancelled.
 
     .. graphviz::
 
@@ -129,10 +129,10 @@ class Activation(object):
     status = fsm.State()
 
     def __init__(self, *args, **kwargs):
-        """Instanciate an activation.
+        """Instantiate an activation.
 
         The activation should be avaliable to instantiate without
-        any agruments.
+        any arguments.
         """
         self.flow_class, self.flow_task = None, None
         self.process, self.task = None, None
@@ -160,7 +160,7 @@ class Activation(object):
         """
         Perform activation action inside a transaction.
 
-        Handle and propagate exception depends on actvation context state
+        Handle and propagate exception depending on activation context state.
         """
         @contextmanager
         def guard():
@@ -193,7 +193,7 @@ class Activation(object):
         """
         Undo the task.
 
-        If flow class have `[task_name]_undo(self, activation)` method it would be called
+        If flow class has `[task_name]_undo(self, activation)` method, it will be called.
         """
         self.task.finished = None
         self.task.save()
@@ -496,7 +496,7 @@ class AbstractGateActivation(Activation):
     @Activation.status.transition(source=STATUS.NEW)
     def perform(self):
         """
-        Calculate the next codes and activates it.
+        Calculate the next node and activate it.
 
         .. seealso::
             :data:`viewflow.signals.task_started`
@@ -598,7 +598,7 @@ class AbstractJobActivation(Activation):
         """
         Run task asynchronously.
 
-        Subclasses should override that method
+        Subclasses should override that method.
         """
         raise NotImplementedError
 
