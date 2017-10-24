@@ -1,5 +1,5 @@
 class FlowRuntimeError(Exception):
-    """Unrecovable flow runtime error."""
+    """Unrecoverable flow runtime error."""
 
 
 class FlowLockFailed(Exception):
