@@ -34,8 +34,8 @@ def flow_func(func):
     """
     Decorator for flow functions.
 
-    Expect function that gets activation instance as the first parameter,
-    Returns function that expects task instance as the first parameter instead
+    Expects function that gets activation instance as the first parameter.
+    Returns function that expects task instance as the first parameter instead.
     """
     @transaction.atomic
     @functools.wraps(func)
@@ -57,11 +57,11 @@ def flow_job(func):
     Decorator that prepares celery task for execution.
 
     Makes celery job function with the following signature
-    `(flow_task-strref, process_pk, task_pk, **kwargs)`
+    `(flow_task-strref, process_pk, task_pk, **kwargs)`.
 
-    Expects actual celery job function which has the following signature `(activation, **kwargs)`
+    Expects actual celery job function which has the following signature `(activation, **kwargs)`.
     If celery task class implements activation interface, job function is
-    called without activation instance `(**kwargs)`
+    called without activation instance `(**kwargs)`.
 
     Process instance is locked only before and after the function execution.
     Please avoid any process state modification during the celery job.
@@ -160,8 +160,8 @@ def flow_start_view(view):
     """
     Decorator for start views, creates and initializes start activation.
 
-    Expects view with the signature `(request, **kwargs)`
-    Returns view with the signature `(request, flow_class, flow_task, **kwargs)`
+    Expects view with the signature `(request, **kwargs)`.
+    Returns view with the signature `(request, flow_class, flow_task, **kwargs)`.
     """
     @transaction.atomic
     @functools.wraps(view)
@@ -191,8 +191,8 @@ def flow_view(view):
     """
     Decorator that locks and runs the flow view in transaction.
 
-    Expects view with the signature `(request, **kwargs)`
-    Returns view with the signature `(request, flow_class, flow_task, process_pk, task_pk, **kwargs)
+    Expects view with the signature `(request, **kwargs)`.
+    Returns view with the signature `(request, flow_class, flow_task, process_pk, task_pk, **kwargs)`.
     """
     @transaction.atomic
     @functools.wraps(view)
