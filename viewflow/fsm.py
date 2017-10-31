@@ -251,7 +251,7 @@ class State(object):
             return func
         return _wrapper
 
-    def get_available_transtions(self, instance):
+    def get_available_transitions(self, instance):
         """List of transitions available from the current state."""
         transitions_cache = instance.__class__.__dict__.get('_transitions{}'.format(self.propname), None)
         if transitions_cache is None:

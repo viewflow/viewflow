@@ -8,22 +8,22 @@ class Test(unittest.TestCase):
         self.assertEqual('initial', base.state)
 
         self.assertTrue(base.prepare.can_proceed())
-        self.assertEqual([Base.prepare], Base.state.get_available_transtions(base))
+        self.assertEqual([Base.prepare], Base.state.get_available_transitions(base))
         base.prepare()
         self.assertEqual('prepared', base.state)
 
         self.assertTrue(base.start.can_proceed())
-        self.assertEqual([Base.start], Base.state.get_available_transtions(base))
+        self.assertEqual([Base.start], Base.state.get_available_transitions(base))
         base.start()
         self.assertEqual('started', base.state)
 
         self.assertTrue(base.done.can_proceed())
-        self.assertEqual([Base.done], Base.state.get_available_transtions(base))
+        self.assertEqual([Base.done], Base.state.get_available_transitions(base))
         base.done()
         self.assertEqual('done', base.state)
 
         self.assertFalse(base.done.can_proceed())
-        self.assertEqual([], Base.state.get_available_transtions(base))
+        self.assertEqual([], Base.state.get_available_transitions(base))
         self.assertRaises(TransitionNotAllowed, base.done)
 
     def test_child_transitions(self):
@@ -48,15 +48,15 @@ class Test(unittest.TestCase):
     def test_subchild_transitions(self):
         sub_child = SubChild()
 
-        self.assertEqual([SubChild.prepare], SubChild.state.get_available_transtions(sub_child))
+        self.assertEqual([SubChild.prepare], SubChild.state.get_available_transitions(sub_child))
         sub_child.prepare()
         self.assertEqual('prepared', sub_child.state)
 
-        self.assertEqual([SubChild.start], SubChild.state.get_available_transtions(sub_child))
+        self.assertEqual([SubChild.start], SubChild.state.get_available_transitions(sub_child))
         sub_child.start()
         self.assertEqual('started', sub_child.state)
 
-        self.assertEqual([SubChild.done], SubChild.state.get_available_transtions(sub_child))
+        self.assertEqual([SubChild.done], SubChild.state.get_available_transitions(sub_child))
         sub_child.done()
         self.assertEqual('finalizing', sub_child.state)
 
@@ -66,7 +66,7 @@ class Test(unittest.TestCase):
     def test_subchild_withmixin_transitions(self):
         sub_child = SubChildWithMixin()
         self.assertTrue(sub_child.prepare.can_proceed())
-        self.assertEqual([SubChildWithMixin.prepare], SubChildWithMixin.state.get_available_transtions(sub_child))
+        self.assertEqual([SubChildWithMixin.prepare], SubChildWithMixin.state.get_available_transitions(sub_child))
         sub_child.prepare()
         self.assertEqual('prepared', sub_child.state)
 

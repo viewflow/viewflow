@@ -18,7 +18,7 @@ def task_management_menu(activation, request):
     """Available tasks actions."""
     actions = []
     if request.user.has_perm(activation.flow_class._meta.manage_permission_name):
-        for transition in activation.get_available_transtions():
+        for transition in activation.get_available_transitions():
             if transition.can_proceed(activation):
                 url = activation.flow_task.get_task_url(
                     activation.task, transition.name, user=request.user,

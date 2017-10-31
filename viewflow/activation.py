@@ -152,9 +152,9 @@ class Activation(object):
             return self.task.status
         return STATUS.UNRIPE
 
-    def get_available_transtions(self):
+    def get_available_transitions(self):
         """List of all available activation transitions."""
-        return self.__class__.status.get_available_transtions(self)
+        return self.__class__.status.get_available_transitions(self)
 
     def exception_guard(self):
         """
