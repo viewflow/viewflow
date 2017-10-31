@@ -57,7 +57,7 @@ class StartFunction(mixins.TaskDescriptionMixin,
         return activation
 
     def ready(self):
-        """Resolve internal `this`-referencies."""
+        """Resolve internal `this`-references."""
         if isinstance(self.func, ThisObject):
             self.func = getattr(self.flow_class.instance, self.func.name)
 
@@ -142,7 +142,7 @@ class Function(mixins.TaskDescriptionMixin,
         super(Function, self).__init__(**kwargs)
 
     def ready(self):
-        """Resolve internal `this`-referencies."""
+        """Resolve internal `this`-references."""
         if isinstance(self.func, ThisObject):
             self.func = getattr(self.flow_class.instance, self.func.name)
         if isinstance(self.task_loader, ThisObject):

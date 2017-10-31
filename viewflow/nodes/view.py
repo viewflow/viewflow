@@ -184,7 +184,7 @@ class View(mixins.PermissionMixin, BaseView):
         """
         Instantiate a View node.
 
-        :keyword assign_view: Overides default AssgnView for the node
+        :keyword assign_view: Overides default AssignView for the node
         :keyword unassign_view: Overides default UnassignView for the node
         """
         self._assign_view = kwargs.pop('assign_view', None)

@@ -52,7 +52,7 @@ class Split(mixins.TaskDescriptionMixin,
             Gateway):
     """Parallel split gateway.
 
-    Activates outgoing tasks to execute concurently. Assumes that all
+    Activates outgoing tasks to execute concurrently. Assumes that all
     outgoing path converges at the same Join node.
 
     If Split has no nodes to activate, FlowRuntimeError would be

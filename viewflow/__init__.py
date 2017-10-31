@@ -85,7 +85,7 @@ class Edge(object):
     def edge_class(self):
         """Type of the edge.
 
-        Viewfow uses `next`, 'cond_true', `cond_false` and `defailt`
+        Viewflow uses `next`, 'cond_true', `cond_false` and `default`
         edge classes.
 
         Edge class could be used as a hint for edge visualization.
@@ -139,7 +139,7 @@ class Node(object):
         """
         Called when flow class setup finished.
 
-        Subclasses could perform additional initialisation here.
+        Subclasses could perform additional initialization here.
         """
 
     def urls(self):

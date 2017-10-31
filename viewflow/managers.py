@@ -28,7 +28,7 @@ def _available_flows(flow_classes, user):
 
 
 def _get_related_path(model, base_model):
-    """Return path suitable for select related for sublcass."""
+    """Return path suitable for select related for subclass."""
     ancestry = []
 
     if model._meta.proxy:
@@ -81,14 +81,14 @@ def coerce_to_related_instance(instance, target_model):
 
 class ProcessIterable(ModelIterable):
     def __iter__(self):
-        base_itererator = super(ProcessIterable, self).__iter__()
+        base_iterator = super(ProcessIterable, self).__iter__()
         if getattr(self.queryset, '_coerced', False):
-            for process in base_itererator:
+            for process in base_iterator:
                 if isinstance(process, self.queryset.model):
                     process = coerce_to_related_instance(process, process.flow_class.process_class)
                 yield process
         else:
-            for process in base_itererator:
+            for process in base_iterator:
                 yield process
 
 
@@ -135,27 +135,27 @@ class ProcessQuerySet(QuerySet):
         """Coerce queryset results to process subclasses."""
 
         # django 1.8 only
-        base_itererator = super(ProcessQuerySet, self).iterator()
+        base_iterator = super(ProcessQuerySet, self).iterator()
         if getattr(self, '_coerced', False):
-            for process in base_itererator:
+            for process in base_iterator:
                 if isinstance(process, self.model):
                     process = coerce_to_related_instance(process, process.flow_class.process_class)
                 yield process
         else:
-            for process in base_itererator:
+            for process in base_iterator:
                 yield process
 
 
 class TaskIterable(ModelIterable):
     def __iter__(self):
-        base_itererator = super(TaskIterable, self).__iter__()
+        base_iterator = super(TaskIterable, self).__iter__()
         if getattr(self.queryset, '_coerced', False):
-            for task in base_itererator:
+            for task in base_iterator:
                 if isinstance(task, self.queryset.model):
                     task = coerce_to_related_instance(task, task.flow_task.flow_class.task_class)
                 yield task
         else:
-            for task in base_itererator:
+            for task in base_iterator:
                 yield task
 
 
@@ -248,14 +248,14 @@ class TaskQuerySet(QuerySet):
     def iterator(self):
         """Coerce queryset results to process subclasses."""
         # django 1.8 only
-        base_itererator = super(TaskQuerySet, self).iterator()
+        base_iterator = super(TaskQuerySet, self).iterator()
         if getattr(self, '_coerced', False):
-            for task in base_itererator:
+            for task in base_iterator:
                 if isinstance(task, self.model):
                     task = coerce_to_related_instance(task, task.flow_task.flow_class.task_class)
                 yield task
         else:
-            for task in base_itererator:
+            for task in base_iterator:
                 yield task
 
 

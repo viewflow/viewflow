@@ -24,7 +24,7 @@ class ManagedStartViewActivation(StartActivation):
 
     @Activation.status.super()
     def prepare(self, data=None, user=None):
-        """Prepare activation for excecution."""
+        """Prepare activation for execution."""
         super(ManagedStartViewActivation, self).prepare.original()
         self.task.owner = user
 
@@ -59,7 +59,7 @@ class ManagedViewActivation(ViewActivation):
 
     @Activation.status.super()
     def prepare(self, data=None, user=None):
-        """Prepare activation for excecution."""
+        """Prepare activation for execution."""
         super(ManagedViewActivation, self).prepare.original()
 
         if user:
@@ -75,7 +75,7 @@ class ManagedViewActivation(ViewActivation):
 
     @classmethod
     def create_task(cls, flow_task, prev_activation, token):
-        """Create a task, calucate owner and permissions."""
+        """Create a task, calculate owner and permissions."""
         task = ViewActivation.create_task(flow_task, prev_activation, token)
 
         activation = task.activate()

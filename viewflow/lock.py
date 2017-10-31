@@ -28,7 +28,7 @@ class NoLock(object):
 
 class SelectForUpdateLock(object):
     """
-    Databace lock uses `select ... for update` on the process instance row.
+    Database lock uses `select ... for update` on the process instance row.
 
     Recommended to use with PostgreSQL.
     """
@@ -58,7 +58,7 @@ class SelectForUpdateLock(object):
 
 class CacheLock(object):
     """
-    Task lock based on Django's cache.
+    Task lock based on Django cache.
 
     Use it if primary cache backend has transactional `add` functionality,
     like `memcached`.
@@ -69,7 +69,7 @@ class CacheLock(object):
             lock_impl = CacheLock(cache=caches['locks'])
 
     The example uses a different cache. The default cache
-    is Django's ``default`` cache configuration.
+    is Django ``default`` cache configuration.
     """
 
     def __init__(self, cache=default_cache, attempts=5, expires=120):  # noqa D102

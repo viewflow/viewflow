@@ -47,7 +47,7 @@ _context_stack = threading.local()
 
 
 def all_leading_canceled(activation):
-    """Condition to check that there are no outgoing tasks or all of them was cancelled."""
+    """Condition to check that there are no outgoing tasks or all of them was canceled."""
     non_canceled_count = activation.task.leading.exclude(status=STATUS.CANCELED).count()
     return non_canceled_count == 0
 

@@ -104,6 +104,6 @@ class Handler(mixins.TaskDescriptionMixin,
         super(Handler, self).__init__(**kwargs)
 
     def ready(self):
-        """Resolve internal `this`-referencies."""
+        """Resolve internal `this`-references."""
         if isinstance(self.handler, ThisObject):
             self.handler = getattr(self.flow_class.instance, self.handler.name)

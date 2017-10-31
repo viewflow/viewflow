@@ -18,7 +18,7 @@ class Transition(object):
         self.conditions = conditions if conditions else []
 
     def conditions_met(self, instance):
-        """Check that all assotioated conditions is True."""
+        """Check that all associated conditions is True."""
         return all(map(lambda condition: condition(instance), self.conditions))
 
 
@@ -77,7 +77,7 @@ class TransitionDescriptor(object):
         return self.transitions
 
     def get_transition(self, source_state, instance=None):
-        """Get a transtion of a source_state.
+        """Get a transition of a source_state.
 
         Returns None if there is no outgoing transitions.
         """
@@ -121,7 +121,7 @@ class TransitionDescriptor(object):
 
 
 class SuperTransitionDescriptor(TransitionDescriptor):
-    """Descriptor that performs the transition descrived in the base class."""
+    """Descriptor that performs the transition described in the base class."""
 
     def get_descriptor(self, instance):
         """Lookup for the transition descriptor in the base classes."""

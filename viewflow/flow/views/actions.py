@@ -33,7 +33,7 @@ class BaseTaskActionView(MessageUserMixin, generic.TemplateView):
 
     def perform(self):
         """
-        Peform the action.
+        Perform the action.
 
         Subclasses should override it.
         """
@@ -146,7 +146,7 @@ class PerformTaskView(FlowTaskManagePermissionMixin, BaseTaskActionView):
     action_title = _('Perform')
 
     def can_proceed(self):
-        """Check that gateway can be reexecuted."""
+        """Check that gateway can be re-executed."""
         return self.activation.perform.can_proceed()
 
     def perform(self):
@@ -162,11 +162,11 @@ class ActivateNextTaskView(FlowTaskManagePermissionMixin, BaseTaskActionView):
     action_title = _('Activate Next')
 
     def can_proceed(self):
-        """Check that node in a state allows to activate ountgoing nodes."""
+        """Check that node in a state allows to activate outgoing nodes."""
         return self.activation.activate_next.can_proceed()
 
     def perform(self):
-        """Activite oungoing nodes."""
+        """Activate outgoing nodes."""
         self.activation.activate_next()
 
 
@@ -206,7 +206,7 @@ class CancelProcessView(FlowManagePermissionMixin, generic.DetailView):
         messages.add_message(self.request, level, message, fail_silently=fail_silently)
 
     def success(self, message, fail_silently=True, **kwargs):
-        """Notification about sucessful operation."""
+        """Notification about successful operation."""
         self.report(message, level=messages.SUCCESS, fail_silently=fail_silently, **kwargs)
 
     def error(self, message, fail_silently=True, **kwargs):

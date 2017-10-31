@@ -10,7 +10,7 @@ from .token import Token
 
 
 def import_flow_by_ref(flow_strref):
-    """Return flow class by flow string refernece."""
+    """Return flow class by flow string reference."""
     app_label, flow_path = flow_strref.split('/')
     return import_string('{}.{}'.format(get_app_package(app_label), flow_path))
 
@@ -54,7 +54,7 @@ class ClassValueWrapper(object):
 
 
 class _SubfieldBase(type):
-    """Backpoort from django 1.8."""
+    """Backport from django 1.8."""
 
     def __new__(cls, name, bases, attrs):
         new_class = super(_SubfieldBase, cls).__new__(cls, name, bases, attrs)
@@ -65,7 +65,7 @@ class _SubfieldBase(type):
 
 
 class _Creator(object):
-    """Backpoort from django 1.8."""
+    """Backport from django 1.8."""
 
     def __init__(self, field):
         self.field = field

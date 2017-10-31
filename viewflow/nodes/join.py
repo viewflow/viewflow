@@ -45,7 +45,7 @@ class JoinActivation(Activation):
             for prev in self.task.previous.exclude(status=STATUS.CANCELED).all())
 
         if len(join_prefixes) > 1:
-            raise FlowRuntimeError('Multiple tokens {} cames to join {}'.format(join_prefixes, self.flow_task.name))
+            raise FlowRuntimeError('Multiple tokens {} came to join {}'.format(join_prefixes, self.flow_task.name))
 
         join_token_prefix = next(iter(join_prefixes))
 

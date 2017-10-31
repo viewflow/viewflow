@@ -68,7 +68,7 @@ class DetailViewMixin(object):
 
 
 class UndoViewMixin(object):
-    """Undo a completd task."""
+    """Undo a completed task."""
 
     undo_view_class = None
 
@@ -204,10 +204,10 @@ class PermissionMixin(object):
         """
         Make task available for users with specific permission.
 
-        Accespts permissions name or callable :: Callable[Activation] -> string::
+        Accepts permissions name or callable :: Callable[Activation] -> string::
 
             .Permission('my_app.can_approve')
-            .Permission(lambda process: 'my_app.department_manager_{}'.format(process.depratment.pk))
+            .Permission(lambda process: 'my_app.department_manager_{}'.format(process.department.pk))
 
         Task specific permission could be auto created during migration::
 
@@ -215,7 +215,7 @@ class PermissionMixin(object):
             do_task = View().Permission(auto_create=True)
 
             # You can specify permission codename and description right here
-            # The following creates `processcls_app.can_execure_task` permission
+            # The following creates `processcls_app.can_execute_task` permission
             do_task = View().Permission('can_execute_task', help_text='Custom text', auto_create=True)
         """
         if permission is None and not auto_create:
@@ -296,7 +296,7 @@ class TaskDescriptionMixin(object):
 
 
 class TaskDescriptionViewMixin(TaskDescriptionMixin):
-    """Extract task desctiption from the view docstring."""
+    """Extract task description from the view docstring."""
 
     def __init__(self, view_or_class=None, **kwargs):  # noqa D102
         super(TaskDescriptionViewMixin, self).__init__(**kwargs)

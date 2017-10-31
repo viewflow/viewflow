@@ -83,7 +83,7 @@ class BaseTasksActionView(FlowListMixin, generic.TemplateView):
         messages.add_message(self.request, level, message, fail_silently=fail_silently)
 
     def success(self, message, fail_silently=True, **kwargs):
-        """Notification about sucessful operation."""
+        """Notification about successful operation."""
         self.report(message, level=messages.SUCCESS, fail_silently=fail_silently, **kwargs)
 
     def error(self, message, fail_silently=True, **kwargs):
@@ -100,7 +100,7 @@ class BaseTasksActionView(FlowListMixin, generic.TemplateView):
 
 
 class TasksUnAssignView(BaseTasksActionView):
-    """Unassign multiple tasks."""
+    """Deassign multiple tasks."""
 
     action_name = 'unassign'
 
@@ -109,7 +109,7 @@ class TasksUnAssignView(BaseTasksActionView):
         return Task.objects.inbox(self.flows, user).filter(pk__in=tasks_pks)
 
     def post(self, request, *args, **kwargs):
-        """Unassign tasks from the user."""
+        """Deassign tasks from the user."""
         for task in self.tasks:
             lock = task.process.flow_class.lock_impl(task.process.flow_class.instance)
             with lock(task.process.flow_class, task.process_id):

@@ -81,7 +81,7 @@ class FlowMeta(object):
 
 
 class FlowInstanceDescriptor(object):
-    """Singleton flow instance descriptior."""
+    """Singleton flow instance descriptor."""
 
     def __init__(self):  # noqa D102
         self.flow_instance = None

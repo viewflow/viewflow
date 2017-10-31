@@ -86,7 +86,7 @@ class MessageUserMixin(object):
         messages.add_message(self.request, level, message, fail_silently=fail_silently)
 
     def success(self, message, fail_silently=True, **kwargs):
-        """Notification about sucessful operation."""
+        """Notification about successful operation."""
         self.report(message, level=messages.SUCCESS, fail_silently=fail_silently, **kwargs)
 
     def error(self, message, fail_silently=True, **kwargs):
@@ -117,7 +117,7 @@ class FlowListMixin(object):
     def get_flow_namespace(self, flow_class):
         namespace = self.ns_map.get(flow_class)
         if namespace is None:
-            raise FlowRuntimeError("{} are not registred in {}".format(flow_class, self))
+            raise FlowRuntimeError("{} are not registered in {}".format(flow_class, self))
         if not self.ns_map_absolute:
             return "{}:{}".format(self.request.resolver_match.namespace, namespace)
 

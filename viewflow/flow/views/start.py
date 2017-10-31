@@ -58,7 +58,7 @@ class BaseStartFlowMixin(object):
 
 
 class StartFlowMixin(MessageUserMixin, BaseStartFlowMixin):
-    """Mixin for flow views co,pletes activation on a form submit."""
+    """Mixin for flow views completes activation on a form submit."""
 
     def activation_done(self, *args, **kwargs):
         """Finish task activation."""

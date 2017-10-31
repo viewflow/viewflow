@@ -68,7 +68,7 @@ def get_all_related_objects(obj):
         from django.db.models.fields.related import ForeignObjectRel
         return [field for field in obj._meta.get_fields() if isinstance(field, ForeignObjectRel)]
     else:
-        # depricated in django 1.9
+        # deprecated in django 1.9
         return obj._meta.get_all_related_objects()
 
 """

@@ -63,5 +63,6 @@ class TaskAdmin(admin.ModelAdmin):
         """Disable manually task creation."""
         return False
 
+
 admin.site.register(Process, ProcessAdmin)
 admin.site.register(Task, TaskAdmin)

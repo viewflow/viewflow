@@ -5,7 +5,7 @@ from ..activation import Activation, AbstractGateActivation
 
 
 class IfActivation(AbstractGateActivation):
-    """Condifinally activate one of outgoing nodes."""
+    """Conditionally activate one of outgoing nodes."""
 
     def __init__(self, **kwargs):  # noqa D102
         self.condition_result = None
@@ -17,7 +17,7 @@ class IfActivation(AbstractGateActivation):
 
     @Activation.status.super()
     def activate_next(self):
-        """Condifinally activate one of outgoing nodes."""
+        """Conditionally activate one of outgoing nodes."""
         if self.condition_result:
             self.flow_task._on_true.activate(prev_activation=self, token=self.task.token)
         else:

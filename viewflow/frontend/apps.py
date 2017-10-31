@@ -11,7 +11,7 @@ from material.frontend.apps import ModuleMixin
 
 
 class ViewflowFrontendConfig(ModuleMixin, AppConfig):
-    """Application config for the viewflow fronend."""
+    """Application config for the viewflow frontend."""
 
     name = 'viewflow.frontend'
     label = 'viewflow_frontend'
@@ -70,7 +70,7 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
 
     @property
     def flows(self):
-        """List of all registred flows."""
+        """List of all registered flows."""
         return self._registry.keys()
 
     @property

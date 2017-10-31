@@ -57,6 +57,7 @@ def import_flows(app_config, **kwargs):
     except ImportError:
         pass
 
+
 pre_migrate.connect(import_flows, dispatch_uid="viewflow.management.import_flows")
 if django.VERSION >= (1, 10):
     post_migrate.connect(create_permissions, dispatch_uid="viewflow.management.create_permissions")

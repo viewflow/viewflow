@@ -29,7 +29,7 @@ class FrontendViewSet(object):
     def filter_kwargs(self, view_class, **kwargs):
         """Add defaults and filter kwargs to only thouse that view can accept.
 
-        Viewset pass to the view only kwars that have non DEFAULT values,
+        Viewset pass to the view only kwargs that have non DEFAULT values,
         and if the view have a corresponding attribute.
 
         In addition, if view has `viewset` attribute, it will receive
@@ -122,7 +122,7 @@ class FrontendViewSet(object):
         ]
 
     """
-    Tasks Action: Unassign
+    Tasks Action: Deassign
     """
     tasks_unassign_view_class = views.TasksUnAssignView
 

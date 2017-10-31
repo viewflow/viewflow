@@ -179,7 +179,7 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
 
     @method_decorator(flow_view)
     def dispatch(self, request, *args, **kwargs):
-        """Check permisions and assign task to the current user."""
+        """Check permissions and assign task to the current user."""
         self.activation = request.activation
 
         if request.user is None or request.user.is_anonymous():
@@ -198,12 +198,12 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
 
 
 class UnassignTaskView(BaseTaskActionView):
-    """Unassign task from the current owner."""
+    """Deassign task from the current owner."""
 
     action_name = 'unassign'
 
     def can_proceed(self):
-        """Check that task is assigned and user has rights to unassign it."""
+        """Check that task is assigned and user has rights to deassign it."""
         if self.activation.unassign.can_proceed():
             return self.activation.flow_task.can_unassign(self.request.user, self.activation.task)
         return False

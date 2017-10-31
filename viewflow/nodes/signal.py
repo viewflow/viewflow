@@ -52,7 +52,7 @@ class StartSignal(mixins.TaskDescriptionMixin,
         return self.receiver(sender=sender, flow_task=self, **signal_kwargs)
 
     def ready(self):
-        """Resolve internal `this`-referencies. and subscribe to the signal."""
+        """Resolve internal `this`-references. and subscribe to the signal."""
         if isinstance(self.receiver, ThisObject):
             self.receiver = getattr(self.flow_class.instance, self.receiver.name)
 
@@ -128,7 +128,7 @@ class Signal(mixins.TaskDescriptionMixin,
                 return self.receiver(sender=sender, _task=task, **signal_kwargs)
 
     def ready(self):
-        """Resolve internal `this`-referencies. and subscribe to the signal."""
+        """Resolve internal `this`-references. and subscribe to the signal."""
         if isinstance(self.receiver, ThisObject):
             self.receiver = getattr(self.flow_class.instance, self.receiver.name)
         if isinstance(self.task_loader, ThisObject):
