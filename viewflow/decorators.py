@@ -24,6 +24,7 @@ def flow_start_func(func):
                 exc = False
                 if activation.lock:
                     activation.lock.__exit__(*sys.exc_info())
+                raise
         finally:
             if exc and activation.lock:
                 activation.lock.__exit__(None, None, None)
@@ -132,6 +133,7 @@ def flow_start_signal(handler):
                 exc = False
                 if activation.lock:
                     activation.lock.__exit__(*sys.exc_info())
+                raise
         finally:
             if exc and activation.lock:
                 activation.lock.__exit__(None, None, None)
@@ -180,6 +182,7 @@ def flow_start_view(view):
                 exc = False
                 if activation.lock:
                     activation.lock.__exit__(*sys.exc_info())
+                raise
         finally:
             if exc and activation.lock:
                 activation.lock.__exit__(None, None, None)
