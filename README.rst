@@ -70,7 +70,7 @@ Viewflow comes with reference UI implementation on top of django-material projec
 
 http://demo.viewflow.io
 
-To checkout and run open source demo version localy, you need to have
+To checkout and run open source demo version locally, you need to have
 `git <https://git-scm.com/>`_ and `tox
 <https://tox.readthedocs.io/en/latest/>`_ tools installed.
 
@@ -124,16 +124,8 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.0.0 2017-05-29
+1.1.0 2017-11-11
 ----------------
-
-* Django 1.11 support
-* Open-sourced Python 2.7 support
-* Added APGL licence additional permissions (allows to link with commercial software)
-* Localization added: German/French/Spainish/Korean/Chinese
-* Improved task detail UI in frontend
-* Frontend - task management menu fix
-* `JobActivation.async` method renamed to `run_async`. Fix python 3.7 reserved word warning.  
-* [PRO] New process dashboard view
-* [PRO] Django-Guardian support for task object level permissions
-* [PRO] Fixes and improvements in the flow chart rendering
+* Fix prefetch_related usage on process and task queryset
+* Fix runtime error in python2.7/gunicorn deployment
+* [PRO] REST API support

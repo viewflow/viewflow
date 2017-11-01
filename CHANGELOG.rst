@@ -2,13 +2,19 @@
 Changelog
 =========
 
+1.1.0 2017-11-11
+----------------
+* Fix prefetch_related usage on process and task queryset
+* Fix runtime error in python2.7/gunicorn deployment
+* [PRO] REST API support
+
 1.0.0 2017-05-29
 ----------------
 
 * Django 1.11 support
 * Open-sourced Python 2.7 support
-* Added APGL licence additional permissions (allows to link with commercial software)
-* Localization added: German/French/Spainish/Korean/Chinese
+* Added AGPL licence additional permissions (allows to link with commercial software)
+* Localization added: German/French/Spanish/Korean/Chinese
 * Improved task detail UI in frontend
 * Frontend - task management menu fix
 * `JobActivation.async` method renamed to `run_async`. Fix python 3.7 reserved word warning.  
@@ -61,7 +67,7 @@ This is the cumulative release with many backward incompatibility changes.
 * task_loader not is the attribute of a flow task. In makes functions
   and signal handlers reusable over different flows.
 
-* Flow namespace are no longer hardcoded. Flow views now can be
+* Flow namespace are no longer hard-coded. Flow views now can be
   attached to any namespace in a URL config. 
 
 * flow_start_func, flow_start_signal decorators need to be used for
