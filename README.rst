@@ -124,7 +124,7 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.1.0 2017-11-11
+1.1.0 2017-11-01
 ----------------
 * Fix prefetch_related usage on process and task queryset
 * Fix runtime error in python2.7/gunicorn deployment
