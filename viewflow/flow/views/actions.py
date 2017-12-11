@@ -1,13 +1,13 @@
 from django.contrib import messages
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
-from django.utils.http import is_safe_url
+from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.utils.timezone import now
-from django.views import generic
+from django.utils.http import is_safe_url
 from django.utils.safestring import mark_safe
+from django.utils.timezone import now
 from django.utils.translation import ugettext_lazy as _
+from django.views import generic
 
 from ...activation import STATUS
 from ...decorators import flow_view

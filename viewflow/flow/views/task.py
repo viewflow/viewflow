@@ -182,7 +182,7 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
         """Check permissions and assign task to the current user."""
         self.activation = request.activation
 
-        if request.user is None or request.user.is_anonymous():
+        if request.user is None or request.user.is_anonymous:
             raise PermissionDenied
 
         if not self.activation.assign.can_proceed():

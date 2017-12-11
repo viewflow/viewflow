@@ -1,7 +1,7 @@
 from copy import copy
 
 from django.conf.urls import url
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from .. import Event, Task, mixins
 from ..activation import StartActivation, ViewActivation, STATUS
@@ -280,7 +280,7 @@ class View(mixins.PermissionMixin, BaseView):
             return False
 
         # user not logged in
-        if user is None or user.is_anonymous():
+        if user is None or user.is_anonymous:
             return False
 
         # available for everyone
@@ -304,7 +304,7 @@ class View(mixins.PermissionMixin, BaseView):
             return False
 
         # user not logged in
-        if user is None or user.is_anonymous():
+        if user is None or user.is_anonymous:
             return False
 
         # Assigned to the same user

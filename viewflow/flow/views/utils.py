@@ -1,4 +1,4 @@
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.http import is_safe_url
 
 from ... import activation
@@ -28,7 +28,7 @@ def get_next_task_url(request, process):
     elif 'back' in request.GET:
         # Back to task list
         back_url = request.GET['back']
-        if not is_safe_url(url=back_url, host=request.get_host()):
+        if not is_safe_url(url=back_url, allowed_hosts={request.get_host()}):
             back_url = '/'
         return back_url
 

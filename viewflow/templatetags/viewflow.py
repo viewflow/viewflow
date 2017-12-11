@@ -1,17 +1,18 @@
 from __future__ import unicode_literals
 
 from collections import OrderedDict
-from inspect import getargspec
 
 from django import template
 from django.core.exceptions import ImproperlyConfigured
-from django.core.urlresolvers import reverse
+from django.template import TemplateSyntaxError, Node
+from django.template.base import kwarg_re
 from django.template.loader import select_template
+from django.urls import reverse
 from django.utils.module_loading import import_string
 
 from .. import flow
 from ..base import Flow
-from ..compat import get_app_package, TemplateSyntaxError, TagHelperNode, parse_bits
+from ..compat import get_app_package
 from ..models import AbstractProcess, AbstractTask
 from ..utils import get_flow_namespace
 from .base import get_model_display_data
@@ -76,14 +77,17 @@ def flowurl(parser, token):
             url_ref = '{}:{}'.format(namespace, url_name if url_name else 'index')
             return reverse(url_ref)
 
-    class URLNode(TagHelperNode):
+    class URLNode(Node):
         def __init__(self, args, kwargs, target_var):
-            super(URLNode, self).__init__(func=None, takes_context=False, args=args, kwargs=kwargs)
+            self.args = args
+            self.kwargs = kwargs
             self.target_var = target_var
 
         def render(self, context):
             request = context['request']  # TODO Check that request template context installed
-            resolved_args, resolved_kwargs = self.get_resolved_arguments(context)
+
+            resolved_args = [arg.resolve(context) for arg in self.args]
+            resolved_kwargs = {k: v.resolve(context) for k, v in self.kwargs.items()}
 
             base_namespace = resolved_kwargs.pop('ns', None)
             ns_map = resolved_kwargs.get('ns_map', None)
@@ -100,19 +104,29 @@ def flowurl(parser, token):
 
     bits = token.split_contents()[1:]
 
+    args = []
+    kwargs = {}
     target_var = None
     if bits[-2] == 'as':
         target_var = bits[-1]
         bits = bits[:-2]
 
-    params, varargs, varkw, defaults = getargspec(geturl)
-    args, kwargs = parse_bits(
-        parser, bits, params, varargs, varkw, defaults,
-        takes_context=False, name='flowurl')
+    if len(bits):
+        for bit in bits:
+            match = kwarg_re.match(bit)
+            if not match:
+                raise TemplateSyntaxError("Malformed arguments to url tag")
+            name, value = match.groups()
+            if name:
+                kwargs[name] = parser.compile_filter(value)
+            else:
+                args.append(parser.compile_filter(value))
+
     return URLNode(args, kwargs, target_var)
 
 
-@register.assignment_tag
+
+@register.simple_tag
 def flow_perms(user, task):
     """
     Assign list of permissions.
@@ -134,7 +148,7 @@ def flow_perms(user, task):
     return result
 
 
-@register.assignment_tag
+@register.simple_tag
 def flow_start_actions(flow_class, user=None):
     """
     List of actions to start flow available for the user.
@@ -150,7 +164,7 @@ def flow_start_actions(flow_class, user=None):
     return sorted(actions, key=lambda node: node.name)
 
 
-@register.assignment_tag
+@register.simple_tag
 def flows_start_actions(flow_classes, user=None):
     """
     List of actions to start each flow available for the user.

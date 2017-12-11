@@ -35,9 +35,9 @@ INSTALLED_APPS = (
     # 'demo.shipment',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware'
+    'django.contrib.auth.middleware.AuthenticationMiddleware'
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -58,34 +58,22 @@ DATABASES = {
 }
 
 
-class DisableMigrations(object):
-
-    def __contains__(self, item):
-        return True
-
-    def __getitem__(self, item):
-        return "notmigrations"
-
-
-if django.VERSION < (1, 11):
-    MIGRATION_MODULES = DisableMigrations()
-else:
-    MIGRATION_MODULES = {
-        'frontend': None,
-        'material': None,
-        'admin': None,
-        'auth': None,
-        'contenttypes': None,
-        'sessions': None,
-        'messages': None,
-        'staticfiles': None,
-        'viewflow_frontend': None,
-        'viewflow': None,
-        'tests': None,
-        'customnode': None,
-        'helloworld': None,
-        'shipment': None,
-    }
+MIGRATION_MODULES = {
+    'frontend': None,
+    'material': None,
+    'admin': None,
+    'auth': None,
+    'contenttypes': None,
+    'sessions': None,
+    'messages': None,
+    'staticfiles': None,
+    'viewflow_frontend': None,
+    'viewflow': None,
+    'tests': None,
+    'customnode': None,
+    'helloworld': None,
+    'shipment': None,
+}
 
 
 TEMPLATES = [

@@ -109,7 +109,7 @@ admin.site.register(TemplateTagProcessEntity)
 
 
 urlpatterns = [
-    url(r'^admin/', include(admin.site.urls))
+    url(r'^admin/', admin.site.urls)
 ]
 
 try:

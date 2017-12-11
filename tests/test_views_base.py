@@ -1,7 +1,7 @@
-from django.core.urlresolvers import resolve
 from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
+from django.urls import resolve
 
 
 from viewflow import flow
@@ -97,7 +97,7 @@ class BaseViewTestFlow(Flow):
 
 
 urlpatterns = [
-    url(r'^test/', include(viewset.FlowViewSet(BaseViewTestFlow).urls, namespace='baseviewtest'))
+    url(r'^test/', include((viewset.FlowViewSet(BaseViewTestFlow).urls, 'baseviewtest')))
 ]
 
 try:

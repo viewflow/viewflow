@@ -1,9 +1,9 @@
-from django.core.urlresolvers import resolve
 from django.conf.urls import include, url
 from django.contrib.auth.models import User
 from django.http.request import QueryDict
 from django.template import Template, Context
 from django.test import TestCase, RequestFactory
+from django.urls import resolve
 
 from viewflow import flow
 from viewflow.base import this, Flow
@@ -85,6 +85,5 @@ class TestTemplateTagsFlow(Flow):
 
 
 urlpatterns = [
-    url(r'^test/', include(viewset.FlowViewSet(TestTemplateTagsFlow).urls,
-                           namespace='testtemplatetags')),
+    url(r'^test/', include((viewset.FlowViewSet(TestTemplateTagsFlow).urls, 'testtemplatetags'))),
 ]

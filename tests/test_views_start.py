@@ -1,8 +1,8 @@
 from django.conf.urls import include, url
-from django.core.urlresolvers import resolve
 from django.contrib.auth.models import User
 from django.db import models
 from django.test import TestCase, RequestFactory
+from django.urls import resolve
 from django.views import generic
 
 from viewflow import flow
@@ -77,7 +77,7 @@ class StartViewFlowEntity(models.Model):
 
 
 urlpatterns = [
-    url(r'^test/', include(viewset.FlowViewSet(StartViewTestFlow).urls, namespace='startviewtest'))
+    url(r'^test/', include((viewset.FlowViewSet(StartViewTestFlow).urls, 'startviewtest')))
 ]
 
 try:

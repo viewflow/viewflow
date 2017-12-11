@@ -2,9 +2,10 @@ from __future__ import unicode_literals
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils import six
+from django.utils.decorators import method_decorator
 from django.utils.http import is_safe_url
 from django.utils.safestring import mark_safe
 from django.utils.translation import ugettext_lazy as _
@@ -14,7 +15,7 @@ from django.views.generic.base import TemplateResponseMixin
 from material.frontend import frontend_url
 from material.frontend.views.list import DataTableMixin
 
-from ..compat import method_decorator
+
 from ..flow.views.mixins import FlowListMixin, FlowViewPermissionMixin
 from ..models import Task
 
