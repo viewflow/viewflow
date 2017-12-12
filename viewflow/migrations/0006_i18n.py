@@ -75,7 +75,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='task',
             name='owner',
-            field=models.ForeignKey(null=True, to=settings.AUTH_USER_MODEL, blank=True, verbose_name='Owner'),
+            field=models.ForeignKey(null=True, to=settings.AUTH_USER_MODEL, blank=True, verbose_name='Owner', on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='task',
@@ -90,7 +90,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='task',
             name='process',
-            field=models.ForeignKey(to='viewflow.Process', verbose_name='Process'),
+            field=models.ForeignKey(to='viewflow.Process', verbose_name='Process', on_delete=models.CASCADE),
         ),
         migrations.AlterField(
             model_name='task',

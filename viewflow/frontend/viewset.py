@@ -153,11 +153,11 @@ class FrontendViewSet(object):
             for flow_class, flow_router in items:
                 flow_label = flow_class._meta.flow_label
                 app_views.append(
-                    url('^{}/'.format(flow_label), include(flow_router.urls, namespace=flow_label))
+                    url('^{}/'.format(flow_label), include((flow_router.urls, flow_label)))
                 )
 
             result.append(
-                url('^{}/'.format(app_label), include(app_views, namespace=app_label))
+                url('^{}/'.format(app_label), include((app_views, app_label)))
             )
 
         return result

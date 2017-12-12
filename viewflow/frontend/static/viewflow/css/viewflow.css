@@ -11,3 +11,7 @@ main .row .row {
   padding-top: 1rem; }
   .task-detail .input-field {
     margin-top: 0; }
+
+.sidenav .collapsible-body > ul:not(.collapsible) > li.active li:not(.active) a,
+.sidenav.sidenav-fixed .collapsible-body > ul:not(.collapsible) > li.active li:not(.active) a {
+  color: rgba(0, 0, 0, 0.87); }

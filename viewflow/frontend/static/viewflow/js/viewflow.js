@@ -1,10 +1,14 @@
 $(document).on('turbolinks:load', function() {
   $('.dropdown-button').dropdown()
   $('.modal').modal()
+  $('.collapsible').collapsible()
 })
 
 $(document).on('turbolinks:before-cache', function() {
   $('.dropdown-content').css('display', 'none')
+  $('.modal').modal('destroy')
+  $('.collapsible').collapsible('destroy')
+  $('.dropdown-button').dropdown('destroy')
 })
 
 $(document).on('turbolinks:before-render', function(event) {

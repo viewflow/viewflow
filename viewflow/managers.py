@@ -43,11 +43,7 @@ def _get_related_path(model, base_model):
         related = parent.remote_field if hasattr(parent, 'remote_field') else parent.rel
 
         ancestry.insert(0, related.get_accessor_name())
-
-        if django.VERSION < (1, 8):
-            parent_model = related.parent_model
-        else:
-            parent_model = related.model
+        parent_model = related.model
 
         parent = parent_model._meta.get_ancestor_link(base_model)
 
@@ -125,6 +121,9 @@ class ProcessQuerySet(QuerySet):
         return self.model.objects.coerce_for(_available_flows(flow_classes, user))
 
     def _clone(self, *args, **kwargs):
+        if django.VERSION >= (2, 0):
+            return super(ProcessQuerySet, self)._clone()
+
         try:
             kwargs.update({'_coerced': self._coerced})
         except AttributeError:
@@ -164,8 +163,7 @@ class TaskQuerySet(QuerySet):
 
     def __init__(self, *args, **kwargs):
         super(TaskQuerySet, self).__init__(*args, **kwargs)
-        if django.VERSION > (1, 8):
-            self._iterable_class = TaskIterable
+        self._iterable_class = TaskIterable
 
     def filter(self, *args, **kwargs):
         """Queryset filter allows to use `process__flow_class` class values."""
@@ -239,6 +237,9 @@ class TaskQuerySet(QuerySet):
             .filter(owner=user, finished__isnull=False)
 
     def _clone(self, *args, **kwargs):
+        if django.VERSION >= (2, 0):
+            return super(TaskQuerySet, self)._clone()
+
         try:
             kwargs.update({'_coerced': self._coerced})
         except AttributeError:
