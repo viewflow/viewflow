@@ -2,15 +2,8 @@ language: python
 sudo: false
 cache: pip
 
-addons:
-  apt:
-    sources:
-    - deadsnakes
-    packages:
-    - python3.5-dev
-
 python:
-  - 3.4
+  - 3.6
 
 services:
   - postgresql
