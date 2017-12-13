@@ -25,7 +25,8 @@ http://viewflow.io.
 .. image:: https://img.shields.io/pypi/pyversions/django-viewflow.svg
     :target: https://pypi.python.org/pypi/django-viewflow
 
-Viewflow works with Django 1.8/1.9/1.10/1.11
+Viewflow 1.1.x works with Django 1.8/1.9/1.10/1.11
+Viewflow GIT works with Django 1.11/2.0
 
 Viewflow 1.x.x  going to be supported till Django 1.8 lifetime (April 2018)
 
@@ -124,8 +125,8 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.1.0 2017-11-01
-----------------
-* Fix prefetch_related usage on process and task queryset
-* Fix runtime error in python2.7/gunicorn deployment
-* [PRO] REST API support
+GIT
+---
+
+* Django 2.0 support
+* Materialize 1.0.0 alpha support

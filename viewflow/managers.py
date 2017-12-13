@@ -120,8 +120,15 @@ class ProcessQuerySet(QuerySet):
         """List of processes available to view for the user."""
         return self.model.objects.coerce_for(_available_flows(flow_classes, user))
 
+    def _chain(self, **kwargs):
+        if hasattr(self, '_coerced'):
+            kwargs['_coerced'] = self._coerced
+
+        return super(ProcessQuerySet, self)._chain(**kwargs)
+
     def _clone(self, *args, **kwargs):
         if django.VERSION >= (2, 0):
+            # attr cloning happens in self._chain()
             return super(ProcessQuerySet, self)._clone()
 
         try:
@@ -235,6 +242,12 @@ class TaskQuerySet(QuerySet):
         """List of tasks finished by the user."""
         return self.filter_available(flow_classes, user) \
             .filter(owner=user, finished__isnull=False)
+
+    def _chain(self, **kwargs):
+        if hasattr(self, '_coerced'):
+            kwargs['_coerced'] = self._coerced
+
+        return super(TaskQuerySet, self)._chain(**kwargs)
 
     def _clone(self, *args, **kwargs):
         if django.VERSION >= (2, 0):
