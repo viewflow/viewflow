@@ -35,7 +35,7 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
 
     def has_perm(self, user):
         """Any authenticated user has a permission for the viewflow."""
-        return user.is_authenticated()
+        return user.is_authenticated
 
     def ready(self):
         """Import all <app>/flows.py modules."""
