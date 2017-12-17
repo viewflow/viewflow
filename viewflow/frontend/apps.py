@@ -48,7 +48,7 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
         base_url = '^workflow/'
 
         return frontend.ModuleURLResolver(
-            base_url, self.viewset.urls, module=self, app_name=self.label)
+            base_url, self.viewset.urls, module=self)
 
     def index_url(self):
         """Base view for the viewflow frontend."""

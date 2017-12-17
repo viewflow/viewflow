@@ -31,11 +31,8 @@ class Demo(ModuleMixin):
     def installed(self):
         return True
 
+
 modules.register(Demo())
-
-
-if django.VERSION < (1, 7):
-    admin.autodiscover()
 
 
 from material.frontend import urls as frontend_urls  # NOQA
