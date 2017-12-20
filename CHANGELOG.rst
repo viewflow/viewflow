@@ -2,6 +2,13 @@
 Changelog
 =========
 
+1.2.0 2017-12-20
+----------------
+
+* Django 2.0 support
+* Drop compatibility with Django 1.8/1.9/1.10
+* Materialize 1.0.0 support
+
 1.1.0 2017-11-01
 ----------------
 * Fix prefetch_related usage on process and task queryset

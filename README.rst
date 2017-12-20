@@ -25,10 +25,8 @@ http://viewflow.io.
 .. image:: https://img.shields.io/pypi/pyversions/django-viewflow.svg
     :target: https://pypi.python.org/pypi/django-viewflow
 
-Viewflow 1.1.x works with Django 1.8/1.9/1.10/1.11
-Viewflow GIT works with Django 1.11/2.0
-
-Viewflow 1.x.x  going to be supported till Django 1.8 lifetime (April 2018)
+- Viewflow 1.1.x compatible with Django 1.8/1.9/1.10/1.11 (supported till Django 1.8 lifetime/April 2018)
+- Viewflow 1.2.x compatible with Django 1.11/2.0 (supported till Django 1.11 lifetime/April 2020)
 
 
 Introduction
@@ -80,9 +78,9 @@ To checkout and run open source demo version locally, you need to have
     git clone https://github.com/viewflow/viewflow.git
     cd viewflow
 
-    TOXENV=py34-dj111 tox -- python manage.py migrate --settings=demo.settings
-    TOXENV=py34-dj111 tox -- python manage.py loaddata demo/helloworld/fixtures/helloworld/default_data.json --settings=demo.settings
-    TOXENV=py34-dj111 tox -- python manage.py runserver --settings=demo.settings
+    TOXENV=py36-dj111 tox -- python manage.py migrate --settings=demo.settings
+    TOXENV=py36-dj111 tox -- python manage.py loaddata demo/helloworld/fixtures/helloworld/default_data.json --settings=demo.settings
+    TOXENV=py36-dj111 tox -- python manage.py runserver --settings=demo.settings
 
 Then, you can open http://127.0.0.1:8000 and login with `admin:admin` username/password pair.
 
@@ -125,8 +123,9 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-GIT
----
+1.2.0 2017-12-20
+----------------
 
 * Django 2.0 support
-* Materialize 1.0.0 alpha support
+* Drop compatibility with Django 1.8/1.9/1.10
+* Materialize 1.0.0 support
