@@ -36,7 +36,7 @@ class Shipment(models.Model):
     last_name = models.CharField(max_length=150)
     email = models.EmailField()
 
-    # shipment addres
+    # shipment address
     address = models.CharField(max_length=150)
     city = models.CharField(max_length=150)
     state = models.CharField(max_length=150)
