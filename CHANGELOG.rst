@@ -6,7 +6,7 @@ Changelog
 ----------------
 
 * Fix admin actions menu
-* Fix this-referennce usange in If-node condition.
+* Fix this-referennce usage in If-node condition.
 * [PRO] Expose Celery Retry task action
 * [PRO] Fix obsolete node url resolve
 
