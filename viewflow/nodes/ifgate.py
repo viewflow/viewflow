@@ -64,6 +64,7 @@ class If(mixins.TaskDescriptionMixin,
         self._on_true = resolver.get_implementation(self._on_true)
         self._on_false = resolver.get_implementation(self._on_false)
 
+    def ready(self):
         if isinstance(self._condition, ThisObject):
             self._condition = getattr(self.flow_class.instance, self._condition.name)
 
