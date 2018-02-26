@@ -2,6 +2,14 @@
 Changelog
 =========
 
+1.2.2 2018-02-26
+----------------
+
+* Fix admin actions menu
+* Fix this-referennce usange in If-node condition.
+* [PRO] Expose Celery Retry task action
+* [PRO] Fix obsolete node url resolve
+
 1.2.0 2017-12-20
 ----------------
 
