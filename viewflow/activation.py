@@ -3,7 +3,6 @@ from __future__ import unicode_literals
 import threading
 import traceback
 import uuid
-
 from contextlib import contextmanager
 
 from django.db import transaction
@@ -414,6 +413,8 @@ class ViewActivation(Activation):
         activation = cls()
         activation.initialize(flow_task, task)
 
+        signals.task_new.send(sender=task.process, task=task)
+
         return activation
 
     def has_perm(self, user):
@@ -460,6 +461,8 @@ class FuncActivation(Activation):
 
         activation = cls()
         activation.initialize(flow_task, task)
+
+        signals.task_new.send(sender=prev_activation.process, task=task)
 
         return activation
 
@@ -544,6 +547,9 @@ class AbstractGateActivation(Activation):
 
         It is safe to schedule job just now b/c the process instance is locked,
         and job will wait until this transaction completes.
+
+        For abstract gate, we will not be firing task_new because
+        no one will have any tasks related to gates.
         """
         flow_class, flow_task = flow_task.flow_class, flow_task
         process = prev_activation.process
@@ -714,6 +720,8 @@ class AbstractJobActivation(Activation):
         activation.initialize(flow_task, task)
         activation.assign()
         activation.schedule()
+
+        signals.task_new.send(sender=prev_activation.process, task=task)
 
         return activation
 
