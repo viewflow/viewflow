@@ -334,9 +334,17 @@ class ViewActivation(Activation):
 
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.ASSIGNED)
     def assign(self, user=None):
-        """Assign user to the task."""
+        """Assign user to the task.
+
+        MODIFICATION:
+        - Since we are interested to track task.started for analytics purposes,
+        we will assign task.started here.
+        - We cannot persist at `activation.prepare` because PREPARED is a state
+        that cannot be saved into the db (by design).
+        """
         if user:
             self.task.owner = user
+        self.task.started = now()
         self.task.save()
 
     @Activation.status.transition(source=STATUS.ASSIGNED, target=STATUS.NEW)
