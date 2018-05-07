@@ -2,6 +2,14 @@
 Changelog
 =========
 
+1.2.5 2018-05-07
+----------------
+
+* Fix process desccription translation on django 2.0
+* Fix process dumpdata on django 2.0
+* [PRO] Frontend - fix page scroll on graph model open
+
+
 1.2.2 2018-02-26
 ----------------
 

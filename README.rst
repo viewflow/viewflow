@@ -123,10 +123,9 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.2.2 2018-02-26
+1.2.5 2018-05-07
 ----------------
 
-* Fix admin actions menu
-* Fix this-referennce usage in If-node condition.
-* [PRO] Expose Celery Retry task action
-* [PRO] Fix obsolete node url resolve
+* Fix process desccription translation on django 2.0
+* Fix process dumpdata on django 2.0
+* [PRO] Frontend - fix page scroll on graph model open
