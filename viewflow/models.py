@@ -4,7 +4,7 @@ from django.conf import settings
 from django.db import models
 from django.template import Template, Context
 from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import python_2_unicode_compatible
+from django.utils.encoding import python_2_unicode_compatible, force_text
 
 from .activation import STATUS, STATUS_CHOICES
 from .exceptions import FlowRuntimeError
@@ -50,7 +50,7 @@ class AbstractProcess(models.Model):
         """Quick textual process state representation for end user."""
         if self.flow_class and self.flow_class.process_class == type(self):
             return Template(
-                self.flow_class.summary_template
+                force_text(self.flow_class.summary_template)
             ).render(
                 Context({'process': self, 'flow_class': self.flow_class})
             )
@@ -103,7 +103,7 @@ class AbstractTask(models.Model):
         if self.flow_task:
             if self.finished:
                 if hasattr(self.flow_task, 'task_result_summary'):
-                    return Template(self.flow_task.task_result_summary or "").render(Context({
+                    return Template(force_text(self.flow_task.task_result_summary or "")).render(Context({
                         'process': self.flow_process,
                         'task': self,
                         'flow_class': self.flow_task.flow_class,
