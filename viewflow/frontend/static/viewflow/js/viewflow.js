@@ -1,6 +1,6 @@
 $(document).on('turbolinks:load', function() {
   $('.dropdown-button').dropdown()
-  $('.modal').modal()
+  $('.modal').modal({preventScrolling: false})
   $('.collapsible').collapsible()
 })
 
