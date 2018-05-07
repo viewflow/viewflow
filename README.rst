@@ -123,9 +123,10 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.2.0 2017-12-20
+1.2.2 2018-02-26
 ----------------
 
-* Django 2.0 support
-* Drop compatibility with Django 1.8/1.9/1.10
-* Materialize 1.0.0 support
+* Fix admin actions menu
+* Fix this-referennce usage in If-node condition.
+* [PRO] Expose Celery Retry task action
+* [PRO] Fix obsolete node url resolve

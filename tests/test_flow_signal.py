@@ -8,24 +8,24 @@ from viewflow.base import Flow, this
 
 class Test(TestCase):
     def test_signal_usecase(self):
-        start_test_signal.send(sender=self)
+        start_test_signal.send(sender=Test)
         process = SignalFlow.process_class.objects.get()
         task = process.active_tasks().get()
-        task_test_signal.send(sender=self, process=process, task=task)
+        task_test_signal.send(sender=Test, process=process, task=task)
 
         tasks = process.task_set.all()
         self.assertEqual(3, tasks.count())
         self.assertTrue(all(task.finished is not None for task in tasks))
 
     def test_signal_ignore_activation(self):
-        start_ignorable_test_signal.send(sender=self)
+        start_ignorable_test_signal.send(sender=Test)
         process = SignalFlow.process_class.objects.get()
-        ignorable_test_signal.send(sender=self, process=process, ignore_me=True)
+        ignorable_test_signal.send(sender=Test, process=process, ignore_me=True)
 
         active_tasks = process.active_tasks()
         self.assertEqual(1, len(active_tasks))
 
-        ignorable_test_signal.send(sender=self, process=process, ignore_me=False)
+        ignorable_test_signal.send(sender=Test, process=process, ignore_me=False)
         tasks = process.task_set.all()
         self.assertEqual(3, tasks.count())
         self.assertTrue(all(task.finished is not None for task in tasks))
@@ -53,7 +53,7 @@ def signal_task(activation, **kwargs):
 class SignalFlow(Flow):
     start = (
         flow.StartSignal(
-            start_test_signal, create_flow)
+            start_test_signal, create_flow, sender=Test)
         .Next(this.signal_task)
     )
 
