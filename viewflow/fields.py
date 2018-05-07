@@ -120,7 +120,7 @@ class FlowReferenceField(with_metaclass(_SubfieldBase, models.CharField)):
         return get_flow_ref(value)
 
     def value_to_string(self, obj):  # noqa D1o2
-        value = self._get_val_from_obj(obj)
+        value = super(FlowReferenceField, self).value_from_object(obj)
         return self.get_prep_value(value)
 
 
@@ -142,7 +142,7 @@ class TaskReferenceField(with_metaclass(_SubfieldBase, models.CharField)):
         return value
 
     def value_to_string(self, obj):  # noqa D102
-        value = self._get_val_from_obj(obj)
+        value = super(TaskReferenceField, self).value_from_object(obj)
         return self.get_prep_value(value)
 
 
