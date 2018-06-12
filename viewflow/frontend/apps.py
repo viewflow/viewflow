@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.apps import AppConfig
 from django.template import Template, TemplateDoesNotExist
 from django.template.loader import get_template
@@ -34,8 +35,9 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
             self._registry[flow_class] = viewset_class(flow_class=flow_class)
 
     def has_perm(self, user):
-        """Any authenticated user has a permission for the viewflow."""
-        return user.is_authenticated
+        """Defaults to any authenticated user has a permission for the viewflow. 
+        Can be overridden by settings VIEWFLOW_FRONTEND_PERM_FUNC to a function that accepts `user` instance."""
+        return getattr(settings, 'VIEWFLOW_FRONTEND_PERM_FUNC', lambda user: user.is_authenticated)(user)
 
     def ready(self):
         """Import all <app>/flows.py modules."""
