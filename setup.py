@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='django-viewflow',
-    version='1.2.5',
+    version='1.3.0',
     author='Mikhail Podgurskiy',
     author_email='kmmbvnr@gmail.com',
     description='Reusable workflow library for django',
@@ -21,15 +21,17 @@ setup(
         'Framework :: Django',
         'Framework :: Django :: 1.11',
         'Framework :: Django :: 2.0',
+        'Framework :: Django :: 2.1',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
         'Topic :: Software Development :: Libraries :: Python Modules',
         'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
     ],
     install_requires=[
         'Django>=1.11',
-        'django-filter>=1.0'
+        'django-filter>=2.0'
     ],
     packages=['viewflow',
               'viewflow.flow',
