@@ -151,7 +151,7 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
             namespace=self.request.resolver_match.namespace)
 
         back = self.request.GET.get('back', None)
-        if back and not is_safe_url(url=back, host=self.request.get_host()):
+        if back and not is_safe_url(url=back, allowed_hosts={self.request.get_host()}):
             back = '/'
 
         if '_continue' in self.request.POST and back:

@@ -238,7 +238,7 @@ class CancelProcessView(FlowManagePermissionMixin, generic.DetailView):
         """Continue to the flow index or redirect according `?back` parameter."""
         if 'back' in self.request.GET:
             back_url = self.request.GET['back']
-            if not is_safe_url(url=back_url, host=self.request.get_host()):
+            if not is_safe_url(url=back_url, allowed_hosts={self.request.get_host()}):
                 back_url = '/'
             return back_url
 

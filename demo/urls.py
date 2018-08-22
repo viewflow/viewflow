@@ -1,6 +1,4 @@
-import django
 from django.conf.urls import include, url
-from django.contrib import admin
 from django.contrib.auth import views as auth
 from django.views import generic
 
@@ -38,8 +36,8 @@ modules.register(Demo())
 from material.frontend import urls as frontend_urls  # NOQA
 
 urlpatterns = [
-    url(r'^accounts/login/$', auth.login, name='login'),
-    url(r'^accounts/logout/$', auth.logout, name='logout'),
+    url(r'^accounts/login/$', auth.LoginView.as_view(), name='login'),
+    url(r'^accounts/logout/$', auth.LogoutView.as_view(), name='logout'),
     url(r'^', include('demo.website')),
     url(r'', include(frontend_urls)),
 ]

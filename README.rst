@@ -123,9 +123,7 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.2.5 2018-05-07
+GIT VERSION
 ----------------
 
-* Fix process desccription translation on django 2.0
-* Fix process dumpdata on django 2.0
-* [PRO] Frontend - fix page scroll on graph model open
+* Django 2.1 support
