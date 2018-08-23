@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from .. import Event, Task, mixins
 from ..activation import StartActivation, ViewActivation, STATUS
+from ..utils import is_owner
 
 
 class BaseStart(mixins.TaskDescriptionViewMixin,
@@ -100,7 +101,7 @@ class Start(mixins.PermissionMixin, BaseStart):
                 return self._owner(user)
             else:
                 owner = get_user_model()._default_manager.get(**self._owner)
-                return owner == user
+                return is_owner(owner, user)
 
         elif self._owner_permission:
             obj = None
@@ -308,7 +309,7 @@ class View(mixins.PermissionMixin, BaseView):
             return False
 
         # Assigned to the same user
-        if task.owner_id == user.pk:
+        if is_owner(task.owner, user):
             return True
 
         # User have flow management permissions
@@ -319,4 +320,4 @@ class View(mixins.PermissionMixin, BaseView):
         if task.owner_permission is None and task.owner is None:
             return True
 
-        return task.owner == user
+        return is_owner(task.owner, user)

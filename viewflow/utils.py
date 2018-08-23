@@ -5,3 +5,8 @@ def get_flow_namespace(flow_class, base_namespace, ns_map=None):
         if ns:
             return '{}:{}'.format(base_namespace, ns) if base_namespace else ns
     return base_namespace
+
+
+def is_owner(owner, user):
+    """Check user instances and subclasses for equility."""
+    return isinstance(user, owner.__class__) and owner.pk == user.pk
