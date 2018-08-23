@@ -128,3 +128,4 @@ Latest changelog
 
 * Django 2.1 support
 * Support task permission checks on user model subclasses
+* [PRO] django-rest-swagger 2.2.0 support
