@@ -2,6 +2,13 @@
 Changelog
 =========
 
+1.3.0 2018-08-23
+----------------
+
+* Django 2.1 support
+* Support task permission checks on user model subclasses
+
+
 1.2.5 2018-05-07
 ----------------
 

@@ -123,7 +123,7 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-GIT VERSION
+1.3.0 2018-08-23
 ----------------
 
 * Django 2.1 support

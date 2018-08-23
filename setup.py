@@ -31,7 +31,7 @@ setup(
     ],
     install_requires=[
         'Django>=1.11',
-        'django-filter>=2.0'
+        'django-filter>=1.0'
     ],
     packages=['viewflow',
               'viewflow.flow',
