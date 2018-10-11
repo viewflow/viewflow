@@ -1,10 +1,10 @@
 {% load i18n viewflow viewflow_frontend %}
 <ul>
-    <li><a href="{% url 'viewflow:index' %}">{% trans 'Inbox' %} <span class="badge" id="id_viewflow_inbox_count" data-turbolinks-update>{{ current_module.flows|inbox_count:user }}</span></a></li>
-    <li><a href="{% url 'viewflow:queue' %}">{% trans 'Unassigned' %} <span class="badge" id="id_viewflow_queue_count" data-turbolinks-update>{{ current_module.flows|queue_count:user }}</span></a></li>
+    <li><a href="{% url 'viewflow:index' %}">{% trans 'Inbox' %} <dmc-turbolinks-update><span class="badge" id="id_viewflow_inbox_count" data-turbolinks-update>{{ current_module.flows|inbox_count:user }}</span></dmc-turbolinks-update></a></li>
+    <li><a href="{% url 'viewflow:queue' %}">{% trans 'Unassigned' %} <dmc-turbolinks-update><span class="badge" id="id_viewflow_queue_count" data-turbolinks-update>{{ current_module.flows|queue_count:user }}</span></dmc-turbolinks-update></a></li>
     <li><a href="{% url 'viewflow:archive' %}">{% trans 'Participated' %}</a></li>
     <li class="submenu">
-        <ul class="collapsible">
+        <dmc-collapsible><ul class="collapsible">
             <li>
                 <a class="collapsible-header">{% trans 'Processes' %}</a>
                 <div class="collapsible-body">
@@ -21,6 +21,6 @@
                     </ul>
                 </div>
             </li>
-        </ul>
+        </ul></dmc-collapsible>
     </li>
 </ul>
