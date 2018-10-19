@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 from setuptools import setup
 
-
 setup(
     name='django-viewflow',
-    version='1.5.6',
+    version='1.5.6.1',
     author='Mikhail Podgurskiy',
     author_email='kmmbvnr@gmail.com',
     description='Reusable workflow library for django',
