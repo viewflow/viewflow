@@ -27,6 +27,7 @@ http://viewflow.io.
 
 - Viewflow 1.1.x compatible with Django 1.8/1.9/1.10/1.11 (supported till Django 1.8 lifetime/April 2018)
 - Viewflow 1.2.x compatible with Django 1.11/2.0 (supported till Django 1.11 lifetime/April 2020)
+- Viewflow 1.3.x/1.4.x compatible with Django 1.11/2.0/2.1 (supported till Django 1.11 lifetime/April 2020)
 
 
 Introduction
@@ -123,9 +124,9 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.3.0 2018-08-23
+1.4.0 2018-10-25
 ----------------
 
+* WebComponent based frontend (compatibility with django-material 1.4.x)
 * Django 2.1 support
-* Support task permission checks on user model subclasses
-* [PRO] django-rest-swagger 2.2.0 support
+* [PRO] Flow chart internationalization

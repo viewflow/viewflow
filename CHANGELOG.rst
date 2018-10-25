@@ -2,6 +2,14 @@
 Changelog
 =========
 
+1.4.0 2018-10-25
+----------------
+
+* WebComponent based frontend (compatibility with django-material 1.4.x)
+* Django 2.1 support
+* [PRO] Flow chart internationalization
+
+
 1.3.0 2018-08-23
 ----------------
 
