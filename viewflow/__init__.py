@@ -16,10 +16,10 @@ class ThisObject(object):
         def get_task_owner(activation):
             flow_class = activation.process.flow_class
             task_node = flow_class._meta.node(self.name)
-            task = flow_class.task_class.objects.get(
+            task = flow_class.task_class.objects.order_by('-id').filter(
                 process=activation.process,
                 flow_task=task_node,
-                status=STATUS.DONE)
+                status=STATUS.DONE).first()
             return task.owner
         return get_task_owner
 
