@@ -1,9 +1,10 @@
 from copy import copy
 
 from .. import Gateway, Edge, mixins
-from ..activation import Activation, AbstractGateActivation
+from ..activation import Activation, AbstractGateActivation, STATUS
 from ..exceptions import FlowRuntimeError
 from ..token import Token
+from ..signals import task_finished
 from .join import Join
 
 
@@ -108,3 +109,65 @@ class Split(mixins.TaskDescriptionMixin,
         result = copy(self)
         result._activate_next.append((node, None))
         return result
+
+
+class EventBasedSplitActivation(SplitActivation):
+    """Event based split gateway activation."""
+
+    @Activation.status.super()
+    def activate_next(self):
+        """Activate next tasks for parallel execution.
+
+        The token is preserved since there is no need to join its
+        outgoing paths.
+        """
+        token_source = self.task.token
+
+        next_tasks = (
+            [task for task in self.next_tasks if not isinstance(task, Join)] +
+            [task for task in self.next_tasks if isinstance(task, Join)]
+        )
+
+        for n, next_task in enumerate(next_tasks, 1):
+            next_task.activate(prev_activation=self, token=token_source)
+
+
+class EventBasedSplit(Split):
+    """Parallel split gateway.
+
+    Activates outgoing tasks to execute concurrently. When a task is completed
+    cancels the remaining active tasks.
+
+    If EventBasedSplit has no nodes to activate, FlowRuntimeError would be
+    raised.
+
+    Example::
+
+        split_clerk_warehouse = (
+            flow.EventBasedSplit()
+            .Next(
+                this.package_goods,
+                cond=lambda a: a.process.need_packaging)
+            .Always(this.shipment_type)
+        )
+    """
+
+    activation_class = EventBasedSplitActivation
+
+    def task_completed(self, sender, **signal_kwargs):
+        task = signal_kwargs['task']
+        gateway = task.previous.filter(flow_task=self).first()
+        if gateway:
+            for leading in gateway.leading.all().exclude(pk=task.pk):
+                activation = leading.activate()
+                if leading.status == STATUS.ASSIGNED:
+                    activation.unassign()
+                if hasattr(activation, 'cancel') and activation.cancel.can_proceed():
+                    activation.cancel()
+
+    def ready(self):
+        super(EventBasedSplit, self).ready()
+        task_finished.connect(
+            self.task_completed, sender=self.flow_class,
+            dispatch_uid="viewflow.flow.signal/{}.{}.{}".format(
+                self.flow_class.__module__, self.flow_class.__name__, self.name))

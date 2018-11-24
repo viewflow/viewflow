@@ -159,6 +159,27 @@ class Split(nodes.Split):
     undo_view_class = views.UndoTaskView
 
 
+class EventBasedSplit(nodes.EventBasedSplit):
+    """
+    Activates outgoing path in-parallel depends on per-path condition.
+
+    When a task is completed cancels the remaining active tasks.
+
+    Example::
+
+        split_on_decision = (
+            flow.EventBasedSplit()
+            .Next(check_post, cond=lambda p: p,is_check_post_required)
+            .Next(this.perform_task_always)
+        )
+    """
+
+    cancel_view_class = views.CancelTaskView
+    detail_view_class = views.DetailTaskView
+    perform_view_class = views.PerformTaskView
+    undo_view_class = views.UndoTaskView
+
+
 class AbstractJob(nodes.AbstractJob):
     """Base task for background jobs."""
 
