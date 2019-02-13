@@ -124,9 +124,7 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.4.0 2018-10-25
+1.5.0 2019-02-13
 ----------------
 
-* WebComponent based frontend (compatibility with django-material 1.4.x)
-* Django 2.1 support
-* [PRO] Flow chart internationalization
+* Added portuguese translation
