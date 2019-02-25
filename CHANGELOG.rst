@@ -2,6 +2,11 @@
 Changelog
 =========
 
+1.5.1 2019-02-25
+----------------
+
+* Task description field became rendered as django template with {{ process }} and {{ task }} variable avaiable
+
 1.5.0 2019-02-13
 ----------------
 

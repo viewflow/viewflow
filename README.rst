@@ -124,7 +124,7 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.5.0 2019-02-13
+1.5.1 2019-02-25
 ----------------
 
-* Added portuguese translation
+* Task description field became rendered as django template with {{ process }} and {{ task }} variable avaiable

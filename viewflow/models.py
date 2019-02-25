@@ -110,7 +110,11 @@ class AbstractTask(models.Model):
                         'flow_task': self.flow_task}))
             else:
                 if hasattr(self.flow_task, 'task_description'):
-                    return self.flow_task.task_description or ""
+                    return Template(force_text(self.flow_task.task_description or "")).render(Context({
+                        'process': self.flow_process,
+                        'task': self,
+                        'flow_class': self.flow_task.flow_class,
+                        'flow_task': self.flow_task}))
 
         return ""
 
