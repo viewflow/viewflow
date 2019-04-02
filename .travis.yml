@@ -19,7 +19,7 @@ before_install:
   - export REDIS_CACHE_URL=redis://127.0.0.1:6379/1
 
 install:
-  - pip install tox
+  - pip install tox tox-travis
   - pip install coveralls
 
 script:
