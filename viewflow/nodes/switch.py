@@ -1,6 +1,6 @@
 from copy import copy
 
-from .. import Gateway, Edge, mixins
+from .. import Gateway, Edge, ThisObject, mixins
 from ..activation import Activation, AbstractGateActivation
 from ..exceptions import FlowRuntimeError
 
@@ -69,7 +69,16 @@ class Switch(mixins.TaskDescriptionMixin,
         self._activate_next = \
             [(resolver.get_implementation(node), cond)
              for node, cond in self._activate_next]
+    
+    def ready(self):
+        next_nodes = []
 
+        for node, condition in self._activate_next:
+            if isinstance(condition, ThisObject):
+                condition = getattr(self.flow_class.instance, condition.name)
+            next_nodes.append((node, condition))
+        self._activate_next = next_nodes
+    
     @property
     def _branches(self):
         return self._activate_next
