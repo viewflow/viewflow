@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='django-viewflow',
-    version='1.5.1',
+    version='1.5.3',
     author='Mikhail Podgurskiy',
     author_email='kmmbvnr@gmail.com',
     description='Reusable workflow library for django',
