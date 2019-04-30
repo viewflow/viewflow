@@ -25,7 +25,7 @@
                         </div>
                         <div class="right">
                             {% for action in actions %}
-                            <a class="btn waves-effect waves-light" onclick="$('#start_actions').closeModal();" href="{% flowurl flow_class action.name ns=request.resolver_match.namespace ns_map=view.ns_map %}?{{ request|query_back:'here' }}">
+                            <a class="btn waves-effect waves-light" href="{% flowurl flow_class action.name ns=request.resolver_match.namespace ns_map=view.ns_map %}?{{ request|query_back:'here' }}">
                                 <i class="left material-icons">add</i>{{ action.task_title|default:action.name|title }}
                             </a><br/>
                             {% endfor %}

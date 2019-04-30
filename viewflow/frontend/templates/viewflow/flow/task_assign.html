@@ -10,17 +10,19 @@
 
 {% block task_actions %}
 <div class="card-action">
-    <div class="left">
-        <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">{% trans 'Detail' %}</a>
-    </div>
-    <div class="right">
-        <form role="form" method="POST">
-            {% csrf_token %}
-            <button type="submit" name="_continue" class="btn btn-flat hide-on-small-only">{% trans 'Assign and continue on this process' %}</button>
-            <button type="submit" name="_assign" class="btn primary btn-lg">{% trans 'Assign' %}</button>
-        </form>
-    </div>
-    <div style="clear:both"></div>
+  <div class="left">
+    <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">{% trans 'Detail' %}</a>
+  </div>
+  <div class="right">
+    <dmc-form>
+      <form role="form" method="POST">
+        {% csrf_token %}
+        <button type="submit" name="_continue" class="btn btn-flat hide-on-small-only">{% trans 'Assign and continue on this process' %}</button>
+        <button type="submit" name="_assign" class="btn primary btn-lg">{% trans 'Assign' %}</button>
+      </form>
+    </dmc-form>
+  </div>
+  <div style="clear:both"></div>
 </div>
 {% endblock %}
 

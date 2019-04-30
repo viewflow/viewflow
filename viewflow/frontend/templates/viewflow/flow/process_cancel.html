@@ -10,59 +10,61 @@
 
 {% block content %}
 <div class="left-panel">
-    <div class="card">
-        <form role="form" method="POST">
-            {% csrf_token %}
-            <div class="card-content">
-                <div class="card-title black-text">{% trans 'Cancel' %} {{ flow_class.process_title }} #{{ process.pk }} and {{ active_tasks|length }} tasks</div>
-                <div class="card-title black-text"><h6>{{ process.summary }}</h6></div>
-                <table class="table bordered">
-                    <thead>
-                        <th>{% trans '#' %}</th>
-                        <th>{% trans 'Name' %}</th>
-                        <th >{% trans 'Description' %}</th>
-                        <th class="hide-on-small-only">{% trans 'Started' %}</th>
-                        <th>{% trans 'Status' %}</th>
-                        <th>&nbsp;</th>
-                    </thead>
-                    <tbody>
-                        {% for task in active_tasks %}
-                        <tr>
-                            <td>
-                                {% flowurl task user=request.user as task_url %}
-                                {% if task_url %}
-                                <a href="{{ task_url }}?back={{ request.get_full_path|urlencode }}">
-                                    {{ task.process.id }}/{{ task.id }}
-                                </a>
-                                {% else %}
-                                {{ task.process.id }}/{{ task.id }}
-                                {% endif %}
-                            </td>
-                            <td>{{ task.flow_task }}</td>
-                            <td>{{ task.summary }}</td>
-                            <td class="hide-on-small-only">{{ task.created }}</td>
-                            <td> {% trans task.status %} </td>
-                            <td>
-                                {% if task in uncancelable_tasks %}
-                                <span class="badge red" style="width:100px">{% trans 'UNCANCELABLE' %}</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+  <div class="card">
+    <dmc-form>
+      <form role="form" method="POST">
+        {% csrf_token %}
+        <div class="card-content">
+          <div class="card-title black-text">{% trans 'Cancel' %} {{ flow_class.process_title }} #{{ process.pk }} and {{ active_tasks|length }} tasks</div>
+          <div class="card-title black-text"><h6>{{ process.summary }}</h6></div>
+          <table class="table bordered">
+            <thead>
+              <th>{% trans '#' %}</th>
+              <th>{% trans 'Name' %}</th>
+              <th >{% trans 'Description' %}</th>
+              <th class="hide-on-small-only">{% trans 'Started' %}</th>
+              <th>{% trans 'Status' %}</th>
+              <th>&nbsp;</th>
+            </thead>
+            <tbody>
+              {% for task in active_tasks %}
+              <tr>
+                <td>
+                  {% flowurl task user=request.user as task_url %}
+                  {% if task_url %}
+                  <a href="{{ task_url }}?back={{ request.get_full_path|urlencode }}">
+                    {{ task.process.id }}/{{ task.id }}
+                  </a>
+                  {% else %}
+                  {{ task.process.id }}/{{ task.id }}
+                  {% endif %}
+                </td>
+                <td>{{ task.flow_task }}</td>
+                <td>{{ task.summary }}</td>
+                <td class="hide-on-small-only">{{ task.created }}</td>
+                <td> {% trans task.status %} </td>
+                <td>
+                  {% if task in uncancelable_tasks %}
+                    <span class="badge red" style="width:100px">{% trans 'UNCANCELABLE' %}</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <div class="card-action">
+            <div class="right-align">
+                <button type="submit" name="_cancel_process" class="btn  btn-flat {% if uncancelable_tasks %}disabled{% endif %}" {% if uncancelable_tasks %}disabled{% endif %}>Cancel</button>
             </div>
-            <div class="card-action">
-                <div class="right-align">
-                    <button type="submit" name="_cancel_process" class="btn  btn-flat {% if uncancelable_tasks %}disabled{% endif %}" {% if uncancelable_tasks %}disabled{% endif %}>Cancel</button>
-                </div>
-            </div>
-        </form>
-    </div>
+        </div>
+      </form>
+    </dmc-form>
+  </div>
 </div>
 <div class="right-panel">
-    {% with hide_active_tasks=True %}
-        {% include_process_data process %}
-    {% endwith %}
+  {% with hide_active_tasks=True %}
+    {% include_process_data process %}
+  {% endwith %}
 </div>
 {% endblock %}

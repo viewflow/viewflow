@@ -8,38 +8,40 @@
 
 {% block content %}
 <div class="left-panel">
-    <div class="card">
-        <div class="card-content">
-            <table class="table selectable bordered">
-                <thead>
-                    <th>{% trans '#' %}</th>
-                    <th>{% trans 'Description' %}</th>
-                    <th>{% trans 'Summary' %}</th>
-                    <th>{% trans 'Process' %}</th>
-                </thead>
-                <tbody>
-                    {% for task in view.tasks %}
-                    <tr>
-                        <td><a target="_blank" href="{% flowurl task user=request.user ns=request.resolver_match.namespace ns_map=view.ns_map %}">{{ task.process.id }}/{{ task.id }}</a></td>
-                        <td><a target="_blank" href="{% flowurl task user=request.user ns=request.resolver_match.namespace ns_map=view.ns_map %}">{{ task.summary|default:task.flow_task }}</a></td>
-                        <td>{{ task.flow_process.summary }}</td>
-                        <td><a target="_blank" href="{% flowurl task.process 'detail' ns=request.resolver_match.namespace ns_map=view.ns_map %}">{{ task.process.flow_class.process_title }} #{{task.process.pk}}</a></td>
-                    </tr>
-                    {% empty %}
-                    <tr><td colspan="4">{% trans 'No task selected' %}</td></tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-        <div class="card-action">
-            <div class="right-align">
-                <form method="POST">
-                    {% csrf_token %}
-                    {{ form }}
-                    <button  type="submit" name="_confirm" class="btn primary white-text">{{ view.action_name }}</button>
-                </form>
-            </div>
-        </div>
+  <div class="card">
+    <div class="card-content">
+      <table class="table selectable bordered">
+        <thead>
+        <th>{% trans '#' %}</th>
+        <th>{% trans 'Description' %}</th>
+        <th>{% trans 'Summary' %}</th>
+        <th>{% trans 'Process' %}</th>
+        </thead>
+        <tbody>
+        {% for task in view.tasks %}
+        <tr>
+            <td><a target="_blank" href="{% flowurl task user=request.user ns=request.resolver_match.namespace ns_map=view.ns_map %}">{{ task.process.id }}/{{ task.id }}</a></td>
+            <td><a target="_blank" href="{% flowurl task user=request.user ns=request.resolver_match.namespace ns_map=view.ns_map %}">{{ task.summary|default:task.flow_task }}</a></td>
+            <td>{{ task.flow_process.summary }}</td>
+            <td><a target="_blank" href="{% flowurl task.process 'detail' ns=request.resolver_match.namespace ns_map=view.ns_map %}">{{ task.process.flow_class.process_title }} #{{task.process.pk}}</a></td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">{% trans 'No task selected' %}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
     </div>
+    <div class="card-action">
+      <div class="right-align">
+        <dmc-form>
+          <form method="POST">
+            {% csrf_token %}
+            {{ form }}
+            <button  type="submit" name="_confirm" class="btn primary white-text">{{ view.action_name }}</button>
+          </form>
+        </dmc-form>
+      </div>
+    </div>
+  </div>
 </div>
 {% endblock %}

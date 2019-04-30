@@ -12,39 +12,41 @@
 {% block content %}
 {% block left-panel %}
 <div class="left-panel">
-    <div class="card">
-        <form role="form" method="POST" enctype="multipart/form-data">
-            <div class="card-content">
-                <div class="card-title">
-                    {{ activation.task.summary|default:activation.task.flow_task }}
-                    <h6>{{ activation.process.summary }}</h6>
-                </div>
-                {% block task_form %}
-                {% csrf_token %}
-                {% form form=form %}{% endform %}
-                {{ activation.management_form }}
-                {% endblock %}
+  <div class="card">
+    <dmc-form>
+      <form role="form" method="POST" enctype="multipart/form-data">
+        <div class="card-content">
+          <div class="card-title">
+            {{ activation.task.summary|default:activation.task.flow_task }}
+            <h6>{{ activation.process.summary }}</h6>
+          </div>
+          {% block task_form %}
+          {% csrf_token %}
+          {% form form=form %}{% endform %}
+          {{ activation.management_form }}
+          {% endblock %}
+        </div>
+        <div class="card-action">
+          <div class="row">
+            {% block task_actions %}
+            <div class="col s3">
+              <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">{% trans 'Detail' %}</a>
             </div>
-            <div class="card-action">
-                <div class="row">
-                    {% block task_actions %}
-                    <div class="col s3">
-                        <a class="btn btn-flat black-text" href="{% flowurl activation.task 'detail' %}?{{ request|query_back }}">{% trans 'Detail' %}</a>
-                    </div>
-                    <div class="col s9 right-align">
-                        <button type="submit" name="_continue" class="btn btn-flat">{% trans 'Done and continue on this process' %}</button>
-                        <button type="submit" name="_done" class="btn primary white-text">{% trans 'Done' %}</button>
-                    </div>
-                    {% endblock %}
-                </div>
+            <div class="col s9 right-align">
+              <button type="submit" name="_continue" class="btn btn-flat">{% trans 'Done and continue on this process' %}</button>
+              <button type="submit" name="_done" class="btn primary white-text">{% trans 'Done' %}</button>
             </div>
-        </form>
-    </div>
+            {% endblock %}
+          </div>
+        </div>
+      </form>
+    </dmc-form>
+  </div>
 </div>
 {% endblock %}
 {% block right-panel %}
 <div class="right-panel">
-    {% include_process_data activation.process %}
+  {% include_process_data activation.process %}
 </div>
 {% endblock %}
 {% endblock %}
