@@ -104,7 +104,7 @@ class FlowListMixin(object):
         """
         Instantiate a view.
 
-        :param ns_map: Dict{'flow_namespace': flow_class}
+        :param ns_map: Dict{flow_class : 'flow_namespace'}
         """
         self.ns_map = kwargs.get('ns_map', {})
         super(FlowListMixin, self).__init__(*args, **kwargs)
