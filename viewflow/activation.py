@@ -338,12 +338,14 @@ class ViewActivation(Activation):
         """Assign user to the task."""
         if user:
             self.task.owner = user
+        self.task.started = now()
         self.task.save()
 
     @Activation.status.transition(source=STATUS.ASSIGNED, target=STATUS.NEW)
     def unassign(self):
         """Remove user from the task assignment."""
         self.task.owner = None
+        self.task.started = None
         self.task.save()
 
     @Activation.status.transition(source=STATUS.ASSIGNED)
@@ -351,6 +353,7 @@ class ViewActivation(Activation):
         """Reassign to another user."""
         if user:
             self.task.owner = user
+        self.task.started = now()
         self.task.save()
 
     @Activation.status.transition(source=STATUS.ASSIGNED, target=STATUS.PREPARED)

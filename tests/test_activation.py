@@ -93,12 +93,15 @@ class Test(TestCase):
         # check assign/reassin flow
         act.assign(Test.UserStub())
         self.assertEqual(act.task.status, STATUS.ASSIGNED)
+        self.assertIsNotNone(act.task.started)
 
         act.reassign(Test.UserStub())
         self.assertEqual(act.task.status, STATUS.ASSIGNED)
+        self.assertIsNotNone(act.task.started)
 
         act.unassign()
         self.assertEqual(act.task.status, STATUS.NEW)
+        self.assertIsNone(act.task.started)
 
         # execute
         act.assign(Test.UserStub())
