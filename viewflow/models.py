@@ -82,6 +82,7 @@ class AbstractTask(models.Model):
     status = models.CharField(_('Status'), max_length=50, default=STATUS.NEW, db_index=True)
 
     created = models.DateTimeField(_('Created'), auto_now_add=True)
+    assigned = models.DateTimeField(_('Assigned'), blank=True, null=True)
     started = models.DateTimeField(_('Started'), blank=True, null=True)
     finished = models.DateTimeField(_('Finished'), blank=True, null=True)
     previous = models.ManyToManyField('self', symmetrical=False, related_name='leading', verbose_name=_('Previous'))

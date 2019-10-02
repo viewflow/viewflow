@@ -80,7 +80,7 @@ class Test(TestCase):
 
         self.assertEqual(str(queryset.query).strip(),
                          'SELECT "viewflow_task"."id", "viewflow_task"."flow_task", "viewflow_task"."flow_task_type",'
-                         ' "viewflow_task"."status", "viewflow_task"."created", "viewflow_task"."started",'
+                         ' "viewflow_task"."status", "viewflow_task"."created", "viewflow_task"."assigned", "viewflow_task"."started",'
                          ' "viewflow_task"."finished", "viewflow_task"."token", "viewflow_task"."process_id",'
                          ' "viewflow_task"."owner_id", "viewflow_task"."external_task_id",'
                          ' "viewflow_task"."owner_permission", "viewflow_task"."comments" FROM "viewflow_task"'
@@ -97,7 +97,7 @@ class Test(TestCase):
 
         self.assertEqual(str(queryset.query).strip(),
                          'SELECT "viewflow_task"."id", "viewflow_task"."flow_task", "viewflow_task"."flow_task_type",'
-                         ' "viewflow_task"."status", "viewflow_task"."created", "viewflow_task"."started",'
+                         ' "viewflow_task"."status", "viewflow_task"."created", "viewflow_task"."assigned", "viewflow_task"."started",'
                          ' "viewflow_task"."finished", "viewflow_task"."token", "viewflow_task"."process_id",'
                          ' "viewflow_task"."owner_id", "viewflow_task"."external_task_id",'
                          ' "viewflow_task"."owner_permission", "viewflow_task"."comments", "viewflow_process"."id",'
@@ -145,7 +145,7 @@ class ChildFlow(Flow):
     process_class = ChildProcess
     task_class = ChildTask
 
-    start = flow.Start(lambda rewquest: None)
+    start = flow.Start(lambda request: None)
 
 
 class GrandChildFlow(Flow):

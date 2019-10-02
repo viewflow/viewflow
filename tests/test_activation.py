@@ -90,15 +90,18 @@ class Test(TestCase):
         act = activation.ViewActivation()
         act.initialize(flow_task, Test.TaskStub())
 
-        # check assign/reassin flow
+        # check assign/reassign flow
         act.assign(Test.UserStub())
         self.assertEqual(act.task.status, STATUS.ASSIGNED)
+        self.assertIsNotNone(act.task.assigned)
 
         act.reassign(Test.UserStub())
         self.assertEqual(act.task.status, STATUS.ASSIGNED)
+        self.assertIsNotNone(act.task.assigned)
 
         act.unassign()
         self.assertEqual(act.task.status, STATUS.NEW)
+        self.assertIsNone(act.task.assigned)
 
         # execute
         act.assign(Test.UserStub())
