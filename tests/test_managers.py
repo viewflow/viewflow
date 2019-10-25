@@ -18,8 +18,14 @@ class Test(TestCase):
         queryset = managers.ProcessQuerySet(model=Process).filter(flow_class=ChildFlow)
 
         self.assertEqual(str(queryset.query).strip(),
-                         'SELECT "viewflow_process"."id", "viewflow_process"."flow_class", "viewflow_process"."status",'
-                         ' "viewflow_process"."created", "viewflow_process"."finished" FROM "viewflow_process"'
+                         'SELECT "viewflow_process"."id", "viewflow_process"."flow_class",'
+                         ' "viewflow_process"."status",'
+                         ' "viewflow_process"."created",'
+                         ' "viewflow_process"."finished",'
+                         ' "viewflow_process"."artifact_content_type_id",'
+                         ' "viewflow_process"."artifact_object_id",'
+                         ' "viewflow_process"."data"'
+                         ' FROM "viewflow_process"'''
                          ' WHERE "viewflow_process"."flow_class" = tests/test_managers.ChildFlow'
                          ' ORDER BY "viewflow_process"."created" DESC')
 
@@ -33,6 +39,9 @@ class Test(TestCase):
             '       "viewflow_process"."status",\n'
             '       "viewflow_process"."created",\n'
             '       "viewflow_process"."finished",\n'
+            '       "viewflow_process"."artifact_content_type_id",\n' 
+            '       "viewflow_process"."artifact_object_id",\n'
+            '       "viewflow_process"."data",\n'
             '       "tests_childprocess"."process_ptr_id",\n'
             '       "tests_childprocess"."comment"\n'
             'FROM "viewflow_process"\n'
@@ -80,10 +89,12 @@ class Test(TestCase):
 
         self.assertEqual(str(queryset.query).strip(),
                          'SELECT "viewflow_task"."id", "viewflow_task"."flow_task", "viewflow_task"."flow_task_type",'
-                         ' "viewflow_task"."status", "viewflow_task"."created", "viewflow_task"."assigned", "viewflow_task"."started",'
+                         ' "viewflow_task"."status", "viewflow_task"."created", "viewflow_task"."assigned",'
+                         ' "viewflow_task"."started",'
                          ' "viewflow_task"."finished", "viewflow_task"."token", "viewflow_task"."process_id",'
+                         ' "viewflow_task"."artifact_content_type_id", "viewflow_task"."artifact_object_id",'
                          ' "viewflow_task"."owner_id", "viewflow_task"."external_task_id",'
-                         ' "viewflow_task"."owner_permission", "viewflow_task"."comments" FROM "viewflow_task"'
+                         ' "viewflow_task"."owner_permission", "viewflow_task"."comments", "viewflow_task"."data" FROM "viewflow_task"'
                          ' WHERE "viewflow_task"."flow_task" = tests/test_managers.ChildFlow.start'
                          ' ORDER BY "viewflow_task"."created" DESC')
 

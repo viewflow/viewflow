@@ -124,7 +124,10 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.5.3 2019-04-23
+GIT Version
 ----------------
 
-* Resolve this-referencies for Split and Switch nodes conditions
+* Django 3.0 support
+* Add process.artifact and task.artifact generic fk fields for default models
+* Add process.data and task.data generic json field for default models
+

@@ -8,7 +8,7 @@ class TaskInline(admin.TabularInline):
     model = Task
     fields = ['flow_task', 'flow_task_type', 'status',
               'token', 'owner']
-    readonly_fields = ['flow_task', 'flow_task_type', 'status', 'token']
+    readonly_fields = ['flow_task', 'flow_task_type', 'status', 'token', 'data']
 
     def has_add_permission(self, request, obj=None):
         """Disable manually task creation."""
@@ -29,7 +29,7 @@ class ProcessAdmin(admin.ModelAdmin):
     list_display = ['pk', 'created', 'flow_class', 'status', 'participants']
     list_display_links = ['pk', 'created', 'flow_class']
     list_filter = ['status']
-    readonly_fields = ['flow_class', 'status', 'finished']
+    readonly_fields = ['flow_class', 'status', 'finished', 'data']
     inlines = [TaskInline]
 
     def has_add_permission(self, request):
@@ -57,7 +57,10 @@ class TaskAdmin(admin.ModelAdmin):
                     'started', 'finished']
     list_display_links = ['pk', 'created', 'process']
     list_filter = ['status']
-    readonly_fields = ['process', 'status', 'flow_task', 'started', 'finished', 'previous', 'token']
+    readonly_fields = [
+        'process', 'status', 'flow_task', 'started', 
+        'finished', 'previous', 'token', 'data',
+    ]
 
     def has_add_permission(self, request):
         """Disable manually task creation."""

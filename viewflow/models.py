@@ -1,9 +1,12 @@
 from __future__ import unicode_literals
 
 from django.conf import settings
+from django.contrib.contenttypes.fields import GenericForeignKey
+from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.template import Template, Context
 from django.utils.encoding import force_text
+from jsonfield_schema import JSONField
 
 from .activation import STATUS, STATUS_CHOICES
 from .compat import _
@@ -155,6 +158,11 @@ class AbstractTask(models.Model):
 
 class Process(AbstractProcess):
     """Default viewflow Process model."""
+    artifact_content_type = models.ForeignKey(ContentType, null=True, blank=True, on_delete=models.CASCADE)
+    artifact_object_id = models.PositiveIntegerField(null=True, blank=True)
+    artifact = GenericForeignKey('artifact_content_type', 'artifact_object_id')
+
+    data = JSONField(null=True, blank=True)
 
     class Meta:  # noqa D101
         ordering = ['-created']
@@ -167,13 +175,19 @@ class Task(AbstractTask):
 
     process = models.ForeignKey(Process, on_delete=models.CASCADE, verbose_name=_('Process'))
 
+    artifact_content_type = models.ForeignKey(ContentType, null=True, blank=True, on_delete=models.CASCADE)
+    artifact_object_id = models.PositiveIntegerField(null=True, blank=True)
+    artifact = GenericForeignKey('artifact_content_type', 'artifact_object_id')
+
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL, blank=True, null=True, db_index=True,
         on_delete=models.CASCADE, verbose_name=_('Owner'))
     external_task_id = models.CharField(_('External Task ID'), max_length=50, blank=True, null=True, db_index=True)
     owner_permission = models.CharField(_('Permission'), max_length=255, blank=True, null=True)
-
     comments = models.TextField(_('Comments'), blank=True, null=True)
+
+    data = JSONField(null=True, blank=True)
+
 
     class Meta:  # noqa D101
         verbose_name = _('Task')

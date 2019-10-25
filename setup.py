@@ -5,7 +5,7 @@ from setuptools import setup
 
 setup(
     name='django-viewflow',
-    version='1.5.6',
+    version='1.6.0',
     author='Mikhail Podgurskiy',
     author_email='kmmbvnr@gmail.com',
     description='Reusable workflow library for django',
@@ -33,6 +33,8 @@ setup(
     install_requires=[
         'Django>=1.11',
         'django-filter>=1.0',
+        'django-jsonfield-schema',
+        'django-annoying',
         'six',
     ],
     packages=['viewflow',
