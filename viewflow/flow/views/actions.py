@@ -6,10 +6,10 @@ from django.utils.decorators import method_decorator
 from django.utils.http import is_safe_url
 from django.utils.safestring import mark_safe
 from django.utils.timezone import now
-from django.utils.translation import ugettext_lazy as _
 from django.views import generic
 
 from ...activation import STATUS
+from ...compat import _
 from ...decorators import flow_view
 from ...exceptions import FlowRuntimeError
 from .mixins import (

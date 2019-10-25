@@ -6,9 +6,10 @@ from __future__ import unicode_literals
 import re
 from collections import defaultdict
 from textwrap import dedent
+from six import with_metaclass
 
 from django.conf.urls import include, url
-from django.utils.six import with_metaclass
+
 
 from . import Node, ThisObject, This, lock, models, forms
 from .compat import get_containing_app_data

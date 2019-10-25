@@ -3,8 +3,8 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
-from django.utils.translation import ugettext_lazy as _
 
+from ...compat import _
 from ...exceptions import FlowRuntimeError
 
 

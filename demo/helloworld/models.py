@@ -1,6 +1,6 @@
 from django.db import models
-from viewflow.models import Process, Task
-from django.utils.translation import ugettext_lazy as _
+from viewflow.models import Process
+from viewflow.compat import _
 
 
 class HelloWorldProcess(Process):

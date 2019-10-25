@@ -1,5 +1,10 @@
 from django.urls import reverse
-from django.utils.http import is_safe_url
+
+try:
+    # django 3.0+
+    from django.utils.http import url_has_allowed_host_and_scheme as is_safe_url
+except ImportError:
+    from django.utils.http import is_safe_url
 
 from ... import activation
 

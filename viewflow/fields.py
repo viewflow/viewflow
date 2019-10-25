@@ -1,8 +1,8 @@
 from __future__ import unicode_literals
 
+from six import string_types, with_metaclass
 from django.db import models
 from django.utils.module_loading import import_string
-from django.utils.six import string_types, with_metaclass
 
 from .compat import get_app_package, get_containing_app_data
 from .exceptions import FlowRuntimeError

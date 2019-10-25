@@ -3,13 +3,19 @@ from __future__ import unicode_literals
 from django.conf import settings
 from django.db import models
 from django.template import Template, Context
-from django.utils.translation import ugettext_lazy as _
-from django.utils.encoding import python_2_unicode_compatible, force_text
+from django.utils.encoding import force_text
 
 from .activation import STATUS, STATUS_CHOICES
+from .compat import _
 from .exceptions import FlowRuntimeError
 from .fields import FlowReferenceField, TaskReferenceField, TokenField
 from .managers import ProcessQuerySet, TaskQuerySet, coerce_to_related_instance
+
+try:
+    from django.utils.encoding import python_2_unicode_compatible
+except ImportError:
+    # django 3.0+
+    python_2_unicode_compatible = lambda cls: cls  # NOQA
 
 
 @python_2_unicode_compatible

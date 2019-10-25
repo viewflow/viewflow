@@ -2,16 +2,10 @@ from __future__ import unicode_literals
 
 import django
 from django.db.models import Q
+from django.db.models.query import ModelIterable
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.query import QuerySet
 from django.db.models.constants import LOOKUP_SEP
-
-
-try:
-    from django.db.models.query import ModelIterable
-except ImportError:
-    # Django 1.8
-    ModelIterable = object
 
 from .activation import STATUS
 from .fields import ClassValueWrapper
@@ -137,20 +131,6 @@ class ProcessQuerySet(QuerySet):
             pass
         return super(ProcessQuerySet, self)._clone(*args, **kwargs)
 
-    def iterator(self):
-        """Coerce queryset results to process subclasses."""
-
-        # django 1.8 only
-        base_iterator = super(ProcessQuerySet, self).iterator()
-        if getattr(self, '_coerced', False):
-            for process in base_iterator:
-                if isinstance(process, self.model):
-                    process = coerce_to_related_instance(process, process.flow_class.process_class)
-                yield process
-        else:
-            for process in base_iterator:
-                yield process
-
 
 class TaskIterable(ModelIterable):
     def __iter__(self):
@@ -258,19 +238,6 @@ class TaskQuerySet(QuerySet):
         except AttributeError:
             pass
         return super(TaskQuerySet, self)._clone(*args, **kwargs)
-
-    def iterator(self):
-        """Coerce queryset results to process subclasses."""
-        # django 1.8 only
-        base_iterator = super(TaskQuerySet, self).iterator()
-        if getattr(self, '_coerced', False):
-            for task in base_iterator:
-                if isinstance(task, self.model):
-                    task = coerce_to_related_instance(task, task.flow_task.flow_class.task_class)
-                yield task
-        else:
-            for task in base_iterator:
-                yield task
 
 
 ProcessManager = ProcessQuerySet.as_manager()

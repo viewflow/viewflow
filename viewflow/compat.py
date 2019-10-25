@@ -1,5 +1,15 @@
 """Django compatibility utils."""
+import django
 from django.apps import apps
+
+
+__all__ = ('_', 'get_app_package', 'get_containing_app_data')
+
+
+if django.VERSION >= (3, 0):
+    from django.utils.translation import gettext_lazy as _
+else:
+    from django.utils.translation import ugettext_lazy as _
 
 
 def get_app_package(app_label):

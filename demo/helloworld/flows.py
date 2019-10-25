@@ -1,8 +1,8 @@
 import os
-from django.utils.translation import ugettext_lazy as _
 
 from viewflow import flow, frontend, lock
 from viewflow.base import this, Flow
+from viewflow.compat import _
 from viewflow.flow import views as flow_views
 
 

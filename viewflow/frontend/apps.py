@@ -4,10 +4,11 @@ from django.template.loader import get_template
 from django.urls import reverse
 from django.utils.module_loading import autodiscover_modules
 from django.utils.module_loading import import_string
-from django.utils.translation import ugettext_lazy as _
 
 from material import frontend
 from material.frontend.apps import ModuleMixin
+
+from ..compat import _
 
 
 class ViewflowFrontendConfig(ModuleMixin, AppConfig):

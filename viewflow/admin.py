@@ -10,7 +10,7 @@ class TaskInline(admin.TabularInline):
               'token', 'owner']
     readonly_fields = ['flow_task', 'flow_task_type', 'status', 'token']
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         """Disable manually task creation."""
         return False
 

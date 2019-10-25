@@ -1,6 +1,6 @@
 from __future__ import unicode_literals
 
-from django.utils.six.moves.urllib.parse import quote as urlquote
+from six.moves.urllib.parse import quote as urlquote
 
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
@@ -8,8 +8,8 @@ from django.shortcuts import redirect
 from django.views import generic
 from django.utils.decorators import method_decorator
 from django.utils.http import is_safe_url
-from django.utils.translation import ugettext_lazy as _
 
+from ...compat import _
 from ...decorators import flow_view
 from .actions import BaseTaskActionView
 from .mixins import MessageUserMixin

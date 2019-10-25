@@ -4,8 +4,8 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.views import generic
 from django.utils.decorators import method_decorator
-from django.utils.translation import ugettext_lazy as _
 
+from ...compat import _
 from ...decorators import flow_start_view
 from .mixins import MessageUserMixin
 from .utils import get_next_task_url
