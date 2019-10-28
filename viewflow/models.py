@@ -158,7 +158,9 @@ class AbstractTask(models.Model):
 
 class Process(AbstractProcess):
     """Default viewflow Process model."""
-    artifact_content_type = models.ForeignKey(ContentType, null=True, blank=True, on_delete=models.CASCADE)
+    artifact_content_type = models.ForeignKey(
+        ContentType, null=True, blank=True,
+        on_delete=models.CASCADE, related_name='+')
     artifact_object_id = models.PositiveIntegerField(null=True, blank=True)
     artifact = GenericForeignKey('artifact_content_type', 'artifact_object_id')
 
@@ -175,7 +177,10 @@ class Task(AbstractTask):
 
     process = models.ForeignKey(Process, on_delete=models.CASCADE, verbose_name=_('Process'))
 
-    artifact_content_type = models.ForeignKey(ContentType, null=True, blank=True, on_delete=models.CASCADE)
+    artifact_content_type = models.ForeignKey(
+        ContentType, null=True, blank=True,
+        on_delete=models.CASCADE, related_name='+'
+    )
     artifact_object_id = models.PositiveIntegerField(null=True, blank=True)
     artifact = GenericForeignKey('artifact_content_type', 'artifact_object_id')
 
