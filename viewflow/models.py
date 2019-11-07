@@ -6,7 +6,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.template import Template, Context
 from django.utils.encoding import force_text
-from jsonfield_schema import JSONField
+from jsonstore import JSONField
 
 from .activation import STATUS, STATUS_CHOICES
 from .compat import _

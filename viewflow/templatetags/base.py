@@ -42,6 +42,8 @@ def get_model_display_data(root_instance, user):
                 continue
             elif field.auto_created:
                 continue
+            elif field.name == 'data':
+                continue
             elif isinstance(field, models.ForeignKey) and not field.auto_created:
                 related_id = getattr(root, field.get_attname())
                 if related_id is not None:

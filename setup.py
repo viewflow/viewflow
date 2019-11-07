@@ -33,7 +33,7 @@ setup(
     install_requires=[
         'Django>=1.11',
         'django-filter>=1.0',
-        'django-jsonfield-schema',
+        'django-jsonstore',
         'django-annoying',
         'six',
     ],

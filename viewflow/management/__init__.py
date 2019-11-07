@@ -5,6 +5,7 @@ import django
 from django.apps import apps
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models.signals import pre_migrate, post_migrate
+from django.utils.encoding import smart_text
 
 
 def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
@@ -25,7 +26,12 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
     ctypes = set()           # The codenames and ctypes that should exist.
 
     for klass in app_config.get_models():
-        ctype = ContentType.objects.db_manager(using).get_for_model(klass)
+        # ctype = ContentType.objects.db_manager(using).get_for_model(klass)
+        opts = klass._meta
+        ctype, _ = ContentType.objects.get_or_create(
+                app_label=opts.app_label,
+                model=opts.object_name.lower()
+        )
         ctypes.add(ctype)
 
         from django.contrib.auth.management import _get_all_permissions
