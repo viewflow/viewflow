@@ -416,6 +416,8 @@ class ViewActivation(Activation):
 
         activation = cls()
         activation.initialize(flow_task, task)
+        if activation.flow_task._on_create is not None:
+            activation.flow_task._on_create(activation)
 
         return activation
 

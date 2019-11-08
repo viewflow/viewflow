@@ -3,7 +3,7 @@ from copy import copy
 from django.conf.urls import url
 from django.urls import reverse
 
-from .. import Event, Task, mixins
+from .. import Event, Task, ThisObject, mixins
 from ..activation import StartActivation, ViewActivation, STATUS
 from ..utils import is_owner
 
@@ -190,7 +190,13 @@ class View(mixins.PermissionMixin, BaseView):
         """
         self._assign_view = kwargs.pop('assign_view', None)
         self._unassign_view = kwargs.pop('unassign_view', None)
+        self._on_create = None
         super(View, self).__init__(*args, **kwargs)
+
+    def ready(self):
+        """Resolve internal `this`-references."""
+        if isinstance(self._on_create, ThisObject):
+            self._on_create = getattr(self.flow_class.instance, self._on_create.name)
 
     def Assign(self, owner=None, **owner_kwargs):
         """
@@ -207,6 +213,24 @@ class View(mixins.PermissionMixin, BaseView):
             result._owner = owner
         else:
             result._owner = owner_kwargs
+        return result
+
+    def onCreate(self, ref):
+        """
+        Call a function when task created::
+
+            class MyFlow(Flow):
+                approve = flow.View(...).OnCreate(this.on_approve_created)
+
+                def on_approve_created(self, activation):
+                    if activation.task.owner:
+                        send_mail(
+                            'View task assigned to you','Here is the message.',
+                            'from@example.com', [activation.task.owner.email]
+                        )
+        """
+        result = copy(self)
+        result._on_create = ref
         return result
 
     @property

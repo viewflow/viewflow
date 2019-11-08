@@ -130,4 +130,5 @@ GIT Version
 * Django 3.0 support
 * Add process.artifact and task.artifact generic fk fields for default models
 * Add process.data and task.data generic json field for default models
+* Add View().OnCreate(...) callback support
 
