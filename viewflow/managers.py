@@ -14,9 +14,7 @@ from .fields import ClassValueWrapper
 def _available_flows(flow_classes, user):
     result = []
     for flow_class in flow_classes:
-        opts = flow_class.process_class._meta
-        view_perm = "{}.view_{}".format(opts.app_label, opts.model_name)
-        if user.has_perm(view_perm):
+        if flow_class.instance.has_view_permission(user):
             result.append(flow_class)
     return result
 

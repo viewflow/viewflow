@@ -212,6 +212,9 @@ class Flow(with_metaclass(FlowMetaClass, object)):
 
         return url('^', include(node_urls), {'flow_class': self})
 
+    def has_view_permission(self, user):
+        return user.has_perm(self._meta.view_permission_name)
+
     def __str__(self):
         return str(self.process_title)
 

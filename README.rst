@@ -131,4 +131,5 @@ GIT Version
 * Add process.artifact and task.artifact generic fk fields for default models
 * Add process.data and task.data generic json field for default models
 * Add View().OnCreate(...) callback support
+* Allow to overide flow view access by Flow.has_view_permission method
 
