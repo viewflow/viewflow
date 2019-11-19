@@ -124,7 +124,7 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-GIT Version
+1.6.0 2019-11-19
 ----------------
 
 * Django 3.0 support
