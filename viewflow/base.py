@@ -27,12 +27,12 @@ class _Resolver(object):
         elif isinstance(link, ThisObject):
             node = self.nodes.get(link.name)
             if not node:
-                raise ValueError("Can't found node with name %s" % link.name)
+                raise ValueError("Cannot find node with name '%s'." % link.name)
             return node
         elif isinstance(link, str):
             node = self.nodes.get(link)
             if not node:
-                raise ValueError("Can't found node with name %s" % link)
+                raise ValueError("Cannot find node with name '%s'." % link)
             return node
 
         raise ValueError("Can't resolve %s" % link)
