@@ -13,7 +13,8 @@
             <dd>
                 {% if value == True %}{% trans 'Yes' %}{% else %}
                 {% if value == False %}{% trans 'No' %}{% else %}
-                {{ value }}{% endif %}{% endif %}
+                {% if value.url %}<a href="{{ value.url }}" target="_blank">{{ value.name }}</a>{% else %}
+                {{ value }}{% endif %}{% endif %}{% endif %}
             </dd>
             {% endfor %}
         </dl>
