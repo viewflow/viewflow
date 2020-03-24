@@ -136,7 +136,7 @@ class Test(TestCase):
         # by default gate exceptions are propogated
         self.assertRaises(ValueError, act.perform)
 
-        # disable gate error propogation
+        # disable gate error propagation
         with activation.Context(propagate_exception=False):
             act.perform()
             self.assertEqual(act.task.status, STATUS.ERROR)
@@ -179,7 +179,7 @@ class Test(TestCase):
         self.assertEqual(act.task.status, STATUS.ASSIGNED)
         self.assertRaises(ValueError, act.schedule)
 
-        # disable error propogation
+        # disable error propagation
         with activation.Context(propagate_exception=False):
             act.schedule()
             act.retry()
