@@ -14,6 +14,7 @@ from ...decorators import flow_view
 from .actions import BaseTaskActionView
 from .mixins import MessageUserMixin
 from .utils import get_next_task_url
+from viewflow.mixins import TaskReporterMixin
 
 
 class BaseFlowMixin(object):
@@ -90,7 +91,7 @@ class FlowMixin(MessageUserMixin, BaseFlowMixin):
 FlowViewMixin = FlowMixin  # TODO Remove
 
 
-class UpdateProcessView(FlowMixin, generic.UpdateView):  # noqa D101
+class UpdateProcessView(TaskReporterMixin, FlowMixin, generic.UpdateView):  # noqa D101
     def __init__(self, *args, **kwargs):  # noqa D102
         super(UpdateProcessView, self).__init__(*args, **kwargs)
         if self.form_class is None and self.fields is None:

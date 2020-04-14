@@ -1,5 +1,6 @@
 from copy import copy
 from textwrap import dedent
+from datetime import datetime
 from django.conf.urls import url
 from django.urls import reverse
 
@@ -324,3 +325,29 @@ class ViewArgsMixin(object):
 
     def __init__(self, **kwargs):  # noqa D102
         self._view_args = kwargs
+
+
+class TaskReporterMixin:
+    """mixin for report/record task result/summary"""
+    task_reporter = None
+
+    def form_valid(self, *args, **kwargs):
+        super_return = super().form_valid(*args, **kwargs)
+
+        if self.task_reporter is not None:
+            activation = self.request.activation
+
+            if callable(self.task_reporter):
+                msg = self.task_reporter(activation)
+            else:
+                msg = self.task_reporter
+
+            activation.task.data = {
+                'time': datetime.now().strftime('%Y/%m%d %H:%M:%S'),
+                'user': self.request.user,
+                'msg': msg
+            }
+
+            activation.task.save()
+
+        return super_return

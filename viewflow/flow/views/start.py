@@ -9,6 +9,7 @@ from ...compat import _
 from ...decorators import flow_start_view
 from .mixins import MessageUserMixin
 from .utils import get_next_task_url
+from viewflow.mixins import TaskReporterMixin
 
 
 class BaseStartFlowMixin(object):
@@ -72,7 +73,7 @@ class StartFlowMixin(MessageUserMixin, BaseStartFlowMixin):
         return HttpResponseRedirect(self.get_success_url())
 
 
-class CreateProcessView(StartFlowMixin, generic.UpdateView): # noqa D101
+class CreateProcessView(TaskReporterMixin, StartFlowMixin, generic.UpdateView): # noqa D101
     def __init__(self, *args, **kwargs):  # noqa D102
         super(CreateProcessView, self).__init__(*args, **kwargs)
         if self.form_class is None and self.fields is None:
