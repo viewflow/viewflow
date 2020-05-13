@@ -195,6 +195,7 @@ class View(mixins.PermissionMixin, BaseView):
 
     def ready(self):
         """Resolve internal `this`-references."""
+        super(View, self).ready()
         if isinstance(self._on_create, ThisObject):
             self._on_create = getattr(self.flow_class.instance, self._on_create.name)
 
