@@ -124,12 +124,9 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.6.0 2019-11-19
+1.6.1 2020-05-13
 ----------------
 
-* Django 3.0 support
-* Add process.artifact and task.artifact generic fk fields for default models
-* Add process.data and task.data generic json field for default models
-* Add View().OnCreate(...) callback support
-* Allow to overide flow view access by Flow.has_view_permission method
-
+* Fix autopermission creation for flow.View nodes
+* Make django-rest-swagger requirements optional
+* Fix REST Charts on python 3+

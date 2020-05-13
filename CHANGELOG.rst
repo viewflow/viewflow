@@ -2,6 +2,14 @@
 Changelog
 =========
 
+1.6.1 2020-05-13
+----------------
+
+* Fix autopermission creation for flow.View nodes
+* Make django-rest-swagger requirements optional
+* Fix REST Charts on python 3+
+
+
 1.6.0 2019-11-19
 ----------------
 
