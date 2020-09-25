@@ -29,6 +29,6 @@ class Migration(migrations.Migration):
             preserve_default=True,
         ),
         migrations.RunPython(
-            update_status
+            update_status, migrations.RunPython.noop
         )
     ]
