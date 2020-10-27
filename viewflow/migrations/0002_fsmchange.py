@@ -3,6 +3,15 @@ from __future__ import unicode_literals
 
 from django.db import models, migrations
 
+def rollback_status_update(apps, schema_editor):
+    Task = apps.get_model("viewflow", "Task")
+    Task.objects.filter(status='DONE').update(status='FNS')
+    Task.objects.filter(status='STARTED').update(status='STR')
+    Task.objects.filter(status='ASSIGNED').update(status='ASN')
+
+    Process = apps.get_model("viewflow", "Process")
+    Process.objects.filter(status='DONE').update(status='FNS')
+    Process.objects.filter(status='STARTED').update(status='STR')
 
 def update_status(apps, schema_editor):
     Process = apps.get_model("viewflow", "Process")
@@ -29,6 +38,6 @@ class Migration(migrations.Migration):
             preserve_default=True,
         ),
         migrations.RunPython(
-            update_status
+            update_status, reverse_code=rollback_status_update
         )
     ]
