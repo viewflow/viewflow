@@ -124,9 +124,7 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.6.1 2020-05-13
+1.7.0 2020-11-18
 ----------------
 
-* Fix autopermission creation for flow.View nodes
-* Make django-rest-swagger requirements optional
-* Fix REST Charts on python 3+
+* Fix TaskQuerySet.user_queue filtering. Remove django 1.8 compatibility code

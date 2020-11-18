@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.7.0 2020-11-18
+----------------
+
+* Fix TaskQuerySet.user_queue filtering. Remove django 1.8 compatibility code
+
+
 1.6.1 2020-05-13
 ----------------
 
