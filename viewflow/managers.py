@@ -8,7 +8,6 @@ from django.db.models.query import QuerySet
 from django.db.models.constants import LOOKUP_SEP
 
 from .activation import STATUS
-from .fields import ClassValueWrapper
 
 
 def _available_flows(flow_classes, user):
@@ -87,14 +86,6 @@ class ProcessQuerySet(QuerySet):
         super(ProcessQuerySet, self).__init__(*args, **kwargs)
         self._iterable_class = ProcessIterable
 
-    def filter(self, *args, **kwargs):
-        """Queryset filter allows to use `flow_class` class values."""
-        flow_class = kwargs.pop('flow_class', None)
-        if flow_class and not isinstance(flow_class, ClassValueWrapper):
-            kwargs['flow_class'] = ClassValueWrapper(flow_class)
-
-        return super(ProcessQuerySet, self).filter(*args, **kwargs)
-
     def coerce_for(self, flow_classes):
         """Return subclass instances of the Task."""
         self._coerced = True
@@ -150,14 +141,6 @@ class TaskQuerySet(QuerySet):
         super(TaskQuerySet, self).__init__(*args, **kwargs)
         self._iterable_class = TaskIterable
 
-    def filter(self, *args, **kwargs):
-        """Queryset filter allows to use `process__flow_class` class values."""
-        flow_class = kwargs.pop('process__flow_class', None)
-        if flow_class and not isinstance(flow_class, ClassValueWrapper):
-            kwargs['process__flow_class'] = ClassValueWrapper(flow_class)
-
-        return super(TaskQuerySet, self).filter(*args, **kwargs)
-
     def coerce_for(self, flow_classes):
         """Return subclass instances of the Task."""
         self._coerced = True
@@ -175,9 +158,6 @@ class TaskQuerySet(QuerySet):
         queryset = self.filter(flow_task_type='HUMAN')
 
         if flow_class is not None:
-            if not isinstance(flow_class, ClassValueWrapper):
-                flow_class = ClassValueWrapper(flow_class)
-
             queryset = queryset.filter(process__flow_class=flow_class)
 
         if not user.is_superuser:
@@ -194,9 +174,6 @@ class TaskQuerySet(QuerySet):
         queryset = self.filter(flow_task_type='HUMAN')
 
         if flow_class is not None:
-            if not isinstance(flow_class, ClassValueWrapper):
-                flow_class = ClassValueWrapper(flow_class)
-
             queryset = queryset.filter(process__flow_class=flow_class)
 
         return queryset.filter(owner=user, finished__isnull=False)

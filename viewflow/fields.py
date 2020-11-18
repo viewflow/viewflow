@@ -46,13 +46,6 @@ def get_task_ref(flow_task):
     return "{}/{}.{}.{}".format(app_label, subpath, flow_task.flow_class.__name__, flow_task.name)
 
 
-class ClassValueWrapper(object):
-    """Wrapper to get around of passing cls objects callable to django queryset."""
-
-    def __init__(self, cls):  # noqa D102
-        self.cls = cls
-
-
 class _SubfieldBase(type):
     """Backport from django 1.8."""
 
@@ -109,8 +102,6 @@ class FlowReferenceField(with_metaclass(_SubfieldBase, models.CharField)):
             return value
         elif isinstance(value, str):
             return value
-        elif isinstance(value, ClassValueWrapper):
-            value = value.cls
         elif not isinstance(value, type):
             # HACK: Django calls callable due query parameter
             # preparation. So here we can get Flow instance,
