@@ -13,7 +13,7 @@ Viewflow came in two flavors:
 
 ## Installation
 
-Viewflow works pith Python 3.7 or greater, and Django 3.1+
+Viewflow works with Python 3.7 or greater, and Django 3.1+
 
 Viewflow:
 
@@ -66,8 +66,32 @@ TODO
 TODO
 
 ### JSON Storage for Django Models
+Keep dumb business data, quick prototyping without DB migrations, replace multi-table inheritance with proxy models.
 
-TODO
+`viewflow.jsonstore.*` is the set of virtual Django Model fields that stores inside single JSON database column.
+
+```python
+from viewflow import jsonstore
+from django.db import models
+
+class Employee(models.Model):
+    data = JSONField(default={})
+    full_name = jsonstore.CharField(max_length=250)
+    hire_date = jsonstore.DateField()
+```
+The result model works like usual django model. All virtual fields are available to construct ModelForms, Viewsets and Admin interfaces.
+
+```python
+class EmployeeForm(forms.ModelForm):
+    class Meta:
+        model = Employee
+        fields = ['full_name', 'hire_date', 'salary']
+
+@admin.register(Employee)
+class EmployeeAdmin(admin.ModelAdmin):
+    list_display = ['full_name', 'hire_date']
+    fields = ['full_name', ('hire_date', 'salary')]
+```
 
 ### Material UI Kit
 
