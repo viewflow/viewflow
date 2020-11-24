@@ -2,14 +2,18 @@
 
 The Django extension for perfectionists with yesterday’s deadlines.
 
-Viewflow provides set of high-level components to build business apps fast. 
-Viewflow helps to organize people collaboration workflow, implement CRUD and reporting.
+Viewflow is the reusable library eases to build business apps fast. Viewflow
+helps to organize people collaboration workflow, implement CRUD and reporting.
 
-The goad of viewflow is to allow to get ready-to-use application on top of Django as fast as with no-code solution. But allow gracefully replace built-in functionality part-by-part with your custom code.
+The goad of viewflow is to allow to get ready-to-use application on top of
+Django as fast as with no-code solution. But allow gracefully replace built-in
+functionality part-by-part with your custom code.
 
-Viewflow came in two flavors: 
-  - Lightweight BSD-licensed library with only un-opinionated base functionality allows to build your own custom solution on top of it.
-  - PRO: Commercially supported full-featured extended library allows to buld ready to use apps with few lines of code. 
+Viewflow came in two flavors:
+- Lightweight BSD-licensed library with only un-opinionated base functionality
+  allows to build your own custom solution on top of it.
+- PRO: Commercially supported reference implementation. Integrated with 3d-party
+  django packages, allows to build ready-to-use apps with few lines of code.
 
 ## Installation
 
@@ -43,7 +47,7 @@ http://demo-next.viewflow.io/
 
 ## Cookbook
 
-Samples applications code for Viewflow PRO avalable at:
+Samples applications code for Viewflow PRO available at:
 
 http://cookbook.viewflow.io
 
@@ -51,7 +55,28 @@ http://cookbook.viewflow.io
 
 ### BPMN Workflow
 
-TODO
+`viewflow.workflow.*` is a lightweight workflow layer on top of Django's Model-View-Template that helps to organize people collaboration business logic.
+
+Viewflow supports parallel activities, allows to have multiple active task at
+one and synchronize people interactions with background python jobs.
+
+Quick start: https://docs-next.viewflow.io/bpmn/quick_start.html
+
+```python
+class HelloWorldFlow(flow.Flow):
+    start = (
+        flow.Start(
+            views.CreateProcessView.as_view(
+                fields=['text']
+            )
+        )
+        .Permission(auto_create=True)
+        .Next(this.approvement_split)
+    )
+
+    ...
+
+```
 
 ### Class-based URL Configuration
 
@@ -63,12 +88,14 @@ TODO
 
 ### Finite State Machine
 
+Sequential
+
 TODO
 
 ### JSON Storage for Django Models
 Keep dumb business data, quick prototyping without DB migrations, replace multi-table inheritance with proxy models.
 
-`viewflow.jsonstore.*` is the set of virtual Django Model fields that stores inside single JSON database column.
+`viewflow.jsonstore.*` is the set of virtual Django Model fields that stores data inside single JSON database column.
 
 ```python
 from viewflow import jsonstore
