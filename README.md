@@ -10,7 +10,7 @@ Django as fast as with no-code solution. But allow gracefully replace built-in
 functionality part-by-part with your custom code.
 
 Viewflow came in two flavors:
-- Lightweight BSD-licensed library with only un-opinionated base functionality
+- Lightweight opensource library with only un-opinionated base functionality
   allows to build your own custom solution on top of it.
 - PRO: Commercially supported reference implementation. Integrated with 3d-party
   django packages, allows to build ready-to-use apps with few lines of code.
@@ -58,7 +58,7 @@ http://cookbook.viewflow.io
 `viewflow.workflow.*` is a lightweight workflow layer on top of Django's Model-View-Template that helps to organize people collaboration business logic.
 
 Viewflow supports parallel activities, allows to have multiple active task at
-one and synchronize people interactions with background python jobs.
+the same time and synchronize people interactions with background python jobs.
 
 Quick start: https://docs-next.viewflow.io/bpmn/quick_start.html
 
@@ -127,6 +127,21 @@ TODO
 ### Reporting
 
 TODO
+
+## License
+
+Viewflow is an Open Source project licensed under the terms of
+the AGPL license - `The GNU Affero General Public License v3.0
+<http://www.gnu.org/licenses/agpl-3.0.html>`_ with the Additional Permissions
+described in `LICENSE_EXCEPTION <./LICENSE_EXCEPTION>`_
+
+You can more read about AGPL at `AGPL FAQ <http://www.affero.org/oagf.html>`_
+This package license scheme follows to GCC Runtime library licensing. If you use
+Linux already, probably this package license, should not bring anything new to
+your stack.
+
+Viewflow PRO has a commercial-friendly license allowing private forks
+and modifications of Viewflow. You can find the commercial license terms in COMM-LICENSE.
 
 
 ## Latest Changelog

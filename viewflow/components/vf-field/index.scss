@@ -1,0 +1,21 @@
+.vf-field__row {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+
+  >.material-icons {
+    line-height: 68px;
+  }
+
+  >.material-icons:first-child {
+    margin-right: 16px;
+  }
+
+  >.material-icons:last-child {
+    margin-left: 8px;
+  }
+}
+
+.vf-field__control {
+  width: 100%;
+}

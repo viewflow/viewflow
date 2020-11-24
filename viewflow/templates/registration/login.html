@@ -1,0 +1,27 @@
+{% extends 'viewflow/base_lockscreen.html' %}
+{% load i18n viewflow %}
+
+{% block title %}{% trans 'Log in' %} - {{ block.super }}{% endblock %}
+
+{% block lockscreen-sidebar-header-title %}{% trans 'Log in' %}{% endblock %}
+
+{% block lockscreen-sidebar-content %}
+<vf-form>
+  <form class="vf-form" method="POST">
+    {% csrf_token %}
+    {% render form %}
+    <button type="submit" class="mdc-button mdc-button--raised vf-page-lockscreen__sidebar-content-action">
+      {% trans 'Log in' %}
+    </button>
+
+    {% url 'password_reset' as reset_url %}
+    {% if reset_url %}
+    <a href="{{ reset_url }}" class="vf-page-lockscreen-reset-link">
+      {% trans 'Reset password' %}
+    </a>
+    {% endif %}
+  </form>
+</vf-form>
+{% endblock %}
+
+{% block lockscreen-content-icon %}<i class="logo__icon material-icons">account_circle</i>{% endblock %}

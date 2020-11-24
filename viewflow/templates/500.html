@@ -1,0 +1,19 @@
+{% extends "viewflow/base_lockscreen.html" %}
+{% load i18n %}
+
+{% block title %}500 {% trans 'Server error' %} - {{ block.super }}{% endblock %}
+
+{% block lockscreen-sidebar-header-title %}500 {% trans 'Server error' %}{% endblock %}
+{% block lockscreen-sidebar-header-subtitle %}¯\_(ツ)_/¯{% endblock %}
+
+{% block lockscreen-sidebar-content %}
+<div class="mdc-typography--body1">
+  {% trans "There's been an error. It's been reported to the site administrators via email and should be fixed shortly. Thanks for your patience." %}
+</div>
+{% endblock %}
+
+{% block lockscreen-sidebar-footer %}
+  <a href="/" class="mdc-button mdc-button--raised vf-page-lockscreen__sidebar-footer-action">{% trans 'View site' %}</a>
+{% endblock %}
+
+{% block lockscreen-content-icon %}<i class="material-icons">error_outline</i>{% endblock %}

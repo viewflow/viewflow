@@ -1,0 +1,18 @@
+{% extends "viewflow/base_lockscreen.html" %}
+{% load i18n %}
+
+{% block title %}400 {% trans 'Bad Request' %} - {{ block.super }}{% endblock %}
+
+{% block lockscreen-sidebar-header-title %}400 {% trans 'Bad Request' %}{% endblock %}
+{% block lockscreen-sidebar-header-subtitle %}ヽ(ಠ_ಠ)ノ{% endblock %}
+
+{% block lockscreen-sidebar-content %}
+<div class="mdc-typography--body1">
+</div>
+{% endblock %}
+
+{% block lockscreen-sidebar-footer %}
+  <a href="/" class="mdc-button mdc-button--raised vf-page-lockscreen__sidebar-footer-action">{% trans 'View site' %}</a>
+{% endblock %}
+
+{% block lockscreen-content-icon %}<i class="material-icons">error</i>{% endblock %}

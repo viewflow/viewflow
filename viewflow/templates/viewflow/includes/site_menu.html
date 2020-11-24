@@ -1,0 +1,21 @@
+{% load i18n viewflow %}
+<vf-page-menu-navigation class="mdc-list">
+  <div class="mdc-list-group">
+    <h3 class="vf-page__menu-subheader mdc-list-group__subheader">{% trans 'Applications' %}</h3>
+    {% block back_link %}{% with parent_index=site.parent_index %}{% if parent_index %}
+    <a class="mdc-list-item vf-page__menu-list-item" href="{{ parent_index }}">
+      <i class="material-icons">arrow_back</i> {% trans 'Back' %}
+    </a>
+    {% endif %}{% endwith %}{% endblock %}
+    {% block app_links %}{% for app in site.menu_items %}{% if app|has_perm:user %}
+    {% reverse app 'index' as index_url %}
+    <a class="mdc-list-item vf-page__menu-list-item" href="{{ index_url }}"{% if app.turbolinks_disabled %} data-turbolinks="false"{% endif %}>
+      {{ app.icon }}{{ app.title }}
+    </a>
+    {% endif %}{% empty %}
+    <div class="mdc-list-item" style="height:auto; color: red">
+    <small>No applications found.</small>
+    </div>
+    {% endfor %}{% endblock %}
+  </div>
+</vf-page-menu-navigation>

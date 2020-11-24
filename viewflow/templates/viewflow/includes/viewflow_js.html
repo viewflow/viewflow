@@ -1,0 +1,12 @@
+{% load static %}
+{% if not debug %}
+<script src="{% static 'viewflow/js/turbolinks.js' %}"></script>
+<script src="{% static 'viewflow/js/perfect-scrollbar.min.js' %}"></script>
+<script src="{% static 'viewflow/js/material-components-web.min.js' %}"></script>
+<script src="{% static 'viewflow/js/viewflow-components.min.js' %}"></script>
+{% else %}
+<script src="{% static 'viewflow/js/turbolinks.js' %}"></script>
+<script src="{% static 'viewflow/js/perfect-scrollbar.min.js' %}"></script>
+<script src="{% static 'viewflow/js/material-components-web.js' %}"></script>
+<script src="{% static 'viewflow/js/viewflow-components.js' %}"></script>
+{% endif %}

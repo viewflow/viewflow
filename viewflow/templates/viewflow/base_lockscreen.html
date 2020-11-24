@@ -1,0 +1,33 @@
+{% extends 'viewflow/base.html' %}
+
+{% block body %}
+<div class="vf-page-lockscreen">
+  <div class="vf-page-lockscreen__sidebar">
+    {% block lockscreen-sidebar %}
+    <div class="vf-page-lockscreen__sidebar-header">
+      {% block lockscreen-sidebar-header %}
+          <div class="vf-page-lockscreen__sidebar-header-title">
+            {% block lockscreen-sidebar-header-title %}{% endblock %}
+          </div>
+          <div class="vf-page-lockscreen__sidebar-header-subtitle">
+            {% block lockscreen-sidebar-header-subtitle %}{% endblock %}
+          </div>
+      {% endblock %}
+    </div>
+    <div class="vf-page-lockscreen__sidebar-content">
+    {% block lockscreen-sidebar-content %}
+    {% endblock %}
+    </div>
+    <div class="vf-page-lockscreen__sidebar-footer">
+      {% block lockscreen-sidebar-footer %}
+      {% endblock %}
+    </div>
+    {% endblock %}
+  </div>
+  <div class="vf-page-lockscreen__content">
+    {% block lockscreen-content %}
+    <div class="vf-page-lockscreen__content-icon">{% block lockscreen-content-icon %}{% endblock %}</div>
+    {% endblock %}
+  </div>
+</div>
+{% endblock %}

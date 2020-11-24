@@ -1,0 +1,19 @@
+.vf-page__grid {
+  padding: 12px;
+  width: 100%;
+}
+
+
+.vf-page__grid-inner {
+  grid-gap: 12px;
+}
+
+@media (max-width: 839px) {
+  .vf-page__grid {
+    padding: 0px;
+  }
+
+  .vf-page-__grid-inner {
+    grid-gap: 0px;
+  }
+}

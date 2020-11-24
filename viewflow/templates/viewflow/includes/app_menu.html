@@ -1,0 +1,18 @@
+{% load i18n viewflow %}
+<vf-page-menu-navigation class="mdc-list">
+  <div class="mdc-list-group">
+    <h3 class="vf-page__menu-subheader mdc-list-group__subheader">{{ app.title }}</h3>
+    {% block viewset_links %}{% for viewset in app.menu_items %}
+    {% reverse viewset 'index' as index_url %}{% if index_url %}
+    <a class="mdc-list-item vf-page__menu-list-item" href="{{ index_url }}">
+      {% if viewset.icon %}{{ viewset.icon }}{% else %}<i class="material-icons">view_carousel</i>{% endif %}{{ viewset.title }}
+    </a>
+    {% endif %}
+    {% empty %}
+    <div class="mdc-list-item" style="height:auto; color: red">
+    <small>No viewsets found. Please point`.menu_template_name` attribute of the Application class to custom menu template</small>
+    </div>
+    {% endfor %}{% endblock %}
+  </div>
+  <div class="mdc-list-divider"></div>
+</vf-page-menu-navigation>

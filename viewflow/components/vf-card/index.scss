@@ -1,0 +1,87 @@
+@import '@material/typography/mixins.scss';
+
+.vf-card__header {
+  padding: 1rem;
+  position: relative;
+}
+
+.vf-card__title {
+  margin: 0;
+  @include mdc-typography("headline6");
+  font-weight: 400;
+}
+
+.vf-card__breadcrumbs {
+  margin: 0;
+  @include mdc-typography("subtitle2");
+  margin-bottom: 10px;
+
+  a {
+    text-decoration: none;
+    color: #3f51b5;
+    color: var(--mdc-theme-primary, #3f51b5);
+  }
+
+  a:before {
+      content: '\E5CC';
+      vertical-align: top;
+      display: inline-block;
+      font-family: 'Material Icons';
+      font-weight: normal;
+      font-style: normal;
+      font-size: 20px;
+      margin-left: -2px;
+      margin-right: 2px;
+      color: rgba(0, 0, 0, 0.87);
+      color: var(--mdc-theme-text-primary-on-background, rgba(0, 0, 0, 0.87));
+  }
+
+  a:first-child:before {
+    display: none;
+  }
+
+  a:last-child {
+    color: rgba(0, 0, 0, 0.87);
+    color: var(--mdc-theme-text-primary-on-background, rgba(0, 0, 0, 0.87))
+  }
+}
+
+.vf-card__menu {
+  display: flex;
+  position: absolute;
+  right: 8px;
+  top: 16px;
+
+  .mdc-list-item__graphic,
+  .mdc-list-item__text {
+    pointer-events: none;
+    margin-right: 16px;
+  }
+}
+
+.vf-card__menu-trigger {
+  min-width: 48px;
+}
+
+.vf-card__form {
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.vf-card__alert {
+  margin-top: 0;
+  @include mdc-typography("headline6");
+  font-size: 1rem;
+  padding: 8px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.54);
+  color: var(--mdc-theme-on-secondary, rgba(0, 0, 0, 0.54));
+  background-color: #e91e63;
+  background-color: var(--mdc-theme-secondary, #e91e63);
+}
+
+.vf-card__actions {
+  justify-content: flex-end;
+  padding: 24px;
+  padding-bottom: 12px;
+}

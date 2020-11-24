@@ -1,0 +1,12 @@
+{% load static %}
+<link href="{% static 'viewflow/fonts/material-design-icons/material-design-icons.css' %}" rel="stylesheet">
+<link href="{% static 'viewflow/fonts/roboto/roboto-fontface.css' %}" rel="stylesheet">
+{% if not debug %}
+<link href="{% static 'viewflow/css/material-components-web.min.css' %}" rel="stylesheet">
+<link href="{% static 'viewflow/css/perfect-scrollbar.css' %}" rel="stylesheet">
+<link href="{% static 'viewflow/css/viewflow-components.min.css' %}" rel="stylesheet">
+{% else %}
+<link href="{% static 'viewflow/css/material-components-web.css' %}" rel="stylesheet">
+<link href="{% static 'viewflow/css/perfect-scrollbar.css' %}" rel="stylesheet">
+<link href="{% static 'viewflow/css/viewflow-components.css' %}" rel="stylesheet">
+{% endif %}

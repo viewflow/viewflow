@@ -1,0 +1,22 @@
+{% extends 'viewflow/base_lockscreen.html' %}
+{% load i18n %}
+
+{% block title %}400 {% trans 'Logout' %} - {{ block.super }}{% endblock %}
+
+{% block lockscreen-sidebar-header-title %}{% trans 'Log out' %}{% endblock %}
+
+{% block lockscreen-sidebar-content %}
+<div class="mdc-typography--body1">
+    {% trans "Thanks for spending some quality time with the Web site today." %}
+</div>
+{% endblock %}
+
+
+{% block lockscreen-sidebar-footer %}
+  {% url 'login' as login_url %}
+  {% if login_url %}
+    <a href="{% url 'login' %}" class="mdc-button mdc-button--raised vf-page-lockscreen__sidebar-footer-action">{% trans 'Log in again' %}</a>
+  {% endif %}
+{% endblock %}
+
+{% block lockscreen-content-icon %}<i class="material-icons">thumb_up</i>{% endblock %}

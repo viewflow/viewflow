@@ -1,0 +1,35 @@
+{% extends "viewflow/base_lockscreen.html" %}
+{% load i18n %}
+
+{% block title %}403 {% trans 'Access Forbidden' %} - {{ block.super }}{% endblock %}
+
+{% block lockscreen-sidebar-header-title %}403 {% trans 'Access Forbidden' %}{% endblock %}
+
+{% block lockscreen-sidebar-content %}
+<div class="mdc-typography--body1">
+  {% if request.user.is_anonymous %}
+    {% trans 'You are not logged in' %}
+  {% else %}
+    {% if exception %}
+      {{ exception }}
+    {% else %}
+      {% blocktrans with user=request.user.get_full_name|default:"You" %}{{ user }} have no rights to access this page{% endblocktrans %}
+    {% endif %}
+  {% endif %}
+</div>
+{% endblock %}
+
+{% block lockscreen-sidebar-footer %}
+  {% url 'login' as login_url %}
+  {% if login_url %}
+  <a href="{% url 'login' %}?next={{ request.path }}" class="mdc-button mdc-button--raised vf-page-lockscreen__sidebar-footer-action">
+    {% if request.user.is_anonymous %}
+      {% trans 'Log in' %}
+    {% else %}
+      {% trans 'Log in as another user' %}
+    {% endif %}
+  </a>
+  {% endif %}
+{% endblock %}
+
+{% block lockscreen-content-icon %}<i class="material-icons">lock</i>{% endblock %}

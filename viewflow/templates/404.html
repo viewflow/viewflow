@@ -1,0 +1,18 @@
+{% extends "viewflow/base_lockscreen.html" %}
+{% load i18n %}
+
+{% block title %}404 {% trans 'Page not found' %} - {{ block.super }}{% endblock %}
+
+{% block lockscreen-sidebar-header-title %}404 {% trans 'Page not found' %}{% endblock %}
+
+{% block lockscreen-sidebar-content %}
+<div class="mdc-typography--body1">
+    {% trans "We're sorry, but the requested page could not be found." %}
+</div>
+{% endblock %}
+
+{% block lockscreen-sidebar-footer %}
+<a href="/" class="mdc-button mdc-button--raised vf-page-lockscreen__sidebar-footer-action">{% trans 'View site' %}</a>
+{% endblock %}
+
+{% block lockscreen-content-icon %}<i class="material-icons">not_interested</i>{% endblock %}

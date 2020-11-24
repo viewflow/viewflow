@@ -1,0 +1,5 @@
+  {% block snackbar %}
+  <vf-snackbar class="mdc-snackbar vf-snackbar" aria-live="assertive" aria-atomic="true" aria-hidden="true">
+    {% for message in messages %}{% if forloop.last %}{{ message }}{% endif %}{% endfor %}
+  </vf-snackbar>
+  {% endblock snackbar%}

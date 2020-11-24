@@ -1,0 +1,63 @@
+{
+  "scripts": {
+    "build": "rollup -c && NODE_ENV=production rollup -c",
+    "dev": "rollup -w -c"
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-class-properties": "^7.10.4",
+    "@rollup/plugin-babel": "^5.2.1",
+    "@rollup/plugin-commonjs": "^15.1.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "babel-core": "^6.26.3",
+    "babel-eslint": "^10.1.0",
+    "babel-preset-solid": "^0.18.14",
+    "classcat": "^4.1.0",
+    "dart-sass": "^1.25.0",
+    "eslint": "^7.10.0",
+    "eslint-config-google": "^0.14.0",
+    "eslint-plugin-babel": "^5.3.1",
+    "eslint-plugin-react": "^7.21.3",
+    "rollup": "^2.29.0",
+    "rollup-plugin-babel-minify": "^10.0.0",
+    "rollup-plugin-copy": "^3.3.0",
+    "rollup-plugin-sass": "^1.2.2",
+    "solid-element": "^0.18.4",
+    "solid-js": "^0.18.4"
+  },
+  "dependencies": {
+    "material-components-web": "^8.0.0-canary.911014711.0",
+    "material-design-icons-iconfont": "^6.1.0",
+    "perfect-scrollbar": "^1.5.0",
+    "roboto-fontface": "^0.10.0",
+    "smartcrop": "^2.0.3",
+    "turbolinks": "^5.3.0-beta.1",
+    "vis-network": "^8.3.2"
+  },
+  "eslintConfig": {
+    "extends": "google",
+    "parser": "babel-eslint",
+    "parserOptions": {
+      "classes": true,
+      "ecmaVersion": 2017,
+      "sourceType": "module"
+    },
+    "plugins": [
+      "babel",
+      "react"
+    ],
+    "rules": {
+      "react/jsx-uses-vars": 2,
+      "require-jsdoc": "off",
+      "max-len": [
+        "error",
+        120
+      ],
+      "no-undef": "error",
+      "no-invalid-this": 0,
+      "babel/no-invalid-this": 1
+    },
+    "env": {
+      "es6": true
+    }
+  }
+}

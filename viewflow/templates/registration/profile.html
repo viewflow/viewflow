@@ -1,0 +1,87 @@
+{% extends 'viewflow/base_page.html' %}
+{% load i18n static viewflow %}
+
+{% block title %}{% trans 'Profile' %} - {{ block.super }}{% endblock %}
+
+{% block js %}
+{{ block.super }}
+{% if not debug %}
+<link href="{% static 'viewflow/css/viewflow-page-profile.min.css' %}" rel="stylesheet">
+<script src="{% static 'viewflow/js/viewflow-page-profile.min.js' %}"></script>
+{% else %}
+<link href="{% static 'viewflow/css/viewflow-page-profile.css' %}" rel="stylesheet">
+<script src="{% static 'viewflow/js/viewflow-page-profile.js' %}"></script>
+{% endif %}
+{% endblock js %}
+
+{% block page-title %}{% trans 'Profile' %}{% endblock %}
+
+{% block page-menu-app %}
+<vf-page-menu-navigation class="mdc-list">
+  <div class="mdc-list-group">
+    <a class="mdc-list-item vf-page__menu-list-item" href="/">
+      <i class="material-icons">arrow_back</i> {% trans 'View site' %}
+    </a>
+  </div>
+  {% url 'profile' as profile_url %}
+  {% if profile_url %}
+  <a class="mdc-list-item vf-page__menu-list-item" href="{{ profile_url }}">
+    <i class="material-icons">account_box</i> {% trans 'Profile' %}
+  </a>
+  {% endif %}
+</vf-page-menu-navigation>
+{% endblock %}
+
+{% block content %}
+<div class="mdc-layout-grid vf-page__grid">
+  <div class="mdc-layout-grid__inner vf-page__grid-inner">
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-10">
+      <div class="mdc-card vf-page-profile__detail">
+        <section class="vf-page-profile__detail-header">
+          <h1 class="mdc-typography--headline6">John Doe</h1>
+          <h2 class="mdc-typography--subtitle2">admin@admin.com</h2>
+        </section>
+        <section>
+          <table class="vf-list__table">
+            <tbody>
+              {% for field, field_name, value in view.get_object_data %}
+              <tr>
+                <th class="vf-list__table-header vf-list__table-header-text">{{ field_name }}</th>
+                <td>{{ value }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </section>
+        <section class="mdc-card__actions vf-page-profile__detail-actions">
+          {% url 'password_change' as password_change_url %}
+          {% if password_change_url %}
+          <a class="mdc-button" href="{{ password_change_url }}">Change password</a>
+          {% endif %}
+          {% url 'profile_edit' as profile_edit_url %}
+          {% if profile_edit_url %}
+          <a class="mdc-button mdc-button--raised" href="{{ profile_edit_url }}">Edit</a>
+          {% endif %}
+        </section>
+      </div>
+    </div>
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-2">
+      <vf-page-profile-avatar class="mdc-card vf-page-profile__avatar">
+        <section class="mdc-card__media vf-page-profile__avatar-media">
+          <div>
+            <img src="{{ request.user|user_avatar_url }}">
+            <div class="vf-page-profile__avatar-shadow"></div>
+          </div>
+        </section>
+        <section class="mdc-card__actions vf-page-profile__avatar-actions">
+            <div class="mdc-button mdc-button--raised mdc-card__action vf-page-profile__avatar-change">
+              Change
+              <input type="file">
+            </div>
+        </section>
+        <form method="POST" enctype="multipart/form-data">{% csrf_token %}</form>
+      </vf-page-profile-avatar>
+    </div>
+  </div>
+</div>
+{% endblock content %}
