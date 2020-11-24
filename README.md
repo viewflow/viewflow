@@ -6,14 +6,16 @@ Viewflow is the reusable library eases to build business apps fast. Viewflow
 helps to organize people collaboration workflow, implement CRUD and reporting.
 
 The goad of viewflow is to allow to get ready-to-use application on top of
-Django as fast as with no-code solution. But allow gracefully replace built-in
+Django as fast as with no-code solution. But allow to gracefully replace built-in
 functionality part-by-part with your custom code.
 
 Viewflow came in two flavors:
-- Lightweight opensource library with only un-opinionated base functionality
+- Lightweight open-source library with only un-opinionated base functionality
   allows to build your own custom solution on top of it.
 - PRO: Commercially supported reference implementation. Integrated with 3d-party
   django packages, allows to build ready-to-use apps with few lines of code.
+
+
 
 ## Installation
 
@@ -51,6 +53,7 @@ Samples applications code for Viewflow PRO available at:
 
 http://cookbook.viewflow.io
 
+
 ## Components
 
 ### BPMN Workflow
@@ -59,8 +62,6 @@ http://cookbook.viewflow.io
 
 Viewflow supports parallel activities, allows to have multiple active task at
 the same time and synchronize people interactions with background python jobs.
-
-Quick start: https://docs-next.viewflow.io/bpmn/quick_start.html
 
 ```python
 class HelloWorldFlow(flow.Flow):
@@ -76,21 +77,99 @@ class HelloWorldFlow(flow.Flow):
 
     ...
 
+urlpatterns = [
+    path(
+        'flow/',
+        FlowAppViewset(
+            HelloWorldFlow, icon=Icon('assignment')
+        ).urls
+    ),
+    path('accounts/', AuthViewset().urls),
+    path('', site.urls),
+]
+
+
 ```
+Quick start: https://docs-next.viewflow.io/bpmn/quick_start.html
 
 ### Class-based URL Configuration
 
-TODO
+A class with `.urls` property, suitable to include into `urlpatterns`
 
-### Deployment automation
+Same concept as Django's Class Based Views but for routing configuration.
 
-    $ npm init django
+Class based url configuration allows to provide configure existing built-in
+application functionality, redefine part of views to your own.
+
+Viewflow contains several pre-build url configurations to build a Site Menu
+structure, CRUD functionality, quickly enable user interfaces for BPMN and FSM
+Workflows, and many 3d party apps.
+
+```python
+from viewflow.contrib.auth import AuthViewset
+from viewflow.urls import Application, Site, Viewset
+
+class WebsiteViewset(Viewset):
+    index_url = path('', index_view, name='index')
+
+site = Site(title="ACME Corp", items=[
+    Application(
+        title='Sample App',
+        icon=Icon('people'),
+        app_name='emp',
+        items=[
+            WebsiteViewset(),
+        ]
+    ),
+])
+
+urlpatterns = [
+    path('', site.urls),
+    path('accounts/', AuthViewset(
+        allow_password_change=True,
+        with_profile_view=True
+    ).urls),
+]
+```
+
+See more at - https://docs-next.viewflow.io/frontend/viewset.html
 
 ### Finite State Machine
 
-Sequential
+Finite state machine workflows is the declarative way to describe consecutive operation through set of states and transitions between them.
 
-TODO
+`viewflow.fsm.*` can help you manage rules and restrictions around moving from one state to another. The package could be used to get low level db-independent fsm implementation, or to wrap existing database model, and implement simple persistent workflow process with quickly bootstrapped UI.
+
+```python
+from enum import Enum
+from viewflow.fsm import State
+
+class Stage(Enum):
+   NEW = 1
+   DONE = 2
+   HIDDEN = 3
+
+
+class MyFlow(object):
+   stage = State(Stage, default=Stage.NEW)
+
+   @stage.transition(source=Stage.NEW, target=Stage.DONE)
+   def complete():
+       pass
+
+   @stage.transition(source=State.ANY, target=Stage.HIDDEN)
+   def hide():
+       pass
+
+flow = MyFlow()
+flow.stage == Stage.NEW  # True
+flow.stage = Stage.DONE  # Raises AttributeError
+
+flow.complete()
+flow.stage == Stage.DONE  # True
+
+flow.complete()  # Now raises TransitionNotAllowed
+```
 
 ### JSON Storage for Django Models
 Keep dumb business data, quick prototyping without DB migrations, replace multi-table inheritance with proxy models.
@@ -119,6 +198,7 @@ class EmployeeAdmin(admin.ModelAdmin):
     list_display = ['full_name', 'hire_date']
     fields = ['full_name', ('hire_date', 'salary')]
 ```
+See more at: https://docs-next.viewflow.io/json_storage.html
 
 ### Material UI Kit
 
