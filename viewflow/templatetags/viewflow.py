@@ -7,6 +7,7 @@ from django.utils.encoding import force_text
 from django.utils.html import conditional_escape
 
 from viewflow.contrib import auth
+from viewflow.forms import FormLayout
 from viewflow.urls import Site, Viewset
 
 
@@ -97,6 +98,46 @@ class ViewsetURLNode(template.Node):
             if context.autoescape:
                 url = conditional_escape(url)
             return url
+
+
+@register.tag('render')
+class FormNode(template.Node):
+    """
+    Render a django form using google material-components-web library.
+
+    Example:
+
+        {% render_form form [layout] %}
+    """
+    default_layout = FormLayout()
+
+    def __init__(self, parser, token):
+        bits = token.split_contents()
+
+        layout_expr = None
+        if len(bits) == 2:
+            tag, form_expr = bits
+        elif len(bits) == 3:
+            tag, form_expr, layout_expr = bits
+        else:
+            raise template.TemplateSyntaxError(
+                "Invalid syntax in material tag, expects only form and optional layout arguments.")
+
+        self.form_expr = parser.compile_filter(form_expr)
+        self.layout_expr = parser.compile_filter(layout_expr) if layout_expr else None
+
+    def render(self, context):
+        form = self.form_expr.resolve(context)
+        if not isinstance(form, forms.BaseForm):
+            raise template.TemplateSyntaxError("material tag first argument must be a form")
+
+        layout = None
+        if self.layout_expr:
+            layout = self.layout_expr.resolve(context)
+        if layout and not isinstance(layout, FormLayout):
+            raise template.TemplateSyntaxError("material tag second argument must be a layout")
+
+        return layout.render(form) if layout else self.default_layout.render(form)
 
 
 @register.tag('get_absolute_url')
