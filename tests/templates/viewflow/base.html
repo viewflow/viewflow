@@ -1,0 +1,7 @@
+{% extends 'viewflow/base.html' %}
+{% load static %}
+
+{% block js %}
+<script src="{% static 'selenium_capture.js' %}"></script>
+{{ block.super }}
+{% endblock %}

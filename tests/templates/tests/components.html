@@ -1,0 +1,22 @@
+{% extends 'viewflow/base_page.html' %}
+{% load viewflow %}
+
+{% block content %}
+<div class="mdc-layout-grid vf-page__grid">
+  <div class="mdc-layout-grid__inner vf-page__grid-inner">
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-10-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone">
+      <div class="mdc-card vf-card">
+        <section class="vf-card__header">
+          <h1 class="vf-card__title">Form test</h1>
+        </section>
+        <section class="vf-card__form">
+          <form method="POST">
+            {% csrf_token %}
+            {% render form %}
+          </form>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -33,6 +33,12 @@ class Test(TestCase):
         """If no user avatar exists, use the default media."""
         self.assertEqual(auth.get_user_avatar_url(self.user), '/static/viewflow/img/user.png')
 
+    def test_profile_page(self):
+        self.assertTrue(self.client.login(username='admin', password='admin'))
+        response = self.client.get('/accounts/profile/')
+        self.assertEqual(response.status_code, 200)
+        self.validator.parse(response.content)
+
     def test_login_page(self):
         response = self.client.get('/accounts/login/')
         self.assertEqual(response.status_code, 200)

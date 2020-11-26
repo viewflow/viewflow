@@ -1,0 +1,41 @@
+vf-field-input {
+  .vf-field__row {
+    height: 76px;
+  }
+
+  .mdc-text-field--invalid:not(.mdc-text-field--disabled) ~ .mdc-text-field-helper-line  .mdc-text-field-helper-text {
+      color: var(--mdc-theme-error, #b00020);
+  }
+
+  .mdc-text-field-helper-text--persistent {
+    margin-top: -6px;
+    font-size: 10px;
+  }
+
+
+  .vf-text-field__button {
+    background-color: red;
+  }
+
+  // .mdc-text-field:not(.mdc-text-field--fullwidth):not(.mdc-text-field--textarea) {
+  //   width: 100%;
+  //   height: 48px;
+  // }
+
+  // .mdc-text-field-helper-text {
+  //   margin-top: -4px;
+  //   padding-bottom: 12px;
+  // }
+
+  // .mdc-text-field__icon {
+  //   margin-bottom: -2px;
+  // }
+
+  // .mdc-text-field--outlined {
+  //   .mdc-floating-label {
+  //     &.mdc-floating-label--float-above {
+  //       top: 26px;
+  //     }
+  //   }
+  // }
+}

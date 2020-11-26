@@ -1,0 +1,18 @@
+vf-field-password {
+  .vf-field__row {
+    height: 76px;
+  }
+
+  .mdc-text-field--invalid:not(.mdc-text-field--disabled) ~ .mdc-text-field-helper-line  .mdc-text-field-helper-text {
+      color: var(--mdc-theme-error, #b00020);
+  }
+
+  .mdc-text-field-helper-text--persistent {
+    margin-top: -6px;
+    font-size: 10px;
+  }
+
+  .vf-text-field__button {
+    min-width: initial;
+  }
+}

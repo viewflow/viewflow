@@ -1,5 +1,13 @@
 /* eslint-env browser */
+import './vf-field';
 import './vf-page-lockscreen';
+import './vf-field-checkbox';
+import './vf-field-input';
+import './vf-field-password';
+import './vf-field-radio-select';
+
+import './vf-page-lockscreen';
+
 
 import {VCardMenu} from './vf-card';
 import {VPage, VPageMenuToggle, VPageMenuNavigation, VPageScrollFix} from './vf-page';

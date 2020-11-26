@@ -1,0 +1,33 @@
+@import '@material/typography/mixins.scss';
+
+vf-field-checkbox {
+  .vf-field__row {
+    height: 76px;
+  }
+
+  .vf-field__checkbox-container {
+    margin-top: 6px;
+  }
+
+  .mdc-form-field>label {
+    padding-left: 0px;
+    @include mdc-typography("subtitle1");
+  }
+
+  .mdc-text-field-helper-text {
+    margin-top: 4px;
+    margin-bottom: 0!important;
+    margin-left: 36px;
+    padding-left: 4px;
+    color: rgba(0,0,0,.6);
+    font-size: 10px;
+  }
+
+  .mdc-text-field-helper-text--validation-msg {
+    color: #b00020;
+    color: var(--mdc-theme-error, #b00020);
+  }
+
+  // label padding-top: 6px
+  // .vf-field__control align-items: end;
+}

@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.test import override_settings
 from django.urls import path
 from django.views.generic import TemplateView
