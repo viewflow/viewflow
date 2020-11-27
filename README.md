@@ -1,13 +1,14 @@
 # Viewflow
 
+
 The Django extension for perfectionists with yesterday’s deadlines.
 
-Viewflow is the reusable library eases to build business apps fast. Viewflow
-helps to organize people collaboration workflow, implement CRUD and reporting.
+Viewflow is the reusable library eases to build business apps fast. Viewflow helps to organize people collaboration workflow, implement CRUD and reporting.
 
-The goad of viewflow is to allow to get ready-to-use application on top of
-Django as fast as with no-code solution. But allow to gracefully replace built-in
-functionality part-by-part with your custom code.
+The goad of viewflow is to allow to get ready-to-use application on top of Django as fast as with no-code solution. But allow to gracefully replace built-in functionality part-by-part with your custom code. Viewflow has pre-buit UI, and assumes that you could implement your own.
+
+[![travis-svg]][travis] [![requirements-svg]][requirements] [![pypi-version]][pypi] [![py-versions]][pypi]
+
 
 Viewflow came in two flavors:
 - Lightweight open-source library with only un-opinionated base functionality
@@ -15,6 +16,7 @@ Viewflow came in two flavors:
 - PRO: Commercially supported reference implementation. Integrated with 3d-party
   django packages, allows to build ready-to-use apps with few lines of code.
 
+<img src="assets/ShipmentProcess.png" alt="drawing" width="600"/>
 
 
 ## Installation
@@ -60,6 +62,10 @@ http://cookbook.viewflow.io
 
 `viewflow.workflow.*` is a lightweight workflow layer on top of Django's Model-View-Template that helps to organize people collaboration business logic.
 
+<a href="https://demo-next.viewflow.io/helloworld/">
+  <img src="assets/dashboard.png" alt="drawing" width="600"/>
+</a>
+
 Viewflow supports parallel activities, allows to have multiple active task at
 the same time and synchronize people interactions with background python jobs.
 
@@ -87,10 +93,9 @@ urlpatterns = [
     path('accounts/', AuthViewset().urls),
     path('', site.urls),
 ]
-
-
 ```
 Quick start: https://docs-next.viewflow.io/bpmn/quick_start.html
+
 
 ### Class-based URL Configuration
 
@@ -138,6 +143,10 @@ See more at - https://docs-next.viewflow.io/frontend/viewset.html
 
 Finite state machine workflows is the declarative way to describe consecutive operation through set of states and transitions between them.
 
+<a href="https://demo-next.viewflow.io/admin/review/review/">
+  <img src="assets/fsm.png" alt="drawing" width="600"/>
+</a>
+
 `viewflow.fsm.*` can help you manage rules and restrictions around moving from one state to another. The package could be used to get low level db-independent fsm implementation, or to wrap existing database model, and implement simple persistent workflow process with quickly bootstrapped UI.
 
 ```python
@@ -151,17 +160,17 @@ class Stage(Enum):
 
 
 class MyFlow(object):
-   stage = State(Stage, default=Stage.NEW)
+    stage = State(Stage, default=Stage.NEW)
 
-   @stage.transition(source=Stage.NEW, target=Stage.DONE)
-   def complete():
-       pass
+    @stage.transition(source=Stage.NEW, target=Stage.DONE)
+    def complete(self):
+        pas
 
-   @stage.transition(source=State.ANY, target=Stage.HIDDEN)
-   def hide():
-       pass
+    @stage.transition(source=State.ANY, target=Stage.HIDDEN)
+    def hide(self):
+        pass
 
-flow = MyFlow()
+flow = NyFlow()
 flow.stage == Stage.NEW  # True
 flow.stage = Stage.DONE  # Raises AttributeError
 
@@ -202,7 +211,25 @@ See more at: https://docs-next.viewflow.io/json_storage.html
 
 ### Material UI Kit
 
-TODO
+Viewflow provides theme kit based on Google Material Design components. Base templates, Login. Logout, Password management views, Forms and CRUD.
+
+SPA look and fell with turbolinks enabled navigation and form processing.
+
+All Javascript managed by WebComponnents based on Solid-JS library.
+
+<p>
+<a href="https://demo-next.viewflow.io/accounts/login/">
+  <img src="assets/login.png" alt="drawing" width="193"/>
+</a>
+<a href="https://demo-next.viewflow.io/atlas/city/">
+  <img src="assets/list.png" alt="drawing" width="200"/>
+</a>
+<a href="https://demo-next.viewflow.io/forms/bank/">
+  <img src="assets/form.png" alt="drawing" width="220"/>
+</a>
+</p>
+
+Documentation: https://docs-next.viewflow.io/frontend/index.html
 
 ### Reporting
 
@@ -229,3 +256,12 @@ and modifications of Viewflow. You can find the commercial license terms in COMM
 ### 2020-XX-XX
 
   * Work in progress
+
+
+[travis-svg]: https://travis-ci.org/viewflow/viewflow.svg
+[travis]: https://travis-ci.org/viewflow/viewflow
+[pypi]: https://pypi.org/project/django-viewflow/
+[pypi-version]: https://img.shields.io/pypi/v/django-viewflow.svg
+[py-versions]: https://img.shields.io/pypi/pyversions/django-viewflow.svg
+[requirements-svg]: https://requires.io/github/viewflow/viewflow/requirements.svg?branch=v2
+[requirements]: https://requires.io/github/viewflow/viewflow/requirements/?branch=v2
