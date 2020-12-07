@@ -1,26 +1,26 @@
 # Viewflow
 **The Django extension for perfectionists with yesterday’s deadlines.**
 
-Viewflow is the reusable library that makes it easy to build business applications fast. Viewflow helps to implement collaboration, and approval workflows, CRUD, and reporting.
+Viewflow is a reusable library that makes it easy to build business applications fast. Viewflow helps to implement collaboration and approval workflows, CRUD, and reporting.
 
 The goal of Viewflow to stay small, flexible, and let you create Django applications as quickly as with no-code solutions.
 
-Viewflow has the pre-built UI, and assumes that you could implement your own.
+Viewflow has a pre-built UI and assumes that you can implement your own.
 
 [![travis-svg]][travis] [![requirements-svg]][requirements] [![pypi-version]][pypi] [![py-versions]][pypi]
 
 
 Viewflow comes in two flavors:
-- Open-source library with only non-opinionated core classes allows you to build
+- Open-source library with only non-opinionated core classes that allows you to build
   your custom solution on top.
-- PRO: Reference functionality implementation. Integrated with 3d-party Django packages included.
+- PRO: Reference functionality implementation. Integrated with third-party Django packages included.
 
 <img src="assets/ShipmentProcess.png" alt="drawing" width="600"/>
 
 
 ## Installation
 
-Viewflow works with Python 3.7 or greater, and Django 3.1+
+Viewflow works with Python 3.7 or greater and Django 3.1+
 
 Viewflow:
 
@@ -30,9 +30,9 @@ Viewflow-PRO
 
     pip install django-viewflow-pro  --extra-index-url https://pypi.viewflow.io/<licence_id>/simple/ --pre
 
-## Quick start
+## Quickstart
 
-You can get a bare minimum pre-configured Django project with Viewflow enabled
+You can get a bare minimum, pre-configured Django project with Viewflow enabled
 with the following command:
 
     npm init django project_name --viewflow
@@ -65,7 +65,7 @@ http://cookbook.viewflow.io
   <img src="assets/dashboard.png" alt="drawing" width="600"/>
 </a>
 
-The workflow layer separates collaboration logic out of views code.
+The workflow layer separates collaboration logic from view code.
 
 ```python
 def approve_task(request, process_pk, task_pk):
@@ -81,7 +81,7 @@ def approve_task(request, process_pk, task_pk):
 ```
 
 Viewflow supports parallel activities, allows having multiple active tasks at
-the same time and synchronize people interactions with background python jobs.
+the same time, and synchronizing people's interactions with background Python jobs.
 
 ```python
 class HelloWorldFlow(flow.Flow):
@@ -108,18 +108,19 @@ urlpatterns = [
     path('', site.urls),
 ]
 ```
-Quick start: https://docs-next.viewflow.io/bpmn/quick_start.html
+
+Quickstart: https://docs-next.viewflow.io/bpmn/quick_start.html
 
 
 ### Class-based URL Configuration
 
-A class with `.urls` property, suitable to include into `urlpatterns`
+A class with `.urls` property, suitable for inclusion into `urlpatterns`
 
-Same concept as Django's class-based views but for URL routing configuration. Generalization of `admin.urls` and rest framework routers.
+Same concept as Django's class-based views but for URL routing configuration. Generalization of `admin.urls` and REST framework routers.
 
-Class-based URL configuration allows to quickly include existing applications into a website, configure, subclass and redefine its functionality.
+Class-based URL configuration allows you to quickly include existing applications into a website, configure, subclass, and redefine its functionality.
 
-Viewflow contains several pre-build URL configurations to build a Site Menu structure, CRUD functionality, quickly enables user interfaces for BPMN and FSM Workflows, and many 3d party apps.
+Viewflow contains several pre-built URL configurations for building a Site Menu structure, CRUD functionality, and quickly enables user interfaces for BPMN and FSM Workflows, along with many third-party apps.
 
 ```python
 from viewflow.contrib.auth import AuthViewset
@@ -158,7 +159,7 @@ Finite state machine workflows are the declarative way to describe consecutive o
   <img src="assets/fsm.png" alt="drawing" width="600"/>
 </a>
 
-`viewflow.fsm.*` can help you manage rules and restrictions around moving from one state to another. The package is suitable to get low-level database-independent FSM implementation, or to wrap an existing database model, and implement a simple persistent workflow process with a quickly bootstrapped UI.
+`viewflow.fsm.*` can help you manage rules and restrictions around moving from one state to another. The package is suitable for getting low-level, database-independent FSM implementation or to wrap an existing database model and implement a simple, persistent workflow process with a quickly bootstrapped UI.
 
 ```python
 from enum import Enum
@@ -192,7 +193,7 @@ flow.complete()  # Now raises TransitionNotAllowed
 ```
 
 ### JSON Storage for Django Models
-Keep dumb business data, quick prototyping without DB migrations, replace multi-table inheritance with proxy models.
+Maintain dumb business data and quick prototyping without DB migrations.
 
 `viewflow.jsonstore.*` is the set of virtual Django Model fields that stores data inside a single JSON database column.
 
@@ -205,7 +206,7 @@ class Employee(models.Model):
     full_name = jsonstore.CharField(max_length=250)
     hire_date = jsonstore.DateField()
 ```
-The result model works like a usual Django model. All virtual fields are available to construct ModelForms, Viewsets and Admin interfaces.
+The result model works like a usual Django model. All virtual fields are available to construct ModelForms, Viewsets, and Admin interfaces.
 
 ```python
 class EmployeeForm(forms.ModelForm):
@@ -222,11 +223,11 @@ See more at: https://docs-next.viewflow.io/json_storage.html
 
 ### Material UI Kit
 
-Viewflow provides the theme kit based on Google Material Design components. Base templates, Login, Logout, Password management views, Forms, and CRUD.
+Viewflow provides a theme kit based on Google Material Design components. Base page templates, Login, Logout, Password management views, Dashboard, Forms, and CRUD.
 
-SPA look and fell with Turbolinks enabled navigation and form processing.
+SPA look and feel with Turbolinks-enabled navigation and form processing.
 
-All Javascript managed by Web Components based on Solid-JS library.
+All JavaScript is managed by Web Components based on Solid-JS library.
 
 <p>
 <a href="https://demo-next.viewflow.io/accounts/login/">
@@ -242,9 +243,6 @@ All Javascript managed by Web Components based on Solid-JS library.
 
 Documentation: https://docs-next.viewflow.io/frontend/index.html
 
-### Reporting
-
-TODO
 
 ## License
 
@@ -254,7 +252,7 @@ the AGPL license - `The GNU Affero General Public License v3.0
 described in `LICENSE_EXCEPTION <./LICENSE_EXCEPTION>`_
 
 You can read more about AGPL at `AGPL FAQ <http://www.affero.org/oagf.html>`_
-This package license scheme follows to GCC Runtime library licensing. If you use Linux already, probably this package license should not bring anything new to your stack.
+This package license scheme follow GCC Runtime library licensing. If you use Linux already, this package license likely won't bring anything new to your stack.
 
 Viewflow PRO has a commercial-friendly license allowing private forks
 and modifications of Viewflow. You can find the commercial license terms in COMM-LICENSE.
