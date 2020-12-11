@@ -37,7 +37,6 @@ class Migration(migrations.Migration):
                 'verbose_name_plural': 'World Requests',
                 'proxy': True,
                 'indexes': [],
-                'constraints': [],
             },
             bases=('viewflow.process',),
         ),

@@ -11,8 +11,8 @@
             {% for name, value in fields %}
             <dt>{{ name }}:</dt> 
             <dd>
-                {% if value == True %}{% trans 'Yes' %}{% else %}
-                {% if value == False %}{% trans 'No' %}{% else %}
+                {% if value is True %}{% trans 'Yes' %}{% else %}
+                {% if value is False %}{% trans 'No' %}{% else %}
                 {% if value.url %}<a href="{{ value.url }}" target="_blank">{{ value.name }}</a>{% else %}
                 {{ value }}{% endif %}{% endif %}{% endif %}
             </dd>
