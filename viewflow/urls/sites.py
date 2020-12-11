@@ -11,6 +11,11 @@ class AppMenuMixin:
     title = None
     icon = Icon("view_carousel")
 
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if isinstance(self.icon, str):
+            self.icon = Icon(self.icon)
+
     def __getattribute__(self, name):
         attr = super().__getattribute__(name)
 
@@ -37,6 +42,8 @@ class Application(IndexViewMixin, Viewset):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        if isinstance(self.icon, str):
+            self.icon = Icon(self.icon)
 
     def __getattribute__(self, name):
         attr = super().__getattribute__(name)
@@ -77,6 +84,9 @@ class Site(IndexViewMixin, Viewset):
 
     def __init__(self, *, title=None, **kwargs):
         super().__init__(**kwargs)
+
+        if isinstance(self.icon, str):
+            self.icon = Icon(self.icon)
 
         if title is not None:
             self.title = title

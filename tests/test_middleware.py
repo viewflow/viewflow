@@ -6,12 +6,12 @@ from viewflow.urls import AppMenuMixin, Application, Site, Viewset, route
 
 class NestedViewset(Viewset):
     app_name = 'nested'
-    page_url = path('page/', TemplateView.as_view(template_name='viewflow/base.html'), name="page")
+    page_path = path('page/', TemplateView.as_view(template_name='viewflow/base.html'), name="page")
 
 
 class CityViewset(AppMenuMixin, Viewset):
-    index_url = path('', TemplateView.as_view(template_name='viewflow/base.html'), name="index")
-    nested_url = route('nested', NestedViewset())
+    index_path = path('', TemplateView.as_view(template_name='viewflow/base.html'), name="index")
+    nested_path = route('nested', NestedViewset())
 
 
 site = Site(title="Test site", items=[
@@ -47,4 +47,4 @@ class Test(TestCase):
 
         # App -> Site -> CityViewset -> Nested
         self.assertTrue(hasattr(match, 'viewset'))
-        self.assertEqual(match.viewset, site._children[0]._children[0].nested_url.viewset)
+        self.assertEqual(match.viewset, site._children[0]._children[0].nested_path.viewset)

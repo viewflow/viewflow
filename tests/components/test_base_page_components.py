@@ -6,7 +6,7 @@ from viewflow.urls import Application, AppMenuMixin, IndexViewMixin, Site, Views
 from . import LiveTestCase
 
 
-@override_settings(ROOT_URLCONF=__name__)
+@override_settings(ROOT_URLCONF=__name__, DEBUG=True)
 class Test(LiveTestCase):
     fixtures = ['users.json']
 
@@ -74,7 +74,7 @@ class Test(LiveTestCase):
 
 class TestViewset(IndexViewMixin, AppMenuMixin, Viewset):
     title = 'Test Viewset'
-    page_url = path('test/', TemplateView.as_view(template_name='viewflow/base_page.html'), name="page")
+    page_path = path('test/', TemplateView.as_view(template_name='viewflow/base_page.html'), name="page")
 
 
 urlpatterns = [

@@ -143,7 +143,7 @@ class AuthViewset(Viewset):
         return self.login_view_class.as_view(**self.get_login_view_kwargs())
 
     @property
-    def login_url(self):
+    def login_path(self):
         return path('login/', self.login_view, name='login')
 
     """
@@ -159,7 +159,7 @@ class AuthViewset(Viewset):
         return self.logout_view_class.as_view(**self.get_logout_view_kwargs())
 
     @property
-    def logout_url(self):
+    def logout_path(self):
         return path('logout/', self.logout_view, name='logout')
 
     """
@@ -175,7 +175,7 @@ class AuthViewset(Viewset):
         return self.pass_change_view_class.as_view(**self.get_pass_change_view_kwargs())
 
     @property
-    def pass_change_url(self):
+    def pass_change_path(self):
         if self.allow_password_change:
             return path(
                 'password_change/', self.pass_change_view,
@@ -194,7 +194,7 @@ class AuthViewset(Viewset):
         return self.pass_change_done_view_class.as_view(**self.get_pass_change_done_view_kwargs())
 
     @property
-    def pass_change_done_url(self):
+    def pass_change_done_path(self):
         if self.allow_password_change:
             return path(
                 'password_change/done/', self.pass_change_done_view,
@@ -213,7 +213,7 @@ class AuthViewset(Viewset):
         return self.pass_reset_view_class.as_view(**self.get_pass_reset_view_kwargs())
 
     @property
-    def pass_reset_url(self):
+    def pass_reset_path(self):
         if self.allow_password_change:
             return path(
                 'password_reset/', self.pass_reset_view,
@@ -232,7 +232,7 @@ class AuthViewset(Viewset):
         return self.pass_reset_done_view_class.as_view(**self.get_pass_reset_done_view_kwargs())
 
     @property
-    def pass_reset_done_url(self):
+    def pass_reset_done_path(self):
         if self.allow_password_change:
             return path(
                 'password_reset/done/', self.pass_reset_done_view,
@@ -251,7 +251,7 @@ class AuthViewset(Viewset):
         return self.pass_reset_confirm_view_class.as_view(**self.get_pass_reset_confirm_view_kwargs())
 
     @property
-    def pass_reset_confirm_url(self):
+    def pass_reset_confirm_path(self):
         if self.allow_password_change:
             return path(
                 'reset/<uidb64>/<token>/', self.pass_reset_confirm_view,
@@ -270,7 +270,7 @@ class AuthViewset(Viewset):
         return self.pass_reset_complete_view_class.as_view(**self.get_pass_reset_complete_view_kwargs())
 
     @property
-    def pass_reset_complete_url(self):
+    def pass_reset_complete_path(self):
         if self.allow_password_change:
             return path(
                 'reset/done/', self.pass_reset_complete_view,
@@ -288,7 +288,7 @@ class AuthViewset(Viewset):
         return self.profile_view_class.as_view(**self.get_profile_view_kwargs())
 
     @property
-    def profile_url(self):
+    def profile_path(self):
         if self.with_profile_view:
             return path('profile/', self.profile_view, name='profile')
 

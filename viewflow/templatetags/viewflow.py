@@ -1,10 +1,14 @@
+import json
 import re
 
 from django import forms, template
 from django.db.models import Model
+from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import NoReverseMatch
 from django.utils.encoding import force_text
-from django.utils.html import conditional_escape
+from django.utils.html import conditional_escape, format_html, _json_script_escapes
+from django.utils.html import json_script as base_json_script
+from django.utils.safestring import mark_safe
 
 from viewflow.contrib import auth
 from viewflow.forms import FormLayout
@@ -246,3 +250,12 @@ def list_page_data(page, list_view):
 @register.filter
 def list_order(request_kwargs, list_view):
     return request_kwargs.get(list_view.ordering_kwarg, '')
+
+
+@register.filter
+def json_script(value, element_id=None):
+    if element_id is not None:
+        return base_json_script(value, element_id)
+    else:
+        json_str = json.dumps(value, cls=DjangoJSONEncoder).translate(_json_script_escapes)
+        return format_html('<script type="application/json">{}</script>', mark_safe(json_str))

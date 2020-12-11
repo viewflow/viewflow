@@ -24,6 +24,9 @@ class Transition(object):
         self.permission = permission
         self.conditions: List[Condition] = conditions if conditions else []
 
+    def __str__(self):
+        return f'{self.label} Transition'
+
     @property
     def label(self):
         """Transition human-readable label."""

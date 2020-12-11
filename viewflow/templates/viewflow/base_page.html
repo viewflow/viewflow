@@ -9,7 +9,9 @@
     <header class="mdc-drawer__header vf-page__menu-header">
       <div class="vf-page__menu-header-content">
         {% block page-menu-avatar %}
-          <img class="vf-page__menu-avatar" src="{{ request.user|user_avatar_url }}" alt="{{ request.user.get_full_name|default:request.user.get_username|title }}">
+          {% if user.is_authenticated %}
+            <img class="vf-page__menu-avatar" src="{{ request.user|user_avatar_url }}" alt="{{ request.user.get_full_name|default:request.user.get_username|title }}">
+          {% endif %}
         {% endblock %}
         <div class="vf-page__menu-info">
           <div class="vf-page__menu-user">

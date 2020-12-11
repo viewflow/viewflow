@@ -10,14 +10,6 @@
     <title>{% block title %}{{ site.title|default:"Django Material" }}{% endblock %}</title>
     {% block css %}
       {% include 'viewflow/includes/viewflow_css.html' %}
-      {% block theme %}
-          {% if site.primary_color or site.secondary_color%}<style type="text/css">
-          :root {
-            {% if site.primary_color %}--mdc-theme-primary: {{ site.primary_color }};{% endif %}
-            {% if site.secondary_color %}--mdc-theme-secondary: {{ site.secondary_color }};{% endif %}
-          }
-          </style>{% endif %}
-      {% endblock %}
     {% endblock css %}
     {% block js %}
       {% url 'javascript-catalog' as javascript_catalog_url %}{% if javascript_catalog_url %}<script type="text/javascript" src="{{ javascript_catalog_url }}"></script>{% endif %}
@@ -26,6 +18,14 @@
     {% block extrahead %}{% endblock %}
   </head>
   <body>
+    {% block theme %}
+        {% if site.primary_color or site.secondary_color%}<style type="text/css">
+        :root {
+          {% if site.primary_color %}--mdc-theme-primary: {{ site.primary_color }};{% endif %}
+          {% if site.secondary_color %}--mdc-theme-secondary: {{ site.secondary_color }};{% endif %}
+        }
+        </style>{% endif %}
+    {% endblock %}
     <vf-turbolinks></vf-turbolinks>
     {% block body %}{% endblock %}
     {% include 'viewflow/includes/snackbar.html' %}

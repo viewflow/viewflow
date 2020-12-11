@@ -5,6 +5,7 @@ from django.apps import apps
 from django.core import mail
 from django.conf import settings
 from django.contrib import auth
+from django.db import models
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
@@ -12,7 +13,19 @@ __all__ = (
     'has_object_perm', 'viewprop', 'DEFAULT', 'first_not_default'
 )
 
-DEFAULT = object()
+
+class MARKER(object):
+    def __init__(self, marker: str):
+        self.marker = marker
+
+    def __iter__(self):
+        return iter(())
+
+    def __repr__(self):
+        return self.marker
+
+
+DEFAULT = MARKER('DEFAULT')
 
 IS_DEV = settings.DEBUG or not hasattr(mail, 'outbox')  # DEBUG or test mode
 
@@ -167,9 +180,21 @@ class Icon(object):
         )
 
 
-class MARKER(object):
-    def __init__(self, marker: str):
-        self.marker = marker
+def get_object_data(obj):
+    """List of object fields to display.
+    Choice fields values are expanded to readable choice label.
+    """
+    for field in obj._meta.fields:
+        if isinstance(field, models.AutoField):
+            continue
+        elif field.auto_created:
+            continue
+        else:
+            choice_display_attr = "get_{}_display".format(field.name)
+        if hasattr(obj, choice_display_attr):
+            value = getattr(obj, choice_display_attr)()
+        else:
+            value = getattr(obj, field.name)
 
-    def __repr__(self):
-        return self.marker
+        if value is not None:
+            yield (field, field.verbose_name.capitalize(), value)

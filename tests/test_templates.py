@@ -42,7 +42,7 @@ class Test(TestCase):
 
 class TestViewset(IndexViewMixin, AppMenuMixin, Viewset):
     title = 'Test Viewset'
-    page_url = path('test/', TemplateView.as_view(template_name='viewflow/base_page.html'), name="page")
+    page_path = path('test/', TemplateView.as_view(template_name='viewflow/base_page.html'), name="page")
 
 
 urlpatterns = [

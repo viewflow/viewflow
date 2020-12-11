@@ -7,25 +7,25 @@ from viewflow.urls import route, IndexViewMixin, Viewset
 class NestedViewset(IndexViewMixin, Viewset):
     app_name = 'nested'
 
-    page_url = path('page/', TemplateView.as_view(template_name='viewflow/base.html'), name="page")
-    route_url = route('test', Viewset())
+    page_path = path('page/', TemplateView.as_view(template_name='viewflow/base.html'), name="page")
+    route_path = route('test', Viewset())
 
 
 class InheritedViewset(NestedViewset):
     app_name = 'nested'
 
-    page_url = path('page2/', TemplateView.as_view(template_name='viewflow/base.html'), name="page")
+    page_path = path('page2/', TemplateView.as_view(template_name='viewflow/base.html'), name="page")
 
 
 class RootViewset(Viewset):
     app_name = 'root'
 
-    index_url = path('', TemplateView.as_view(template_name='viewflow/base.html'), name="index")
-    nested_url = route('test', NestedViewset())
-    nested2_url = route('nested2', NestedViewset(app_name='nested2'))
+    index_path = path('', TemplateView.as_view(template_name='viewflow/base.html'), name="index")
+    nested_path = route('test', NestedViewset())
+    nested2_path = route('nested2', NestedViewset(app_name='nested2'))
 
     # check here that route_url mounted second time successfully
-    nested3_url = route('inherited', InheritedViewset(app_name='nested2'))
+    nested3_path = route('inherited', InheritedViewset(app_name='nested2'))
 
 
 urlconfig = RootViewset()
@@ -48,8 +48,8 @@ class Test(TestCase):  # noqa: D101
 
     def test_urlconf_resolve(self):
         self.assertEqual('/', urlconfig.reverse('index'))
-        self.assertEqual('/test/', urlconfig.nested_url.viewset.reverse('index'))
-        self.assertEqual('/test/page/', urlconfig.nested_url.viewset.reverse('page'))
+        self.assertEqual('/test/', urlconfig.nested_path.viewset.reverse('index'))
+        self.assertEqual('/test/page/', urlconfig.nested_path.viewset.reverse('page'))
 
     def test_autoredirect(self):
         response = self.client.get(reverse('root:nested:index'))

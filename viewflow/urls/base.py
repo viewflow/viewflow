@@ -107,7 +107,7 @@ class ViewsetMeta(type):
     def __new__(mcs, name, bases, attrs):
         current_patterns = []
         for key, value in list(attrs.items()):
-            if not key.endswith('_url') or key.startswith('get_'):
+            if not key.endswith('_path') or key.startswith('get_'):
                 continue
             current_patterns.append((key, value))
 
@@ -177,7 +177,7 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
                 self._children.append(viewset)
 
     def _create_url_pattern(self, value):
-        if isinstance(value, URLPattern):
+        if isinstance(value, (URLPattern, URLResolver)):
             return value
         elif isinstance(value, Route):
             value.viewset.parent = self
@@ -265,7 +265,7 @@ class _IndexRedirectView(RedirectView):
             if redirect is None:
                 raise ValueError(
                     "Can't determine index url. Please add an explicit "
-                    "`index_url = path('', RedirectView(url='...'), name='index')`"
+                    "`index_path = path('', RedirectView(url='...'), name='index')`"
                     " declaration for the viewset")
             return redirect
         return super().get_redirect_url(*args, **kwargs)
@@ -276,5 +276,5 @@ class IndexViewMixin(metaclass=ViewsetMeta):
     Redirect from / to the first non-parameterized view of the Viewset class.
     """
     @property
-    def index_url(self):
+    def index_path(self):
         return path('', _IndexRedirectView.as_view(viewset=self), name="index")
