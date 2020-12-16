@@ -65,7 +65,7 @@ http://cookbook.viewflow.io
   <img src="assets/dashboard.png" alt="drawing" width="600"/>
 </a>
 
-The workflow layer separates collaboration logic from view code.
+The workflow layer separates collaboration logic from the views code.
 
 ```python
 def approve_task(request, process_pk, task_pk):

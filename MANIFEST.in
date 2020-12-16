@@ -1,0 +1,7 @@
+include LICENSE
+include LICENSE_EXCEPTION 
+include MANIFEST.in
+include README.rst
+recursive-include viewflow/templates *
+recursive-include viewflow/locale *
+recursive-include viewflow/static *
