@@ -9,6 +9,14 @@ VIEWFLOW = {
 }
 """
 
+# Copyright (c) 2017-2020, Mikhail Podgurskiy
+# All Rights Reserved.
+
+# This work is dual-licensed under AGPL defined in file 'LICENSE' with
+# LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
+# which is part of this source code package.
+
+
 from copy import deepcopy
 
 from django.conf import settings as django_settings
@@ -19,7 +27,7 @@ from viewflow.forms import renderers
 
 
 DEFAULTS = {
-    'AUTOREGISTER': True,
+    'AUTOREGISTER': 'viewflow' in django_settings.INSTALLED_APPS,
     'WIDGET_RENDERERS': renderers.WIDGET_RENDERERS,
 }
 
