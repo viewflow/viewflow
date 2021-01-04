@@ -1,6 +1,6 @@
 from copy import copy
 from textwrap import dedent
-from django.conf.urls import url
+from django.conf.urls import re_path
 from django.urls import reverse
 
 from . import Edge
@@ -46,8 +46,8 @@ class DetailViewMixin(object):
         """Add `/<process_pk>/<task_pk>/detail/` url."""
         urls = super(DetailViewMixin, self).urls()
         urls.append(
-            url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/detail/$'.format(self.name),
-                self.detail_view, {'flow_task': self}, name="{}__detail".format(self.name))
+            re_path(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/detail/$'.format(self.name),
+                    self.detail_view, {'flow_task': self}, name="{}__detail".format(self.name))
         )
         return urls
 
@@ -85,8 +85,8 @@ class UndoViewMixin(object):
         """Add `/<process_pk>/<task_pk>/undo/` url."""
         urls = super(UndoViewMixin, self).urls()
         urls.append(
-            url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/undo/$'.format(self.name),
-                self.undo_view, {'flow_task': self}, name="{}__undo".format(self.name))
+            re_path(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/undo/$'.format(self.name),
+                    self.undo_view, {'flow_task': self}, name="{}__undo".format(self.name))
         )
         return urls
 
@@ -116,8 +116,8 @@ class CancelViewMixin(object):
         """Add `/<process_pk>/<task_pk>/cancel/` url."""
         urls = super(CancelViewMixin, self).urls()
         urls.append(
-            url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/cancel/$'.format(self.name),
-                self.cancel_view, {'flow_task': self}, name="{}__cancel".format(self.name))
+            re_path(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/cancel/$'.format(self.name),
+                    self.cancel_view, {'flow_task': self}, name="{}__cancel".format(self.name))
         )
         return urls
 
@@ -146,7 +146,7 @@ class PerformViewMixin(object):
     def urls(self):
         """Add `/<process_pk>/<task_pk>/perform/` url."""
         urls = super(PerformViewMixin, self).urls()
-        urls.append(url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/perform/$'.format(self.name),
+        urls.append(re_path(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/perform/$'.format(self.name),
                     self.perform_view, {'flow_task': self}, name="{}__perform".format(self.name)))
         return urls
 
@@ -176,8 +176,8 @@ class ActivateNextMixin(object):
         """Add `/<process_pk>/<task_pk>/activate_next/` url."""
         urls = super(ActivateNextMixin, self).urls()
         urls.append(
-            url(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/activate_next/$'.format(self.name),
-                self.activate_next_view, {'flow_task': self}, name="{}__activate_next".format(self.name))
+            re_path(r'^(?P<process_pk>\d+)/{}/(?P<task_pk>\d+)/activate_next/$'.format(self.name),
+                    self.activate_next_view, {'flow_task': self}, name="{}__activate_next".format(self.name))
         )
         return urls
 
