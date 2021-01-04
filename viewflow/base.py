@@ -8,7 +8,7 @@ from collections import defaultdict
 from textwrap import dedent
 from six import with_metaclass
 
-from django.conf.urls import include, url
+from django.conf.urls import include, re_path
 
 
 from . import Node, ThisObject, This, lock, models, forms
@@ -202,7 +202,7 @@ class Flow(with_metaclass(FlowMetaClass, object)):
         Build URL patterns list for all flow nodes::
 
             urlpatterns = [
-                url(r'^admin/', include('admin.site.urls')),
+                re_path(r'^admin/', include('admin.site.urls')),
                 MyFlow.instance.urls,
             ]
         """
@@ -210,7 +210,7 @@ class Flow(with_metaclass(FlowMetaClass, object)):
         for node in self._meta.nodes():
             node_urls += node.urls()
 
-        return url('^', include(node_urls), {'flow_class': self})
+        return re_path('^', include(node_urls), {'flow_class': self})
 
     def has_view_permission(self, user):
         return user.has_perm(self._meta.view_permission_name)
