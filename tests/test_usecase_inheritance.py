@@ -5,7 +5,11 @@ from viewflow.base import Flow, this
 
 class BaseFlow(Flow):
     start = flow.StartFunction().Next(this.end)
+    handle = flow.Handler(this.handler_execute)
     end = flow.End()
+
+    def handler_execute(self, activation):
+        raise NotImplementedError
 
 
 class FlowMixin(object):
@@ -18,6 +22,9 @@ class ChildFlow(FlowMixin, BaseFlow):
     alert = flow.Function(this.send_alert).Next(this.notify_admins)
     notify_users = FlowMixin.notify_users.Next(this.end)
 
+    def handler_execute(self, activation):
+        raise NotImplementedError
+
     def send_alert(self, activation):
         activation.prepare()
         activation.done()
@@ -26,10 +33,6 @@ class ChildFlow(FlowMixin, BaseFlow):
 class Test(TestCase):
     def test_base_flow_unchanged(self):
         self.assertEqual(BaseFlow.start._next, BaseFlow.end)
-
-    def test_child_flow_got_base_nodes(self):
-        self.assertEqual(ChildFlow.end, BaseFlow.end)
-        self.assertEqual(ChildFlow._meta.node('end'), BaseFlow.end)
 
     def test_child_flow_overides_base_node(self):
         self.assertEqual(ChildFlow.alert._next, ChildFlow.notify_admins)
@@ -43,4 +46,8 @@ class Test(TestCase):
             'notify_admins__perform', 'notify_admins__cancel', 'notify_admins__undo',
             'notify_admins__detail', 'notify_users__perform', 'notify_users__cancel',
             'notify_users__undo', 'notify_users__detail', 'start__perform',
-            'start__cancel', 'start__undo', 'start__detail']))
+            'start__cancel', 'start__undo', 'start__detail',
+            'handle__cancel', 'handle__undo', 'handle__detail', 'handle__perform']))
+
+    def test_handle_proper_initialized(self):
+        self.assertEqual(ChildFlow.handle.handler, ChildFlow.instance.handler_execute)

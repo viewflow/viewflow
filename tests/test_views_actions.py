@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.urls import include, re_path
 from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
 from django.urls import resolve
@@ -251,7 +251,7 @@ class ActionsTestFlow(Flow):
 
 
 urlpatterns = [
-    url(r'^test/', include((viewset.FlowViewSet(ActionsTestFlow).urls, 'actionstest')))
+    re_path(r'^test/', include((viewset.FlowViewSet(ActionsTestFlow).urls, 'actionstest')))
 ]
 
 try:

@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.urls import include, re_path
 from django.contrib.auth.models import User
 from django.http.request import QueryDict
 from django.template import Template, Context
@@ -85,5 +85,5 @@ class TestTemplateTagsFlow(Flow):
 
 
 urlpatterns = [
-    url(r'^test/', include((viewset.FlowViewSet(TestTemplateTagsFlow).urls, 'testtemplatetags'))),
+    re_path(r'^test/', include((viewset.FlowViewSet(TestTemplateTagsFlow).urls, 'testtemplatetags'))),
 ]

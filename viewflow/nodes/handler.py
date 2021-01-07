@@ -100,10 +100,12 @@ class Handler(mixins.TaskDescriptionMixin,
     activation_class = HandlerActivation
 
     def __init__(self, handler, **kwargs):  # noqa D102
-        self.handler = handler
+        self._handler = handler
         super(Handler, self).__init__(**kwargs)
 
     def ready(self):
         """Resolve internal `this`-references."""
-        if isinstance(self.handler, ThisObject):
-            self.handler = getattr(self.flow_class.instance, self.handler.name)
+        if isinstance(self._handler, ThisObject):
+            self.handler = getattr(self.flow_class.instance, self._handler.name)
+        else:
+            self.handler = self._handler

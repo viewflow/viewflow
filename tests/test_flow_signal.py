@@ -33,8 +33,8 @@ class Test(TestCase):
 
 start_test_signal = Signal()
 start_ignorable_test_signal = Signal()
-task_test_signal = Signal(providing_args=["process", "task"])
-ignorable_test_signal = Signal(providing_args=["process", "ignore_me"])
+task_test_signal = Signal()
+ignorable_test_signal = Signal()
 
 
 @flow.flow_start_signal

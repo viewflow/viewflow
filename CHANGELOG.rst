@@ -2,6 +2,13 @@
 Changelog
 =========
 
+1.8.0 2021-01-07
+----------------
+
+* Clean Django 4.0 warnings
+* Allow flow.Handler redifinition with inheritance 
+
+
 1.7.0 2020-11-18
 ----------------
 

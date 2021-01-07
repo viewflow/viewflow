@@ -137,16 +137,20 @@ class Function(mixins.TaskDescriptionMixin,
              MyFlow.shipment_received_handler.run(task=task)
 
         """
-        self.func = func
-        self.task_loader = task_loader
+        self._func = func
+        self._task_loader = task_loader
         super(Function, self).__init__(**kwargs)
 
     def ready(self):
         """Resolve internal `this`-references."""
-        if isinstance(self.func, ThisObject):
-            self.func = getattr(self.flow_class.instance, self.func.name)
-        if isinstance(self.task_loader, ThisObject):
-            self.task_loader = getattr(self.flow_class.instance, self.task_loader.name)
+        if isinstance(self._func, ThisObject):
+            self.func = getattr(self.flow_class.instance, self._func.name)
+        else:
+            self.func = self._func
+        if isinstance(self._task_loader, ThisObject):
+            self._task_loader = getattr(self.flow_class.instance, self._task_loader.name)
+        else:
+            self.task_loader = self._task_loader
 
     def run(self, *args, **kwargs):
         """Execute the function task."""

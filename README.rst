@@ -28,7 +28,8 @@ http://viewflow.io.
 - Viewflow 1.1.x compatible with Django 1.8/1.9/1.10/1.11 (supported till Django 1.8 lifetime/April 2018)
 - Viewflow 1.2.x compatible with Django 1.11/2.0 (supported till Django 1.11 lifetime/April 2020)
 - Viewflow 1.3.x/1.4.x/1.5.x compatible with Django 1.11/2.0/2.1/2.2 (supported till Django 1.11 lifetime/April 2020)
-- Viewflow 1.6.x compatible with Django 2.0/2.1/2.2/3.0/3.1
+- Viewflow 1.6.x/1.7.x compatible with Django 2.0/2.1/2.2/3.0/3.1 (supported till Django 2.0 lifetime/December 2020)
+- Viewflow 1.8.x compatible with Django 2.1/2.2/3.0/3.1
 
 Introduction
 ============
@@ -124,7 +125,8 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.7.0 2020-11-18
+1.8.0 2021-01-07
 ----------------
 
-* Fix TaskQuerySet.user_queue filtering. Remove django 1.8 compatibility code
+* Clean Django 4.0 warnings
+* Allow flow.Handler redifinition with inheritance 

@@ -1,5 +1,5 @@
 from django.urls import resolve
-from django.conf.urls import include, url
+from django.conf.urls import include, re_path
 from django.db import models
 from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory
@@ -142,7 +142,7 @@ class TaskViewFlowEntity(models.Model):
 
 
 urlpatterns = [
-    url(r'^test/', include((viewset.FlowViewSet(TaskViewTestFlow).urls, 'taskviewtest')))
+    re_path(r'^test/', include((viewset.FlowViewSet(TaskViewTestFlow).urls, 'taskviewtest')))
 ]
 
 try:

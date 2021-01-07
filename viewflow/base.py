@@ -4,6 +4,7 @@ Flow definition
 from __future__ import unicode_literals
 
 import re
+from copy import copy
 from collections import defaultdict
 from textwrap import dedent
 from six import with_metaclass
@@ -23,7 +24,7 @@ class _Resolver(object):
 
     def get_implementation(self, link):
         if isinstance(link, Node):
-            return link
+            return self.nodes.get(link.name)
         elif isinstance(link, ThisObject):
             node = self.nodes.get(link.name)
             if not node:
@@ -102,19 +103,24 @@ class FlowMetaClass(type):
 
     def __new__(cls, class_name, bases, attrs):
         """Construct new flow class."""
+        # set up flow tasks
+        nodes = {}
+
+        for base_class in bases:
+            for name, attr in base_class.__dict__.items():
+                if isinstance(attr, Node):
+                    nodes[name] = copy(attr)
+
+        for name, attr in attrs.items():
+            if isinstance(attr, Node):
+                nodes[name] = copy(attr)
+
+        attrs.update(nodes)
+
         new_class = super(FlowMetaClass, cls).__new__(cls, class_name, bases, attrs)
 
         # singleton instance
         new_class.instance = FlowInstanceDescriptor()
-
-        # set up flow tasks
-        nodes = {}
-        for base_class in bases:
-            for name, attr in base_class.__dict__.items():
-                if isinstance(attr, Node):
-                    nodes[name] = attr
-        nodes.update({name: attr for name, attr in attrs.items()
-                      if isinstance(attr, Node)})
 
         for name, node in nodes.items():
             node.name = name
