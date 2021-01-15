@@ -2,6 +2,12 @@
 Changelog
 =========
 
+1.8.1 2021-01-15
+----------------
+
+* Fix this-referencies for flow.Functon task loader
+
+
 1.8.0 2021-01-07
 ----------------
 

@@ -125,6 +125,12 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
+1.8.1 2021-01-15
+----------------
+
+* Fix this-referencies for flow.Functon task loader
+
+
 1.8.0 2021-01-07
 ----------------
 

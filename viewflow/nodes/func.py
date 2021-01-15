@@ -148,7 +148,7 @@ class Function(mixins.TaskDescriptionMixin,
         else:
             self.func = self._func
         if isinstance(self._task_loader, ThisObject):
-            self._task_loader = getattr(self.flow_class.instance, self._task_loader.name)
+            self.task_loader = getattr(self.flow_class.instance, self._task_loader.name)
         else:
             self.task_loader = self._task_loader
 
