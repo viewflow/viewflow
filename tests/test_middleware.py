@@ -14,8 +14,8 @@ class CityViewset(AppMenuMixin, Viewset):
     nested_path = route('nested', NestedViewset())
 
 
-site = Site(title="Test site", items=[
-    Application(app_name="test", items=[
+site = Site(title="Test site", viewsets=[
+    Application(app_name="test", viewsets=[
         CityViewset(),
     ])
 ])

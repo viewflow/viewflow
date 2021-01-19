@@ -31,6 +31,7 @@
 
 .vf-page-lockscreen__sidebar-header-subtitle {
   @include mdc-typography("subtitle2");
+  font-weight: 300;
 }
 
 .vf-page-lockscreen__sidebar-content {
@@ -90,4 +91,19 @@
   margin: 8px;
   text-decoration: none;
   font-size: 14px;
+}
+
+.vf-page-lockscreen__socialaccount {
+  padding: 0;
+  text-align: center;
+}
+
+.vf-page-lockscreen__socialaccount-provider {
+  display: inline;
+  font-size: 2rem;
+  padding: 8px;
+
+  a.socialaccount_provider {
+    text-decoration: none;
+  }
 }

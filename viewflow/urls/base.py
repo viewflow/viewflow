@@ -149,7 +149,7 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
 
     Viewset classes could be inherited, extended, and have overridden attributes.
     """
-    items = None
+    viewsets = None
 
     def __init__(self, urls=None, **initkwargs):
         super().__init__()
@@ -171,9 +171,9 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
             setattr(self, key, value)
 
         # clone additional routes
-        if self.items:
-            self.items = [copy.copy(item) for item in self.items]
-            self._children += self.items
+        if self.viewsets:
+            self.viewsets = [copy.copy(viewset) for viewset in self.viewsets]
+            self._children += self.viewsets
 
         # clone route instances
         for attr_name in self.declared_patterns:
@@ -205,7 +205,7 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
             urlpatterns.append(self._create_url_pattern(url_entry))
 
         # additional routes
-        for viewset in self.items or []:
+        for viewset in self.viewsets or []:
             if viewset.app_name is None:
                 viewset.app_name = camel_case_to_underscore(
                     strip_suffixes(

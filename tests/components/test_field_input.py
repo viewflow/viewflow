@@ -30,7 +30,7 @@ class TestForm(forms.Form):
 
 
 urlpatterns = [
-    path('', Site(items=[
+    path('', Site(viewsets=[
         Application(
             title='Test Application',
             urls=[

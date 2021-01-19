@@ -134,7 +134,7 @@ class Site(IndexViewMixin, Viewset):
     def register(self, app_class):
         app = app_class()
         app._parent = self
-        self.items.append(app)
+        self.viewsets.append(app)
         return app_class
 
     @cached_property

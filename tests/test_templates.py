@@ -46,10 +46,10 @@ class TestViewset(IndexViewMixin, AppMenuMixin, Viewset):
 
 
 urlpatterns = [
-    path('', Site(items=[
+    path('', Site(viewsets=[
         Application(
             title='Test Application',
-            items=[TestViewset()]
+            viewsets=[TestViewset()]
         )
     ]).urls)
 ]

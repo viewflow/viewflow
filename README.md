@@ -129,12 +129,12 @@ from viewflow.urls import Application, Site, Viewset
 class WebsiteViewset(Viewset):
     index_url = path('', index_view, name='index')
 
-site = Site(title="ACME Corp", items=[
+site = Site(title="ACME Corp", viewsets=[
     Application(
         title='Sample App',
         icon=Icon('people'),
         app_name='emp',
-        items=[
+        viewsets=[
             WebsiteViewset(),
         ]
     ),

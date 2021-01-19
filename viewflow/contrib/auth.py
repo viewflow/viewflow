@@ -299,6 +299,16 @@ class AuthViewset(Viewset):
         if self.with_profile_view:
             return path('profile/', self.profile_view, name='profile')
 
+    """
+    Django-allauth integration
+    """
+    def get_allauth_prodivers(self):
+        try:
+            from allauth.socialaccount import providers
+            return providers.registry.get_list()
+        except ImportError:
+            return []
+
 
 GREETINGS = [
     _('Fantastic!'),
