@@ -15,8 +15,8 @@ class LoginRequiredMixin(object):
     def dispatch(self, *args, **kwargs):  # noqa D102
         return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
 
-
-class FlowViewPermissionMixin(LoginRequiredMixin):
+@method_decorator(login_required, name="dispatch")
+class FlowViewPermissionMixin:
     """Mixin for flow views, check the view permission."""
 
     def dispatch(self, *args, **kwargs):  # noqa D102
@@ -25,7 +25,8 @@ class FlowViewPermissionMixin(LoginRequiredMixin):
             super(FlowViewPermissionMixin, self).dispatch)(*args, **kwargs)
 
 
-class FlowManagePermissionMixin(LoginRequiredMixin):
+@method_decorator(login_required, name="dispatch")
+class FlowManagePermissionMixin:
     """Mixin for flow flow views, check flow manage permission."""
 
     def dispatch(self, *args, **kwargs):  # noqa D102
@@ -34,7 +35,8 @@ class FlowManagePermissionMixin(LoginRequiredMixin):
             super(FlowManagePermissionMixin, self).dispatch)(*args, **kwargs)
 
 
-class FlowTaskManagePermissionMixin(LoginRequiredMixin):
+@method_decorator(login_required, name="dispatch")
+class FlowTaskManagePermissionMixin:
     """Mixin for flow task views, check flow manage permission."""
 
     def dispatch(self, *args, **kwargs):  # noqa D102
