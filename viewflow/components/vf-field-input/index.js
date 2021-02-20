@@ -3,7 +3,7 @@
 import {customElement} from 'solid-element';
 import {MDCTextField} from '@material/textfield';
 import {noShadowDOM} from 'component-register';
-import {onCleanup, afterEffects} from 'solid-js';
+import {onCleanup, createEffect} from 'solid-js';
 import cc from 'classcat';
 
 import './index.scss';
@@ -41,7 +41,7 @@ export const Input = (props) => {
   let control;
   let textfield;
 
-  afterEffects(() => {
+  createEffect(() => {
     setTimeout(() => {
       textfield = new MDCTextField(control);
       control.textfield=textfield;
@@ -92,6 +92,7 @@ export const Input = (props) => {
         type={ props.type }
         value={ props.value }
         aria-labelledby={ props.id + '_label' }
+        oninput={props.onInput}
         onChange={props.onChange}
         onFocus={props.onFocus}
         onKeyUp={props.onKeyUp}

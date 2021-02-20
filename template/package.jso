@@ -1,0 +1,40 @@
+{
+  "name": "create-django",
+  "version": "0.3.0",
+  "description": "Initialize new django project",
+  "author": "Mikhail Podgurskiy",
+  "license": "UNLICENSED",
+  "files": [
+    "deploy.yml.js",
+    "index.js",
+    "manage.py.js",
+    "package.json.js",
+    "pyproject.toml.js",
+    "rollup.config.js.js",
+    "project_name/__init__.py.js",
+    "project_name/asgi.py.js",
+    "project_name/celery.py.js",
+    "project_name/settings.py.js",
+    "project_name/urls.py.js",
+    "project_name/wsgi.py.js",
+    "project_name/components/index.js.js",
+    "project_name/components/my-component/index.js.js",
+    "project_name/components/my-component/index.scss.js",
+    "project_name/users/__init__.py.js",
+    "project_name/users/admin.py.js",
+    "project_name/users/forms.py.js",
+    "project_name/users/managers.py.js",
+    "project_name/users/models.py.js",
+    "project_name/users/migrations/__init__.py.js",
+    "project_name/users/migrations/0001_initial.py.js"
+  ],
+  "bin": {
+    "create-django": "./index.js"
+  },
+  "dependencies": {
+    "ansible-vault": "^1.0.1",
+    "commander": "^5.1.0",
+    "inquirer": "^7.3.3",
+    "nanoid": "^3.1.12"
+  }
+}
