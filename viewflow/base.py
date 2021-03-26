@@ -14,7 +14,7 @@ from django.conf.urls import include
 try:
     from django.conf.urls import re_path
 except ImportError:
-    from django.conf.urls import url
+    from django.conf.urls import url as re_path
 
 
 from . import Node, ThisObject, This, lock, models, forms

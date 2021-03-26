@@ -5,7 +5,7 @@ from django.urls import reverse
 try:
     from django.conf.urls import re_path
 except ImportError:
-    from django.conf.urls import url
+    from django.conf.urls import url as re_path
 
 from . import Edge
 
