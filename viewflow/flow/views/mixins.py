@@ -15,32 +15,34 @@ class LoginRequiredMixin(object):
     def dispatch(self, *args, **kwargs):  # noqa D102
         return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
 
-
-class FlowViewPermissionMixin(object):
+@method_decorator(login_required, name="dispatch")
+class FlowViewPermissionMixin:
     """Mixin for flow views, check the view permission."""
 
     def dispatch(self, *args, **kwargs):  # noqa D102
         self.flow_class = kwargs['flow_class']
-        return permission_required(self.flow_class._meta.view_permission_name)(
+        return permission_required(self.flow_class._meta.view_permission_name, raise_exception=True)(
             super(FlowViewPermissionMixin, self).dispatch)(*args, **kwargs)
 
 
-class FlowManagePermissionMixin(object):
+@method_decorator(login_required, name="dispatch")
+class FlowManagePermissionMixin:
     """Mixin for flow flow views, check flow manage permission."""
 
     def dispatch(self, *args, **kwargs):  # noqa D102
         self.flow_class = kwargs['flow_class']
-        return permission_required(self.flow_class._meta.manage_permission_name)(
+        return permission_required(self.flow_class._meta.manage_permission_name, raise_exception=True)(
             super(FlowManagePermissionMixin, self).dispatch)(*args, **kwargs)
 
 
-class FlowTaskManagePermissionMixin(object):
+@method_decorator(login_required, name="dispatch")
+class FlowTaskManagePermissionMixin:
     """Mixin for flow task views, check flow manage permission."""
 
     def dispatch(self, *args, **kwargs):  # noqa D102
         self.flow_task = kwargs['flow_task']
         self.flow_class = self.flow_task.flow_class
-        return permission_required(self.flow_class._meta.manage_permission_name)(
+        return permission_required(self.flow_class._meta.manage_permission_name, raise_exception=True)(
             super(FlowTaskManagePermissionMixin, self).dispatch)(*args, **kwargs)
 
 
