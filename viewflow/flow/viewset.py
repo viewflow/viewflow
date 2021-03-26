@@ -1,4 +1,10 @@
-from django.conf.urls import re_path, include
+from django.conf.urls import include
+
+try:
+    from django.conf.urls import re_path
+except ImportError:
+    from django.conf.urls import url
+
 
 from .views import (
     CancelProcessView, DetailProcessView, ProcessListView,
