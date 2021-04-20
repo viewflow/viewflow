@@ -170,12 +170,9 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
             <button type="submit" name="_continue">Assign and continue on this process</button>
             <button type="submit" name="_assign">Assign</button>
         """
-        if ('_assign' in request.POST) or ('_continue' in request.POST):
-            self.activation.assign(self.request.user)
-            self.success(_('Task {task} has been assigned'))
-            return HttpResponseRedirect(self.get_success_url())
-        else:
-            return self.get(request, *args, **kwargs)
+        self.activation.assign(self.request.user)
+        self.success(_('Task {task} has been assigned'))
+        return HttpResponseRedirect(self.get_success_url())
 
     @method_decorator(flow_view)
     def dispatch(self, request, *args, **kwargs):
