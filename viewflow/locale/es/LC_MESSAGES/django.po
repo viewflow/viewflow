@@ -53,7 +53,7 @@ msgstr "Empezado"
 #: viewflow/activation.py:41
 msgctxt "STATUS"
 msgid "Unripe"
-msgstr ""
+msgstr "No listo"
 
 #: viewflow/flow/views/actions.py:114
 msgid "Undo"
@@ -62,7 +62,7 @@ msgstr "Deshacer"
 #: viewflow/flow/views/actions.py:123
 #, python-brace-format
 msgid "Task {task} has been undone."
-msgstr "Se ha deshecho task {task}."
+msgstr "Se ha deshecho la tarea {task}."
 
 #: viewflow/flow/views/actions.py:130
 #: viewflow/frontend/templates/viewflow/flow/process_cancel.html:17
@@ -77,7 +77,7 @@ msgstr "Se ha cancelado la tarea {task}."
 
 #: viewflow/flow/views/actions.py:146
 msgid "Perform"
-msgstr "Realizar"
+msgstr "Ejecutar"
 
 #: viewflow/flow/views/actions.py:162
 msgid "Activate Next"
@@ -96,7 +96,7 @@ msgstr "El proceso {process} ha sido cancelado."
 #: viewflow/flow/views/start.py:64
 #, python-brace-format
 msgid "Process {process} has been started."
-msgstr "Se ha iniciado process {process}."
+msgstr "Se ha iniciado el proceso {process}."
 
 #: viewflow/flow/views/task.py:59
 #, python-brace-format
@@ -186,7 +186,7 @@ msgstr "Próximas tareas"
 #: viewflow/frontend/views.py:157 viewflow/frontend/views.py:203
 #: viewflow/frontend/views.py:248
 msgid "#"
-msgstr ""
+msgstr "#"
 
 #: viewflow/frontend/templates/viewflow/flow/process_cancel.html:22
 #: viewflow/frontend/templates/viewflow/flow/queue.html:12
@@ -294,7 +294,7 @@ msgstr "Ejecutar"
 #: viewflow/frontend/templates/viewflow/menu.html:3
 #: viewflow/frontend/templates/viewflow/site_tasks.html:6
 msgid "Inbox"
-msgstr "Entrante"
+msgstr "Buzón"
 
 #: viewflow/frontend/templates/viewflow/includes/breadcrumb_category.html:3
 #: viewflow/frontend/templates/viewflow/menu.html:4
@@ -348,7 +348,7 @@ msgstr "Tareas activas"
 
 #: viewflow/models.py:15
 msgid "Flow"
-msgstr "Fluir"
+msgstr "Flujo"
 
 #: viewflow/models.py:76
 msgid "Type"
@@ -360,7 +360,7 @@ msgstr "Anterior"
 
 #: viewflow/models.py:83
 msgid "Token"
-msgstr "Simbólico"
+msgstr "Token"
 
 #: viewflow/models.py:146
 msgid "Process list"
