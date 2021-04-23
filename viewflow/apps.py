@@ -7,3 +7,4 @@ class ViewflowConfig(AppConfig):
     icon = '<i class="material-icons">assignment</i>'
     name = 'viewflow'
     verbose_name = 'Workflow'
+    default_auto_field = 'django.db.models.AutoField'
