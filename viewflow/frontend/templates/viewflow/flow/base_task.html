@@ -18,6 +18,7 @@
     }
 </style>
 <div class="left-panel">
+    {% block left-panel__top %}{% endblock %}
     <div class="card">
         <div class="card-content">
             <div class="card-title">{% block task_title %}{{ activation.task.flow_task.task_title|default:activation.task.flow_task }}{% endblock %}</div>
@@ -84,6 +85,7 @@
         </div>
         {% block task_actions %} {% endblock %}
     </div>
+    {% block left-panel__bottm %}{% endblock %}
 </div>
 {% endblock %}
 {% block right-panel %}

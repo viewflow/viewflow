@@ -10,6 +10,7 @@
 {% block content %}
 {% block left-panel %}
 <div class="left-panel">
+  {% block left-panel__top %}{% endblock %}
   <div class="card">
     <dmc-form>
       <form role="form" method="POST" enctype="multipart/form-data">
@@ -28,6 +29,7 @@
       </form>
     </dmc-form>
   </div>
+  {% block left-panel__bottom %}{% endblock %}
 </div>
 {% endblock %}
 {% block right-panel %}{% endblock %}

@@ -10,6 +10,7 @@
 
 {% block content %}
 <div class="left-panel">
+  {% block left-panel__top %}{% endblock %}
   <div class="card">
     <dmc-form>
       <form role="form" method="POST">
@@ -61,6 +62,7 @@
       </form>
     </dmc-form>
   </div>
+  {% block left-panel__bottom %}{% endblock %}
 </div>
 <div class="right-panel">
   {% with hide_active_tasks=True %}

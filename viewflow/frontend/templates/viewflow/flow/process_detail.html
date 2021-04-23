@@ -10,6 +10,7 @@
 {% block content %}
 {% block left-panel %}
 <div class="left-panel">
+    {% block left-panel__top %}{% endblock %}
     <div class="card">
         <div class="card-content">
             <div class="card-title">{{ process.summary }}</div>
@@ -60,6 +61,7 @@
             {% endif %}
         </div>
     </div>
+    {% block left-panel__bottom %}{% endblock %}
 </div>
 {% endblock %}
 {% block right-panel %}
