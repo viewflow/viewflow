@@ -125,14 +125,12 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.8.1 2021-01-15
+1.9.0 2021-04-30
 ----------------
 
-* Fix this-referencies for flow.Functon task loader
+- Add additional template blocks for left panel. Close #311
+- Fix issue with task assign on default POST
+- Fix Spanish translation
+- Add Italian translation
+- Add custom rollback to update_status migration
 
-
-1.8.0 2021-01-07
-----------------
-
-* Clean Django 4.0 warnings
-* Allow flow.Handler redifinition with inheritance 
