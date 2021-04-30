@@ -148,6 +148,7 @@ class AllTaskListView(FlowListMixin,
                       TemplateResponseMixin,
                       DataTableMixin,
                       generic.View):
+    model = Task
     list_display = [
         'task_hash', 'description', 'process_summary', 'process_url', 'created'
     ]
@@ -197,6 +198,7 @@ class AllQueueListView(
         'task_hash', 'description', 'process_summary',
         'process_url', 'created'
     ]
+    model = Task
     template_name = 'viewflow/site_queue.html'
 
     def task_hash(self, task):
@@ -242,6 +244,7 @@ class AllArchiveListView(FlowListMixin,
         'task_hash', 'description', 'started',
         'finished', 'process_title', 'process_summary',
     ]
+    model = Task
     template_name = 'viewflow/site_archive.html'
 
     def task_hash(self, task):
@@ -337,6 +340,7 @@ class ProcessListView(FlowViewPermissionMixin,
     def get_queryset(self):
         """Filtered process list."""
         process_class = self.flow_class.process_class
+        self.model = process_class
         queryset = process_class.objects.filter(flow_class=self.flow_class)
         ordering = self.get_ordering()
         if ordering:
