@@ -9,7 +9,7 @@ import datetime
 import decimal
 import json
 import uuid
-from typing import List
+from typing import List, Tuple
 from django.db import DEFAULT_DB_ALIAS, models, router
 from django.db.models import signals
 from django.db.models.sql.where import WhereNode, AND
