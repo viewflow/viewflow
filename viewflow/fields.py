@@ -19,7 +19,31 @@ from django.utils.timezone import is_aware
 
 
 class CompositeKey(models.AutoField):
-
+    """
+    Example of use:
+    ```
+    class ShippingMethodMarketplaces(models.Model):
+        id = CompositeKey(fields_map=[
+            ('marketplace','MarketplaceId'),
+            ('shipping_method','ShippingMethodId')
+        ])
+        marketplace = models.ForeignKey(
+            'Market.Marketplaces',
+            models.PROTECT,
+            db_column='MarketplaceId',
+        )
+        shipping_method = models.ForeignKey(
+            'Shipping.ShippingMethod',
+            models.PROTECT,
+            db_column='ShippingMethodId',
+        )
+        price = models.DecimalField(
+            db_column='Price',
+            decimal_places=2,
+            max_digits=8,
+        )
+    ```
+    """
     class Key(dict):
         """Dictionary with json-compatible string conversion."""
         def __str__(self):
@@ -30,8 +54,9 @@ class CompositeKey(models.AutoField):
                 tuple(self[key] for key in sorted(self.keys()))
             )
 
-    def __init__(self, columns: List[str], **kwargs):
-        self.columns = columns
+    def __init__(self, fields_map: List[Tuple[str, str]], **kwargs):
+        self.columns = [i[0] for i in fields_map]
+        self.fields_map = fields_map
         super().__init__(primary_key=True, **kwargs)
 
     def contribute_to_class(self, cls, name, private_only=False):
@@ -39,7 +64,7 @@ class CompositeKey(models.AutoField):
         self.model = cls
         self.concrete = False
         self.editable = False
-        self.column = self.columns[0]            # for default order_by
+        self.column = self.fields_map[0][1]      # for default order_by
         cls._meta.add_field(self, private=True)  # virtual field
         cls._meta.setup_pk(self)                 # acts as pk
 
