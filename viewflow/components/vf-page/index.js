@@ -1,7 +1,6 @@
 /* eslint-env browser */
 import './index.scss';
 
-import Turbolinks from 'turbolinks';
 import {drawer, topAppBar} from 'material-components-web';
 import {div} from '../vf-field/jhtml';
 
@@ -128,10 +127,13 @@ export class VPageMenuNavigation extends HTMLElement {
   }
 
   activate = () => {
+    // TODO: try to perform this on visit complete, to get current path without currentVisit trick
+    const Turbo = window.Turbo;
     let currentPath = window.location.pathname;
-    if (Turbolinks.controller.currentVisit && Turbolinks.controller.currentVisit.redirectedToLocation) {
-      currentPath = Turbolinks.controller.currentVisit
-          .redirectedToLocation.absoluteURL.substring(
+
+    if (Turbo.navigator.currentVisit && Turbo.navigator.currentVisit.redirectedToLocation) {
+      currentPath = Turbo.navigator.currentVisit
+          .redirectedToLocation.href.substring(
               window.location.origin.length,
           );
     }

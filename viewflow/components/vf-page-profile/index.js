@@ -1,7 +1,5 @@
 /* eslint-env browser, node */
-import Turbolinks from 'turbolinks';
 import './index.scss';
-import smartcrop from 'smartcrop';
 
 
 export class VPageProfileAvatar extends HTMLElement {
@@ -17,7 +15,9 @@ export class VPageProfileAvatar extends HTMLElement {
     this._uploadButtonEl.removeEventListener('change', this.onChangeAvatarClick);
   }
 
-  onChangeAvatarClick = (event) => {
+  onChangeAvatarClick = async (event) => {
+    this._uploadButtonEl.classList.toggle('vf-page-profile__avatar-change--disabled');
+
     const files = event.target.files;
     if (files.length === 0 || files[0].type.indexOf('image') === -1) {
       this.showError('No images selected');
@@ -44,7 +44,7 @@ export class VPageProfileAvatar extends HTMLElement {
       width: 256,
       height: 256,
     };
-    return smartcrop.crop(image, options).then((result) => {
+    return window.smartcrop.crop(image, options).then((result) => {
       const cropCanvas = document.createElement('canvas');
       cropCanvas.width = 256;
       cropCanvas.height = 256;
@@ -57,47 +57,14 @@ export class VPageProfileAvatar extends HTMLElement {
     });
   }
 
-  _upload(canvas) {
-    this._uploadButtonEl.classList.toggle('vf-page-profile__avatar-change--disabled');
+  async _upload(canvas) {
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve));
+    const file = new File([blob], 'avatar.jpg', {type: 'image/jpeg', lastModified: new Date().getTime()});
+    const container = new DataTransfer();
+    container.items.add(file);
 
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', window.location.search, true);
-    xhr.setRequestHeader('Turbolinks-Referrer', window.location);
-
-    xhr.onload = (event) => {
-      const Snapshot = Turbolinks.controller.view.getSnapshot().constructor;
-      const Location = Turbolinks.controller.view.getSnapshot().getRootLocation().constructor;
-
-      let location = xhr.getResponseHeader('turbolinks-location');
-      const snapshot = Snapshot.wrap(xhr.response);
-
-      if (!location) {
-        location = window.location.href;
-      }
-
-      Turbolinks.controller.adapter.hideProgressBar();
-      Turbolinks.controller.cache.put(new Location(location), snapshot);
-      Turbolinks.visit(location, {action: 'restore'});
-      Turbolinks.clearCache();
-
-      if (xhr.status > 299) {
-        Turbolinks.controller.disable();
-      }
-    };
-
-    xhr.onerror = (event) => {
-      Turbolinks.controller.adapter.hideProgressBar();
-      this.uploadButton_.classList.toggle('vf-profile-avatar__change--disabled');
-      this.showError('Request error');
-    };
-
-    Turbolinks.controller.adapter.showProgressBarAfterDelay();
-
-    canvas.toBlob((blob) => {
-      const formData = new FormData(this._formEl);
-      formData.append('avatar', blob, 'avatar.jpg');
-      xhr.send(formData);
-    });
+    this._formEl.querySelector('input[type=file]').files = container.files;
+    this._formEl.querySelector('button').click();
   }
 
   _showError(message, timeout=2000) {

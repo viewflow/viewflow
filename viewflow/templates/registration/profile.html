@@ -5,13 +5,7 @@
 
 {% block js %}
 {{ block.super }}
-{% if not debug %}
-<link href="{% static 'viewflow/css/viewflow-page-profile.min.css' %}" rel="stylesheet">
-<script src="{% static 'viewflow/js/viewflow-page-profile.min.js' %}"></script>
-{% else %}
-<link href="{% static 'viewflow/css/viewflow-page-profile.css' %}" rel="stylesheet">
-<script src="{% static 'viewflow/js/viewflow-page-profile.js' %}"></script>
-{% endif %}
+<script src="{% static 'viewflow/js/smartcrop.js' %}"></script>
 {% endblock js %}
 
 {% block page-title %}{% trans 'Profile' %}{% endblock %}
@@ -77,9 +71,14 @@
             <div class="mdc-button mdc-button--raised mdc-card__action vf-page-profile__avatar-change">
               Change
               <input type="file">
+
             </div>
         </section>
-        <form method="POST" enctype="multipart/form-data">{% csrf_token %}</form>
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="file" name="avatar" style="display:none">
+            <button type="submit" style="display:none">Submit</button>
+        </form>
       </vf-page-profile-avatar>
     </div>
   </div>

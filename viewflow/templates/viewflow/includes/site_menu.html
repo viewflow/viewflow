@@ -9,7 +9,7 @@
     {% endif %}{% endwith %}{% endblock %}
     {% block app_links %}{% for app in site.menu_items %}{% if app|has_perm:user %}
     {% reverse app 'index' as index_url %}
-    <a class="mdc-list-item vf-page__menu-list-item" href="{{ index_url }}"{% if app.turbolinks_disabled %} data-turbolinks="false"{% endif %}>
+    <a class="mdc-list-item vf-page__menu-list-item" href="{{ index_url }}"{% if app.turbo_disabled %} data-turbo="false"{% endif %}>
       {{ app.icon }}{{ app.title }}
     </a>
     {% endif %}{% empty %}

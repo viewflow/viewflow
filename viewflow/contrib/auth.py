@@ -79,7 +79,11 @@ class ProfileView(generic.DetailView):
             cache.delete(key)
             messages.add_message(self.request, messages.SUCCESS, random.choice(GREETINGS), fail_silently=True)
         else:
-            messages.add_message(self.request, messages.ERROR, form.errors(), fail_silently=True)
+            message = ''.join(
+                f"{field}: " + ''.join(error['message'] for error in errors)
+                for field, errors in form.errors.get_json_data(escape_html=True).items()
+            )
+            messages.add_message(self.request, messages.ERROR, message, fail_silently=True)
         return self.get(request, *args, **kwargs)
 
 

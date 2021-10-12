@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {% block favicon %}<link rel="icon" href="{% static 'viewflow/img/favicon.png' %}" type="image/png" />{% endblock %}
-    {% block turbolinks-cache-control %}<meta name="turbolinks-cache-control" content="no-cache">{% endblock %}
+    {% block turbo-cache-control %}<meta name="turbo-cache-control" content="no-cache">{% endblock %}
     <title>{% block title %}{{ site.title|default:"Django Material" }}{% endblock %}</title>
     {% block css %}
       {% include 'viewflow/includes/viewflow_css.html' %}
@@ -26,7 +26,7 @@
         }
         </style>{% endif %}
     {% endblock %}
-    <vf-turbolinks></vf-turbolinks>
+    <vf-turbo></vf-turbo>
     {% block body %}{% endblock %}
     {% include 'viewflow/includes/snackbar.html' %}
   </body>

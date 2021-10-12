@@ -39,8 +39,8 @@
         {% block page-menu-primary %}
         <div class="vf-page__menu-primary">
           {% block page-menu-app %}
-            {% if app %}{% include app.menu_template_name with app=app %}{% endif %}
-            {% if site %}{% include site.menu_template_name with site=site user=request.user only %}{% endif %}
+            {% if app and app.menu_template_name %}{% include app.menu_template_name with app=app %}{% endif %}
+            {% if site and site.menu_template_name %}{% include site.menu_template_name with site=site user=request.user only %}{% endif %}
           {% endblock %}
         </div>
         {% endblock page-menu-primary %}
@@ -77,7 +77,7 @@
     <header class="mdc-top-app-bar vf-page__body-toolbar">
       <div class="mdc-top-app-bar__row">
         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-          <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button vf-page__menu-toggle" aria-label="Open navigation menu" data-turbolinks="false">menu</button>
+          <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button vf-page__menu-toggle" aria-label="Open navigation menu" data-turbo="false">menu</button>
           <span class="mdc-top-app-bar__title">
             {% block page-title %}{{ app.title|default:site.title|default:"Django Material" }}{% endblock %}
           </span>

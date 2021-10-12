@@ -1,7 +1,6 @@
 /* eslint-env browser */
 
 import {snackbar} from 'material-components-web';
-// import Turbolinks from 'turbolinks';
 import {div, a} from '../vf-field/jhtml';
 
 export class VSnackbar extends HTMLElement {
@@ -55,13 +54,6 @@ export class VSnackbar extends HTMLElement {
     const link = this.querySelector('a');
     if (link && window.location.href !== link.href) {
       actionText = link.textContent;
-      // actionHandler = () => {
-      //   if (Turbolinks) {
-      //     Turbolinks.visit(link.href);
-      //   } else {
-      //     window.location = link.href;
-      //   }
-      // };
     }
 
     if (message) {

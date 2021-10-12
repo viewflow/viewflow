@@ -87,7 +87,7 @@ Custom user model, forms and admin.
 
 Modern ECMAScript and SASS build pipeline with Rollup.
 
-Add `components/index.js` and `components/my-component` Web Compoenent sample. Result Javascript and CSS compiled to the configured Django `static/` directory
+Add `components/index.js` and `components/my-component` Web Component sample. Result Javascript and CSS compiled to the configured Django `static/` directory
 
 ```
 $ npm run build # dev and minified build

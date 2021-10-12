@@ -33,7 +33,7 @@ class Admin(Application):
 
     title = _("Administration")
     icon = Icon("build")
-    turbolinks_disabled = True
+    turbo_disabled = True
 
     def __init__(self, *, admin_site=None, **kwargs):
         self.admin_site = admin_site or admin.site

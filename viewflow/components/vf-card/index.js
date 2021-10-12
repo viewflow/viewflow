@@ -1,7 +1,6 @@
 /* eslint-env browser */
 import './index.scss';
 
-import Turbolinks from 'turbolinks';
 import {menu} from 'material-components-web';
 
 export class VCardMenu extends HTMLElement {
@@ -29,8 +28,8 @@ export class VCardMenu extends HTMLElement {
     event.preventDefault();
     const itemData = event.detail.item.dataset;
     if (itemData.cardMenuHref) {
-      if (Turbolinks) {
-        Turbolinks.visit(itemData.cardMenuHref);
+      if (window.Turbo) {
+        window.Turbo.visit(itemData.cardMenuHref);
       } else {
         window.location = itemData.cardMenuHref;
       }
