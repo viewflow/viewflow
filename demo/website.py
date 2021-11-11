@@ -1,9 +1,8 @@
-from django.conf.urls import url
+from django.urls import path
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
-from django.utils.http import is_safe_url
 
 
 def users(request):
@@ -36,12 +35,12 @@ def login_as(request):
         logout(request)
 
     redirect_to = request.GET.get('next')
-    if not redirect_to or not is_safe_url(redirect_to):
+    if not redirect_to:
         return redirect('/workflow/')
     else:
         return HttpResponseRedirect(redirect_to)
 
 
 urlpatterns = [
-    url(r'^login_as/$', login_as, name="login_as")
+    path('login_as/', login_as, name="login_as")
 ]

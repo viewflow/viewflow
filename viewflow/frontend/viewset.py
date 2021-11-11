@@ -1,5 +1,5 @@
 import itertools
-from django.conf.urls import url, include
+from django.urls import path, include, re_path
 
 from ..flow.viewset import FlowViewSet as BaseFlowViewSet
 from . import views
@@ -153,11 +153,11 @@ class FrontendViewSet(object):
             for flow_class, flow_router in items:
                 flow_label = flow_class._meta.flow_label
                 app_views.append(
-                    url('^{}/'.format(flow_label), include((flow_router.urls, flow_label)))
+                    path('{}/'.format(flow_label), include((flow_router.urls, flow_label)))
                 )
 
             result.append(
-                url('^{}/'.format(app_label), include((app_views, app_label)))
+                path('{}/'.format(app_label), include((app_views, app_label)))
             )
 
         return result
@@ -174,7 +174,7 @@ class FrontendViewSet(object):
 
         for url_entry in url_entries:
             url_re, view, name = url_entry
-            result.append(url(url_re, view, name=name))
+            result.append(re_path(url_re, view, name=name))
 
         return result
 
@@ -184,5 +184,5 @@ class FrontendViewSet(object):
         flow_urls = self.collect_flows_urls()
 
         return [
-            url('^', (viewset_urls + flow_urls, 'viewflow', 'viewflow'))
+            path('', (viewset_urls + flow_urls, 'viewflow', 'viewflow'))
         ]

@@ -1,5 +1,4 @@
-from django.urls import resolve
-from django.conf.urls import include, re_path
+from django.urls import resolve, include, re_path
 from django.db import models
 from django.contrib.auth.models import User
 from django.test import TestCase, RequestFactory

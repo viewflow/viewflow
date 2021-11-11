@@ -1,11 +1,7 @@
 from copy import copy
 from textwrap import dedent
-from django.urls import reverse
+from django.urls import reverse, re_path
 
-try:
-    from django.conf.urls import re_path
-except ImportError:
-    from django.conf.urls import url as re_path
 
 from . import Edge
 

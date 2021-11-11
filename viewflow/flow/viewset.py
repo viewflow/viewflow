@@ -1,9 +1,4 @@
-from django.conf.urls import include
-
-try:
-    from django.conf.urls import re_path
-except ImportError:
-    from django.conf.urls import url as re_path
+from django.urls import include, re_path
 
 
 from .views import (

@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.urls import include, path
 from django.contrib.auth import views as auth
 from django.views import generic
 
@@ -20,7 +20,7 @@ class Demo(ModuleMixin):
         index_view = generic.TemplateView.as_view(template_name='demo/index.html')
 
         return frontend.ModuleURLResolver(
-            '^', [url('^$', index_view, name="index")],
+            '^', [path('', index_view, name="index")],
             module=self, app_name='demo', namespace='demo')
 
     def index_url(self):
@@ -36,8 +36,8 @@ modules.register(Demo())
 from material.frontend import urls as frontend_urls  # NOQA
 
 urlpatterns = [
-    url(r'^accounts/login/$', auth.LoginView.as_view(), name='login'),
-    url(r'^accounts/logout/$', auth.LogoutView.as_view(), name='logout'),
-    url(r'^', include('demo.website')),
-    url(r'', include(frontend_urls)),
+    path('accounts/login/', auth.LoginView.as_view(), name='login'),
+    path('accounts/logout/', auth.LogoutView.as_view(), name='logout'),
+    path('', include('demo.website')),
+    path('', include(frontend_urls)),
 ]
