@@ -53,7 +53,8 @@ class BaseStartFlowMixin(object):
         if not self.activation.has_perm(request.user):
             raise PermissionDenied
 
-        self.activation.prepare(request.POST or None, user=request.user)
+        user = request.user if not request.user.is_anonymous else None
+        self.activation.prepare(request.POST or None, user=user)
         return super(BaseStartFlowMixin, self).dispatch(request, **kwargs)
 
 
