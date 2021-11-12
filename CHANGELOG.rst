@@ -2,6 +2,14 @@
 Changelog
 =========
 
+1.10.0 2021-11-12
+-----------------
+
+- Django 4.0 support
+- Fix set assigned time on auto-assign
+- Allow anonymous users to trigger flow start
+
+
 1.9.0 2021-04-30
 ----------------
 

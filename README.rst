@@ -29,7 +29,8 @@ http://viewflow.io.
 - Viewflow 1.2.x compatible with Django 1.11/2.0 (supported till Django 1.11 lifetime/April 2020)
 - Viewflow 1.3.x/1.4.x/1.5.x compatible with Django 1.11/2.0/2.1/2.2 (supported till Django 1.11 lifetime/April 2020)
 - Viewflow 1.6.x/1.7.x compatible with Django 2.0/2.1/2.2/3.0/3.1 (supported till Django 2.0 lifetime/December 2020)
-- Viewflow 1.8.x compatible with Django 2.1/2.2/3.0/3.1
+- Viewflow 1.8.x/1.9.x compatible with Django 2.1/2.2/3.0/3.1
+- Viewflow 1.10.x compatible with Django 2.2/3.0/3.1/3.2/4.0
 
 Introduction
 ============
@@ -125,12 +126,9 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.9.0 2021-04-30
-----------------
+1.10.0 2021-11-12
+-----------------
 
-- Add additional template blocks for left panel. Close #311
-- Fix issue with task assign on default POST
-- Fix Spanish translation
-- Add Italian translation
-- Add custom rollback to update_status migration
-
+- Django 4.0 support
+- Fix set assigned time on auto-assign
+- Allow anonymous users to trigger flow start
