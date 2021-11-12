@@ -1,3 +1,4 @@
+from django.utils.timezone import now
 from ..activation import Activation, StartActivation, ViewActivation, STATUS
 from ..exceptions import FlowRuntimeError
 
@@ -89,6 +90,7 @@ class ManagedViewActivation(ViewActivation):
         owner = flow_task.calc_owner(activation)
         if owner:
             task.owner = owner
+            task.assigned = now()
             task.status = STATUS.ASSIGNED
 
         return task
