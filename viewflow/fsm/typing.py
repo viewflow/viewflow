@@ -2,14 +2,18 @@
 # All Rights Reserved.
 
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
-# LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 
-from typing import Callable, Any, List, Mapping, TYPE_CHECKING
+from typing import Callable, Any, List, Union, Mapping, TYPE_CHECKING
+from viewflow.this_object import ThisObject
 
 if TYPE_CHECKING:
     from .base import TransitionMethod, Transition  # NOQA
 
+UserModel = Any
 StateValue = Any
-Condition = Callable[[Any], bool]
+Condition = Union[ThisObject, Callable[[object, object], bool]]
+Permission = Union[ThisObject, Callable[[object, Any], bool]]
 StateTransitions = Mapping['TransitionMethod', List['Transition']]
+TransitionFunction = Callable[..., Any]

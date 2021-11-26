@@ -35,7 +35,7 @@ class DOMBuilder {
       element.textContent = this.textContent;
     }
 
-    for (let attr in this.attrs) {
+    for (const attr in this.attrs) {
       if (this.attrs.hasOwnProperty(attr)) {
         let value = this.attrs[attr];
 
@@ -54,8 +54,8 @@ class DOMBuilder {
           }
         } else if (! (typeof(value) === 'string' || typeof(value) === 'number')) {
           // join hash key if enabled
-          let valuesList = [];
-          for (let key in value) {
+          const valuesList = [];
+          for (const key in value) {
             if (value.hasOwnProperty(key)) {
               const keyValue = value[key];
               if (keyValue) {

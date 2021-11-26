@@ -1,5 +1,4 @@
-import {noShadowDOM} from 'component-register';
-import {onCleanup,  createEffect} from 'solid-js';
+import {onCleanup, createEffect} from 'solid-js';
 import {customElement} from 'solid-element';
 import {MDCCheckbox} from '@material/checkbox';
 import cc from 'classcat';
@@ -23,7 +22,9 @@ const VCheckboxField = customElement('vf-field-checkbox', defaultProps, (props, 
   let control;
   let checkbox;
 
-  noShadowDOM(element);
+  Object.defineProperty(element, 'renderRoot', {
+    value: element,
+  });
 
   createEffect(() => {
     checkbox = new MDCCheckbox(control);

@@ -1,4 +1,3 @@
-import {noShadowDOM} from 'component-register';
 import {customElement} from 'solid-element';
 import cc from 'classcat';
 
@@ -20,7 +19,9 @@ const defaultProps = {
 
 
 const VRadioSelectField = customElement('vf-field-radio-select', defaultProps, (props, {element}) => {
-  noShadowDOM(element);
+  Object.defineProperty(element, 'renderRoot', {
+    value: element,
+  });
 
   const items = (props) => {
     const items = [];

@@ -2,7 +2,6 @@
 
 import {customElement} from 'solid-element';
 import {createState} from 'solid-js';
-import {noShadowDOM} from 'component-register';
 import {Input, HelpText} from '../vf-field-input';
 import './index.scss';
 
@@ -28,18 +27,22 @@ const VPasswordField = customElement('vf-field-password', defaultProps, (props, 
     'visible': props.type !== 'password',
   });
 
-  noShadowDOM(element);
+  Object.defineProperty(element, 'renderRoot', {
+    value: element,
+  });
 
   const onBtnClick = (event) => {
     event.preventDefault();
     setState({'visible': !state.visible});
   };
 
+  const inputType = () => state.visible ? 'text': 'password';
+
   return (
     <div class="vf-field__row">
       <Input
         {...props}
-        type={() => state.visible ? 'text': 'password'}
+        type={inputType()}
         trailingButton={() => state.visible ? 'visibility' : 'visibility_off'}
         onTrailingButtonClick={onBtnClick}/>
       { props.helpText || props.error ? <HelpText {...props}/> : '' }

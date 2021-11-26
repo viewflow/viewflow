@@ -1,4 +1,12 @@
-"""Viewflow - dev toolkit for backoffice automation."""
+"""Viewflow - The Django extension for perfectionists with yesterday’s deadlines."""
+
+# Copyright (c) 2017-2020, Mikhail Podgurskiy
+# All Rights Reserved.
+
+# This work is dual-licensed under AGPL defined in file 'LICENSE' with
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
+# which is part of this source code package.
+
 from django.conf import settings as django_settings
 from .conf import settings
 from .this_object import this
@@ -21,6 +29,6 @@ if settings.AUTOREGISTER:
     site_middleware = 'viewflow.middleware.SiteMiddleware'
     if site_middleware not in django_settings.MIDDLEWARE:
         django_settings.MIDDLEWARE += (site_middleware, )
-    turbolinks_middleware = 'viewflow.middleware.TurbolinksMiddleware'
-    if turbolinks_middleware not in django_settings.MIDDLEWARE:
-        django_settings.MIDDLEWARE += (turbolinks_middleware, )
+    turbo_middleware = 'viewflow.middleware.HotwireTurboMiddleware'
+    if turbo_middleware not in django_settings.MIDDLEWARE:
+        django_settings.MIDDLEWARE += (turbo_middleware, )

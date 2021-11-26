@@ -1,4 +1,6 @@
 /* eslint-env browser */
+import './_grid.scss';
+import './_menu.scss';
 import './index.scss';
 
 import {drawer, topAppBar} from 'material-components-web';

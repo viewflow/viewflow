@@ -6,6 +6,7 @@
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
 # LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
 # which is part of this source code package.
+from typing import Any
 
 
 class ThisMethod(object):
@@ -27,7 +28,7 @@ class ThisObject(object):
     def __init__(self, name):  # noqa D102
         self.name = name
 
-    def resolve(self, instance):
+    def resolve(self, instance: object) -> Any:
         # TODO meaningfull exception
         return getattr(instance, self.name)
 

@@ -4,7 +4,7 @@
     <h3 class="vf-page__menu-subheader mdc-list-group__subheader">{{ app.title }}</h3>
     {% block viewset_links %}{% for viewset in app.menu_items %}
     {% reverse viewset 'index' as index_url %}{% if index_url %}
-    <a class="mdc-list-item vf-page__menu-list-item" href="{{ index_url }}">
+    <a class="mdc-list-item vf-page__menu-list-item" href="{{ index_url }}" {% if app.turbo_disabled or viewset.turbo_disabled %} data-turbo="false"{% endif %}>
       {% if viewset.icon %}{{ viewset.icon }}{% else %}<i class="material-icons">view_carousel</i>{% endif %}{{ viewset.title }}
     </a>
     {% endif %}

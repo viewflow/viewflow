@@ -150,6 +150,7 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
     Viewset classes could be inherited, extended, and have overridden attributes.
     """
     viewsets = None
+    turbo_disabled = False
 
     def __init__(self, urls=None, **initkwargs):
         super().__init__()

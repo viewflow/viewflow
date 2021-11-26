@@ -2,7 +2,6 @@
 
 import {customElement} from 'solid-element';
 import {MDCTextField} from '@material/textfield';
-import {noShadowDOM} from 'component-register';
 import {onCleanup, createEffect} from 'solid-js';
 import cc from 'classcat';
 
@@ -48,6 +47,13 @@ export const Input = (props) => {
     });
   });
 
+  createEffect(() => {
+    props.value;
+    if (textfield) {
+      textfield.layout();
+    }
+  });
+
   onCleanup(() => {
     textfield.destroy();
   });
@@ -90,6 +96,7 @@ export const Input = (props) => {
         required={ !!props.required }
         step = { props.step }
         type={ props.type }
+        tabindex={ props.tabIndex }
         value={ props.value }
         aria-labelledby={ props.id + '_label' }
         oninput={props.onInput}
@@ -119,7 +126,9 @@ export const Input = (props) => {
 };
 
 const VInputField = customElement('vf-field-input', defaultProps, (props, {element}) => {
-  noShadowDOM(element);
+  Object.defineProperty(element, 'renderRoot', {
+    value: element,
+  });
 
   return (
     <div class="vf-field__row">

@@ -3,7 +3,7 @@ import setuptools
 
 setuptools.setup(
     name='django-viewflow',
-    version='2.0.0a0',
+    version='2.0.0a2',
     author_email='kmmbvnr@gmail.com',
     author='Mikhail Podgurskiy',
     description="Reusable library to build business applications fast",
