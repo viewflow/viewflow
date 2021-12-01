@@ -3,8 +3,12 @@ import './_grid.scss';
 import './_menu.scss';
 import './index.scss';
 
-import {drawer, topAppBar} from 'material-components-web';
+import {drawer, topAppBar, textField} from 'material-components-web';
+import {customElement} from 'solid-element';
+import {createSignal, createEffect} from 'solid-js';
 import {div} from '../vf-field/jhtml';
+import cc from 'classcat';
+
 
 export class VPage extends HTMLElement {
   connectedCallback() {
@@ -194,3 +198,91 @@ export class VPageScrollFix extends HTMLElement {
     }
   }
 }
+
+
+export const VPageSearch = customElement('vf-page-search', {value: '', active: false}, (props, {element}) => {
+  let control;
+  let textfield;
+  Object.defineProperty(element, 'renderRoot', {value: element});
+  const [active, setActive] = createSignal(!!props.value);
+
+  createEffect(() => {
+    setTimeout(() => {
+      textfield = new textField.MDCTextField(control);
+      control.textfield=textfield;
+      if (active()) {
+        textfield.focus();
+      }
+    });
+  });
+
+  const getStartSection = () => {
+    const parentRow = element.closest('.mdc-top-app-bar__row');
+    return parentRow.querySelector('.mdc-top-app-bar__section--align-start');
+  };
+
+  if (!!props.value) {
+    getStartSection().style.display = 'none';
+  }
+
+  const onBackClick = (event) => {
+    getStartSection().style.removeProperty('display');
+
+    const inputEl = element.querySelector('input');
+    if (inputEl.value) {
+      inputEl.value = '';
+      element.querySelector('button[type=submit]').click();
+    }
+    setActive(false);
+  };
+
+  const onSearchClick = (event) => {
+    if (!active()) {
+      getStartSection().style.display = 'none';
+      setActive(true);
+      textfield.focus();
+      event.preventDefault();
+    }
+  };
+
+
+  return (
+    <div class={'vf-page__search-container' + (active() ? ' vf-page__search-container--active':'')}>
+      <button
+        class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button vf-page__search-back-button"
+        data-turbo="false"
+        onClick={onBackClick}
+      >arrow_back</button>
+      <vf-form>
+        <form method="GET">
+          <label
+            class={cc({
+              'mdc-text-field': true,
+              'mdc-text-field--filled': true,
+              'mdc-text-field--label-floating': !!props.value,
+            })}
+            ref={control}>
+            <span
+              class={cc({
+                'mdc-floating-label': true,
+                'mdc-floating-label--float-above': !!props.value,
+              })}
+              id="id_page_search_label"
+            >Search...</span>
+            <input
+              class="mdc-text-field__input"
+              type="text" aria-labelledby="id_page_search_label"
+              value={props.value}
+              name="_search"/>
+            <span class="mdc-line-ripple"></span>
+          </label>
+          <button
+            class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button"
+            type="submit"
+            onClick={onSearchClick}
+          >search</button>
+        </form>
+      </vf-form>
+    </div>
+  );
+});

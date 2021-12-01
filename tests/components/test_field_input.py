@@ -33,7 +33,7 @@ urlpatterns = [
     path('', Site(viewsets=[
         Application(
             title='Test Application',
-            urls=[
+            urlpatterns=[
                 path('form/', FormView.as_view(form_class=TestForm, template_name='tests/components.html'))
             ]
         ),

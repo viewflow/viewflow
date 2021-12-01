@@ -2,7 +2,7 @@
 # All Rights Reserved.
 
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
-# LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 
 import copy
@@ -151,10 +151,10 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
     """
     viewsets = None
     turbo_disabled = False
+    urlpatterns = None
 
-    def __init__(self, urls=None, **initkwargs):
+    def __init__(self, **initkwargs):
         super().__init__()
-        self._additional_urls = urls
         self._urls_cache = None
         self._children = []
 
@@ -202,7 +202,7 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
         urlpatterns = []
 
         # url overrides
-        for url_entry in self._additional_urls or []:
+        for url_entry in self.urlpatterns or []:
             urlpatterns.append(self._create_url_pattern(url_entry))
 
         # additional routes
@@ -211,7 +211,7 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
                 viewset.app_name = camel_case_to_underscore(
                     strip_suffixes(
                         viewset.__class__.__name__,
-                        ['Application', 'Viewset', 'Admin', 'Flow'])
+                        ['App', 'Application', 'Viewset', 'Admin', 'Flow'])
                 )
                 assert viewset.app_name, "Can't provide auto name for a {}".format(viewset)
             urlpatterns.append(self._create_url_pattern(route(viewset.app_name, viewset)))

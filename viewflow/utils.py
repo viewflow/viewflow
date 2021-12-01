@@ -2,7 +2,7 @@
 # All Rights Reserved.
 
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
-# LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 
 import re
@@ -16,9 +16,7 @@ from django.db import models
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
-__all__ = (
-    'has_object_perm', 'viewprop', 'DEFAULT', 'first_not_default'
-)
+__all__ = ("has_object_perm", "viewprop", "DEFAULT", "first_not_default")
 
 
 class MARKER(object):
@@ -32,9 +30,9 @@ class MARKER(object):
         return self.marker
 
 
-DEFAULT = MARKER('DEFAULT')
+DEFAULT = MARKER("DEFAULT")
 
-IS_DEV = settings.DEBUG or not hasattr(mail, 'outbox')  # DEBUG or test mode
+IS_DEV = settings.DEBUG or not hasattr(mail, "outbox")  # DEBUG or test mode
 
 
 def first_not_default(*args):
@@ -47,15 +45,17 @@ def first_not_default(*args):
 def camel_case_to_underscore(name):
     """Convert camel cased SomeString to some_string"""
 
-    return re.sub('([a-z0-9])([A-Z])', r'\1_\2',
-                  re.sub('(.)([A-Z][a-z]+)', r'\1_\2', name)).lower()
+    return re.sub(
+        "([a-z0-9])([A-Z])", r"\1_\2", re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    ).lower()
 
 
 def camel_case_to_title(name):
     """Convert camel cased 'SomeString' to 'Some string'"""
 
-    return re.sub('([a-z0-9])([A-Z])', r'\1 \2',
-                  re.sub('(.)([A-Z][a-z]+)', r'\1 \2', name)).capitalize()
+    return re.sub(
+        "([a-z0-9])([A-Z])", r"\1 \2", re.sub("(.)([A-Z][a-z]+)", r"\1 \2", name)
+    ).capitalize()
 
 
 def has_object_perm(user, short_perm_name, model, obj=None):
@@ -74,7 +74,7 @@ def strip_suffixes(word, suffixes):
 
     for suffix in suffixes:
         if word != suffix and word.endswith(suffix):
-            word = word[:-len(suffix)]
+            word = word[: -len(suffix)]
     return word
 
 
@@ -82,7 +82,8 @@ def strip_dict_keys_prefix(a_dict, prefix):
     """Construct new dict, from source keys started with prefix."""
 
     return {
-        key[len(prefix):]: value for key, value in a_dict.items()
+        key[len(prefix):]: value
+        for key, value in a_dict.items()
         if key.startswith(prefix)
     }
 
@@ -112,8 +113,9 @@ class viewprop(object):
     """
     A property that can be overridden.
     """
+
     def __init__(self, func):
-        self.__doc__ = getattr(func, '__doc__')
+        self.__doc__ = getattr(func, "__doc__")
         self.fget = func
 
     def __get__(self, obj, objtype=None):
@@ -127,36 +129,40 @@ class viewprop(object):
         obj.__dict__[self.fget.__name__] = value
 
     def __repr__(self):
-        return '<view_property func={}>'.format(self.fget)
+        return "<view_property func={}>".format(self.fget)
 
 
 def create_wrapper_view(origin_view, flow_task=None, flow_class=None):
     """Create a wrapper view with flow_task/flow_class injected."""
+
     def view(request, *args, **kwargs):
         if flow_class is not None:
             request.flow_class = flow_class
         if flow_task is not None:
             request.flow_task = flow_task
         return origin_view(request, *args, **kwargs)
-    return update_wrapper_view(view, origin_view, flow_task=flow_task, flow_class=flow_class)
+
+    return update_wrapper_view(
+        view, origin_view, flow_task=flow_task, flow_class=flow_class
+    )
 
 
 def update_wrapper_view(view, origin_view, flow_task=None, flow_class=None):
     """Update a wrapper view to look like the wrapped origin_view."""
 
     view_class = None
-    if hasattr(origin_view, 'view_class'):  # django generic view
+    if hasattr(origin_view, "view_class"):  # django generic view
         view_class = view.view_class = origin_view.view_class
-    if hasattr(origin_view, 'cls'):  # django restframework generic view
+    if hasattr(origin_view, "cls"):  # django restframework generic view
         view_class = view.cls = origin_view.cls
-    if hasattr(origin_view, 'view_initkwargs'):  # both 八(＾□＾*)
+    if hasattr(origin_view, "view_initkwargs"):  # both 八(＾□＾*)
         view.view_initkwargs = origin_view.initkwargs or {}
 
         # poor-man dependency injection. Mostly b/c of dumb restframework BaseSchemaGenerator.create_view impl
-        if flow_class and hasattr(view_class, 'flow_class'):
-            view.view_initkwargs['flow_task'] = flow_class
-        if flow_task and hasattr(view_class, 'flow_task'):
-            view.view_initkwargs['flow_task'] = flow_task
+        if flow_class and hasattr(view_class, "flow_class"):
+            view.view_initkwargs["flow_task"] = flow_class
+        if flow_task and hasattr(view_class, "flow_task"):
+            view.view_initkwargs["flow_task"] = flow_task
 
     update_wrapper(view, origin_view)
     return view

@@ -82,6 +82,9 @@
             {% block page-title %}{{ app.title|default:site.title|default:"Django Material" }}{% endblock %}
           </span>
         </section>
+        <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end">
+        {% block page-toolbar-actions %}{% endblock %}
+        </section>
       </div>
     </header>
     {% endblock %}

@@ -1,7 +1,7 @@
 /* eslint-env browser */
 
 import {customElement} from 'solid-element';
-import {createState} from 'solid-js';
+import {createSignal} from 'solid-js';
 import {Input, HelpText} from '../vf-field-input';
 import './index.scss';
 
@@ -23,9 +23,7 @@ const defaultProps = {
 };
 
 const VPasswordField = customElement('vf-field-password', defaultProps, (props, {element}) => {
-  const [state, setState] = createState({
-    'visible': props.type !== 'password',
-  });
+  const [visible, setVisible] = createSignal(props.type !== 'password');
 
   Object.defineProperty(element, 'renderRoot', {
     value: element,
@@ -33,17 +31,17 @@ const VPasswordField = customElement('vf-field-password', defaultProps, (props, 
 
   const onBtnClick = (event) => {
     event.preventDefault();
-    setState({'visible': !state.visible});
+    setVisible(!visible());
   };
 
-  const inputType = () => state.visible ? 'text': 'password';
+  const inputType = () => visible() ? 'text': 'password';
 
   return (
     <div class="vf-field__row">
       <Input
         {...props}
         type={inputType()}
-        trailingButton={() => state.visible ? 'visibility' : 'visibility_off'}
+        trailingButton={() => visible() ? 'visibility' : 'visibility_off'}
         onTrailingButtonClick={onBtnClick}/>
       { props.helpText || props.error ? <HelpText {...props}/> : '' }
     </div>

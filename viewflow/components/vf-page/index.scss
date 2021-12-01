@@ -21,6 +21,13 @@ body {
   flex-direction: row;
   width: 100%;
   min-height: 100%;
+
+
+  @media (max-width: 599px) {
+    .vf-page__body-toolbar .mdc-top-app-bar__row {
+      height: 64px;
+    }
+  }
 }
 
 .vf-page__body {
@@ -51,4 +58,42 @@ body {
   align-items: flex-start;
 }
 
+vf-page-search {
+  display: contents;
 
+  .vf-page__search-container {
+    display: flex;
+    align-items: center;
+
+    label {
+      width: 100%;
+      display: none;
+      margin-left: 16px;
+      margin-right: 16px;
+    }
+
+    .vf-page__search-back-button {
+      display: none;
+    }
+
+    &.vf-page__search-container--active {
+      width: 100%;
+      vf-form {
+        width: 100%;
+        form {
+          display: flex;
+          align-items: center;
+        }
+      }
+
+      label {
+        width: 100%;
+        display: initial;
+      }
+
+      .vf-page__search-back-button {
+        display: initial;
+      }
+    }
+  }
+}
