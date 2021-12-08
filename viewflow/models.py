@@ -5,7 +5,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 from django.template import Template, Context
-from django.utils.encoding import force_text
+from django.utils.encoding import force_str
 from jsonstore import JSONField
 
 from .activation import STATUS, STATUS_CHOICES
@@ -59,7 +59,7 @@ class AbstractProcess(models.Model):
         """Quick textual process state representation for end user."""
         if self.flow_class and self.flow_class.process_class == type(self):
             return Template(
-                force_text(self.flow_class.summary_template)
+                force_str(self.flow_class.summary_template)
             ).render(
                 Context({'process': self, 'flow_class': self.flow_class})
             )
@@ -113,14 +113,14 @@ class AbstractTask(models.Model):
         if self.flow_task:
             if self.finished:
                 if hasattr(self.flow_task, 'task_result_summary'):
-                    return Template(force_text(self.flow_task.task_result_summary or "")).render(Context({
+                    return Template(force_str(self.flow_task.task_result_summary or "")).render(Context({
                         'process': self.flow_process,
                         'task': self,
                         'flow_class': self.flow_task.flow_class,
                         'flow_task': self.flow_task}))
             else:
                 if hasattr(self.flow_task, 'task_description'):
-                    return Template(force_text(self.flow_task.task_description or "")).render(Context({
+                    return Template(force_str(self.flow_task.task_description or "")).render(Context({
                         'process': self.flow_process,
                         'task': self,
                         'flow_class': self.flow_task.flow_class,

@@ -7,7 +7,11 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.views import generic
 from django.utils.decorators import method_decorator
-from django.utils.http import is_safe_url
+try:
+    # django 3.0+
+    from django.utils.http import url_has_allowed_host_and_scheme as is_safe_url
+except ImportError:
+    from django.utils.http import is_safe_url
 
 from ...compat import _
 from ...decorators import flow_view

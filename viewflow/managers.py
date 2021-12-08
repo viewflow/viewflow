@@ -104,10 +104,10 @@ class ProcessQuerySet(QuerySet):
         return self.model.objects.coerce_for(_available_flows(flow_classes, user))
 
     def _chain(self, **kwargs):
+        chained = super(ProcessQuerySet, self)._chain(**kwargs)
         if hasattr(self, '_coerced'):
-            kwargs['_coerced'] = self._coerced
-
-        return super(ProcessQuerySet, self)._chain(**kwargs)
+            chained._coerced = self._coerced
+        return chained
 
     def _clone(self, *args, **kwargs):
         if django.VERSION >= (2, 0):
@@ -199,10 +199,10 @@ class TaskQuerySet(QuerySet):
             .filter(owner=user, finished__isnull=False)
 
     def _chain(self, **kwargs):
+        chained = super(TaskQuerySet, self)._chain(**kwargs)
         if hasattr(self, '_coerced'):
-            kwargs['_coerced'] = self._coerced
-
-        return super(TaskQuerySet, self)._chain(**kwargs)
+            chained._coerced = self._coerced
+        return chained
 
     def _clone(self, *args, **kwargs):
         if django.VERSION >= (2, 0):
