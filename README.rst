@@ -126,6 +126,12 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
+1.10.1 2011-12-10
+-----------------
+
+- Django 4.0 fixes
+
+
 1.10.0 2021-11-12
 -----------------
 
