@@ -5,7 +5,6 @@ import django
 from django.apps import apps
 from django.db import DEFAULT_DB_ALIAS, router
 from django.db.models.signals import pre_migrate, post_migrate
-from django.utils.encoding import smart_text
 
 
 def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_DB_ALIAS, **kwargs):
