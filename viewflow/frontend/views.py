@@ -32,6 +32,7 @@ class BaseTasksActionView(FlowListMixin, generic.TemplateView):
     action_name = None
     success_url = 'viewflow:index'
     template_name = 'viewflow/site_task_action.html'
+    model = Task
 
     def get_context_data(self, **kwargs):
         """Context for the action view.
@@ -113,7 +114,7 @@ class TasksUnAssignView(BaseTasksActionView):
 
     def get_tasks(self, user, tasks_pks):
         """List of tasks assigned to the user."""
-        return Task.objects.inbox(self.flows, user).filter(pk__in=tasks_pks)
+        return self.model.objects.inbox(self.flows, user).filter(pk__in=tasks_pks)
 
     def post(self, request, *args, **kwargs):
         """Deassign tasks from the user."""
@@ -134,7 +135,7 @@ class TasksAssignView(BaseTasksActionView):
 
     def get_tasks(self, user, tasks_pks):
         """List of tasks that can be assigned for the user."""
-        return Task.objects.queue(self.flows, user).filter(pk__in=tasks_pks)
+        return self.model.objects.queue(self.flows, user).filter(pk__in=tasks_pks)
 
     def post(self, request, *args, **kwargs):
         """Assign tasks to the current user."""
@@ -184,7 +185,7 @@ class AllTaskListView(FlowListMixin,
 
     def get_queryset(self):
         """Filtered task list."""
-        queryset = Task.objects.inbox(self.flows, self.request.user)
+        queryset = self.model.objects.inbox(self.flows, self.request.user)
         ordering = self.get_ordering()
         if ordering:
             if isinstance(ordering, six.string_types):
@@ -231,7 +232,7 @@ class AllQueueListView(
 
     def get_queryset(self):
         """Filtered task list."""
-        queryset = Task.objects.queue(self.flows, self.request.user)
+        queryset = self.model.objects.queue(self.flows, self.request.user)
         ordering = self.get_ordering()
         if ordering:
             if isinstance(ordering, six.string_types):
@@ -279,7 +280,7 @@ class AllArchiveListView(FlowListMixin,
 
     def get_queryset(self):
         """All tasks from all processes assigned to the current user."""
-        queryset = Task.objects.archive(self.flows, self.request.user)
+        queryset = self.model.objects.archive(self.flows, self.request.user)
         ordering = self.get_ordering()
         if ordering:
             if isinstance(ordering, six.string_types):

@@ -126,15 +126,8 @@ Please see `FAQ <https://github.com/kmmbvnr/django-viewflow/wiki/Pro-FAQ>`_ for 
 Latest changelog
 ================
 
-1.10.1 2011-12-10
+1.11.0 2021-04-05
 -----------------
 
 - Django 4.0 fixes
-
-
-1.10.0 2021-11-12
------------------
-
-- Django 4.0 support
-- Fix set assigned time on auto-assign
-- Allow anonymous users to trigger flow start
+- Simplify frontend task model customization

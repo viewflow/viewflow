@@ -2,7 +2,14 @@
 Changelog
 =========
 
-1.10.1 2011-12-10
+1.11.0 2021-04-05
+-----------------
+
+- Django 4.0 fixes
+- Simplify frontend task model customization
+
+
+1.10.1 2021-12-10
 -----------------
    
 - Django 4.0 fixes

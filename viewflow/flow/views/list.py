@@ -31,10 +31,11 @@ class AllTaskListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
     paginate_orphans = 5
     context_object_name = 'task_list'
     template_name = 'viewflow/site_tasks.html'
+    model = models.Task
 
     def get_queryset(self):
         """Filtered task list."""
-        return models.Task.objects.inbox(self.flows, self.request.user).order_by('-created')
+        return self.model.objects.inbox(self.flows, self.request.user).order_by('-created')
 
 
 class AllQueueListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
@@ -44,10 +45,11 @@ class AllQueueListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
     paginate_orphans = 5
     context_object_name = 'queue'
     template_name = 'viewflow/site_queue.html'
+    model = models.Task
 
     def get_queryset(self):
         """Filtered task list."""
-        return models.Task.objects.queue(self.flows, self.request.user).order_by('-created')
+        return self.model.objects.queue(self.flows, self.request.user).order_by('-created')
 
 
 class AllArchiveListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
@@ -57,10 +59,11 @@ class AllArchiveListView(LoginRequiredMixin, FlowListMixin, generic.ListView):
     paginate_orphans = 5
     context_object_name = 'task_list'
     template_name = 'viewflow/site_archive.html'
+    model = models.Task
 
     def get_queryset(self):
         """All tasks from all processes assigned to the current user."""
-        return models.Task.objects.archive(self.flows, self.request.user).order_by('-created')
+        return self.model.objects.archive(self.flows, self.request.user).order_by('-created')
 
 
 class ProcessListView(FlowViewPermissionMixin, generic.ListView):
