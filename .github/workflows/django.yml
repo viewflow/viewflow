@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: Set up Python
-      uses: actions/setup-python@v2
+      uses: actions/setup-python@v2l
       with:
         python-version: 3.7
     - name: Install dependencies
@@ -22,8 +22,10 @@ jobs:
         tox --notest
     - name: Run Tests
       run: |
-        tox -- coverage run --source='.' ./manage.py test --exclude-tag=selenium --exclude-tag=integration
+        tox -- coverage run --source='viewflow' ./manage.py test --exclude-tag=selenium --exclude-tag=integration
+        tox -- coverage lcov
     - name: Coveralls
       uses: coverallsapp/github-action@master
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
+        path-to-lcov: coverage.lcov
