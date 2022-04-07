@@ -22,7 +22,7 @@ jobs:
         tox --notest
     - name: Run Tests
       run: |
-        tox -- coverage run --source='.' ./manage.py test --exclude-tag=selenium --exclude-tag=integration
+        .venv/bin/coverage run --source='.' ./manage.py test --exclude-tag=selenium --exclude-tag=integration
     - name: Coveralls
       uses: coverallsapp/github-action@master
       with:
