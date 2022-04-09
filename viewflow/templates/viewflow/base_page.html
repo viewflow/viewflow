@@ -39,8 +39,8 @@
         {% block page-menu-primary %}
         <div class="vf-page__menu-primary">
           {% block page-menu-app %}
-            {% if app and app.menu_template_name %}{% include app.menu_template_name %}{% endif %}
-            {% if site and site.menu_template_name %}{% include site.menu_template_name %}{% endif %}
+          {% if app and app.menu_template_name %}{% include app.menu_template_name %}{% endif %}
+          {% if site and site.menu_template_name %}{% include site.menu_template_name %}{% endif %}
           {% endblock %}
         </div>
         {% endblock page-menu-primary %}

@@ -2,11 +2,11 @@
 # All Rights Reserved.
 
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
-# LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 
 from django.contrib import admin
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 from viewflow import Icon
 from viewflow.urls import Application

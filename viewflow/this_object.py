@@ -4,7 +4,7 @@
 # All Rights Reserved.
 
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
-# LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 from typing import Any
 
@@ -32,7 +32,15 @@ class ThisObject(object):
         # TODO meaningfull exception
         return getattr(instance, self.name)
 
+    # def __copy__(self):
+    #     return super().__copy__()
+
+    # def __deepcopy__(self, memo):
+    #     return super().__deepcopy__(memo)
+
     def __getattr__(self, name):
+        if name.startswith('__'):
+            super().__getattr__(name)
         return ThisMethod(self.name, name)
 
 

@@ -2,7 +2,7 @@
 # All Rights Reserved.
 
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
-# LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 
 from django.urls import NoReverseMatch
@@ -37,7 +37,7 @@ class AppMenuMixin:
 
         return attr
 
-    def has_perm(self, user):
+    def has_view_permission(self, user, obj=None):
         return True
 
 
@@ -46,6 +46,7 @@ class Application(IndexViewMixin, Viewset):
     icon = Icon("view_module")
     menu_template_name = 'viewflow/includes/app_menu.html'
     base_template_name = 'viewflow/base_page.html'
+    permission = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -55,7 +56,7 @@ class Application(IndexViewMixin, Viewset):
     def __getattribute__(self, name):
         attr = super().__getattribute__(name)
 
-        if name == 'title' and attr is None:
+        if name == 'title' and not attr:
             title = camel_case_to_title(
                 strip_suffixes(
                     self.__class__.__name__, ['Application', 'Viewset', 'Admin', 'App', 'Flow'])
@@ -72,14 +73,15 @@ class Application(IndexViewMixin, Viewset):
     def get_context_data(self, request):
         return {}
 
-    def has_perm(self, user):
+    def has_view_permission(self, user, obj=None):
+        if self.permission is not None:
+            return user.has_perm(self.permission)
         return True
 
-    def menu_items(self, user=None):
+    def menu_items(self):
         for viewset in self._children:
             if isinstance(viewset, AppMenuMixin):
-                if user is None or viewset.has_perm(user):
-                    yield viewset
+                yield viewset
 
 
 class Site(IndexViewMixin, Viewset):
@@ -88,6 +90,7 @@ class Site(IndexViewMixin, Viewset):
     menu_template_name = 'viewflow/includes/site_menu.html'
     primary_color = None
     secondary_color = None
+    permission = None
 
     def __init__(self, *, title=None, **kwargs):
         super().__init__(**kwargs)
@@ -122,13 +125,14 @@ class Site(IndexViewMixin, Viewset):
     def _get_resolver_extra(self):
         return {'viewset': self, 'site': self}
 
-    def menu_items(self, user=None):
+    def menu_items(self):
         for viewset in self._children:
-            if isinstance(viewset, Application):
-                if user is None or viewset.has_perm(user):
-                    yield viewset
+            if isinstance(viewset, (Site, Application)):
+                yield viewset
 
-    def has_perm(self, user):
+    def has_view_permission(self, user, obj=None):
+        if self.permission is not None:
+            return user.has_perm(self.permission)
         return True
 
     def register(self, app_class):

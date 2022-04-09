@@ -1,7 +1,7 @@
 /* eslint-env browser */
 
 import {customElement} from 'solid-element';
-import {MDCTextField} from '@material/textfield';
+import {textField} from 'material-components-web';
 import {onCleanup, createEffect} from 'solid-js';
 import cc from 'classcat';
 
@@ -42,7 +42,7 @@ export const Input = (props) => {
 
   createEffect(() => {
     setTimeout(() => {
-      textfield = new MDCTextField(control);
+      textfield = new textField.MDCTextField(control);
       control.textfield=textfield;
     });
   });

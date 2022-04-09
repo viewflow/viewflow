@@ -2,20 +2,16 @@
 # All Rights Reserved.
 
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
-# LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 
-import json
 import re
 
 from django import forms, template
 from django.db.models import Model
-from django.core.serializers.json import DjangoJSONEncoder
 from django.urls import NoReverseMatch
-from django.utils.encoding import force_text
-from django.utils.html import conditional_escape, format_html, _json_script_escapes
-from django.utils.html import json_script as base_json_script
-from django.utils.safestring import mark_safe
+from django.utils.encoding import force_str
+from django.utils.html import conditional_escape
 
 from viewflow.contrib import auth
 from viewflow.forms import FormLayout
@@ -29,7 +25,7 @@ KWARG_RE = re.compile(r"(?:(\w+)=)?(.+)")
 
 def _parse_var_and_args(tagname, parser, bits):
     variable_name, args, kwargs = None, [], {}
-    if len(bits) >= 2 and bits[-2] == 'as':
+    if len(bits) >= 2 and bits[-2] == "as":
         variable_name = bits[-1]
         bits = bits[:-2]
 
@@ -37,7 +33,9 @@ def _parse_var_and_args(tagname, parser, bits):
         for bit in bits:
             match = KWARG_RE.match(bit)
             if not match:
-                raise template.TemplateSyntaxError("Malformed arguments for {} tag".format(tagname))
+                raise template.TemplateSyntaxError(
+                    "Malformed arguments for {} tag".format(tagname)
+                )
             name, value = match.groups()
             if name:
                 kwargs[name] = parser.compile_filter(value)
@@ -50,13 +48,12 @@ def _parse_var_and_args(tagname, parser, bits):
 def _resolve_args(context, args, kwargs):
     args = [arg.resolve(context) for arg in args]
     kwargs = {
-        force_text(key, 'ascii'): value.resolve(context)
-        for key, value in kwargs.items()
+        force_str(key, "ascii"): value.resolve(context) for key, value in kwargs.items()
     }
     return args, kwargs
 
 
-@register.tag('reverse')
+@register.tag("reverse")
 class ViewsetURLNode(template.Node):
     """
     Reverse a url to a view within viewset
@@ -70,22 +67,25 @@ class ViewsetURLNode(template.Node):
         if len(bits) < 2:
             raise template.TemplateSyntaxError(
                 "get_url takes at least two arguments, an "
-                "viewset and the name of a url.")
+                "viewset and the name of a url."
+            )
 
         self.viewset = parser.compile_filter(bits[1])
         self.view_name = parser.compile_filter(bits[2])
         self.variable_name, self.args, self.kwargs = _parse_var_and_args(
-            'get_url', parser, bits[3:]
+            "get_url", parser, bits[3:]
         )
 
     def render(self, context):
         args, kwargs = _resolve_args(context, self.args, self.kwargs)
 
         viewset = self.viewset.resolve(context)
-        if not isinstance(viewset, Viewset):
-            raise template.TemplateSyntaxError(f"reverse first argument must be a viewset instance, got '{viewset}'")
-
         view_name = self.view_name.resolve(context)
+
+        if not isinstance(viewset, Viewset):
+            raise template.TemplateSyntaxError(
+                f"reverse '{view_name}' first argument must be a viewset instance, got '{viewset}'"
+            )
 
         try:
             current_app = context.request.current_app
@@ -95,23 +95,25 @@ class ViewsetURLNode(template.Node):
             except AttributeError:
                 current_app = None
 
-        url = ''
+        url = ""
         try:
-            url = viewset.reverse(view_name, args=args, kwargs=kwargs, current_app=current_app)
+            url = viewset.reverse(
+                view_name, args=args, kwargs=kwargs, current_app=current_app
+            )
         except NoReverseMatch:
             if self.variable_name is None:
                 raise
 
         if self.variable_name:
             context[self.variable_name] = url
-            return ''
+            return ""
         else:
             if context.autoescape:
                 url = conditional_escape(url)
             return url
 
 
-@register.tag('render')
+@register.tag("render")
 class FormNode(template.Node):
     """
     Render a django form using google material-components-web library.
@@ -120,6 +122,7 @@ class FormNode(template.Node):
 
         {% render_form form [layout] %}
     """
+
     default_layout = FormLayout()
 
     def __init__(self, parser, token):
@@ -132,7 +135,8 @@ class FormNode(template.Node):
             tag, form_expr, layout_expr = bits
         else:
             raise template.TemplateSyntaxError(
-                "Invalid syntax in material tag, expects only form and optional layout arguments.")
+                "Invalid syntax in material tag, expects only form and optional layout arguments."
+            )
 
         self.form_expr = parser.compile_filter(form_expr)
         self.layout_expr = parser.compile_filter(layout_expr) if layout_expr else None
@@ -140,18 +144,22 @@ class FormNode(template.Node):
     def render(self, context):
         form = self.form_expr.resolve(context)
         if not isinstance(form, forms.BaseForm):
-            raise template.TemplateSyntaxError("material tag first argument must be a form")
+            raise template.TemplateSyntaxError(
+                "material tag first argument must be a form"
+            )
 
         layout = None
         if self.layout_expr:
             layout = self.layout_expr.resolve(context)
         if layout and not isinstance(layout, FormLayout):
-            raise template.TemplateSyntaxError("material tag second argument must be a layout")
+            raise template.TemplateSyntaxError(
+                "material tag second argument must be a layout"
+            )
 
         return layout.render(form) if layout else self.default_layout.render(form)
 
 
-@register.tag('get_absolute_url')
+@register.tag("get_absolute_url")
 class AbsoluteURLNode(template.Node):
     """
     Call viewset.get_absolute_url for an object from site
@@ -164,24 +172,30 @@ class AbsoluteURLNode(template.Node):
         bits = token.split_contents()
         if len(bits) < 3:
             raise template.TemplateSyntaxError(
-                "viewset_url takes at least two arguments, a "
-                "site and an object.")
+                "viewset_url takes at least two arguments, a " "site and an object."
+            )
 
         self.site = parser.compile_filter(bits[1])
         self.object = parser.compile_filter(bits[2])
-        if len(bits) >= 2 and bits[-2] == 'as':
+
+        self.variable_name = None
+        if len(bits) >= 2 and bits[-2] == "as":
             self.variable_name = bits[-1]
 
     def render(self, context):
         site = self.site.resolve(context)
         if not isinstance(site, Site):
-            raise template.TemplateSyntaxError("site_url first argument must be a site instance")
+            raise template.TemplateSyntaxError(
+                "get_absolute_url first argument must be a site instance"
+            )
 
         obj = self.object.resolve(context)
         if not isinstance(obj, Model):
-            raise template.TemplateSyntaxError("site_url third argument must be a model instance")
+            raise template.TemplateSyntaxError(
+                "get_absolute_url third argument must be a model instance"
+            )
 
-        url = ''
+        url = ""
         try:
             url = site.get_absolute_url(context.request, obj)
         except NoReverseMatch:
@@ -190,7 +204,7 @@ class AbsoluteURLNode(template.Node):
 
         if self.variable_name:
             context[self.variable_name] = url
-            return ''
+            return ""
         else:
             if context.autoescape:
                 url = conditional_escape(url)
@@ -220,11 +234,11 @@ def has_perm(app, user):
 
     Example:
 
-        {% if request.resolver_match.app|has_perm:request.user %}
+        {% if request.resolver_match.app|has_perm:request %}
             {% include app.menu_template_name app=request.resolver_match.app only %}
         {% endif %}
     """
-    return app.has_perm(user)
+    return app.has_view_permission(user)
 
 
 @register.filter
@@ -236,11 +250,11 @@ def user_avatar_url(user):
 @register.filter
 def list_column_order(column_def, list_view):
     """Sort order for the column from the list view."""
-    if hasattr(list_view, 'columns_order'):
+    if hasattr(list_view, "columns_order"):
         position, order = None, list_view.columns_order.get(column_def)
         if order:
             position = list(list_view.columns_order.keys()).index(column_def) + 1
-            return {'position': position, 'sort': order}
+            return {"position": position, "sort": order}
     return None
 
 
@@ -248,21 +262,12 @@ def list_column_order(column_def, list_view):
 def list_page_data(page, list_view):
     """Formated page data for a table.
 
-       Returned data is a list of list of cell values zipped with column definitions.
-       [[(column, value), (column, value), ...], ...]
+    Returned data is a list of list of cell values zipped with column definitions.
+    [[(column, value), (column, value), ...], ...]
     """
     return list_view.get_page_data(page)
 
 
 @register.filter
 def list_order(request_kwargs, list_view):
-    return request_kwargs.get(list_view.ordering_kwarg, '')
-
-
-@register.filter
-def json_script(value, element_id=None):
-    if element_id is not None:
-        return base_json_script(value, element_id)
-    else:
-        json_str = json.dumps(value, cls=DjangoJSONEncoder).translate(_json_script_escapes)
-        return format_html('<script type="application/json">{}</script>', mark_safe(json_str))
+    return request_kwargs.get(list_view.ordering_kwarg, "")

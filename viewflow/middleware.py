@@ -2,7 +2,7 @@
 # All Rights Reserved.
 
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
-# LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 
 from django.core.exceptions import PermissionDenied
@@ -27,18 +27,14 @@ class SiteMiddleware(object):
         match = request.resolver_match
         if match:
             extra = getattr(match.url_name, 'extra', {})
-            site, app, viewset = extra.get('site'), extra.get('app'), extra.get('viewset')
+            site, app = extra.get('site'), extra.get('app')
 
             if site:
-                if not site.has_perm(request.user):
+                if not site.has_view_permission(request.user):
                     raise PermissionDenied
 
             if app:
-                if not app.has_perm(request.user):
-                    raise PermissionDenied
-
-            if viewset:
-                if hasattr(viewset, 'has_perm') and not viewset.has_perm(request.user):
+                if not app.has_view_permission(request.user):
                     raise PermissionDenied
 
             for name, value in extra.items():

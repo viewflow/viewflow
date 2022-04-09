@@ -2,7 +2,7 @@
 # All Rights Reserved.
 
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
-# LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 
 import random
@@ -22,7 +22,7 @@ from django.db import models
 from django.urls import path
 from django.utils.decorators import method_decorator
 from django.views import generic
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import gettext_lazy as _
 
 # from viewflow.forms.widgets import TextInput, PasswordInput
 from viewflow.urls import Viewset

@@ -67,6 +67,7 @@ class BaseViewset(object):
     parent_namespace = None
 
     def __init__(self):
+        super().__init__()
         self._parent = None
 
     @property
@@ -106,6 +107,9 @@ class BaseViewset(object):
             viewname = view_namespace + viewname
 
         return reverse(viewname, args=args, kwargs=kwargs, current_app=current_app)
+
+    def has_view_permission(self, user, obj=None):
+        return True
 
 
 class ViewsetMeta(type):
@@ -205,6 +209,13 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
         for url_entry in self.urlpatterns or []:
             urlpatterns.append(self._create_url_pattern(url_entry))
 
+        # class attributes
+        for attr_name in self.declared_patterns:
+            attr_value = getattr(self, attr_name)
+            if isinstance(attr_value, types.FunctionType) or attr_value is None:
+                continue
+            urlpatterns.append(self._create_url_pattern(attr_value))
+
         # additional routes
         for viewset in self.viewsets or []:
             if viewset.app_name is None:
@@ -215,13 +226,6 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
                 )
                 assert viewset.app_name, "Can't provide auto name for a {}".format(viewset)
             urlpatterns.append(self._create_url_pattern(route(viewset.app_name, viewset)))
-
-        # class attributes
-        for attr_name in self.declared_patterns:
-            attr_value = getattr(self, attr_name)
-            if isinstance(attr_value, types.FunctionType) or attr_value is None:
-                continue
-            urlpatterns.append(self._create_url_pattern(attr_value))
 
         return urlpatterns
 
