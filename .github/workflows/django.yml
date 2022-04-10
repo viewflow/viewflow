@@ -20,6 +20,7 @@ jobs:
         python -m pip install setuptools==59.8.0
         python -m pip install tox
         tox --notest
+    - uses: syphar/restore-virtualenv@v1
     - name: Run Tests
       run: |
         tox -- coverage run --source='viewflow' ./manage.py test --exclude-tag=selenium --exclude-tag=integration
