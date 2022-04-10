@@ -28,6 +28,25 @@ class Test(TestCase):
         ).render(context)
         self.assertEqual(f"/model/{self.user.pk}/change/", content)
 
+    def test_reverse(self):
+        context = Context({"request": self.request, "viewset": site.viewsets[0], "user": self.user})
+        context.request = self.request
+
+        content = Template(
+            "{% load viewflow %}{% reverse viewset 'change' user.pk %}"
+        ).render(context)
+        self.assertEqual(f"/model/{self.user.pk}/change/", content)
+
+        content = Template(
+            "{% load viewflow %}{% reverse viewset 'change' user.pk as var %}{{ var }}"
+        ).render(context)
+        self.assertEqual(f"/model/{self.user.pk}/change/", content)
+
+        content = Template(
+            "{% load viewflow %}{% reverse viewset 'change' pk=user.pk %}"
+        ).render(context)
+        self.assertEqual(f"/model/{self.user.pk}/change/", content)
+
     def test_get_verbose_name(self):
         context = Context({"model": User})
         content = Template(
