@@ -7,7 +7,7 @@ The goal of Viewflow to stay small, flexible, and let you create Django applicat
 
 Viewflow has a pre-built UI and assumes that you can implement your own.
 
-[![travis-svg]][travis] [![requirements-svg]][requirements] [![pypi-version]][pypi] [![py-versions]][pypi]
+[![GitHub Workflow Status]][build] [![requirements-svg]][requirements] [![pypi-version]][pypi] [![py-versions]][pypi]
 
 
 Viewflow comes in two flavors:
@@ -265,6 +265,7 @@ and modifications of Viewflow. You can find the commercial license terms in COMM
   * Work in progress
 
 
+[build]: https://img.shields.io/github/workflow/status/viewflow/viewflow/Viewflow%20CI
 [travis-svg]: https://travis-ci.org/viewflow/viewflow.svg
 [travis]: https://travis-ci.org/viewflow/viewflow
 [pypi]: https://pypi.org/project/django-viewflow/
