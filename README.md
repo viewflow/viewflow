@@ -7,7 +7,7 @@ The goal of Viewflow to stay small, flexible, and let you create Django applicat
 
 Viewflow has a pre-built UI and assumes that you can implement your own.
 
-[![build]][Github Workflow Status] [![coverage]][Coverage] [![pypi-version]][pypi] [![py-versions]][pypi]
+[![build]][build] [![coverage]][coverage] [![pypi-version]][pypi] [![py-versions]][pypi]
 
 
 Viewflow comes in two flavors:
