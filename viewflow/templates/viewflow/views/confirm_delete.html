@@ -1,0 +1,53 @@
+{% extends request.resolver_match.app.base_template_name|default:'viewflow/base_page.html' %}
+{% load i18n viewflow %}
+
+{% block content %}
+<div class="mdc-layout-grid vf-page__grid">
+  <div class="mdc-layout-grid__inner vf-page__grid-inner">
+    {% block confirm-cell %}
+    <div class="mdc-layout-grid__cell {% block detail-cell-span %}mdc-layout-grid__cell--span-10-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone{% endblock %}">
+      <div class="mdc-card vf-card">
+        <section class="vf-card__header">
+          <h1 class="vf-card__title">{{ view.object }}</h1>
+          {% block confirm-header-subtitle %}
+          <h2 class="vf-card__breadcrumbs">
+            <a href="{% reverse viewset 'list' %}">{{ view.model|verbose_name_plural|title }}</a>
+            {% if view.object.pk %}
+            {% reverse viewset 'detail' view.object.pk as detail_url %}
+            {% if detail_url  %}
+            <a href="{{ detail_url }}">{{ view.object }}</a>
+            {% else %}
+            <a href="{% reverse viewset 'change' view.object.pk %}">{{ view.object }}</a>
+            {% endif %}
+            {% endif %}
+            <a>{% trans 'Delete' %}</a>
+          </h2>
+          {% endblock %}
+        </section>
+        <vf-form>
+          <form class="vf-form" method="POST">
+            {% csrf_token %}
+            <section class="vf-card__form">
+              <h3 class="vf-card__alert">
+                {% blocktrans with escaped_object=object %}"{{ escaped_object }}" and all of the following related items will be deleted{% endblocktrans %}
+              </h3>
+
+              {% for model, objects in view.get_deleted_objects %}
+                <h3 class="mdc-typography--headline5">{{ model|verbose_name_plural|title }}</h3>
+                {% for object in objects %}
+                  {% get_absolute_url site object as object_url %}
+                  {% if object_url %}<a class="mdc-typography--body1" target="_blank" href="{{ object_url }}">{{ object }}</a>{% else %}{{ object }}{% endif %}{% if not forloop.last %},&nbsp;{% endif %}
+                {% endfor %}
+              {% endfor %}
+            </section>
+            <section class="mdc-card__actions vf-card__actions">
+              <button class="mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit">Delete</button>
+            </section>
+          </form>
+        </vf-form>
+      </div>
+    </div
+    {% endblock confirm-cell %}
+  </div>
+</div>
+{% endblock content %}

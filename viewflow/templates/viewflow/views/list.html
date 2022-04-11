@@ -1,0 +1,104 @@
+{% extends request.resolver_match.app.base_template_name|default:'viewflow/base_page.html' %}
+{% load viewflow %}
+
+{% block  page-toolbar-actions %}
+{% if view.search_enabled %}<vf-page-search value="{{ view.get_search_term|default:'' }}"></vf-page-search>{% endif %}
+{{ block.super }}
+{% endblock %}
+
+{% block content %}
+{% block list-filter %}{% if view.filterset %}{% include 'viewflow/includes/list_filter.html' %}{% endif %}{% endblock list-filter %}
+<div class="mdc-layout-grid vf-page__grid mdc-drawer-app-content">
+  <div class="mdc-layout-grid__inner vf-page__grid-inner">
+    {% block list-cell %}
+    <div class="mdc-layout-grid__cell {% block list-cell-span %}mdc-layout-grid__cell--span-12{% endblock %}">
+      <div class="mdc-card vf-card">
+        {% block list-header %}
+        <section class="vf-card__header">
+          {% block list-header-title %}<h1 class="vf-card__title">{{ view.model|verbose_name_plural|title }}</h1>{% endblock %}
+          {% block list-header-subtitle %}{% endblock %}
+          {% block list-header-menu %}
+          <div class="vf-card__menu">
+            {% if view.filterset %}
+            <vf-list-filter-trigger class="mdc-button vf-list__filter-trigger{% if view.filterset.form.has_changed %} vf-list__filter-trigger--active{% endif %}" data-toggle-filter-id="id_filter_drawer">
+              <i class="material-icons">filter_list</i>
+            </vf-list-filter-trigger>
+            {% endif %}
+            {% include 'viewflow/includes/view_action_menu.html' with view=view only %}
+          </div>
+          {% endblock %}
+        </section>
+        {% endblock list-header %}
+
+        {% block list-content %}
+        {% with bulk_actions=view.get_bulk_actions %}
+        <section>
+          <vf-list data-list-sort-order-param="{{ view.ordering_kwarg }}" data-list-sort-page-param="{{ view.page_kwarg }}">
+            {% if bulk_actions %}<vf-list-bulk-actions></vf-list-bulk-actions>{% endif %}
+            <table class="vf-list__table" {% if paginator and paginator.count %} data-total-items-count="{{ paginator.count }}"{% endif %}>
+              <thead>
+                <tr>
+                  {% if bulk_actions %}
+                  <th class="vf-list__action-header">
+                    <div class="mdc-checkbox">
+                      <input type="checkbox" class="mdc-checkbox__native-control"/>
+                      <div class="mdc-checkbox__background">
+                        <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                          <path class="mdc-checkbox__checkmark-path"
+                                fill="none" stroke="white"
+                                d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                        </svg>
+                      <div class="mdc-checkbox__mixedmark"></div>
+                      </div>
+                    </div>
+                  </th>
+                  <th colspan="{{ view.list_columns.items|length }}" class="vf-list__actions">
+                    {% include 'viewflow/includes/list_bulk_actions.html' with actions=bulk_actions %}
+                  </th>
+                  {% endif %}
+                    {% for name, column in view.list_columns.items %}
+                    {% with order=column|list_column_order:view %}
+                    <th class="vf-list__table-header vf-list__table-header-{{ column.column_type }}{% if column.orderby %} vf-list__table-header--sortable mdc-ripple-surface{% endif %}{% if order %} vf-list__table-header--sort-{{ order.sort }}{% endif %}"{% if column.orderby %}
+                      {% if order %}data-list-sort-position="{{ order.position }}" title="{{ order.position }}"{% endif %}
+                      data-list-sort-column="{{ column.attr_name }}"{% endif %}>
+                      <span>{{ column.header }}</span>
+                    </th>
+                    {% endwith %}
+                    {% endfor %}
+                </tr>
+              </thead>
+              <tbody>
+                {% for obj, row in page_obj|default:object_list|list_page_data:view %}
+                <tr data-row-id="{{ obj.pk }}">
+                  {% if bulk_actions %}
+                  <td class="vf-list__action-cell">
+                    <div class="mdc-checkbox">
+                        <input type="checkbox" class="mdc-checkbox__native-control"/>
+                        <div class="mdc-checkbox__background">
+                          <svg class="mdc-checkbox__checkmark" viewBox="0 0 24 24">
+                            <path class="mdc-checkbox__checkmark-path"
+                                  fill="none" stroke="white"
+                                  d="M1.73,12.91 8.1,19.28 22.79,4.59"/>
+                          </svg>
+                          <div class="mdc-checkbox__mixedmark"></div>
+                        </div>
+                      </div>
+                  </td>
+                  {% endif %}
+                  {% for column, value in row %}<td class="vf-list__table-cell-{{ column.column_type }}">{{ value }}</td>{% endfor %}
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+          </vf-list>
+        </section>
+        {% endwith %}
+        {% endblock list-content %}
+
+        {% block list-pagination %}{% include 'viewflow/includes/list_pagination.html' %}{% endblock list-pagination %}
+      </div>
+    </div>
+    {% endblock list-cell %}
+  </div>
+</div>
+{% endblock content %}

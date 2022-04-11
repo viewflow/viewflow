@@ -1,0 +1,38 @@
+{% extends 'viewflow/views/form.html' %}
+{% load i18n viewflow %}
+
+{% block breadcrumbs_items %}
+<a href="{% reverse viewset 'list' %}">{{ view.model|verbose_name_plural|title }}</a>
+{% if view.object.pk %}
+{% reverse viewset 'detail' view.object.pk as detail_url %}
+{% if detail_url  %}
+<a href="{{ detail_url }}">{{ view.object }}</a>
+{% endif %}
+{% endif %}
+<a>{{ view.transition.label }}</a>
+{% endblock %}
+
+
+{% block form %}
+<section>
+  <table class="vf-list__table">
+    <tbody>
+      {% for field, field_name, value in view.get_object_data %}{% if field.name not in form.fields %}
+      <tr>
+        <th class="vf-list__table-header vf-list__table-header-text">{{ field_name }}</th>
+        <td class="vf-list__table-cell vf-list__table-cell-text">{{ value }}</td>
+      </tr>
+      {% endif %}{% endfor %}
+      {% block detail-extra %}{% endblock %}
+    </tbody>
+  </table>
+</section>
+{{ block.super }}
+{% endblock %}
+
+
+{% block form-actions-list %}
+<button class="mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit">
+  {%trans 'Confirm' %}
+</button>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% load i18n viewflow %}
+<div class="mdc-card vf-card">
+  {% block detail-header %}
+  <section class="vf-card__header">
+    <h1 class="vf-card__title">{{ view.object }}</h1>
+    <h2 class="vf-card__breadcrumbs">
+      <a href="{% reverse viewset 'list' %}">{{ view.model|verbose_name_plural|title }}</a>
+      <a>{{ view.object }}</a>
+    </h2>
+    <div class="vf-card__menu">
+      {% include 'viewflow/includes/view_action_menu.html' with view=view only %}
+    </div>
+  </section>
+  {% endblock detail-header %}
+  {% block detail-content %}
+  <section>
+    <table class="vf-list__table">
+      <tbody>
+        {% for field, field_name, value in view.get_object_data %}
+        <tr>
+          <th class="vf-list__table-header vf-list__table-header-text">{{ field_name }}</th>
+          <td class="vf-list__table-cell vf-list__table-cell-text">{{ value }}</td>
+        </tr>
+        {% endfor %}
+        {% block detail-extra %}{% endblock %}
+      </tbody>
+    </table>
+  </section>
+  {% endblock detail-content %}
+  {% block detail-actions %}
+  <section class="mdc-card__actions vf-card__actions">
+    {% block detail-actions-list %}
+      {% for action in view.get_object_actions %}
+      <a class="mdc-button mdc-button--outlined mdc-card__action mdc-card__action--button" href="{{ action.url }}">
+        {% if action.icon %}{{ action.icon }}{% endif %}
+        <span class="mdc-button__label">{{ action.name }}</span>
+      </a>
+      {% endfor %}
+
+      {% with change_link=view.get_object_change_link %}{% if change_link %}
+      <a class="mdc-button mdc-card__action mdc-card__action--button" href="{{ change_link }}">{% trans 'Change' %}</a>
+      {% endif %}{% endwith %}
+    {% endblock %}
+  </section>
+  {% endblock detail-actions %}
+</div>

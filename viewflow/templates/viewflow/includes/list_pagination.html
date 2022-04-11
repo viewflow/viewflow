@@ -1,0 +1,29 @@
+<vf-list-pagination id="id_pagination" class="vf-list__pagination" data-list-page-has-next="{{ page_obj.has_next|yesno:'1,0' }}" data-list-page-param="{{ view.page_kwarg }}">
+  <span class="vf-list__pagination-summary">
+    {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ paginator.count }}
+  </span>
+  <ul class="vf-list__pagination__container" role="navigation">
+    {% if page_obj.has_previous %}
+      <li class="vf-list__pagination-item vf-list__pagination-item--prev" data-page="{{ page_obj.previous_page_number }}">
+        <a href="?page={{ page_obj.previous_page_number }}#pagination">
+            <i class="material-icons">navigate_before</i>
+        </a>
+      </li>
+    {% else %}
+    <li class="vf-list__pagination-item vf-list__pagination-item--disabled" aria-hidden="true">
+      <i class="material-icons">navigate_before</i>
+    </li>
+    {% endif %}
+    {% if page_obj.has_next %}
+    <li class="vf-list__pagination-item vf-list__pagination-item--next" data-page="{{ page_obj.next_page_number }}">
+      <a href="?page={{ page_obj.next_page_number }}#pagination">
+          <i class="material-icons">navigate_next</i>
+      </a>
+    </li>
+    {% else %}
+    <li class="vf-list__pagination-item vf-list__pagination-item--disabled" aria-hidden="true">
+        <i class="material-icons">navigate_next</i>
+    </li>
+    {% endif %}
+  </ul>
+</vf-list-pagination>
