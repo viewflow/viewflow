@@ -1,7 +1,7 @@
 try:
     from unittest import mock
 except ImportError:
-    import mock
+    from unittest import mock
 
 from django.test import TestCase
 from django.utils.decorators import method_decorator
@@ -172,7 +172,7 @@ class Test(TestCase):
         self.assertTrue(Flow.method_called)
 
 
-class ProcessStub(object):
+class ProcessStub:
     _default_manager = mock.Mock()
 
     def __init__(self, flow_class=None):
@@ -186,7 +186,7 @@ class ProcessStub(object):
         return
 
 
-class TaskStub(object):
+class TaskStub:
     _default_manager = mock.Mock()
 
     def __init__(self, flow_task=None):
@@ -206,12 +206,12 @@ class TaskStub(object):
         return
 
 
-class FlowStub(object):
+class FlowStub:
     process_class = ProcessStub
     task_class = TaskStub
     lock_impl = lock.no_lock
     instance = None
 
 
-class UserStub(object):
+class UserStub:
     pass

@@ -9,7 +9,7 @@ class ManagedStartViewActivation(StartActivation):
     management_form_class = None
 
     def __init__(self, **kwargs):  # noqa D102
-        super(ManagedStartViewActivation, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.management_form = None
         self.management_form_class = kwargs.pop('management_form_class', None)
 
@@ -26,7 +26,7 @@ class ManagedStartViewActivation(StartActivation):
     @Activation.status.super()
     def prepare(self, data=None, user=None):
         """Prepare activation for execution."""
-        super(ManagedStartViewActivation, self).prepare.original()
+        super().prepare.original()
         self.task.owner = user
 
         management_form_class = self.get_management_form_class()
@@ -34,7 +34,7 @@ class ManagedStartViewActivation(StartActivation):
 
         if data:
             if not self.management_form.is_valid():
-                raise FlowRuntimeError('Activation metadata is broken {}'.format(self.management_form.errors))
+                raise FlowRuntimeError(f'Activation metadata is broken {self.management_form.errors}')
             self.task = self.management_form.save(commit=False)
 
 
@@ -44,7 +44,7 @@ class ManagedViewActivation(ViewActivation):
     management_form_class = None
 
     def __init__(self, **kwargs):  # noqa D102
-        super(ManagedViewActivation, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self.management_form = None
         self.management_form_class = kwargs.pop('management_form_class', None)
 
@@ -61,7 +61,7 @@ class ManagedViewActivation(ViewActivation):
     @Activation.status.super()
     def prepare(self, data=None, user=None):
         """Prepare activation for execution."""
-        super(ManagedViewActivation, self).prepare.original()
+        super().prepare.original()
 
         if user:
             self.task.owner = user
@@ -71,7 +71,7 @@ class ManagedViewActivation(ViewActivation):
 
         if data:
             if not self.management_form.is_valid():
-                raise FlowRuntimeError('Activation metadata is broken {}'.format(self.management_form.errors))
+                raise FlowRuntimeError(f'Activation metadata is broken {self.management_form.errors}')
             self.task = self.management_form.save(commit=False)
 
     @classmethod

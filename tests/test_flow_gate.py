@@ -1,7 +1,7 @@
 try:
     from unittest import mock
 except ImportError:
-    import mock
+    from unittest import mock
 
 from django.test import TestCase
 
@@ -71,7 +71,7 @@ class Test(TestCase):
         self.assertEqual(act.task.status, STATUS.CANCELED)
 
 
-class ProcessStub(object):
+class ProcessStub:
     _default_manager = mock.Mock()
 
     def __init__(self, flow_class=None):
@@ -84,7 +84,7 @@ class ProcessStub(object):
         return
 
 
-class TaskStub(object):
+class TaskStub:
     _default_manager = mock.Mock()
 
     def __init__(self, flow_task=None, token='start/1_2'):
@@ -104,14 +104,14 @@ class TaskStub(object):
         return
 
 
-class FlowStub(object):
+class FlowStub:
     process_class = ProcessStub
     task_class = TaskStub
     lock_impl = lock.no_lock
     instance = None
 
 
-class FlowTaskStub(object):
+class FlowTaskStub:
     activated = False
 
     @classmethod

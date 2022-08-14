@@ -4,7 +4,7 @@ from .activation import STATUS
 default_app_config = 'viewflow.apps.ViewflowConfig'
 
 
-class ThisObject(object):
+class ThisObject:
     """Helper for forward references on flow tasks."""
 
     def __init__(self, name):  # noqa D102
@@ -24,7 +24,7 @@ class ThisObject(object):
         return get_task_owner
 
 
-class This(object):
+class This:
     """Helper for building forward referenced flow task.
 
     The rationale is ability to specify references to the class
@@ -61,7 +61,7 @@ class This(object):
         return ThisObject(name)
 
 
-class Edge(object):
+class Edge:
     """Edge of the Flow graph."""
 
     __slots__ = ('_src', '_dst', '_edge_class', '_label')
@@ -97,7 +97,7 @@ class Edge(object):
             self._edge_class, self._src, self._dst)
 
 
-class Node(object):
+class Node:
     """
     Base class for flow task.
 
@@ -117,7 +117,7 @@ class Node(object):
         if activation_class:
             self.activation_class = activation_class
 
-        super(Node, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def _outgoing(self):
         """Outgoing edge iterator."""
@@ -133,7 +133,7 @@ class Node(object):
     def __str__(self):
         if self.name:
             return self.name.title().replace('_', ' ')
-        return super(Node, self).__str__()
+        return super().__str__()
 
     def ready(self):
         """

@@ -41,7 +41,7 @@ class HandlerActivation(Activation):
     @Activation.status.transition(source=[STATUS.ERROR, STATUS.DONE], target=STATUS.NEW)
     def undo(self):
         """Undo the task."""
-        super(HandlerActivation, self).undo.original()
+        super().undo.original()
 
     @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
@@ -101,7 +101,7 @@ class Handler(mixins.TaskDescriptionMixin,
 
     def __init__(self, handler, **kwargs):  # noqa D102
         self._handler = handler
-        super(Handler, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def ready(self):
         """Resolve internal `this`-references."""

@@ -27,8 +27,8 @@ class DetailTaskView(generic.TemplateView):
             opts = self.activation.flow_task.flow_class._meta
 
             return (
-                '{}/{}/{}_detail.html'.format(opts.app_label, opts.flow_label, flow_task.name),
-                '{}/{}/task_detail.html'.format(opts.app_label, opts.flow_label),
+                f'{opts.app_label}/{opts.flow_label}/{flow_task.name}_detail.html',
+                f'{opts.app_label}/{opts.flow_label}/task_detail.html',
                 'viewflow/flow/task_detail.html')
         else:
             return [self.template_name]
@@ -38,7 +38,7 @@ class DetailTaskView(generic.TemplateView):
 
         :keyword activation: the task activation instance
         """
-        context = super(DetailTaskView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['activation'] = self.activation
         return context
 
@@ -49,7 +49,7 @@ class DetailTaskView(generic.TemplateView):
 
         if not self.activation.flow_task.can_view(request.user, self.activation.task):
             raise PermissionDenied
-        return super(DetailTaskView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class DetailProcessView(FlowViewPermissionMixin, generic.DetailView):
@@ -70,7 +70,7 @@ class DetailProcessView(FlowViewPermissionMixin, generic.DetailView):
             opts = self.flow_class._meta
 
             return (
-                '{}/{}/process_detail.html'.format(opts.app_label, opts.flow_label),
+                f'{opts.app_label}/{opts.flow_label}/process_detail.html',
                 'viewflow/flow/process_detail.html')
         else:
             return [self.template_name]
@@ -81,7 +81,7 @@ class DetailProcessView(FlowViewPermissionMixin, generic.DetailView):
         :keyword process: a Process instance
         :keyword task_list: List of tasks of the process
         """
-        context = super(DetailProcessView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['task_list'] = context['process'].task_set.all().order_by('created')
         return context
 

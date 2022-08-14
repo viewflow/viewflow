@@ -1,7 +1,6 @@
 """
 Flow definition
 """
-from __future__ import unicode_literals
 
 import re
 from copy import copy
@@ -16,7 +15,7 @@ from . import Node, ThisObject, This, lock, models, forms
 from .compat import get_containing_app_data
 
 
-class _Resolver(object):
+class _Resolver:
     """Resolver this-references over flow nodes."""
 
     def __init__(self, nodes):  # noqa
@@ -39,7 +38,7 @@ class _Resolver(object):
         raise ValueError("Can't resolve %s" % link)
 
 
-class FlowMeta(object):
+class FlowMeta:
     """Flow meta options."""
 
     def __init__(self, app_label, flow_class, nodes):  # noqa D102
@@ -50,7 +49,7 @@ class FlowMeta(object):
     @property
     def flow_label(self):
         """Unique flow label."""
-        module = "{}.{}".format(self.flow_class.__module__, self.flow_class.__name__)
+        module = f"{self.flow_class.__module__}.{self.flow_class.__name__}"
         app_label, app_package = get_containing_app_data(module)
 
         subpath = module[len(app_package) + 1:]
@@ -73,16 +72,16 @@ class FlowMeta(object):
     def view_permission_name(self):
         """Name of the permission to view flow instances."""
         opts = self.flow_class.process_class._meta
-        return "{}.view_{}".format(opts.app_label, opts.model_name)
+        return f"{opts.app_label}.view_{opts.model_name}"
 
     @property
     def manage_permission_name(self):
         """Name of the permission to administer flow instances."""
         opts = self.flow_class.process_class._meta
-        return "{}.manage_{}".format(opts.app_label, opts.model_name)
+        return f"{opts.app_label}.manage_{opts.model_name}"
 
 
-class FlowInstanceDescriptor(object):
+class FlowInstanceDescriptor:
     """Singleton flow instance descriptor."""
 
     def __init__(self):  # noqa D102
@@ -117,7 +116,7 @@ class FlowMetaClass(type):
 
         attrs.update(nodes)
 
-        new_class = super(FlowMetaClass, cls).__new__(cls, class_name, bases, attrs)
+        new_class = super().__new__(cls, class_name, bases, attrs)
 
         # singleton instance
         new_class.instance = FlowInstanceDescriptor()
@@ -176,7 +175,7 @@ class FlowMetaClass(type):
         return new_class
 
 
-class Flow(with_metaclass(FlowMetaClass, object)):
+class Flow(metaclass=FlowMetaClass):
     """
     Base class for flow definition::
 

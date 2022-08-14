@@ -10,7 +10,7 @@ class JoinActivation(Activation):
 
     def __init__(self, **kwargs):  # noqa D102
         self.next_task = None
-        super(JoinActivation, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.STARTED)
     def start(self):
@@ -40,12 +40,12 @@ class JoinActivation(Activation):
         if not self.flow_task._wait_all:
             return True
 
-        join_prefixes = set(
+        join_prefixes = {
             prev.token.get_common_split_prefix(self.task.token, prev.pk)
-            for prev in self.task.previous.exclude(status=STATUS.CANCELED).all())
+            for prev in self.task.previous.exclude(status=STATUS.CANCELED).all()}
 
         if len(join_prefixes) > 1:
-            raise FlowRuntimeError('Multiple tokens {} came to join {}'.format(join_prefixes, self.flow_task.name))
+            raise FlowRuntimeError(f'Multiple tokens {join_prefixes} came to join {self.flow_task.name}')
 
         join_token_prefix = next(iter(join_prefixes))
 
@@ -67,7 +67,7 @@ class JoinActivation(Activation):
         conditions=[all_leading_canceled])
     def undo(self):
         """Undo the task."""
-        super(JoinActivation, self).undo.original()
+        super().undo.original()
 
     @Activation.status.transition(source=[STATUS.NEW, STATUS.STARTED])
     def perform(self):
@@ -78,7 +78,7 @@ class JoinActivation(Activation):
     @Activation.status.transition(source=[STATUS.NEW, STATUS.STARTED], target=STATUS.CANCELED)
     def cancel(self):
         """Cancel existing join."""
-        super(JoinActivation, self).cancel.original()
+        super().cancel.original()
 
     @Activation.status.transition(source=STATUS.DONE)
     def activate_next(self):
@@ -172,5 +172,5 @@ class Join(mixins.TaskDescriptionMixin,
     activation_class = JoinActivation
 
     def __init__(self, wait_all=True, **kwargs):  # noqa D102
-        super(Join, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._wait_all = wait_all

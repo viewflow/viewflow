@@ -42,7 +42,7 @@ class Test(TestCase):
                       TestFlowBaseFlow.process_class._meta.permissions)
 
     def test_task_description_mixin_parse(self):
-        class TestView(object):
+        class TestView:
             """
             Test Task
 

@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
@@ -64,12 +62,12 @@ class AbstractProcess(models.Model):
                 Context({'process': self, 'flow_class': self.flow_class})
             )
 
-        return "{} - {}".format(self.flow_class.process_title, self.status)
+        return f"{self.flow_class.process_title} - {self.status}"
 
     def __str__(self):
         if self.flow_class:
-            return '{} #{}'.format(self.flow_class.process_title, self.pk)
-        return "<Process {}> - {}".format(self.pk, self.status)
+            return f'{self.flow_class.process_title} #{self.pk}'
+        return f"<Process {self.pk}> - {self.status}"
 
     class Meta:  # noqa D101
         abstract = True
@@ -135,7 +133,7 @@ class AbstractTask(models.Model):
         if self.flow_task:
             self.flow_task_type = self.flow_task.task_type
 
-        super(AbstractTask, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)
 
     def activate(self):
         """Instantiate and configure new task activation."""
@@ -150,7 +148,7 @@ class AbstractTask(models.Model):
                 self.flow_task,
                 self.pk,
                 self.status)
-        return "<Task {}> - {}".format(self.pk, self.status)
+        return f"<Task {self.pk}> - {self.status}"
 
     class Meta:  # noqa D101
         abstract = True

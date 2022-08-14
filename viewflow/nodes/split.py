@@ -12,7 +12,7 @@ class SplitActivation(AbstractGateActivation):
 
     def __init__(self, **kwargs):   # noqa D102
         self.next_tasks = []
-        super(SplitActivation, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def calculate_next(self):
         """Calculate nodes list to activate."""
@@ -24,7 +24,7 @@ class SplitActivation(AbstractGateActivation):
                 self.next_tasks.append(node)
 
         if not self.next_tasks:
-            raise FlowRuntimeError('No next task available for {}'.format(self.flow_task.name))
+            raise FlowRuntimeError(f'No next task available for {self.flow_task.name}')
 
     @Activation.status.super()
     def activate_next(self):
@@ -73,7 +73,7 @@ class Split(mixins.TaskDescriptionMixin,
     activation_class = SplitActivation
 
     def __init__(self, **kwargs):   # noqa D102
-        super(Split, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._activate_next = []
 
     def _outgoing(self):

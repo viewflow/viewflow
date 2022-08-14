@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db import models
 from django.db.models.fields.related import ForeignObjectRel
 from django.contrib.auth import get_permission_codename
@@ -56,7 +54,7 @@ def get_model_display_data(root_instance, user):
                             if value is not None:
                                 children.append((field.verbose_name.title(), value))
             else:
-                choice_display_attr = "get_{}_display".format(field.get_attname())
+                choice_display_attr = f"get_{field.get_attname()}_display"
                 if hasattr(root, choice_display_attr):
                     value = getattr(root, choice_display_attr)()
                 else:
@@ -79,8 +77,8 @@ def get_model_display_data(root_instance, user):
         # if any suitable for display children found
         if children:
             change_perm = get_permission_codename('change', root._meta)
-            if user.has_perm("%s.%s" % (root._meta.app_label, change_perm)):
-                admin_url_name = "admin:{}_{}_change".format(root._meta.app_label, root._meta.model_name)
+            if user.has_perm(f"{root._meta.app_label}.{change_perm}"):
+                admin_url_name = f"admin:{root._meta.app_label}_{root._meta.model_name}_change"
                 try:
                     root_admin_url = reverse(admin_url_name, args=(root.pk,))
                 except NoReverseMatch:

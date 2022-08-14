@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
 from django.views import generic
@@ -11,7 +9,7 @@ from .mixins import MessageUserMixin
 from .utils import get_next_task_url
 
 
-class BaseStartFlowMixin(object):
+class BaseStartFlowMixin:
     """Mixin for start views."""
 
     def get_context_data(self, **kwargs):
@@ -20,7 +18,7 @@ class BaseStartFlowMixin(object):
         :keyword activation: the task activation instance
         """
         kwargs['activation'] = self.activation
-        return super(BaseStartFlowMixin, self).get_context_data(**kwargs)
+        return super().get_context_data(**kwargs)
 
     def get_success_url(self):
         """Continue on task or redirect back to task list."""
@@ -40,8 +38,8 @@ class BaseStartFlowMixin(object):
             opts = self.activation.flow_task.flow_class._meta
 
             return (
-                '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
-                '{}/{}/start.html'.format(opts.app_label, opts.flow_label),
+                f'{opts.app_label}/{opts.flow_label}/{flow_task.name}.html',
+                f'{opts.app_label}/{opts.flow_label}/start.html',
                 'viewflow/flow/start.html')
         else:
             return [self.template_name]
@@ -55,7 +53,7 @@ class BaseStartFlowMixin(object):
 
         user = request.user if not request.user.is_anonymous else None
         self.activation.prepare(request.POST or None, user=user)
-        return super(BaseStartFlowMixin, self).dispatch(request, **kwargs)
+        return super().dispatch(request, **kwargs)
 
 
 class StartFlowMixin(MessageUserMixin, BaseStartFlowMixin):
@@ -68,14 +66,14 @@ class StartFlowMixin(MessageUserMixin, BaseStartFlowMixin):
 
     def form_valid(self, *args, **kwargs):
         """If the form is valid, save the associated model and finish the task."""
-        super(StartFlowMixin, self).form_valid(*args, **kwargs)
+        super().form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         return HttpResponseRedirect(self.get_success_url())
 
 
 class CreateProcessView(StartFlowMixin, generic.UpdateView): # noqa D101
     def __init__(self, *args, **kwargs):  # noqa D102
-        super(CreateProcessView, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.form_class is None and self.fields is None:
             self.fields = []
 

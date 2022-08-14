@@ -18,7 +18,7 @@ class End(mixins.TaskDescriptionMixin,
     activation_class = EndActivation
 
     def __init__(self, **kwargs):  # noqa D102
-        super(End, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def _outgoing(self):
         return iter([])

@@ -1,7 +1,7 @@
 try:
     from unittest import mock
 except ImportError:
-    import mock
+    from unittest import mock
 
 from django.test import TestCase
 
@@ -10,7 +10,7 @@ from viewflow.activation import STATUS
 
 
 class Test(TestCase):
-    class ProcessStub(object):
+    class ProcessStub:
         _default_manager = mock.Mock()
 
         def __init__(self, flow_class=None):
@@ -25,7 +25,7 @@ class Test(TestCase):
 
     ProcessStub._default_manager.get.return_value = ProcessStub()
 
-    class TaskStub(object):
+    class TaskStub:
         process_id = 1
         status = STATUS.NEW
 
@@ -42,11 +42,11 @@ class Test(TestCase):
             self.pk = 1
             return
 
-    class UserStub(object):
+    class UserStub:
         pass
 
     def init_node(self, node):
-        class FlowStub(object):
+        class FlowStub:
             process_class = Test.ProcessStub
             lock_impl = staticmethod(lock.no_lock)
             task_class = Test.TaskStub
@@ -118,7 +118,7 @@ class Test(TestCase):
         class GateActivation(activation.AbstractGateActivation):
             def __init__(self, *args, **kwargs):
                 self.throw_error = kwargs.pop('throw_error', False)
-                super(GateActivation, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
 
             def calculate_next(self):
                 if self.throw_error:
@@ -159,7 +159,7 @@ class Test(TestCase):
         class JobActivation(activation.AbstractJobActivation):
             def __init__(self, *args, **kwargs):
                 self.throw_on_schedule_error = kwargs.pop('throw_on_schedule_error', False)
-                super(JobActivation, self).__init__(*args, **kwargs)
+                super().__init__(*args, **kwargs)
 
             def run_async(self):
                 if self.throw_on_schedule_error:

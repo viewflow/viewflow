@@ -9,7 +9,7 @@ class IfActivation(AbstractGateActivation):
 
     def __init__(self, **kwargs):  # noqa D102
         self.condition_result = None
-        super(IfActivation, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def calculate_next(self):
         """Calculate node to activate."""
@@ -51,7 +51,7 @@ class If(mixins.TaskDescriptionMixin,
 
         :param cond: Callable[activation] -> bool
         """
-        super(If, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._condition = cond
         self._on_true = None
         self._on_false = None

@@ -1,5 +1,4 @@
 """Prevents inconsistent db updates for flow."""
-from __future__ import unicode_literals
 
 import time
 import random
@@ -11,7 +10,7 @@ from django.db import transaction, DatabaseError
 from viewflow.exceptions import FlowLockFailed
 
 
-class NoLock(object):
+class NoLock:
     """
     No pessimistic locking, just execute flow task in transaction.
 
@@ -26,7 +25,7 @@ class NoLock(object):
         return lock
 
 
-class SelectForUpdateLock(object):
+class SelectForUpdateLock:
     """
     Database lock uses `select ... for update` on the process instance row.
 
@@ -49,14 +48,14 @@ class SelectForUpdateLock(object):
                             sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
                             time.sleep(sleep_time)
                         else:
-                            raise FlowLockFailed('Lock failed for {}'.format(flow_class))
+                            raise FlowLockFailed(f'Lock failed for {flow_class}')
                     else:
                         yield
                         break
         return lock
 
 
-class CacheLock(object):
+class CacheLock:
     """
     Task lock based on Django cache.
 
@@ -80,7 +79,7 @@ class CacheLock(object):
     def __call__(self, flow):  # noqa D102
         @contextmanager
         def lock(flow_class, process_pk):
-            key = 'django-viewflow-lock-{}/{}'.format(flow_class._meta.flow_label, process_pk)
+            key = f'django-viewflow-lock-{flow_class._meta.flow_label}/{process_pk}'
 
             for i in range(self.attempts):
                 if self.cache.add(key, 1, self.expires):
@@ -89,7 +88,7 @@ class CacheLock(object):
                     sleep_time = (((i + 1) * random.random()) + 2 ** i) / 2.5
                     time.sleep(sleep_time)
             else:
-                raise FlowLockFailed('Lock failed for {}'.format(flow_class))
+                raise FlowLockFailed(f'Lock failed for {flow_class}')
 
             try:
                 with transaction.atomic():

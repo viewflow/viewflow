@@ -7,7 +7,7 @@ from .views import (
 )
 
 
-class FlowViewSet(object):
+class FlowViewSet:
     """
     Shortcut for a flow urls routing.
 

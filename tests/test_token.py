@@ -30,5 +30,5 @@ class Test(TestCase):
         source = Token.split_token_source(prev_token, task_pk=5)
         tokens = list(islice(source, 5))
 
-        self.assertEqual(set([token.get_common_split_prefix('start/1_2/3_4', 0) for token in tokens]),
-                         set(['start/1_2/3_4/5_']))
+        self.assertEqual({token.get_common_split_prefix('start/1_2/3_4', 0) for token in tokens},
+                         {'start/1_2/3_4/5_'})

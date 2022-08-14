@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import threading
 import traceback
 import uuid
@@ -13,7 +11,7 @@ from django.utils.translation import pgettext_lazy
 from . import fsm, signals
 
 
-class STATUS(object):
+class STATUS:
     """Activation status constants used in the viewflow.
 
     3d party code can use any other strings in addition to build in
@@ -52,7 +50,7 @@ def all_leading_canceled(activation):
     return non_canceled_count == 0
 
 
-class Context(object):
+class Context:
     """Thread-local activation context, dynamically scoped.
 
     :keyword propagate_exception: If True, on activation failure
@@ -105,7 +103,7 @@ class Context(object):
 context = Context.create(propagate_exception=True)
 
 
-class Activation(object):
+class Activation:
     """
     Base class for flow task activations.
 
@@ -137,7 +135,7 @@ class Activation(object):
         self.flow_class, self.flow_task = None, None
         self.process, self.task = None, None
 
-        super(Activation, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @status.setter()
     def set_status(self, value):
@@ -169,7 +167,7 @@ class Activation(object):
                     yield
             except Exception as exc:
                 if not context.propagate_exception:
-                    self.task.comments = "{}\n{}".format(exc, traceback.format_exc())
+                    self.task.comments = f"{exc}\n{traceback.format_exc()}"
                     self.task.finished = now()
                     self.set_status(STATUS.ERROR)
                     self.task.save()
@@ -199,7 +197,7 @@ class Activation(object):
         self.task.save()
 
         # call custom undo handler
-        handler_name = '{}_undo'.format(self.flow_task.name)
+        handler_name = f'{self.flow_task.name}_undo'
         handler = getattr(self.flow_class.instance, handler_name, None)
         if handler:
             handler(self)
@@ -304,7 +302,7 @@ class StartActivation(Activation):
         self.task.save()
 
         # call custom undo handler
-        handler_name = '{}_undo'.format(self.flow_task.name)
+        handler_name = f'{self.flow_task.name}_undo'
         handler = getattr(self.flow_class.instance, handler_name, None)
         if handler:
             handler(self)
@@ -390,7 +388,7 @@ class ViewActivation(Activation):
     def undo(self):
         """Undo the task."""
         self.task.owner = None
-        super(ViewActivation, self).undo.original()
+        super().undo.original()
 
     @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
@@ -540,7 +538,7 @@ class AbstractGateActivation(Activation):
         conditions=[all_leading_canceled])
     def undo(self):
         """Undo the task."""
-        super(AbstractGateActivation, self).undo.original()
+        super().undo.original()
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):
@@ -684,12 +682,12 @@ class AbstractJobActivation(Activation):
         target=STATUS.ASSIGNED, conditions=[all_leading_canceled])
     def undo(self):
         """Undo the task."""
-        super(AbstractJobActivation, self).undo.original()
+        super().undo.original()
 
     @Activation.status.transition(source=[STATUS.NEW, STATUS.ASSIGNED], target=STATUS.CANCELED)
     def cancel(self):
         """Cancel existing task."""
-        super(AbstractJobActivation, self).cancel.original()
+        super().cancel.original()
 
     @Activation.status.transition(source=STATUS.DONE, conditions=[all_leading_canceled])
     def activate_next(self):
@@ -779,7 +777,7 @@ class EndActivation(Activation):
         self.process.status = STATUS.NEW
         self.process.finished = None
         self.process.save()
-        super(EndActivation, self).undo.original()
+        super().undo.original()
 
     @classmethod
     def activate(cls, flow_task, prev_activation, token):

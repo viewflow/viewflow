@@ -21,7 +21,7 @@ class AbstractJob(mixins.TaskDescriptionMixin,
     task_type = 'JOB'
 
     def __init__(self, job, **kwargs):  # noqa D102
-        super(AbstractJob, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._job = job
 
     @property

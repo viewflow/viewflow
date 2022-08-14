@@ -103,7 +103,7 @@ def flow_job(func):
                 task = flow_task.flow_class.task_class.objects.get(pk=task_pk, process_id=process_pk)
                 activation = flow_task.activation_class()
                 activation.initialize(flow_task, task)
-                activation.error(comments="{}\n{}".format(exc, traceback.format_exc()))
+                activation.error(comments=f"{exc}\n{traceback.format_exc()}")
             raise
         else:
             # mark as done

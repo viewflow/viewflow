@@ -25,7 +25,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         next_url = views.get_next_task_url(request, process)
-        self.assertEqual(next_url, '/test/{}/'.format(process.pk))
+        self.assertEqual(next_url, f'/test/{process.pk}/')
 
     def test_get_next_task_url_back(self):
         request = RequestFactory().get('/test/', {'back': '/test_back_url/'})
@@ -53,7 +53,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         next_url = views.get_next_task_url(request, act.process)
-        self.assertEqual(next_url, '/test/{}/test_task/{}/'.format(task.process_id, task.pk))
+        self.assertEqual(next_url, f'/test/{task.process_id}/test_task/{task.pk}/')
 
     def test_get_next_task_url_continue_unassigned_task(self):
         user = User.objects.create(username='test')
@@ -66,7 +66,7 @@ class Test(TestCase):
         request.resolver_match = resolve('/test/')
 
         next_url = views.get_next_task_url(request, act.process)
-        self.assertEqual(next_url, '/test/{}/test_task/{}/assign/'.format(task.process_id, task.pk))
+        self.assertEqual(next_url, f'/test/{task.process_id}/test_task/{task.pk}/assign/')
 
     def test_detail_view(self):
         act = BaseViewTestFlow.start.run()

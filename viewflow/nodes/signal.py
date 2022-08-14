@@ -45,7 +45,7 @@ class StartSignal(mixins.TaskDescriptionMixin,
         self.receiver = receiver
         self.sender = sender
 
-        super(StartSignal, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def on_signal(self, sender, **signal_kwargs):
         """Signal handler."""
@@ -110,13 +110,13 @@ class Signal(mixins.TaskDescriptionMixin,
         self.sender = sender
         self.task_loader = task_loader
         self.allow_skip = allow_skip
-        super(Signal, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def on_signal(self, sender, **signal_kwargs):
         """Signal handler."""
         if self.task_loader is None:
             if 'task' not in signal_kwargs:
-                raise FlowRuntimeError('{} have no task_loader and got signal without task instance'.format(self.name))
+                raise FlowRuntimeError(f'{self.name} have no task_loader and got signal without task instance')
             return self.receiver(sender=sender, **signal_kwargs)
         else:
             task = self.task_loader(self, sender=sender, **signal_kwargs)

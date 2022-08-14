@@ -19,7 +19,7 @@ class DynamicSplitActivation(AbstractGateActivation):
         elif self.flow_task._ifnone_next_node is not None:
             self.flow_task._ifnone_next_node.activate(prev_activation=self, token=self.task.token)
         else:
-            raise FlowRuntimeError("{} activated with zero and no IfNone nodes specified".format(self.flow_task.name))
+            raise FlowRuntimeError(f"{self.flow_task.name} activated with zero and no IfNone nodes specified")
 
 
 class DynamicSplit(mixins.NextNodeMixin,
@@ -52,12 +52,12 @@ class DynamicSplit(mixins.NextNodeMixin,
     activation_class = DynamicSplitActivation
 
     def __init__(self, callback):
-        super(DynamicSplit, self).__init__()
+        super().__init__()
         self._task_count_callback = callback
         self._ifnone_next_node = None
 
     def _resolve(self, resolver):
-        super(DynamicSplit, self)._resolve(resolver)
+        super()._resolve(resolver)
         self._ifnone_next_node = resolver.get_implementation(self._ifnone_next_node)
 
     def IfNone(self, node):

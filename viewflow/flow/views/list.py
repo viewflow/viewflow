@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.views import generic
 
 from ... import activation, models
@@ -85,14 +83,14 @@ class ProcessListView(FlowViewPermissionMixin, generic.ListView):
             opts = self.flow_class._meta
 
             return (
-                '{}/{}/process_list.html'.format(opts.app_label, opts.flow_label),
+                f'{opts.app_label}/{opts.flow_label}/process_list.html',
                 'viewflow/flow/process_list.html')
         else:
             return [self.template_name]
 
     def get_context_data(self, **kwargs):
         """Context for a view."""
-        context = super(ProcessListView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['flow_class'] = self.flow_class
         return context
 
@@ -122,7 +120,7 @@ class TaskListView(FlowViewPermissionMixin, generic.ListView):
             opts = self.flow_class._meta
 
             return (
-                '{}/{}/task_list.html'.format(opts.app_label, opts.flow_label),
+                f'{opts.app_label}/{opts.flow_label}/task_list.html',
                 'viewflow/flow/task_list.html')
         else:
             return [self.template_name]
@@ -155,7 +153,7 @@ class QueueListView(FlowViewPermissionMixin, generic.ListView):
             opts = self.flow_class._meta
 
             return (
-                '{}/{}/queue.html'.format(opts.app_label, opts.flow_label),
+                f'{opts.app_label}/{opts.flow_label}/queue.html',
                 'viewflow/flow/queue.html')
         else:
             return [self.template_name]
@@ -187,7 +185,7 @@ class ArchiveListView(FlowViewPermissionMixin, generic.ListView):
             opts = self.flow_class._meta
 
             return (
-                '{}/{}/archive.html'.format(opts.app_label, opts.flow_label),
+                f'{opts.app_label}/{opts.flow_label}/archive.html',
                 'viewflow/flow/archive.html')
         else:
             return [self.template_name]

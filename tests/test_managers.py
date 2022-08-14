@@ -56,7 +56,7 @@ class Test(TestCase):
 
         with self.assertNumQueries(1):
             queryset = managers.ProcessQuerySet(model=Process).coerce_for([GrandChildFlow, ChildFlow, Flow])
-            self.assertEqual(set(queryset), set([process1, process2, process3]))
+            self.assertEqual(set(queryset), {process1, process2, process3})
 
     def test_process_queryset_cource_values_list(self):
         process = ChildProcess.objects.create(flow_class=ChildFlow)
@@ -129,7 +129,7 @@ class Test(TestCase):
 
         with self.assertNumQueries(1):
             queryset = managers.TaskQuerySet(model=Task).coerce_for([GrandChildFlow, ChildFlow])
-            self.assertEqual(set(queryset), set([task1, task2]))
+            self.assertEqual(set(queryset), {task1, task2})
 
     def test_task_queryset_cource_values_list(self):
         process = ChildProcess.objects.create(flow_class=ChildFlow)

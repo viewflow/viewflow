@@ -39,7 +39,7 @@ def get_next_task_url(request, process):
 
     # Back to process list
     if process and process.pk:
-        return reverse('{}:detail'.format(namespace),
+        return reverse(f'{namespace}:detail',
                        kwargs={'process_pk': process.pk})
     else:
-        return reverse('{}:index'.format(namespace))
+        return reverse(f'{namespace}:index')

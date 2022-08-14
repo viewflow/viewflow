@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from collections import OrderedDict
 
 from django import template
@@ -66,13 +64,13 @@ def flowurl(parser, token):
                 app_label, flow_class_path = ref.split('/')
             except ValueError:
                 raise TemplateSyntaxError(
-                    "Flow reference string should  looks like 'app_label/FlowCls' but '{}'".format(ref))
+                    f"Flow reference string should  looks like 'app_label/FlowCls' but '{ref}'")
 
             app_package = get_app_package(app_label)
             if app_package is None:
-                raise TemplateSyntaxError("{} app not found".format(app_label))
+                raise TemplateSyntaxError(f"{app_label} app not found")
 
-            flow_class = import_string('{}.flows.{}'.format(app_package, flow_class_path))
+            flow_class = import_string(f'{app_package}.flows.{flow_class_path}')
             namespace = get_flow_namespace(flow_class, ns, ns_map)
             url_ref = '{}:{}'.format(namespace, url_name if url_name else 'index')
             return reverse(url_ref)
@@ -190,7 +188,7 @@ def include_process_data(context, process):
     opts = process.flow_class._meta
 
     template_names = (
-        '{}/{}/process_data.html'.format(opts.app_label, opts.flow_label),
+        f'{opts.app_label}/{opts.flow_label}/process_data.html',
         'viewflow/flow/process_data.html')
     template = select_template(template_names)
     context.push()

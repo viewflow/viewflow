@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import django
 from django.db.models import Q
 from django.db.models.query import ModelIterable
@@ -68,7 +66,7 @@ def coerce_to_related_instance(instance, target_model):
 
 class ProcessIterable(ModelIterable):
     def __iter__(self):
-        base_iterator = super(ProcessIterable, self).__iter__()
+        base_iterator = super().__iter__()
         if getattr(self.queryset, '_coerced', False):
             for process in base_iterator:
                 if isinstance(process, self.queryset.model):
@@ -83,7 +81,7 @@ class ProcessQuerySet(QuerySet):
     """Base manager for the flow Process."""
 
     def __init__(self, *args, **kwargs):
-        super(ProcessQuerySet, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._iterable_class = ProcessIterable
 
     def coerce_for(self, flow_classes):
@@ -104,7 +102,7 @@ class ProcessQuerySet(QuerySet):
         return self.model.objects.coerce_for(_available_flows(flow_classes, user))
 
     def _chain(self, **kwargs):
-        chained = super(ProcessQuerySet, self)._chain(**kwargs)
+        chained = super()._chain(**kwargs)
         if hasattr(self, '_coerced'):
             chained._coerced = self._coerced
         return chained
@@ -112,18 +110,18 @@ class ProcessQuerySet(QuerySet):
     def _clone(self, *args, **kwargs):
         if django.VERSION >= (2, 0):
             # attr cloning happens in self._chain()
-            return super(ProcessQuerySet, self)._clone()
+            return super()._clone()
 
         try:
             kwargs.update({'_coerced': self._coerced})
         except AttributeError:
             pass
-        return super(ProcessQuerySet, self)._clone(*args, **kwargs)
+        return super()._clone(*args, **kwargs)
 
 
 class TaskIterable(ModelIterable):
     def __iter__(self):
-        base_iterator = super(TaskIterable, self).__iter__()
+        base_iterator = super().__iter__()
         if getattr(self.queryset, '_coerced', False):
             for task in base_iterator:
                 if isinstance(task, self.queryset.model):
@@ -138,7 +136,7 @@ class TaskQuerySet(QuerySet):
     """Base manager for the Task."""
 
     def __init__(self, *args, **kwargs):
-        super(TaskQuerySet, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         self._iterable_class = TaskIterable
 
     def coerce_for(self, flow_classes):
@@ -199,20 +197,20 @@ class TaskQuerySet(QuerySet):
             .filter(owner=user, finished__isnull=False)
 
     def _chain(self, **kwargs):
-        chained = super(TaskQuerySet, self)._chain(**kwargs)
+        chained = super()._chain(**kwargs)
         if hasattr(self, '_coerced'):
             chained._coerced = self._coerced
         return chained
 
     def _clone(self, *args, **kwargs):
         if django.VERSION >= (2, 0):
-            return super(TaskQuerySet, self)._clone()
+            return super()._clone()
 
         try:
             kwargs.update({'_coerced': self._coerced})
         except AttributeError:
             pass
-        return super(TaskQuerySet, self)._clone(*args, **kwargs)
+        return super()._clone(*args, **kwargs)
 
 
 ProcessManager = ProcessQuerySet.as_manager()

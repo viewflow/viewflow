@@ -1,5 +1,4 @@
 """Import flows before auth permission setup."""
-from __future__ import unicode_literals
 
 import django
 from django.apps import apps
@@ -58,7 +57,7 @@ def create_permissions(app_config, verbosity=2, interactive=True, using=DEFAULT_
 def import_flows(app_config, **kwargs):
     """Pre-import flows to allow permissions auto-creation."""
     try:
-        __import__('{}.flows'.format(app_config.module.__name__))
+        __import__(f'{app_config.module.__name__}.flows')
     except ImportError:
         pass
 

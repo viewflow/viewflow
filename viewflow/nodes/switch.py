@@ -10,7 +10,7 @@ class SwitchActivation(AbstractGateActivation):
 
     def __init__(self, **kwargs):  # noqa D102
         self.next_task = None
-        super(SwitchActivation, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def calculate_next(self):
         """Calculate node to activate."""
@@ -23,7 +23,7 @@ class SwitchActivation(AbstractGateActivation):
                 self.next_task = node
 
         if not self.next_task:
-            raise FlowRuntimeError('No next task available for {}'.format(self.flow_task.name))
+            raise FlowRuntimeError(f'No next task available for {self.flow_task.name}')
 
     @Activation.status.super()
     def activate_next(self):
@@ -57,7 +57,7 @@ class Switch(mixins.TaskDescriptionMixin,
     activation_class = SwitchActivation
 
     def __init__(self, **kwargs):  # noqa D102
-        super(Switch, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._activate_next = []
 
     def _outgoing(self):

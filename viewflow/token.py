@@ -1,11 +1,9 @@
-from __future__ import unicode_literals
-
 from itertools import count
 from django.utils.deconstruct import deconstructible
 
 
 @deconstructible
-class Token(object):
+class Token:
     """
     Helper for tree-like flow token management.
 
@@ -39,7 +37,7 @@ class Token(object):
     def get_common_split_prefix(self, join_token, task_pk):
         """Common prefix for tokens."""
         if self == join_token:
-            return '{}/{}_'.format(self.token, task_pk)
+            return f'{self.token}/{task_pk}_'
         return '{}_'.format(self.token.rsplit('_', 1)[0])
 
     def __str__(self):
@@ -59,4 +57,4 @@ class Token(object):
     def split_token_source(cls, prev_token, task_pk):
         """Span a set of uniq tokens with common prefix."""
         for n in count(1):
-            yield Token("{}/{}_{}".format(prev_token, task_pk, n))
+            yield Token(f"{prev_token}/{task_pk}_{n}")

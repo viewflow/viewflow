@@ -21,7 +21,7 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
     viewset = 'viewflow.frontend.viewset.FrontendViewSet'
 
     def __init__(self, app_name, app_module):  # noqa D102
-        super(ViewflowFrontendConfig, self).__init__(app_name, app_module)
+        super().__init__(app_name, app_module)
         self._registry = {}
 
     def register(self, flow_class, viewset_class=None):
@@ -78,7 +78,7 @@ class ViewflowFrontendConfig(ModuleMixin, AppConfig):
     def sites(self):
         """List of all flows with a title."""
         return sorted(
-            [
+            (
                 (flow_class.process_title, flow_class)
                 for flow_class in self._registry.keys()
-            ], key=lambda item: item[0])
+            ), key=lambda item: item[0])

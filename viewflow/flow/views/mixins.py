@@ -8,12 +8,12 @@ from ...compat import _
 from ...exceptions import FlowRuntimeError
 
 
-class LoginRequiredMixin(object):
+class LoginRequiredMixin:
     """Mixin to check that user is authenticated."""
 
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):  # noqa D102
-        return super(LoginRequiredMixin, self).dispatch(*args, **kwargs)
+        return super().dispatch(*args, **kwargs)
 
 @method_decorator(login_required, name="dispatch")
 class FlowViewPermissionMixin:
@@ -22,7 +22,7 @@ class FlowViewPermissionMixin:
     def dispatch(self, *args, **kwargs):  # noqa D102
         self.flow_class = kwargs['flow_class']
         return permission_required(self.flow_class._meta.view_permission_name, raise_exception=True)(
-            super(FlowViewPermissionMixin, self).dispatch)(*args, **kwargs)
+            super().dispatch)(*args, **kwargs)
 
 
 @method_decorator(login_required, name="dispatch")
@@ -32,7 +32,7 @@ class FlowManagePermissionMixin:
     def dispatch(self, *args, **kwargs):  # noqa D102
         self.flow_class = kwargs['flow_class']
         return permission_required(self.flow_class._meta.manage_permission_name, raise_exception=True)(
-            super(FlowManagePermissionMixin, self).dispatch)(*args, **kwargs)
+            super().dispatch)(*args, **kwargs)
 
 
 @method_decorator(login_required, name="dispatch")
@@ -43,10 +43,10 @@ class FlowTaskManagePermissionMixin:
         self.flow_task = kwargs['flow_task']
         self.flow_class = self.flow_task.flow_class
         return permission_required(self.flow_class._meta.manage_permission_name, raise_exception=True)(
-            super(FlowTaskManagePermissionMixin, self).dispatch)(*args, **kwargs)
+            super().dispatch)(*args, **kwargs)
 
 
-class MessageUserMixin(object):
+class MessageUserMixin:
     """Notify a user using django messaging system."""
 
     def report(self, message, level=messages.INFO, fail_silently=True, **kwargs):
@@ -68,7 +68,7 @@ class MessageUserMixin(object):
         """
         namespace = self.request.resolver_match.namespace
 
-        process_url = reverse('{}:detail'.format(namespace), args=[self.activation.process.pk])
+        process_url = reverse(f'{namespace}:detail', args=[self.activation.process.pk])
         process_link = '<a href="{process_url}">#{process_pk}</a>'.format(
             process_url=process_url,
             process_pk=self.activation.process.pk)
@@ -96,7 +96,7 @@ class MessageUserMixin(object):
         self.report(message, level=messages.ERROR, fail_silently=fail_silently, **kwargs)
 
 
-class FlowListMixin(object):
+class FlowListMixin:
     """Mixin for list view contains multiple flows."""
 
     ns_map = None
@@ -109,7 +109,7 @@ class FlowListMixin(object):
         :param ns_map: Dict{flow_class : 'flow_namespace'}
         """
         self.ns_map = kwargs.get('ns_map', {})
-        super(FlowListMixin, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @property
     def flows(self):
@@ -119,13 +119,13 @@ class FlowListMixin(object):
     def get_flow_namespace(self, flow_class):
         namespace = self.ns_map.get(flow_class)
         if namespace is None:
-            raise FlowRuntimeError("{} are not registered in {}".format(flow_class, self))
+            raise FlowRuntimeError(f"{flow_class} are not registered in {self}")
         if not self.ns_map_absolute:
-            return "{}:{}".format(self.request.resolver_match.namespace, namespace)
+            return f"{self.request.resolver_match.namespace}:{namespace}"
 
     def get_process_url(self, process, url_type='detail'):
         namespace = self.get_flow_namespace(process.flow_class)
-        return reverse('{}:{}'.format(namespace, url_type), args=[process.pk])
+        return reverse(f'{namespace}:{url_type}', args=[process.pk])
 
     def get_task_url(self, task, url_type=None):
         namespace = self.get_flow_namespace(task.process.flow_class)

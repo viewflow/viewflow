@@ -9,7 +9,7 @@ class ActivationDataForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):  # noqa D102
         kwargs.setdefault('prefix', '_viewflow_activation')
-        super(ActivationDataForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     class Meta:  # noqa D101
         model = Task

@@ -44,7 +44,7 @@ class StartFunction(mixins.TaskDescriptionMixin,
         :param func: Callable[activation, **kwargs]
         """
         self.func = func if func is not None else self.start_func_default
-        super(StartFunction, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     @method_decorator(flow_start_func)
     def start_func_default(self, activation):
@@ -139,7 +139,7 @@ class Function(mixins.TaskDescriptionMixin,
         """
         self._func = func
         self._task_loader = task_loader
-        super(Function, self).__init__(**kwargs)
+        super().__init__(**kwargs)
 
     def ready(self):
         """Resolve internal `this`-references."""

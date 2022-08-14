@@ -28,7 +28,7 @@ class StartView(StartFlowMixin, generic.UpdateView):
     def activation_done(self, form):
         shipment = form.save()
         self.activation.process.shipment = shipment
-        super(StartView, self).activation_done(form)
+        super().activation_done(form)
 
 
 class ShipmentView(FlowMixin, generic.UpdateView):

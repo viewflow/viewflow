@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 from django.db import models
 from django.utils.encoding import python_2_unicode_compatible
 from viewflow.models import Process, Task
@@ -24,7 +22,7 @@ class Insurance(models.Model):
     cost = models.IntegerField()
 
     def __str__(self):
-        return '{} ${}'.format(self.company_name, self.cost)
+        return f'{self.company_name} ${self.cost}'
 
 
 class Shipment(models.Model):

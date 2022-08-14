@@ -12,7 +12,7 @@ class BaseFlow(Flow):
         raise NotImplementedError
 
 
-class FlowMixin(object):
+class FlowMixin:
     notify_admins = flow.Handler(this.send_alert).Next(this.notify_users)
     notify_users = flow.Handler(this.send_alert)
 
@@ -39,7 +39,7 @@ class Test(TestCase):
         self.assertEqual(ChildFlow.notify_users._next, ChildFlow.end)
 
     def test_child_flow_contains_all_urls(self):
-        patterns_names = sorted([pat.name for pat in ChildFlow.instance.urls.url_patterns])
+        patterns_names = sorted(pat.name for pat in ChildFlow.instance.urls.url_patterns)
         self.assertEqual(patterns_names, sorted([
             'alert__perform', 'alert__cancel', 'alert__undo', 'alert__detail',
             'end__perform', 'end__cancel', 'end__undo', 'end__detail',

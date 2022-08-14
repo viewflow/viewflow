@@ -86,7 +86,7 @@ class Test(unittest.TestCase):
         self.assertTrue(state_setter.done.can_proceed())
 
 
-class Base(object):
+class Base:
     state = State(default='initial')
 
     @state.transition(source='initial', target='prepared')
@@ -105,7 +105,7 @@ class Base(object):
 class Child(Base):
     @Base.state.super()
     def start(self):
-        super(Child, self).start.original()
+        super().start.original()
 
     @Base.state.transition(source='started', target='finalizing')
     def done(self):
@@ -120,7 +120,7 @@ class SubChild(Child):
     pass
 
 
-class Mixin(object):
+class Mixin:
     pass
 
 
@@ -128,7 +128,7 @@ class SubChildWithMixin(Mixin, Child):
     pass
 
 
-class StateSetter(object):
+class StateSetter:
     state = State()
 
     def __init__(self):

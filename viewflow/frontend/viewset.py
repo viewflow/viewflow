@@ -13,7 +13,7 @@ class FlowViewSet(BaseFlowViewSet):
     ]
 
 
-class FrontendViewSet(object):
+class FrontendViewSet:
     def __init__(self, registry):
         self.registry = registry
 
@@ -153,11 +153,11 @@ class FrontendViewSet(object):
             for flow_class, flow_router in items:
                 flow_label = flow_class._meta.flow_label
                 app_views.append(
-                    path('{}/'.format(flow_label), include((flow_router.urls, flow_label)))
+                    path(f'{flow_label}/', include((flow_router.urls, flow_label)))
                 )
 
             result.append(
-                path('{}/'.format(app_label), include((app_views, app_label)))
+                path(f'{app_label}/', include((app_views, app_label)))
             )
 
         return result

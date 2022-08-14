@@ -1,5 +1,3 @@
-from __future__ import unicode_literals
-
 import inspect
 
 
@@ -7,7 +5,7 @@ class TransitionNotAllowed(Exception):
     """Raised when a transition is not allowed."""
 
 
-class Transition(object):
+class Transition:
     """Allowed state change."""
 
     __slots__ = ('source', 'target', 'conditions')
@@ -22,7 +20,7 @@ class Transition(object):
         return all(map(lambda condition: condition(instance), self.conditions))
 
 
-class TransitionMethod(object):
+class TransitionMethod:
     """Instance method wrapper that performs the transition."""
 
     do_not_call_in_templates = True
@@ -44,7 +42,7 @@ class TransitionMethod(object):
         return self.descriptor(self.instance, *args, **kwargs)
 
 
-class TransitionDescriptor(object):
+class TransitionDescriptor:
     """Base transition definition descriptor."""
 
     do_not_call_in_templates = True
@@ -100,10 +98,10 @@ class TransitionDescriptor(object):
         transition = self.get_transition(current_state, instance)
 
         if transition is None:
-            raise TransitionNotAllowed('No transition from {0}'.format(current_state))
+            raise TransitionNotAllowed(f'No transition from {current_state}')
 
         if not transition.conditions_met(instance):
-            raise TransitionNotAllowed("Transition conditions have not been met for method '{0}'".format(self.name))
+            raise TransitionNotAllowed(f"Transition conditions have not been met for method '{self.name}'")
 
         if transition.target:
             self.state.set(instance, transition.target)
@@ -131,7 +129,7 @@ class SuperTransitionDescriptor(TransitionDescriptor):
                 if not isinstance(super_descriptor, SuperTransitionDescriptor):
                     break
         else:
-            raise ValueError('Base transition not found for {}'.format(self.name))
+            raise ValueError(f'Base transition not found for {self.name}')
 
         return super_descriptor
 
@@ -157,10 +155,10 @@ class SuperTransitionDescriptor(TransitionDescriptor):
         transition = descriptor.get_transition(current_state, instance)
 
         if transition is None:
-            raise TransitionNotAllowed('No transition from {0}'.format(current_state))
+            raise TransitionNotAllowed(f'No transition from {current_state}')
 
         if not transition.conditions_met(instance):
-            raise TransitionNotAllowed("Transition conditions have not been met for method '{0}'".format(self.name))
+            raise TransitionNotAllowed(f"Transition conditions have not been met for method '{self.name}'")
 
         if transition.target:
             self.state.set(instance, transition.target)
@@ -174,7 +172,7 @@ class SuperTransitionDescriptor(TransitionDescriptor):
             return result
 
 
-class State(object):
+class State:
     """A descriptor that handles state."""
 
     def __init__(self, default=None):  # noqa D102
@@ -208,7 +206,7 @@ class State(object):
     @property
     def propname(self):
         """Default class attribute name to store the state."""
-        return '_fsm{}'.format(id(self))
+        return f'_fsm{id(self)}'
 
     def transition(self, source=None, target=None, conditions=None):
         """Decorator to mark transition methods."""
@@ -253,7 +251,7 @@ class State(object):
 
     def get_available_transitions(self, instance):
         """List of transitions available from the current state."""
-        transitions_cache = instance.__class__.__dict__.get('_transitions{}'.format(self.propname), None)
+        transitions_cache = instance.__class__.__dict__.get(f'_transitions{self.propname}', None)
         if transitions_cache is None:
             transitions_cache = {}
             descriptors = inspect.getmembers(instance.__class__, lambda attr: isinstance(attr, TransitionDescriptor))
@@ -263,7 +261,7 @@ class State(object):
                         transitions_cache[source] = []
                     transitions_cache[source].append(descriptor)
 
-            setattr(instance.__class__, '_transitions{}'.format(self.propname), transitions_cache)
+            setattr(instance.__class__, f'_transitions{self.propname}', transitions_cache)
 
         result = [descriptor for descriptor in transitions_cache.get(self.get(instance), [])
                   if descriptor.can_proceed(instance)]

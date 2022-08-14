@@ -1,6 +1,4 @@
-from __future__ import unicode_literals
-
-from six.moves.urllib.parse import quote as urlquote
+from urllib.parse import quote as urlquote
 
 from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseRedirect
@@ -20,7 +18,7 @@ from .mixins import MessageUserMixin
 from .utils import get_next_task_url
 
 
-class BaseFlowMixin(object):
+class BaseFlowMixin:
     """Mixin for a task views."""
 
     def get_context_data(self, **kwargs):
@@ -28,7 +26,7 @@ class BaseFlowMixin(object):
 
         :keyword activation: the task activation instance
         """
-        context = super(BaseFlowMixin, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['activation'] = self.activation
         return context
 
@@ -50,8 +48,8 @@ class BaseFlowMixin(object):
             opts = self.activation.flow_task.flow_class._meta
 
             return (
-                '{}/{}/{}.html'.format(opts.app_label, opts.flow_label, flow_task.name),
-                '{}/{}/task.html'.format(opts.app_label, opts.flow_label),
+                f'{opts.app_label}/{opts.flow_label}/{flow_task.name}.html',
+                f'{opts.app_label}/{opts.flow_label}/task.html',
                 'viewflow/flow/task.html')
         else:
             return [self.template_name]
@@ -71,7 +69,7 @@ class BaseFlowMixin(object):
             raise PermissionDenied
 
         self.activation.prepare(request.POST or None)
-        return super(BaseFlowMixin, self).dispatch(request, **kwargs)
+        return super().dispatch(request, **kwargs)
 
 
 class FlowMixin(MessageUserMixin, BaseFlowMixin):
@@ -86,7 +84,7 @@ class FlowMixin(MessageUserMixin, BaseFlowMixin):
 
     def form_valid(self, *args, **kwargs):
         """If the form is valid, save the associated model and finish the task."""
-        super(FlowMixin, self).form_valid(*args, **kwargs)
+        super().form_valid(*args, **kwargs)
         self.activation_done(*args, **kwargs)
         return HttpResponseRedirect(self.get_success_url())
 
@@ -96,7 +94,7 @@ FlowViewMixin = FlowMixin  # TODO Remove
 
 class UpdateProcessView(FlowMixin, generic.UpdateView):  # noqa D101
     def __init__(self, *args, **kwargs):  # noqa D102
-        super(UpdateProcessView, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if self.form_class is None and self.fields is None:
             self.fields = []
 
@@ -133,8 +131,8 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
             opts = self.activation.flow_class._meta
 
             return (
-                '{}/{}/{}_assign.html'.format(opts.app_label, opts.flow_label, flow_task.name),
-                '{}/{}/task_assign.html'.format(opts.app_label, opts.flow_label),
+                f'{opts.app_label}/{opts.flow_label}/{flow_task.name}_assign.html',
+                f'{opts.app_label}/{opts.flow_label}/task_assign.html',
                 'viewflow/flow/task_assign.html')
         else:
             return [self.template_name]
@@ -144,7 +142,7 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
 
         :keyword activation: the task activation instance
         """
-        context = super(AssignTaskView, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context['activation'] = self.activation
         return context
 
@@ -159,7 +157,7 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
             back = '/'
 
         if '_continue' in self.request.POST and back:
-            url = "{}?back={}".format(url, urlquote(back))
+            url = f"{url}?back={urlquote(back)}"
         elif back:
             url = back
 
@@ -195,7 +193,7 @@ class AssignTaskView(MessageUserMixin, generic.TemplateView):
         if not self.activation.flow_task.can_assign(request.user, self.activation.task):
             raise PermissionDenied
 
-        return super(AssignTaskView, self).dispatch(request, *args, **kwargs)
+        return super().dispatch(request, *args, **kwargs)
 
 
 class UnassignTaskView(BaseTaskActionView):
