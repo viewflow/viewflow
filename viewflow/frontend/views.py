@@ -275,7 +275,7 @@ class AllArchiveListView(FlowListMixin,
     def process_summary(self, task):
         process_url = frontend_url(self.request, self.get_process_url(task.process), back_link='here')
         return mark_safe('<a href="{}">{}</a>'.format(
-            process_url, task.flow_process.summary()))
+            process_url, task.flow_process.summary))
     process_summary.short_description = _('Process Summary')
 
     def get_queryset(self):
@@ -313,7 +313,7 @@ class ProcessListView(FlowViewPermissionMixin,
     def process_summary(self, process):
         return mark_safe('<a href="{}">{}</a>'.format(
             self.get_process_link(process),
-            process.summary())
+            process.summary)
         )
     process_summary.short_description = 'Summary'
 
