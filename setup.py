@@ -30,6 +30,7 @@ setuptools.setup(
         'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
     ],
     install_requires=[
-        'Django>=3.1',
+        'Django>=3.2',
+        'django-filter>=2.3.0',
     ],
 )
