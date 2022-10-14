@@ -1,0 +1,42 @@
+vf-field-date {
+  .vf-datepicker__button {
+    padding: 0;
+    height: 24px;
+    margin-top: 24px;
+    margin-left: 8px;
+    min-width: 24px;
+  }
+
+  .vf-text-field__input--date:not(:focus)::placeholder {
+    color: transparent !important;
+  }
+
+  .vf-text-field__input--date:focus::placeholder {
+    color: rgba(0,0,0,.38);
+  }
+
+  .mdc-dialog .mdc-dialog__content {
+    padding: 0 8px 0 0;
+  }
+
+  @media (max-width: 600px) {
+    .mdc-dialog .mdc-dialog__content {
+      padding: 0 8px 0 8px;
+    }
+  }
+
+  .vf-datepicker__surface {
+    width: auto;
+    min-width: initial;
+
+    .mdc-dialog__body {
+      padding: 0 10px 0px 0px;
+      margin: 0;
+    }
+  }
+
+  .mdc-text-field-helper-text--persistent {
+    margin-top: -6px;
+    font-size: 10px;
+  }
+}

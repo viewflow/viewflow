@@ -1,0 +1,60 @@
+@import '@material/typography/mixins.scss';
+
+.vf-form {
+  padding: 0;
+}
+
+
+.vf-form-row {
+  grid-row-gap: 0;
+}
+
+.vf-form__visiblefields  {
+  grid-gap: 0;
+}
+
+.vf-form__formset-header {
+  @include mdc-typography("subtitle2");
+
+  margin-top: 8px;
+  margin-bottom: 8px;
+  padding-bottom: 16px;
+  padding-left: 8px;
+  position: relative;
+  font-weight: 400;
+  font-size: 0.9rem;
+  color:  #333;
+}
+
+.vf-form__formset-header:before {
+  content: "";
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: -8px;
+  left: 0;
+  background-color: var(--mdc-theme-primary, #3f51b5);
+  opacity: 0.1;
+}
+
+.vf-form__button--active {
+  background-image: -webkit-gradient(linear, 0 0, 100% 100%,
+    color-stop(.25, rgba(0, 0, 0, .10)),
+    color-stop(.25, transparent),
+    color-stop(.5, transparent),
+    color-stop(.5, rgba(0, 0, 0, .10)),
+    color-stop(.75, rgba(0, 0, 0, .10)),
+    color-stop(.75, transparent),
+    to(transparent));
+  background-size: 50px 50px;
+  animation: vf-form__button-stripes 2s linear infinite;
+}
+
+@keyframes vf-form__button-stripes {
+  from {
+      background-position: 0 0;
+  }
+  to {
+     background-position: -50px 0;
+  }
+}

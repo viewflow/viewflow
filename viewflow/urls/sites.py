@@ -75,6 +75,8 @@ class Application(IndexViewMixin, Viewset):
 
     def has_view_permission(self, user, obj=None):
         if self.permission is not None:
+            if callable(self.permission):
+                return self.permission(user)
             return user.has_perm(self.permission)
         return True
 

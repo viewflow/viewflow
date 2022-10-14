@@ -1,0 +1,63 @@
+// https://html-online.com/articles/simple-popup-box/
+
+vf-modal-trigger {
+ &:not(.vf-modal-trigger--open) {
+    cursor: pointer;
+
+    .vf-modal-trigger__button  {
+      display: none;
+    }
+  }
+
+  &.vf-modal-trigger--open {
+    background:rgba(0,0,0,.4);
+    cursor:pointer;
+    // display:none;
+    height:100%;
+    position:fixed;
+    text-align:center;
+    top:0;
+    left: 0;
+    width:100%;
+    z-index:10000;
+
+    .vf-modal-trigger__helper {
+      display:inline-block;
+      height:100%;
+      vertical-align:middle;
+    }
+
+    .vf-modal-trigger__button {
+      background-color: #fff;
+      cursor: pointer;
+      display: inline-block;
+      font-family: arial;
+      font-weight: bold;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 25px;
+      line-height: 30px;
+      width: 30px;
+      height: 30px;
+      text-align: center;
+
+      &:hover {
+        text-shadow: 1px 1px 1px darkgrey
+      }
+    }
+
+    .vf-modal-trigger__content {
+      cursor: auto;
+      background-color: #fff;
+      box-shadow: 10px 10px 60px #555;
+      display: inline-block;
+      height: 70%;
+      min-height: 70%;
+      vertical-align: middle;
+      width: 60%;
+      position: relative;
+      padding: 15px 5%;
+    }
+  }
+}

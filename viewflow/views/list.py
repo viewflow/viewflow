@@ -319,14 +319,6 @@ class BaseListModelView(generic.ListView):
     def get_column_def(self, attr_name):
         opts = self.model._meta
 
-        # an object field
-        try:
-            model_field = opts.get_field(attr_name)
-        except FieldDoesNotExist:
-            pass
-        else:
-            return ModelFieldColumn(model_field)
-
         # object printable string representation
         if attr_name == "__str__":
             return ObjectAttrColumn(self.model, attr_name, opts.verbose_name.capitalize())
@@ -336,6 +328,14 @@ class BaseListModelView(generic.ListView):
         for data_source in data_sources:
             if hasattr(data_source, attr_name):
                 return DataSourceColumn(data_source, attr_name)
+
+        # an object field
+        try:
+            model_field = opts.get_field(attr_name)
+        except FieldDoesNotExist:
+            pass
+        else:
+            return ModelFieldColumn(model_field)
 
         # a method from object
         if hasattr(self.model, attr_name):

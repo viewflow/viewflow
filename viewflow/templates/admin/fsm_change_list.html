@@ -1,0 +1,36 @@
+{% extends 'admin/change_list.html' %}
+{% load admin_list admin_urls i18n fsm %}
+
+{% block object-tools-items %}
+  {# django-reversion integration #}
+  {% if not is_popup and has_add_permission and has_change_permission %}
+    {% url opts|admin_urlname:'recoverlist' as recover_url %}
+    {% if recover_url %}
+    <li>
+      <a href="{{ recover_url }}" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a>
+    </li>
+    {% endif %}
+  {% endif %}
+
+  {{ block.super }}
+{% endblock %}
+
+{% block filters %}
+  <div id="changelist-filter">
+    <h2>{% trans 'Graph' %}</h2>
+    <div id="changelist-graph">
+      <vf-modal-trigger class="vf-modal-trigger--closed">
+        <span class="vf-modal-trigger__helper"></span>
+        <div class="vf-modal-trigger__content">
+          <div class="vf-modal-trigger__button">&times;</div>
+          <vf-network dot="{{ flow_chart }}"></vf-network>
+        </div>
+      </vf-modal-trigger>
+    </div>
+    {% if cl.has_filters %}
+      <h2>{% trans 'Filter' %}</h2>
+      {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
+    {% endif %}
+  </div>
+  {% endblock %}
+

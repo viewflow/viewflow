@@ -1,7 +1,8 @@
 /* eslint-env browser */
 import './index.scss';
 
-import {menu} from 'material-components-web';
+import {MDCMenu} from '@material/menu';
+
 
 export class VCardMenu extends HTMLElement {
   connectedCallback() {
@@ -9,15 +10,19 @@ export class VCardMenu extends HTMLElement {
       this._menuEl = this.querySelector('.mdc-menu');
       this._triggerEl = this.querySelector('.vf-card__menu-trigger');
 
-      this._mdcMenu = new menu.MDCMenu(this._menuEl);
+      this._mdcMenu = new MDCMenu(this._menuEl);
       this._menuEl.addEventListener('MDCMenu:selected', this.onMenuSelect);
       this._triggerEl.addEventListener('click', this.onToggleMenu);
     });
   }
 
   disconnectedCallback() {
-    this._mdcMenu.destroy();
-    this._triggerEl.removeEventListener('click', this.onToggleMenu);
+    if(this._mdcMenu) {
+      this._mdcMenu.destroy();
+    }
+    if(this._triggerEl) {
+      this._triggerEl.removeEventListener('click', this.onToggleMenu);
+    }
   }
 
   onToggleMenu = () => {

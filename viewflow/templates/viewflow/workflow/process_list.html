@@ -1,0 +1,17 @@
+{% extends 'viewflow/views/list.html' %}
+{% load i18n viewflow %}
+
+
+{% block content %}
+{{ block.super }}
+<div style="position: fixed;right: 23px;bottom: 23px;padding-top: 15px;margin-bottom: 0;z-index: 997;">
+  <a href="{% reverse viewset 'index' %}" style="color:white" class="mdc-fab" aria-label="{% trans 'Process list' %}">
+    <div class="mdc-fab__ripple"></div>
+    <span class="mdc-fab__icon material-icons">dashboard</span>
+  </a>
+</div>
+{% endblock %}
+
+
+{# allow to scroll down to aviod clash with fab button #}
+{% block list-cell %}{{ block.super }}<div style="margin-bottom:35px">&nbsp;</div>{% endblock %}

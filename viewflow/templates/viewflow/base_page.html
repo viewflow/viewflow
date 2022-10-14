@@ -3,15 +3,13 @@
 {% block body %}
 <vf-page-scroll-fix></vf-page-scroll-fix>
 <vf-page class="vf-page">
-  {% block page-menu %}
+  {% block page-menu %}{% if user.is_authenticated %}
   <aside class="vf-page__menu mdc-drawer mdc-drawer--dismissible">
     {% block page-menu-header %}
     <header class="mdc-drawer__header vf-page__menu-header">
       <div class="vf-page__menu-header-content">
         {% block page-menu-avatar %}
-          {% if user.is_authenticated %}
-            <img class="vf-page__menu-avatar" src="{{ request.user|user_avatar_url }}" alt="{{ request.user.get_full_name|default:request.user.get_username|title }}">
-          {% endif %}
+          <img class="vf-page__menu-avatar" src="{{ request.user|user_avatar_url }}" alt="{{ request.user.get_full_name|default:request.user.get_username|title }}">
         {% endblock %}
         <div class="vf-page__menu-info">
           <div class="vf-page__menu-user">
@@ -51,14 +49,16 @@
             {% block page-menu-user-actions %}
               {% url 'profile' as profile_url %}
               {% if profile_url %}
-              <a class="mdc-list-item vf-page__menu-list-item" href="{{ profile_url }}"  {% if viewset.turbo_disabled %} data-turbo="false"{% endif %}>
-                <i class="material-icons">account_box</i> {% trans 'Profile' %}
+              <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ profile_url }}"  {% if viewset.turbo_disabled %} data-turbo="false"{% endif %}>
+                <span class="mdc-list-item__start"><i class="material-icons">account_box</i></span>
+                <span class="mdc-list-item__content">{% trans 'Profile' %}</span>
               </a>
               {% endif %}
               {% url 'logout' as logout_url %}
               {% if logout_url %}
-              <a class="mdc-list-item vf-page__menu-list-item" href="{{ logout_url }}" {% if viewset.turbo_disabled %} data-turbo="false"{% endif %}>
-                <i class="material-icons">exit_to_app</i> {% trans 'Log out' %}
+              <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ logout_url }}" {% if viewset.turbo_disabled %} data-turbo="false"{% endif %}>
+                <span class="mdc-list-item__start"><i class="material-icons">exit_to_app</i></span>
+                <span class="mdc-list-item__content">{% trans 'Log out' %}</span>
               </a>
               {% endif %}
             {% endblock %}
@@ -70,27 +70,40 @@
     </nav>
     {% endblock page-menu-content %}
   </aside>
-  {% endblock page-menu %}
+  {% endif %}{% endblock page-menu %}
   {% block page-body %}
   <div class="vf-page__body mdc-drawer-app-content">
     {% block page-toolbar %}
     <header class="mdc-top-app-bar vf-page__body-toolbar">
       <div class="mdc-top-app-bar__row">
         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+          {% if user.is_authenticated %}
           <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button vf-page__menu-toggle" aria-label="Open navigation menu" data-turbo="false">menu</button>
+          {% endif %}
           <span class="mdc-top-app-bar__title">
             {% block page-title %}{{ app.title|default:site.title|default:"Django Material" }}{% endblock %}
           </span>
         </section>
         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end">
-        {% block page-toolbar-actions %}{% endblock %}
+        {% block page-toolbar-actions %}
+        {% if not user.is_authenticated %}
+          {% url 'login' as login_url %}{% if login_url %}
+          <a class="mdc-button" href="{{ login_url }}?next={{ request.path }}" style="color:white">Login</a>
+          {% endif %}
+        {% endif %}
+        {% endblock %}
         </section>
       </div>
     </header>
     {% endblock %}
     {% block page-content %}
     <main class="vf-page__content">
-      {% block content %}{% endblock %}
+      {% block content %}
+      <div class="mdc-list-item" style="height:auto; color: red; background:white; padding: 20px; margin: 20px; width: 100%">
+        <small>To place content here override {% templatetag  openblock %} block content {% templatetag  closeblock %} in your template</small>
+        </div>
+
+      {% endblock %}
     </main>
     {% endblock %}
   </div>

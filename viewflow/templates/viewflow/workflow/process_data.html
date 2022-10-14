@@ -1,0 +1,31 @@
+{% load viewflow %}
+<div class="mdc-card vf-card">
+  <section class="vf-card__header">
+    <h1 class="vf-card__title">{{ process }}</h1>
+  </section>
+  <section class="vf-card__body">
+    <table class="vf-list__table">
+      <tbody>
+        <tr>
+          <td colspan="2">
+            <vf-modal-trigger class="vf-modal-trigger--closed">
+              <span class="vf-modal-trigger__helper"></span>
+              <div class="vf-modal-trigger__content">
+                <div class="vf-modal-trigger__button">&times;</div>
+                <img class="responsive-img" src="{% reverse process.flow_class 'process_chart' process.pk %}" alt="flow graph" style="height:100%;max-width:100%"/>
+              </div>
+            </vf-modal-trigger>
+          </td>
+        </tr>
+        {% for field, field_name, value in process_data %}
+        {% if field.name != 'data' and field.name != 'flow_class' and field.name != 'artifact_object_id' and field.name != 'artifact_content_type'%}
+        <tr>
+          <th class="vf-list__table-header vf-list__table-header-text">{{ field_name }}</th>
+          <td>{{ value }}</td>
+        </tr>
+        {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+</section>
+</div>

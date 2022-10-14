@@ -30,4 +30,11 @@ if __name__ == "__main__":
             "available on your PYTHONPATH environment variable? Did you "
             "forget to activate a virtual environment?"
         ) from exc
+
+    # from pyannotate_runtime import collect_types
+    # collect_types.init_types_collection()
+    # with collect_types.collect():
+    #     execute_from_command_line(sys.argv)
+    # collect_types.dump_stats('/tmp/types.json')
+
     execute_from_command_line(sys.argv)

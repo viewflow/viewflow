@@ -1,0 +1,9 @@
+{% extends 'viewflow/workflow/task_detail.html' %}
+
+{% block breadcrumbs_items %}
+  {{ block.super }}
+  {% if request.activation.task.status == 'STARTED' or request.activation.task.status == 'SCHEDULED' %}
+  <vf-linear-progress intermediate="true"></vf-linear-progress>
+  <vf-page-reload></vf-page-reload>
+  {% endif %}
+{% endblock %}

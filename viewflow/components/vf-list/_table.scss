@@ -1,0 +1,173 @@
+.vf-list__table {
+  width:100%;
+  display: block;
+  border-collapse: collapse;
+  border-spacing: 0;
+  font-family: Roboto, sans-serif;
+
+  thead {
+    z-index: 1;
+  }
+
+  thead > tr,
+  tbody > tr {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  }
+
+  td {
+    padding: 15px 5px;
+
+    &.vf-list__table-cell-boolean {
+      padding-top: 8px;
+      padding-bottom: 5px;
+    }
+  }
+
+  td, th{
+    display: table-cell;
+    vertical-align: middle;
+    border-radius: 2px;
+  }
+
+  tbody, thead tr {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+
+  thead {
+    display: block;
+    position: sticky;
+    top: -1px;
+    background: #fff;
+    background: var(--mdc-theme-background, #fff);
+
+    th {
+      color: rgba(0, 0, 0, 0.54);
+      font-size: 14px;
+      font-weight: 400;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+    }
+
+    tr>th {
+      padding: 20px 5px 19px 5px;
+    }
+
+    tr>th:first-child {
+      padding-left: 24px;
+    }
+
+    tr>th:last-child {
+      padding-right: 24px;
+    }
+  }
+  tbody {
+    tr:hover {
+      background-color: #eee;
+    }
+
+    tr.vf-list-row--selected:hover {
+      background-color: #fffab3
+    }
+
+    th, td {
+      color: rgba(0, 0, 0, 0.87);
+      font-size: 14px;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      overflow: hidden;
+
+      i.material-icons {
+        color: rgba(0, 0,0, 0.70);
+      }
+
+      a {
+        text-decoration: none;
+        color: var(--mdc-theme-primary, #3f51b5);
+      }
+    }
+
+    tr>th:first-child,
+    tr>td:first-child {
+      padding-left: 24px;
+    }
+
+    tr>td:last-child {
+      padding-right: 24px;
+    }
+  }
+}
+
+.vf-list__table-header--sortable {
+  cursor: pointer;
+
+  span {
+    pointer-events: none;
+  }
+}
+
+@mixin vf-list__table-header-icon() {
+  font-family: "Material Icons";
+  text-rendering: optimizeLegibility;
+  font-feature-settings: 'liga' 1;
+  font-style: normal;
+  text-transform: none;
+  line-height: 1;
+
+  display: inline-block;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  position: relative;
+  margin-bottom: -3px;
+  font-size: 16px;
+}
+
+.vf-list__table-header-text,
+.vf-list__table-cell-text,
+.vf-list__table-header-boolean,
+.vf-list__table-cell-boolean {
+  text-align: left;
+}
+
+.vf-list__table-header-text.vf-list__table-header--sort-asc {
+  span:after {
+    @include vf-list__table-header-icon();
+    content: "\E5DB";
+    margin-left: 4px;
+
+  }
+}
+
+.vf-list__table-header-text.vf-list__table-header--sort-desc {
+  span:after {
+    @include vf-list__table-header-icon();
+    content: "\E5D8";
+    margin-left: 4px;
+
+  }
+}
+
+.vf-list__table-header-numeric,
+.vf-list__table-cell-numeric {
+  text-align: right
+}
+
+.vf-list__table-header-numeric.vf-list__table-header--sort-asc {
+  span:before {
+    @include vf-list__table-header-icon();
+    content: "\E5DB";
+    margin-left: 4px;
+
+  }
+}
+
+.vf-list__table-header-numeric.vf-list__table-header--sort-desc {
+  span:before {
+    @include vf-list__table-header-icon();
+    content: "\E5D8";
+    margin-left: 4px;
+
+  }
+}

@@ -111,15 +111,11 @@
 }
 
 .mdc-drawer  .vf-page__menu-list-item {
-  margin: 0;
-  padding: 4px 16px;
+  font-size: 14px;
+  height: 48px;
 
-  >i.material-icons {
-    width: 24px;
-    height: 24px;
-    margin-left: 0;
-    margin-right: 32px;
-    color: rgba(0, 0, 0, 0.54);
+  .mdc-list-item__meta {
+    line-height: 48px;
   }
 
   &.mdc-list-item--selected {
@@ -130,10 +126,6 @@
       color: inherit;
     }
 
-    margin-left: 8px;
-    margin-right: 8px;
-    padding-left: 8px;
-    padding-right: 8px;
 
     &::before {
       background: #3f51b5;
@@ -152,5 +144,8 @@
 }
 
 .mdc-drawer .vf-page__menu-subheader {
-  margin-bottom: 8px;
+  margin-top: 4px;
+  margin-bottom: 4px;
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
 }

@@ -1,0 +1,15 @@
+vf-field-textarea {
+  .mdc-text-field {
+    margin-bottom: 20px;
+  }
+
+  .mdc-text-field-helper-line {
+    margin-top: -22px;
+    margin-bottom: 8px;
+  }
+
+  .mdc-text-field--invalid:not(.mdc-text-field--disabled) ~ .mdc-text-field-helper-line  .mdc-text-field-helper-text {
+    color: var(--mdc-theme-error, #b00020);
+  }
+
+}

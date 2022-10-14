@@ -1,0 +1,142 @@
+{% load l10n %}{% localize off %}<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 {{ grid.width }} {{ grid.height }}" preserveAspectRatio="xMidYMid">
+    <defs>
+        <path id="end-marker-path" transform="rotate(180 2.5 2.5)"
+              stroke-linecap="round" d="M5,0 0,2.5 5,5 3.5,3 3.5,2z"
+              stroke-width="1.0000" fill="#000" stroke="none"/>
+        <marker id="end-marker" markerHeight="5" markerWidth="5" orient="auto" refX="2.5" refY="2.5" >
+            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#end-marker-path"
+                 stroke-width="1.0000" fill="#000" stroke="none"/>
+        </marker>
+    </defs>
+    <style type="text/css"><![CDATA[    
+        g.done circle.event,
+        g.done path.event,
+        g.done circle.end-event,
+        g.done path.gateway,
+        g.done rect.task
+        {
+            fill: #c8e6c9;
+            fill-opacity:0.5;
+        }
+    
+        g.scheduled circle.event,
+        g.scheduled path.event,
+        g.scheduled circle.end-event,
+        g.scheduled path.gateway,
+        g.scheduled rect.task
+        {
+            fill: #b3e5fc;
+            fill-opacity:0.5;
+        }
+    
+        g.started circle.event,
+        g.started path.event,
+        g.started circle.end-event,
+        g.started path.gateway,
+        g.started rect.task
+        {
+            fill: #ffa726;
+            fill-opacity:0.5;
+        }
+    
+        g.new circle.event,
+        g.new path.event,
+        g.new circle.end-event,
+        g.new path.gateway,
+        g.new rect.task
+        {
+            fill: #42a5f5;
+            fill-opacity:0.5;
+        }
+    
+        g.error circle.event,
+        g.error path.event,
+        g.error circle.end-event,
+        g.error path.gateway,
+        g.error rect.task
+        {
+            fill: #f44336;
+            fill-opacity:0.5;
+        }
+    
+        g.canceled circle.event,
+        g.canceled path.event,
+        g.canceled circle.end-event,
+        g.canceled path.gateway,
+        g.canceled rect.task
+        {
+            fill: #90a4ae;
+            fill-opacity:0.5;
+        }
+    
+        g.assigned circle.event,
+        g.assigned path.event,
+        g.assigned circle.end-event,
+        g.assigned path.gateway,
+        g.assigned rect.task
+        {
+            fill: #ffeb3b;
+            fill-opacity:0.5;
+        }
+    
+        circle.event,
+        path.event {
+            fill: none;
+            stroke: #000;
+        }
+
+        circle.end-event {
+            stroke-width: 4;
+        }
+
+        path.event-marker {
+            fill: none;
+            stroke: #000;
+        }
+
+        path.gateway {
+            fill: none;
+            stroke: #000;
+            stroke-width: 1.1;
+        }
+
+        text.gateway-marker {
+            font-weight: bold;
+            font-family: 'Arial';
+            text-anchor: middle;
+            alignment-baseline: baseline;
+        }
+
+        rect.task {
+            fill: none;
+            stroke: #000;
+            stroke-width: 1.1;
+        }
+
+        text.align-middle {
+            font-family: 'Arial';
+            text-anchor: middle;
+            alignment-baseline: central;
+        }
+
+        path.task-marker {
+            fill: none;
+            stroke: #000;
+            stroke-width: 1.1;
+        }
+        ]]>
+    </style>
+    {% for cell in cells %}
+    <g id="{{ cell.node.name }}" transform="translate({{ cell.shape.x }}, {{ cell.shape.y }})"{% if cell.status %} class="{{ cell.status|lower }}"{% endif %}>
+        {% if cell.status %}<title>{{ cell.status }}</title>{% endif %}
+        {{ cell.shape.svg|safe }}
+        {% for text, class, font_size, x, y in cell.shape.text %}
+        <text class="{{ class }}" font-size="{{ font_size }}px" x="{{ x }}" y="{{ y }}">{% if forloop.first %}{{ text|title }}{% else %}{{ text }}{% endif %}</text>
+        {% endfor %}
+    </g>
+    {% endfor %}{% for edge in edges %}
+    <path fill="none" stroke="#000000" stroke-width="2" id="{{ edge.src.name}}__{{ edge.dst.name }}" marker-end="url(#end-marker)"
+          d="{% for x,y in edge.segments %}{% if forloop.first %}M{% else %} L{% endif %}{{ x }}, {{ y }}{% endfor %}"/>
+
+    {% endfor %}
+</svg>{% endlocalize %}

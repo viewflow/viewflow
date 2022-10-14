@@ -46,6 +46,9 @@ class Transition(object):
         self.permission = permission
         self.conditions = conditions if conditions else []
 
+    def __repr__(self) -> str:
+        return f"<Transition({self.label} {self.source} -> {self.target}) object at {id(self)}>"
+
     def __str__(self) -> str:
         return f"{self.label} Transition"
 

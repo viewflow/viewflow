@@ -1,0 +1,49 @@
+{% extends request.resolver_match.app.base_template_name|default:'viewflow/base_page.html' %}
+{% load i18n viewflow %}
+
+{% block content %}
+<div class="mdc-layout-grid vf-page__grid">
+  <div class="mdc-layout-grid__inner vf-page__grid-inner">
+    {% block confirm-cell %}
+    <div class="mdc-layout-grid__cell {% block detail-cell-span %}mdc-layout-grid__cell--span-10-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone{% endblock %}">
+      <div class="mdc-card vf-card">
+        <section class="vf-card__header">
+          <h1 class="vf-card__title">{{ view.model|verbose_name_plural|title }}</h1>
+          <h2 class="vf-card__breadcrumbs">
+            <a href="{% reverse viewset 'list' %}">{{ view.model|verbose_name_plural|title }}</a>
+            <a>{% trans 'Export' %}</a>
+          </h2>
+        </section>
+        <vf-form>
+          <form class="vf-form" method="POST" data-turbo="false">
+            {% csrf_token %}
+            <section class="vf-card__form">
+              <h3 class="vf-card__alert">
+                {% if view.objects_count %}
+                  {% blocktrans with name=view.model|verbose_name plural_name=view.model|verbose_name_plural count objects_count=view.objects_count %}
+                    Export the {{ name }}
+                    {% plural %}
+                    Export the {{ objects_count }} {{ plural_name }}
+                  {% endblocktrans %}
+                {% else %}
+                  {% blocktrans with plural_name=view.model|verbose_name_plural %}
+                    Export all {{ plural_name }}
+                  {% endblocktrans %}
+                {% endif %}
+              </h3>
+            </section>
+            <section class="vf-card__form">
+              {% render form %}
+            </section>
+            <section class="mdc-card__actions vf-card__actions">
+              <a class="mdc-button mdc-card__action mdc-card__action--button" name="_confirm" style="margin-right: auto;" onclick="window.history.back(-1)"><i class="material-icons">arrow_back</i>{% trans "Back" %}  </a>
+              <input class="mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit" name="_confirm" value="{% trans "Export" %}">
+            </section>
+          </form>
+        </vf-form>
+      </div>
+    </div
+    {% endblock confirm-cell %}
+  </div>
+</div>
+{% endblock content %}

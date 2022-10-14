@@ -1,0 +1,24 @@
+.vf-inline-calendar__label {
+  color: rgba(0,0,0,.5);
+  font-size: 12px;
+  line-height: 15px;
+}
+
+.vf-inline-calendar__label--required:after {
+  margin-left: 1px;
+  content: "*";
+}
+
+.vf-inline-calendar__helptext {
+  margin: 0 0 8px 0;
+  color: rgba(0, 0, 0, 0.38);
+  color: var(--mdc-theme-text-hint-on-light, rgba(0, 0, 0, 0.38));
+  font-size: 11px;
+  text-align: center;
+  max-width: 470px;
+}
+
+.vf-inline-calendar__label--invalid,
+.vf-inline-calendar__helptext--invalid {
+  color: #d50000;
+}

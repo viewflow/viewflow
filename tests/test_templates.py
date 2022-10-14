@@ -9,6 +9,8 @@ from viewflow.urls import Application, AppMenuMixin, IndexViewMixin, Site, Views
 
 @override_settings(ROOT_URLCONF=__name__)
 class Test(TestCase):
+    fixtures = ['users.json']
+
     def setUp(self):
         self.request = RequestFactory().get('/')
         self.request.user = AnonymousUser()
@@ -30,6 +32,7 @@ class Test(TestCase):
         self.validator.parse(response.content)
 
     def test_base_page__with_site_menu(self):
+        self.assertTrue(self.client.login(username="admin", password="admin"))
         response = self.client.get('/application/test/test/')
         self.assertTrue('Test Application' in response.content.decode())
         self.assertTrue('Test Viewset' in response.content.decode())

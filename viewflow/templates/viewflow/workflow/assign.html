@@ -1,0 +1,56 @@
+{% extends request.resolver_match.app.base_template_name|default:'viewflow/workflow/base_page.html' %}
+{% load i18n viewflow %}
+
+
+{% block content %}{% with process=request.activation.process task=request.activation.task %}
+<div class="mdc-layout-grid vf-page__grid">
+  <div class="mdc-layout-grid__inner">
+    {% block form-cell %}
+    <div class="mdc-layout-grid__cell {% block form-cell-span %}mdc-layout-grid__cell--span-10-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone{% endblock %}">
+      <div class="mdc-card vf-card">
+        <section class="vf-card__header">
+          {% block form-header-title %}
+          <h1 class="vf-card__title">
+              {{ task.flow_task.task_title }}
+          </h1>
+          {% endblock %}
+          {% block form-header-subtitle %}
+          <h2 class="vf-card__breadcrumbs">
+            {% block breadcrumbs_items %}
+              <a href="{% reverse viewset 'index' %}">{{ process.flow_class.process_title }}</a>
+              <a href="{% reverse viewset 'process_detail' process.pk %}">#{{ process.pk }}</a>
+              <a href="{% reverse task.flow_task 'index' process.pk task.pk %}">{{ task.flow_task.task_title }} #{{ task.pk}}</a>
+              <a>{% trans 'Assign' %}</a>
+            {% endblock %}
+          </h2>
+          {% endblock %}
+          {% block form-header-menu %}{% endblock %}
+        </section>
+        <vf-form>
+          <form class="vf-form" method="POST" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+            {% csrf_token %}
+            <section class="vf-card__form">
+              <span class="mdc-typography--body1">{{ request.activation.task.summary }}</span>
+            </section>
+            <section class="mdc-card__actions vf-card__actions">
+              <button class="mdc-button mdc-card__action mdc-card__action--button mdc-button--touch" name='_continue' value="1">
+                <span class="mdc-button__ripple"></span>
+                <span class="mdc-button__touch"></span>
+                <span class="mdc-button__focus-ring"></span>
+                <span class="mdc-button__label">{% trans 'Assign and continue' %}</span>
+              </button>
+              <button class="mdc-button mdc-card__action mdc-card__action--button mdc-button--raised mdc-button--touch">
+                <span class="mdc-button__ripple"></span>
+                <span class="mdc-button__touch"></span>
+                <span class="mdc-button__focus-ring"></span>
+                <span class="mdc-button__label">{% trans 'Assign' %}</span>
+              </button>
+            </section>
+          </form>
+        </vf-form>
+      </div>
+    </div>
+    {% endblock form-cell %}
+  </div>
+</div>
+{% endwith %}{% endblock content %}

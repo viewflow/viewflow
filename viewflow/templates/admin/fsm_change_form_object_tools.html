@@ -1,0 +1,16 @@
+{% load i18n admin_urls %}
+
+{% for transition, conditions_met, has_perm in transitions %}
+<li>
+  {% if not has_perm %}
+      <a class="disabled link" aria-disabled="true" title="Not allowed">{{ transition.label }}</a>
+  {% elif not conditions_met %}
+    <a class="disabled link" aria-disabled="true" title="Conditions unmet">{{ transition.label }}</a>
+  {% else %}
+    {% url opts|admin_urlname:'transition' original.pk|admin_urlquote transition.slug  as transition_url %}
+    <a href="{% add_preserved_filters transition_url %}" class="link">
+      {{ transition.label }}
+    </a>
+  {% endif %}
+</li>
+{% endfor %}

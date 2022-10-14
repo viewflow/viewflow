@@ -6,9 +6,10 @@
   <div class="mdc-menu mdc-menu-surface" tabindex="-1">
     <ul class="mdc-list" role="menu" aria-hidden="true">
       {% for action in actions %}
-      <li class="mdc-list-item" role="menuitem" tabindex="0" {% if action.url %}data-card-menu-href="{{ action.url }}"{% endif %}>
-          {{ action.icon|default:'' }} <span class="mdc-list-item__text">{{ action.name }}</span>
-        </li>
+      <li class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon" role="menuitem" tabindex="0" {% if action.url %}data-card-menu-href="{{ action.url }}"{% endif %}>
+        <span class="mdc-list-item__start">{{ action.icon|default:'' }}</span>
+        <span class="mdc-list-item__text mdc-list-item__content">{{ action.name }}</span>
+      </li>
       {% endfor %}
     </ul>
   </div>

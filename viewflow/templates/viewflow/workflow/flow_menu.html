@@ -1,0 +1,26 @@
+{% extends 'viewflow/includes/app_menu.html' %}
+{% load i18n viewflow %}
+
+{% block viewset_links %}{% with flow_viewset=request.resolver_match.flow_viewset %}
+<a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{% reverse flow_viewset 'index' %}">
+  <span class="mdc-list-item__start"><i class="material-icons" aria-hidden="true">dashboard</i></span>
+  <span class="mdc-list-item__content">{% trans 'Dashboard' %}</span>
+</a>
+<a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{% reverse flow_viewset 'inbox' %}">
+  <span class="mdc-list-item__start"><i class="material-icons" aria-hidden="true">inbox</i></span>
+  <span class="mdc-list-item__content">{% trans 'Inbox' %}</span>
+  <span class="mdc-list-item__meta">{{ user_inbox.count }}</span>
+</a>
+<a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{% reverse flow_viewset 'queue' %}">
+  <span class="mdc-list-item__start"><i class="material-icons" aria-hidden="true">schedule</i></span>
+  <span class="mdc-list-item__content">{% trans 'Queue' %}</span>
+  <span class="mdc-list-item__meta">{{ user_queue.count }}</span>
+</a>
+<a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{% reverse flow_viewset 'archive' %}">
+  <span class="mdc-list-item__start"><i class="material-icons" aria-hidden="true">archive</i></span>
+  <span class="mdc-list-item__content">{% trans 'Archive' %}</span>
+</a>
+{{ block.super }}
+{% endwith %}{% endblock %}
+
+{% block viewset_links_notfound %}{% endblock %}

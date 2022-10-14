@@ -45,9 +45,11 @@ class FormLayoutMixin(object):
 
 
 class Action(object):
-    def __init__(self, name, url=None, icon=None):
+    def __init__(self, name, url=None, viewname=None, icon=None):
+        assert url or viewname
         self.name = name
         self.url = url
+        self.viewname = viewname
         self.icon = icon
 
 

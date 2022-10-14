@@ -1,0 +1,62 @@
+{% load i18n viewflow %}<div class="vf-list__action-selected"></div>
+<div class="vf-list__action-select-all">
+  <button class="mdc-button">Select all</button>
+</div>
+<div class="vf-list__action-select">
+  <div class="mdc-form-field">
+    <div class="mdc-select mdc-select--outlined">
+      <div class="mdc-select__anchor">
+        <span class="mdc-notched-outline">
+          <span class="mdc-notched-outline__leading"></span>
+          <span class="mdc-notched-outline__notch">
+            <span class="mdc-floating-label">{% trans 'Pick an action' %}</span>
+          </span>
+          <span class="mdc-notched-outline__trailing"></span>
+        </span>
+        <span class="mdc-select__selected-text-container">
+          <span class="mdc-select__selected-text"></span>
+        </span>
+        <span class="mdc-select__dropdown-icon">
+          <svg
+              class="mdc-select__dropdown-icon-graphic"
+              viewBox="7 10 10 5" focusable="false">
+            <polygon
+                class="mdc-select__dropdown-icon-inactive"
+                stroke="none"
+                fill-rule="evenodd"
+                points="7 10 12 15 17 10">
+            </polygon>
+            <polygon
+                class="mdc-select__dropdown-icon-active"
+                stroke="none"
+                fill-rule="evenodd"
+                points="7 15 12 10 17 15">
+            </polygon>
+          </svg>
+        </span>
+      </div>
+
+      <div class="mdc-select__menu mdc-menu mdc-menu-surface">
+        <ul class="mdc-list" role="listbox">
+        {% for action in bulk_actions %}
+          {% if action.viewname %}
+          <li class="mdc-list-item mdc-list-item--with-one-line" data-value="{% reverse viewset action.viewname %}?{{ view.filterset.data.urlencode }}" role="option">
+          {% else %}
+          <li class="mdc-list-item mdc-list-item--with-one-line" data-value="{{ action.url }}?{{ view.filterset.data.urlencode }}" role="option">
+          {% endif %}
+            <span class="mdc-list-item__ripple"></span>
+            <span class="mdc-list-item__text mdc-list-item__content">{{ action.name }}</span>
+          </li>
+        {% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+<vf-form>
+  <form action="." method="post" class="vf-list__action-form">
+    {% csrf_token %}
+    <button type="submit" class="vf-list__action-button mdc-button mdc-button--dense mdc-button--raised">GO</button>
+  </form>
+</vf-form>
+</div>

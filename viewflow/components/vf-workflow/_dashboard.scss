@@ -1,0 +1,75 @@
+@import '@material/typography/mixins.scss';
+
+.vf-dashboard__grid {
+  height: 100%;
+  overflow-x: scroll;
+  .vf-page__grid-inner {
+    height: 100%;
+  }
+}
+
+.vf-dashboard {
+  display: flex;
+  align-items: stretch;
+  height: calc(100vh - 90px);
+  max-width:100%;
+  padding-right: 10px;
+
+   .responsive-img {
+     max-width: 100%;
+   }
+
+  .dashboard-content {
+      position: relative;
+      display: flex;
+      align-items: stretch;
+      max-width:100%;
+      padding-top: 10px;
+      padding-bottom: 15px;
+
+      >.ps-scrollbar-y-rail {
+          display: none;
+      }
+  }
+
+  .column {
+      display: flex;
+      flex-direction: column;
+      width: 300px;
+      flex-shrink: 0;
+      flex-grow: 0;
+      margin-left: 5px;
+      background: #ddd;
+      padding: 15px;
+
+      .column-title {
+        margin: 0;
+        @include mdc-typography("subtitle1");
+      }
+
+      .column-content {
+          position: relative;
+          overflow: auto;
+
+          &.ps-container > .ps-scrollbar-y-rail {
+              opacity: 0.9 !important;
+          }
+      }
+
+      .column-action {
+          line-height: 45px;
+          text-align: center;
+      }
+  }
+
+  .vf-dashboard__card-detail {
+      padding-top: 5px;
+      padding-bottom: 5px;
+
+      >label {
+          display:block;
+          font-size: .8rem;
+          color: #9e9e9e;
+      }
+  }
+}

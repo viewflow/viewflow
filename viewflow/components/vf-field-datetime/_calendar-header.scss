@@ -1,0 +1,25 @@
+.vf-calendar-header {
+  width: 160px;
+  flex-grow: 0;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  background-color: #3f51b5;
+  background-color: var(--mdc-theme-primary, #3f51b5);
+  padding: 24px 24px 20px;
+  margin-right: 8px;
+}
+
+.vf-calendar-header__year {
+  color: rgba(255,255,255,.7);
+  color: var(--mdc-theme-text-secondary-on-primary-dark,rgba(255,255,255,.7));
+}
+
+.vf-calendar-header__date {
+  color: white;
+}
+
+@media (max-width: 600px) {
+  .vf-calendar-header {
+    display: none;
+  }
+}

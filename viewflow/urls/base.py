@@ -24,6 +24,7 @@ class _UrlName(str):
     Just to keep a reference over django url resolve calling
     hierarchy.
     """
+
     def __init__(self, value):
         str.__init__(value)
         self.extra = {}
@@ -31,7 +32,7 @@ class _UrlName(str):
 
 class _URLResolver(URLResolver):
     def __init__(self, *args, **kwargs):
-        self.extra = kwargs.pop('extra', {})
+        self.extra = kwargs.pop("extra", {})
         super(_URLResolver, self).__init__(*args, **kwargs)
 
     def resolve(self, *args, **kwargs):
@@ -46,14 +47,16 @@ class _URLResolver(URLResolver):
         return result
 
 
-Route = namedtuple('Route', ['prefix', 'viewset'])
+Route = namedtuple("Route", ["prefix", "viewset"])
 
 
 def route(prefix, viewset):
     """A viewset url"""
     if not isinstance(viewset, BaseViewset):
         raise ValueError(
-            "route(...) second argument should be a viewset instance, got {} instead".format(viewset)
+            "route(...) second argument should be a viewset instance, got {} instead".format(
+                viewset
+            )
         )
     return Route(prefix, viewset)
 
@@ -62,6 +65,7 @@ class BaseViewset(object):
     """
     Class-based django routing configuration
     """
+
     app_name = None
     namespace = None
     parent_namespace = None
@@ -77,28 +81,32 @@ class BaseViewset(object):
     @parent.setter
     def parent(self, value):
         if self._parent is not None:
-            warnings.warn(f"Viewset {self.__class__.__name__} parent could be set only once", Warning)
+            warnings.warn(
+                f"Viewset {self.__class__.__name__} parent could be set only once",
+                Warning,
+            )
         if self.parent_namespace is not None:
-            warnings.warn(f"Viewset {self.__class__.__name__} already has explicit parent namespace", Warning)
+            warnings.warn(
+                f"Viewset {self.__class__.__name__} already has explicit parent namespace",
+                Warning,
+            )
         self._parent = value
 
     @property
     def urls(self):
-        raise NotImplementedError('Subclass should override this')
+        raise NotImplementedError("Subclass should override this")
 
     def reverse(self, viewname, args=None, kwargs=None, current_app=None):
         """Get view url."""
-        view_namespace = ''
+        view_namespace = ""
 
         current_viewset = self
         while current_viewset:
             namespace = current_viewset.namespace or current_viewset.app_name
             if namespace:
-                view_namespace = '{}:{}'.format(
-                    namespace, view_namespace
-                )
+                view_namespace = "{}:{}".format(namespace, view_namespace)
             if current_viewset.parent is None and current_viewset.parent_namespace:
-                view_namespace = '{}:{}'.format(
+                view_namespace = "{}:{}".format(
                     current_viewset.parent_namespace, view_namespace
                 )
             current_viewset = current_viewset.parent
@@ -118,11 +126,11 @@ class ViewsetMeta(type):
     def __new__(mcs, name, bases, attrs):
         current_patterns = []
         for key, value in list(attrs.items()):
-            if not key.endswith('_path') or key.startswith('get_'):
+            if not key.endswith("_path") or key.startswith("get_"):
                 continue
             current_patterns.append((key, value))
 
-        attrs['declared_patterns'] = OrderedDict(current_patterns)
+        attrs["declared_patterns"] = OrderedDict()  # current_patterns removed
 
         new_class = super().__new__(mcs, name, bases, attrs)
 
@@ -130,7 +138,7 @@ class ViewsetMeta(type):
         declared_patterns = OrderedDict()
         for base in reversed(new_class.__mro__):
             # Collect fields from base class.
-            if hasattr(base, 'declared_patterns'):
+            if hasattr(base, "declared_patterns"):
                 declared_patterns.update(base.declared_patterns)
 
             # Field shadowing.
@@ -138,7 +146,16 @@ class ViewsetMeta(type):
                 if value is None and attr in declared_patterns:
                     declared_patterns.pop(attr)
 
-        new_class.declared_patterns = declared_patterns
+        # place current class items on top of inherited, to allow override first index view in a child class
+        # new_class.declared_patterns = declared_patterns
+        new_class.declared_patterns = OrderedDict(current_patterns)
+        new_class.declared_patterns.update(
+            {
+                key: value
+                for key, value in declared_patterns.items()
+                if key not in current_patterns
+            }
+        )
 
         return new_class
 
@@ -153,6 +170,7 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
 
     Viewset classes could be inherited, extended, and have overridden attributes.
     """
+
     viewsets = None
     turbo_disabled = False
     urlpatterns = None
@@ -164,15 +182,19 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
 
         # customize instance attributes
         for key, value in initkwargs.items():
-            if key.startswith('_'):
+            if key.startswith("_"):
                 raise TypeError(
                     "You tried to pass the private {} name as a "
-                    "keyword argument to {}(). Don't do that.".format(key, self.__name__))
+                    "keyword argument to {}(). Don't do that.".format(
+                        key, self.__name__
+                    )
+                )
             if not hasattr(self.__class__, key):
                 raise TypeError(
                     "{}() received an invalid keyword {}. Viewset constructor "
                     "only accepts arguments that are already "
-                    "attributes of the class." .format(self.__class__.__name__, key))
+                    "attributes of the class.".format(self.__class__.__name__, key)
+                )
             setattr(self, key, value)
 
         # clone additional routes
@@ -194,10 +216,15 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
         elif isinstance(value, Route):
             value.viewset.parent = self
             patterns, app_name, namespace = value.viewset.urls
-            pattern = path('{}/'.format(value.prefix) if value.prefix else '', include((patterns, app_name), namespace=namespace))
+            pattern = path(
+                "{}/".format(value.prefix) if value.prefix else "",
+                include((patterns, app_name), namespace=namespace),
+            )
             return pattern
         else:
-            raise ValueError('{} got unknown url entry {}'.format(self.__class__.__name__, value))
+            raise ValueError(
+                "{} got unknown url entry {}".format(self.__class__.__name__, value)
+            )
 
     def _get_urls(self):
         """
@@ -222,15 +249,20 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
                 viewset.app_name = camel_case_to_underscore(
                     strip_suffixes(
                         viewset.__class__.__name__,
-                        ['App', 'Application', 'Viewset', 'Admin', 'Flow'])
+                        ["App", "Application", "Viewset", "Admin", "Flow"],
+                    )
                 )
-                assert viewset.app_name, "Can't provide auto name for a {}".format(viewset)
-            urlpatterns.append(self._create_url_pattern(route(viewset.app_name, viewset)))
+                assert viewset.app_name, "Can't provide auto name for a {}".format(
+                    viewset
+                )
+            urlpatterns.append(
+                self._create_url_pattern(route(viewset.app_name, viewset))
+            )
 
         return urlpatterns
 
     def _get_resolver_extra(self):
-        return {'viewset': self}
+        return {"viewset": self}
 
     @property
     def urls(self):
@@ -240,8 +272,10 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
         if self._urls_cache is None:
             self._urls_cache = self._get_urls()
 
-        pattern = RoutePattern('', is_endpoint=False)
-        resolver = _URLResolver(pattern, self._urls_cache, extra=self._get_resolver_extra())
+        pattern = RoutePattern("", is_endpoint=False)
+        resolver = _URLResolver(
+            pattern, self._urls_cache, extra=self._get_resolver_extra()
+        )
         return [resolver], self.app_name, namespace
 
 
@@ -249,23 +283,31 @@ def _get_index_redirect_url(viewset):
     """
     Return first non-parameterized viewset url.
     """
-    def _get_index_url(url_patterns, prefix='./'):
-        index_first_patterns = sorted(url_patterns, key=lambda pat: getattr(pat, 'name', '') != 'index')
+
+    def _get_index_url(url_patterns, prefix="./"):
+        index_first_patterns = sorted(
+            url_patterns, key=lambda pat: getattr(pat, "name", "") != "index"
+        )
         for url_pattern in index_first_patterns:
             if isinstance(url_pattern, URLPattern):
                 couldbe_index_view = (
                     isinstance(url_pattern.pattern, RoutePattern)
                     and url_pattern.pattern.converters == {}
                     and not (
-                        hasattr(url_pattern.callback, 'view_class')
+                        hasattr(url_pattern.callback, "view_class")
                         and url_pattern.callback.view_class == _IndexRedirectView
                     )
                 )
                 if couldbe_index_view:
                     return prefix + url_pattern.pattern._route
-            elif isinstance(url_pattern, URLResolver) and isinstance(url_pattern.pattern, RoutePattern):
-                return _get_index_url(url_pattern.url_patterns, prefix + url_pattern.pattern._route)
-    return _get_index_url(viewset.urls[0], './')
+            elif isinstance(url_pattern, URLResolver) and isinstance(
+                url_pattern.pattern, RoutePattern
+            ):
+                return _get_index_url(
+                    url_pattern.url_patterns, prefix + url_pattern.pattern._route
+                )
+
+    return _get_index_url(viewset.urls[0], "./")
 
 
 class _IndexRedirectView(RedirectView):
@@ -278,7 +320,8 @@ class _IndexRedirectView(RedirectView):
                 raise ValueError(
                     "Can't determine index url. Please add an explicit "
                     "`index_path = path('', RedirectView(url='...'), name='index')`"
-                    " declaration for the viewset")
+                    " declaration for the viewset"
+                )
             return redirect
         return super().get_redirect_url(*args, **kwargs)
 
@@ -287,6 +330,7 @@ class IndexViewMixin(metaclass=ViewsetMeta):
     """
     Redirect from / to the first non-parameterized view of the Viewset class.
     """
+
     @property
     def index_path(self):
-        return path('', _IndexRedirectView.as_view(viewset=self), name="index")
+        return path("", _IndexRedirectView.as_view(viewset=self), name="index")

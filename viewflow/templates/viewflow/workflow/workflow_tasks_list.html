@@ -1,0 +1,55 @@
+{% extends 'viewflow/views/list.html' %}
+{% load i18n viewflow %}
+
+{% block content %}
+{{ block.super }}
+<vf-dialog>
+  <div style="position: fixed;right: 23px;bottom: 23px;padding-top: 15px;margin-bottom: 0;z-index: 997;">
+    <a href="#" style="color:white" class="mdc-fab vf-dialog__trigger" aria-label="{% trans 'Start' %}">
+      <div class="mdc-fab__ripple"></div>
+      <span class="mdc-fab__icon material-icons">add</span>
+    </a>
+  </div>
+  <div class="mdc-dialog">
+    <div class="mdc-dialog__container">
+      <div class="mdc-dialog__surface"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="Start Flow">
+        <div class="mdc-dialog__content">
+          <h4 class="mdc-typography mdc-typography--headline5" style="margin-bottom:8px">{% trans 'New process' %}</h4>
+          <div>
+            {% for flow_class, start_nodes in view.flows_start_nodes.items %}
+              <h5 class="mdc-typography mdc-typography--headline6" style="margin-bottom:8px">{{ flow_class.process_title }}</h5>
+              <div style="display:flex;flex-direction:row;gap:20px;">
+                <div>
+                {{ flow_class.process_description|default:"" }}
+                </div>
+                <div>
+                {% for start_node in start_nodes %}
+                <a href="{% reverse start_node 'execute' %}" class="mdc-button mdc-dialog__button mdc-button--raised">
+                  <div class="mdc-button__ripple"></div>
+                  <span class="mdc-button__label">{{ start_node }}</span>
+                </a>
+                {% endfor %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+        <!--div class="mdc-dialog__actions">
+          <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
+            <div class="mdc-button__ripple"></div>
+            <span class="mdc-button__label">Cancel</span>
+          </button>
+          <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="discard">
+            <div class="mdc-button__ripple"></div>
+            <span class="mdc-button__label">Discard</span>
+          </button>
+        </div-->
+      </div>
+    </div>
+    <div class="mdc-dialog__scrim"></div>
+  </div>
+</vf-dialog>
+{% endblock %}

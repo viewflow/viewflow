@@ -1,0 +1,15 @@
+{% load viewflow %}
+<vf-list-filter id="id_filter_drawer" class="mdc-drawer mdc-drawer--dismissible vf-list__filter{% if view.filterset.form.has_changed %} mdc-drawer--open{% endif %}">
+  <nav class="mdc-drawer__content">
+    <h4 class="vf-list__filter-title">Filter</h4>
+    <vf-form>
+      <form method="GET" class="vf-list__filter-form">
+        {% render view.filterset.form %}
+        <input type="hidden" name="{{ view.ordering_kwarg }}" value="{{ request.GET|list_order:view }}">
+        <div class="v_list__filter-actions">
+          <button class="mdc-button" type="submit">Filter</button>
+        </div>
+      </form>
+    </vf-form>
+  </nav>
+</vf-list-filter>

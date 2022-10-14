@@ -1,0 +1,110 @@
+@import '@material/typography/mixins.scss';
+
+
+.vf-list__filter.mdc-drawer.mdc-drawer--open:not(.mdc-drawer--closing)+.mdc-drawer-app-content {
+  margin-right: 256px;
+  margin-left: 0;
+}
+
+.vf-list__filter.mdc-drawer--animate {
+    transform: translateX(100%);
+}
+
+.vf-list__filter.mdc-drawer--opening {
+    transform: translateX(0);
+}
+
+.vf-list__filter.mdc-drawer--closing {
+    transform: translateX(100%);
+}
+
+.vf-list__filter {
+  height: calc(100% - 64px);
+
+  &.mdc-drawer .mdc-list-item {
+    font-size: 1rem;
+    font-size: var(--mdc-typography-subtitle1-font-size, 1rem);
+    font-weight: 400;
+    margin: 0;
+    height: 48px;
+  }
+
+  &.mdc-drawer--dismissible {
+    left: initial;
+    right: 0;
+
+    border-right-width: 0;
+    border-left-width: 1px;
+    border-right-style: none;
+    border-left-style: solid;
+
+    border-radius: 0 0 0 0;
+  }
+
+  &.mdc-drawer--dismissible {
+    .mdc-drawer__content {
+      -webkit-transform: translateX(107%);
+      transform: translateX(107%);
+      -webkit-transform: translateX(calc(100% + 20px));
+      transform: translateX(calc(100% + 20px));
+      will-change: unset;
+    }
+
+    &.mdc-drawer--open  {
+      .mdc-drawer__content {
+        -webkit-transform: none;
+        transform: none;
+      }
+    }
+  }
+
+  &.mdc-drawer--modal {
+    left: initial;
+    right: 0;
+  }
+
+  &.mdc-drawer--temporary {
+    .mdc-drawer__drawer {
+      -webkit-transform: translateX(100v);
+      transform: translateX(100vw);
+      left: auto;
+      right: 0;
+      will-change: unset;
+    }
+
+    &.mdc-drawer--open {
+      .mdc-drawer__drawer {
+        -webkit-transform: none;
+        transform: none;
+      }
+    }
+  }
+}
+
+.vf-list__filter-trigger--active {
+  &.mdc-button:not(:disabled) {
+    color: #e91e63;
+    color: var(--mdc-theme-secondary,#e91e63);
+  }
+}
+
+.vf-list__filter-title {
+  @include mdc-typography("headline6");
+  padding-left: 16px;
+  margin-bottom: 0.5rem;
+}
+
+.vf-list__filter-form {
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.v_list__filter-actions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.vf-list__filter-trigger {
+  min-width: 48px;
+}

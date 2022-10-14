@@ -1,0 +1,108 @@
+.vf-list-row--selected {
+  background: #f7f7f7;
+  background: #fffccf;
+}
+
+.vf-list__action-header,
+.vf-list__action-cell {
+  width: 60px;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
+
+.vf-list__table {
+  thead tr>th.vf-list__action-header:first-child {
+    padding-left: 2px;
+    padding-right: 7px;
+  }
+
+  tbody tr>td.vf-list__action-cell:first-child {
+    padding-left: 12px;
+    padding-right: 0px;
+  }
+
+  .vf-list__actions {
+    display: none;
+    text-align: left;
+    flex-wrap: wrap;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .vf-list__action--active {
+    .vf-list__table-header {
+      display: none
+    }
+
+    .vf-list__actions {
+      display: flex;
+    }
+  }
+}
+
+.vf-list__actions vf-form button {
+  margin-top: 10px;
+  margin-right: 16px;
+}
+
+.vf-list__action-selected {
+  line-height: 36px;
+  color: rgba(0,0,0,.87);
+  color: var(-mdc-theme-text-primary-on-background, rgba(0,0,0,.87));
+  font-size: 16px;
+  padding-top: 10px;
+}
+
+.vf-list__action-select-all {
+  margin-right: 20px;
+  flex-grow: 1;
+  margin-left: 16px;
+  flex-grow: 1;
+  padding-top: 10px;
+
+  &.vf-list__action-select-all--selected .mdc-button {
+    display: none;
+  }
+}
+
+.vf-list__action-select {
+  padding-right: 8px;
+
+  >div.mdc-form-field {
+    .mdc-select--outlined .mdc-select__anchor {
+      height: 39px;
+      margin-top: 8px;
+      margin-bottom: 2px;
+    }
+
+    .mdc-select__dropdown-icon {
+      margin-left: 8px;
+      margin-right: 8px;
+    }
+
+    .mdc-select--outlined .mdc-select__anchor.mdc-notched-outline--upgraded .mdc-floating-label--float-above,
+    .mdc-select--outlined .mdc-select__anchor .mdc-notched-outline--upgraded .mdc-floating-label--float-above {
+      margin-top: 8px;
+    }
+  }
+}
+
+
+@media (max-width: 839px) {
+  .vf-list__action-selected {
+    display: none;
+  }
+
+  .vf-list__action-select-all {
+    margin-left: 0;
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .vf-list__action-select-all {
+    display: none;
+  }
+}

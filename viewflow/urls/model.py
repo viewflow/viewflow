@@ -190,7 +190,7 @@ class UpdateViewMixin(metaclass=ViewsetMeta):
         return actions
 
 
-class ModelViewset(ListBulkActionsMixin, CreateViewMixin, UpdateViewMixin, BaseModelViewset, AppMenuMixin):
+class ModelViewset(ListBulkActionsMixin, CreateViewMixin, UpdateViewMixin, AppMenuMixin, BaseModelViewset):
     """List/Create/Update/Delete for a model."""
 
     def get_object_url(self, request, obj):
@@ -336,7 +336,7 @@ class DetailViewMixin(metaclass=ViewsetMeta):
         return actions
 
 
-class ReadonlyModelViewset(DetailViewMixin, ListBulkActionsMixin, BaseModelViewset, AppMenuMixin):
+class ReadonlyModelViewset(DetailViewMixin, ListBulkActionsMixin, AppMenuMixin, BaseModelViewset):
     """
     Readonly model viewset with List and object details view only
     """

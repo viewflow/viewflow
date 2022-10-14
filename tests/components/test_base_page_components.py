@@ -1,6 +1,7 @@
 from django.test import override_settings
 from django.urls import path
 from django.views.generic import TemplateView
+from viewflow.contrib.auth import AuthViewset
 from viewflow.urls import Application, AppMenuMixin, IndexViewMixin, Site, Viewset
 
 from . import LiveTestCase
@@ -9,6 +10,13 @@ from . import LiveTestCase
 @override_settings(ROOT_URLCONF=__name__, DEBUG=True)
 class Test(LiveTestCase):
     fixtures = ['users.json']
+
+    def setUp(self):
+        self.client.login(username='admin', password='admin')
+        cookie = self.client.cookies['sessionid']
+        self.browser.get(self.live_server_url)
+        self.browser.add_cookie({'name': 'sessionid', 'value': cookie.value, 'secure': False, 'path': '/'})
+        self.browser.refresh()
 
     def test_page_navigation(self):
         self.browser.get(f"{self.live_server_url}/application/test/test/")
@@ -88,5 +96,6 @@ urlpatterns = [
             title='Test Application 2',
             viewsets=[TestViewset()]
         )
-    ]).urls)
+    ]).urls),
+    path('accounts/', AuthViewset().urls),
 ]

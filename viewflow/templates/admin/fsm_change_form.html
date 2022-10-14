@@ -1,0 +1,7 @@
+{% extends 'admin/change_form.html' %}
+{% load fsm %}
+
+{% block object-tools-items %}
+  {% change_form_fsm_tools %}
+  {{ block.super }}
+{% endblock %}

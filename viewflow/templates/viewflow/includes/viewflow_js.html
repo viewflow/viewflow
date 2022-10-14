@@ -1,14 +1,5 @@
 {% load static %}
-{% if not debug %}
 <script src="{% static 'viewflow/js/turbo.es2017-umd.js' %}" data-turbo-eval="false"></script>
 <script src="{% static 'viewflow/js/perfect-scrollbar.min.js' %}"></script>
-<script src="{% static 'viewflow/js/material-components-web.min.js' %}"></script>
 <script src="{% static 'viewflow/js/vis-network.min.js' %}"></script>
-<script src="{% static 'viewflow/js/viewflow-components.min.js' %}"></script>
-{% else %}
-<script src="{% static 'viewflow/js/turbo.es2017-umd.js' %}" data-turbo-eval="false"></script>
-<script src="{% static 'viewflow/js/perfect-scrollbar.min.js' %}"></script>
-<script src="{% static 'viewflow/js/material-components-web.js' %}"></script>
-<script src="{% static 'viewflow/js/vis-network.js' %}"></script>
-<script src="{% static 'viewflow/js/viewflow-components.js' %}"></script>
-{% endif %}
+<script src="{% static 'viewflow/js/viewflow.min.js' %}"></script>

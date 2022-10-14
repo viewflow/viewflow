@@ -15,7 +15,6 @@ env = environ.Env(
 )
 env.read_env(BASE_DIR / '.env') if os.path.exists(BASE_DIR / '.env') else None
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/dev/howto/deployment/checklist/
 
@@ -31,8 +30,9 @@ ALLOWED_HOSTS = [env.str('DOMAIN_NAME')]
 # Application definition
 
 INSTALLED_APPS = [
+    'tests.apps.TestsConfig',
     'viewflow',
-    # 'viewflow.workflow',
+    'viewflow.workflow',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -42,8 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'guardian',
-
-    'tests.apps.TestsConfig',
 ]
 
 MIDDLEWARE = [
@@ -88,6 +86,7 @@ DATABASES = {
     'default': env.db(),
 }
 
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # Disable migrations for tests
 MIGRATION_MODULES = {
@@ -101,6 +100,7 @@ MIGRATION_MODULES = {
     'tests': None,
     'guardian': None,
     'helloworld': None,
+    'bloodtest': None,
 }
 
 # Internationalization
@@ -159,3 +159,19 @@ LOGGING = {
 FIXTURE_DIRS = (
     BASE_DIR / 'fixtures',
 )
+
+# Celery
+# http://docs.celeryproject.org/en/latest/index.html
+
+CELERY_WORKER_CONCURRENCY = 1
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_BROKER_URL = 'redis://localhost:6379/10'
+
+CELERY_IMPORTS = [
+    os.path.join(root, filename)[len(str(BASE_DIR)) + 1: -3].replace('/', '.')
+    for root, dirs, files in os.walk(BASE_DIR / 'tests')
+    for filename in files
+    if filename.startswith('test_') and filename.endswith('.py')
+]

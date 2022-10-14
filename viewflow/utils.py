@@ -211,3 +211,6 @@ def get_object_data(obj):
 
         if value is not None:
             yield (field, field.verbose_name.capitalize(), value)
+
+    if hasattr(obj, 'artifact_object_id') and obj.artifact_object_id:
+        yield from get_object_data(obj.artifact)
