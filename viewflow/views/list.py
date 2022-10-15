@@ -251,7 +251,7 @@ class OrderableListViewMixin(object):
                         _, column_order_prefix, column_orderby = column_ordering.rpartition('-')
                         ordering[column_def] = 'asc' if column_order_prefix == param_prefix else 'desc'
         else:
-            # ordered by expliplicit self.ordering definition or by queryset.order_by
+            # ordered by explicit self.ordering definition or by queryset.order_by
             raw_ordering = []
             if isinstance(self.ordering, (list, tuple)):
                 raw_ordering.extend(self.ordering)

@@ -38,6 +38,8 @@ class AppMenuMixin:
         return attr
 
     def has_view_permission(self, user, obj=None):
+        if hasattr(super(), 'has_view_permission'):
+            return super().has_view_permission(user, obj=obj)
         return True
 
 
@@ -77,7 +79,7 @@ class Application(IndexViewMixin, Viewset):
         if self.permission is not None:
             if callable(self.permission):
                 return self.permission(user)
-            return user.has_perm(self.permission)
+            return user.is_authenticated and user.has_perm(self.permission)
         return True
 
     def menu_items(self):
