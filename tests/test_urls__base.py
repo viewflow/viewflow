@@ -51,6 +51,6 @@ class Test(TestCase):  # noqa: D101
         self.assertEqual('/test/', urlconfig.nested_path.viewset.reverse('index'))
         self.assertEqual('/test/page/', urlconfig.nested_path.viewset.reverse('page'))
 
-    def test_autoredirect(self):
+    def test_auto_redirect(self):
         response = self.client.get(reverse('root:nested:index'))
         self.assertRedirects(response, '/test/page/')

@@ -8,8 +8,10 @@
 from urllib.parse import quote as urlquote
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.forms.models import modelform_factory
+from django.utils.decorators import method_decorator
 from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django.views import generic
@@ -20,6 +22,7 @@ from viewflow.utils import viewprop, has_object_perm
 from .base import FormLayoutMixin
 
 
+@method_decorator(login_required, name='dispatch')
 class CreateModelView(FormLayoutMixin, FormDependentSelectMixin, FormAjaxCompleteMixin, generic.CreateView):
     viewset = None
     layout = None

@@ -9,10 +9,12 @@ import datetime
 import decimal
 from functools import lru_cache
 
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import FieldDoesNotExist, PermissionDenied
 from django.db import models
 from django.forms.utils import pretty_name
 from django.utils import formats, timezone
+from django.utils.decorators import method_decorator
 from django.utils.encoding import force_str
 from django.utils.functional import cached_property
 from django.utils.html import format_html
@@ -413,6 +415,7 @@ class BaseListModelView(generic.ListView):
         return super().dispatch(request, *args, **kwargs)
 
 
+@method_decorator(login_required, name='dispatch')
 class ListModelView(BulkActionsMixin,
                     FilterableViewMixin,
                     OrderableListViewMixin,

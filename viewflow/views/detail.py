@@ -6,13 +6,16 @@
 # which is part of this source code package.
 
 from django.contrib.admin.utils import unquote
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied, ValidationError
 from django.http import Http404
+from django.utils.decorators import method_decorator
 from django.views import generic
 
 from viewflow.utils import has_object_perm, get_object_data
 
 
+@method_decorator(login_required, name='dispatch')
 class DetailModelView(generic.DetailView):
     viewset = None
     page_actions = None
