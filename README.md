@@ -54,7 +54,7 @@ http://cookbook.viewflow.io
 
 ## Components
 
-<img src="assets/ViewflowComponents.svg" alt="drawing" width="600"/>
+<img src="assets/ViewflowComponents.svg" alt="drawing" width="400"/>
 
 ### Class-based URL configurations
 
@@ -201,6 +201,10 @@ urlpatterns = [
 ```
 
 ### BPMN Workflow
+
+<a href="https://demo-next.viewflow.io/helloworld/">
+  <img src="assets/dashboard.png" alt="drawing" width="600"/>
+</a>
 
 lightweight workflow layer on top of Django's Model-View-Template that helps to
 organize people's collaboration business logic. BPMN workflows supports parallel
