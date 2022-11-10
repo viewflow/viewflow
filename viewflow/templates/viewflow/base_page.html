@@ -3,7 +3,7 @@
 {% block body %}
 <vf-page-scroll-fix></vf-page-scroll-fix>
 <vf-page class="vf-page">
-  {% block page-menu %}{% if user.is_authenticated %}
+  {% block page-menu %}{% if site and user.is_authenticated %}
   <aside class="vf-page__menu mdc-drawer mdc-drawer--dismissible">
     {% block page-menu-header %}
     <header class="mdc-drawer__header vf-page__menu-header">
@@ -77,7 +77,7 @@
     <header class="mdc-top-app-bar vf-page__body-toolbar">
       <div class="mdc-top-app-bar__row">
         <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-          {% if user.is_authenticated %}
+          {% if site and user.is_authenticated %}
           <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button vf-page__menu-toggle" aria-label="Open navigation menu" data-turbo="false">menu</button>
           {% endif %}
           <span class="mdc-top-app-bar__title">
