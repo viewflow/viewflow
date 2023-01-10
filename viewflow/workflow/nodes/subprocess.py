@@ -9,8 +9,6 @@ from . import mixins
 
 class StartSubprocess(
     mixins.NextNodeMixin,
-    mixins.NodeUndoMixin,
-    mixins.NodeCancelMixin,
     Node
 ):
     """Start subprocess handle"""
@@ -31,8 +29,6 @@ class StartSubprocess(
 
 class Subprocess(
     mixins.NextNodeMixin,
-    mixins.NodeUndoMixin,
-    mixins.NodeCancelMixin,
     Node
 ):
     task_type = 'SUBPROCESS'

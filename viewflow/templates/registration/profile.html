@@ -52,11 +52,11 @@
         <section class="mdc-card__actions vf-page-profile__detail-actions">
           {% url 'password_change' as password_change_url %}
           {% if password_change_url %}
-          <a class="mdc-button" href="{{ password_change_url }}">Change password</a>
+          <a class="mdc-button" href="{{ password_change_url }}">{% trans "Change password" %}</a>
           {% endif %}
           {% url 'profile_edit' as profile_edit_url %}
           {% if profile_edit_url %}
-          <a class="mdc-button mdc-button--raised" href="{{ profile_edit_url }}">Edit</a>
+          <a class="mdc-button mdc-button--raised" href="{{ profile_edit_url }}">{% trans "Edit" %}</a>
           {% endif %}
         </section>
       </div>
@@ -71,7 +71,7 @@
         </section>
         <section class="mdc-card__actions vf-page-profile__avatar-actions">
             <div class="mdc-button mdc-button--raised mdc-card__action vf-page-profile__avatar-change">
-              Change
+              {% trans "Change" %}
               <input type="file">
 
             </div>
@@ -79,7 +79,7 @@
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             <input type="file" name="avatar" style="display:none">
-            <button type="submit" style="display:none">Submit</button>
+            <button type="submit" style="display:none">{% trans "Submit" %}</button>
         </form>
       </vf-page-profile-avatar>
     </div>

@@ -5,9 +5,10 @@ from viewflow.workflow import nodes
 from . import views, mixins, utils
 
 
-class Start(mixins.NodeDetailMixin, nodes.Start):
+class Start(mixins.NodeDetailMixin, mixins.NodeUndoMixin, nodes.Start):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
 
     @property
     def start_view(self):
@@ -18,19 +19,25 @@ class Start(mixins.NodeDetailMixin, nodes.Start):
         return path(f'{self.name}/', utils.wrap_start_view(self, self.start_view), name='execute')
 
 
-class StartHandle(mixins.NodeDetailMixin, nodes.StartHandle):
+class StartHandle(mixins.NodeDetailMixin, mixins.NodeUndoMixin, nodes.StartHandle):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
 
 
-class End(mixins.NodeDetailMixin, nodes.End):
+class End(mixins.NodeDetailMixin, mixins.NodeUndoMixin, mixins.NodeReviveMixin, nodes.End):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
 
 
-class View(mixins.NodeDetailMixin, nodes.View):
+class View(mixins.NodeDetailMixin, mixins.NodeCancelMixin, mixins.NodeUndoMixin, mixins.NodeReviveMixin, nodes.View):
     index_view_class = views.UserIndexTaskView
     detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
 
     """
     Execute View
@@ -70,7 +77,7 @@ class View(mixins.NodeDetailMixin, nodes.View):
     """
     Unassign
     """
-    unassign_view_class = None
+    unassign_view_class = views.UnassignTaskView
 
     @viewprop
     def unassign_view(self):
@@ -80,7 +87,7 @@ class View(mixins.NodeDetailMixin, nodes.View):
 
     @property
     def unassign_path(self):
-        if self.assign_view:
+        if self.unassign_view:
             return path(
                 f'<int:process_pk>/{self.name}/<int:task_pk>/unassign/',
                 utils.wrap_task_view(self, self.unassign_view, permission=self.can_unassign),
@@ -88,51 +95,72 @@ class View(mixins.NodeDetailMixin, nodes.View):
             )
 
 
-class If(mixins.NodeDetailMixin, nodes.If):
+class If(mixins.NodeDetailMixin, mixins.NodeUndoMixin, mixins.NodeReviveMixin, nodes.If):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
 
 
-class Function(mixins.NodeDetailMixin, nodes.Function):
+class Function(mixins.NodeDetailMixin, mixins.NodeUndoMixin, nodes.Function):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
 
 
-class Handle(mixins.NodeDetailMixin, nodes.Handle):
+class Handle(mixins.NodeDetailMixin, mixins.NodeCancelMixin, mixins.NodeUndoMixin, mixins.NodeReviveMixin, nodes.Handle):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
 
 
-class Obsolete(mixins.NodeDetailMixin, nodes.Obsolete):
+class Obsolete(mixins.NodeDetailMixin, mixins.NodeCancelMixin, nodes.Obsolete):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
 
 
-class Join(mixins.NodeDetailMixin, mixins.NodeExecuteMixin, nodes.Join):
+class Join(mixins.NodeDetailMixin, mixins.NodeExecuteMixin, mixins.NodeCancelMixin, mixins.NodeUndoMixin, mixins.NodeReviveMixin, nodes.Join):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
 
 
-class Split(mixins.NodeDetailMixin, mixins.NodeExecuteMixin, nodes.Split):
+class Split(mixins.NodeDetailMixin, mixins.NodeExecuteMixin, mixins.NodeUndoMixin, mixins.NodeReviveMixin, nodes.Split):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
 
 
-class StartSubprocess(mixins.NodeDetailMixin, nodes.StartSubprocess):
+class StartSubprocess(mixins.NodeDetailMixin, mixins.NodeCancelMixin, mixins.NodeUndoMixin, nodes.StartSubprocess):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+    undo_view_class = views.UndoTaskView
 
 
-class Subprocess(mixins.NodeDetailMixin, nodes.Subprocess):
+class Subprocess(mixins.NodeDetailMixin, mixins.NodeCancelMixin, mixins.NodeUndoMixin, nodes.Subprocess):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+    undo_view_class = views.UndoTaskView
 
 
-class NSubprocess(mixins.NodeDetailMixin, nodes.NSubprocess):
+class NSubprocess(mixins.NodeDetailMixin, mixins.NodeCancelMixin, mixins.NodeUndoMixin, nodes.NSubprocess):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+    undo_view_class = views.UndoTaskView
 
 
-class Switch(mixins.NodeDetailMixin, nodes.Switch):
+class Switch(mixins.NodeDetailMixin, mixins.NodeCancelMixin, mixins.NodeUndoMixin, mixins.NodeReviveMixin, nodes.Switch):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView

@@ -3,7 +3,7 @@ from django.utils.timezone import now
 from viewflow import this
 from viewflow.utils import is_owner
 from ..base import Node
-from ..activation import Activation, leading_tasks_canceled
+from ..activation import Activation, leading_tasks_canceled, has_manage_permission
 from ..status import STATUS, PROCESS
 from . import mixins
 
@@ -16,7 +16,9 @@ class StartActivation(mixins.NextNodeActivationMixin, Activation):
         flow_class = flow_task.flow_class
 
         process = flow_class.process_class(flow_class=flow_class)
-        task = flow_class.task_class(flow_task=flow_task, process=process, started=now())
+        task = flow_class.task_class(
+            flow_task=flow_task, process=process, started=now()
+        )
 
         return cls(task)
 
@@ -30,7 +32,10 @@ class StartActivation(mixins.NextNodeActivationMixin, Activation):
 
 class StartHandleActivation(StartActivation):
     @Activation.status.transition(
-        source=STATUS.DONE, target=STATUS.CANCELED, conditions=[leading_tasks_canceled]
+        source=STATUS.DONE,
+        target=STATUS.CANCELED,
+        conditions=[leading_tasks_canceled],
+        permission=has_manage_permission,
     )
     def undo(self):
         # undo
@@ -78,25 +83,24 @@ class StartViewActivation(StartActivation):
 
 class Start(
     mixins.NextNodeMixin,
-    mixins.NodeCancelMixin,
     mixins.NodePermissionMixin,
-    mixins.NodeUndoMixin,
-    Node
+    Node,
 ):
     """Start a flow from django view."""
+
     activation_class = StartViewActivation
 
-    task_type = 'HUMAN_START'
+    task_type = "HUMAN_START"
 
     shape = {
-        'width': 50,
-        'height': 50,
-        'svg': """
+        "width": 50,
+        "height": 50,
+        "svg": """
             <circle class="event" cx="25" cy="25" r="25"/>
-        """
+        """,
     }
 
-    bpmn_element = 'startEvent'
+    bpmn_element = "startEvent"
 
     def __init__(self, view, undo_func=None, **kwargs):
         super().__init__()
@@ -129,7 +133,9 @@ class Start(
                 else:
                     obj = self._owner_permission_obj
 
-            return user.has_perm(self._owner_permission, obj=obj) or user.has_perm(self._owner_permission)
+            return user.has_perm(self._owner_permission, obj=obj) or user.has_perm(
+                self._owner_permission
+            )
 
         else:
             """
@@ -138,24 +144,20 @@ class Start(
             return True
 
 
-class StartHandle(
-    mixins.NextNodeMixin,
-    mixins.NodeUndoMixin,
-    mixins.NodeCancelMixin,
-    Node
-):
+class StartHandle(mixins.NextNodeMixin, Node):
     """Start flow from code."""
-    task_type = 'START'
+
+    task_type = "START"
 
     shape = {
-        'width': 50,
-        'height': 50,
-        'svg': """
+        "width": 50,
+        "height": 50,
+        "svg": """
             <circle class="event" cx="25" cy="25" r="25"/>
-        """
+        """,
     }
 
-    bpmn_element = 'startEvent'
+    bpmn_element = "startEvent"
 
     activation_class = StartHandleActivation
 
@@ -167,7 +169,9 @@ class StartHandle(
     def _create_wrapper_function(self, origin_func):
         def func(**kwargs):
             activation = self.activation_class.create(self, None, None)
-            result = origin_func(activation, **kwargs) if origin_func else activation.process
+            result = (
+                origin_func(activation, **kwargs) if origin_func else activation.process
+            )
             activation.execute()
             return result
 

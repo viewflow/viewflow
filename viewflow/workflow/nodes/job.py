@@ -46,8 +46,6 @@ class AbstractJobActivation(mixins.NextNodeActivationMixin, Activation):
 
 class AbstractJob(
     mixins.NextNodeMixin,
-    mixins.NodeCancelMixin,
-    mixins.NodeUndoMixin,
     Node
 ):
     task_type = 'JOB'

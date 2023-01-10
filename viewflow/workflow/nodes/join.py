@@ -105,8 +105,6 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
 
 class Join(
     mixins.NextNodeMixin,
-    mixins.NodeUndoMixin,
-    mixins.NodeCancelMixin,
     Node,
 ):
     """Wait for one or all incoming links and activates next path."""

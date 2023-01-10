@@ -3,22 +3,21 @@ from django.utils.timezone import now
 from viewflow import this
 from viewflow.utils import is_owner
 from ..base import Node
-from ..activation import Activation
+from ..activation import Activation, has_manage_permission
 from ..status import STATUS
 from . import mixins
 
 
 class ViewActivation(mixins.NextNodeActivationMixin, Activation):
-    """View node activation. """
+    """View node activation."""
 
     @classmethod
     def create(cls, flow_task, prev_activation, token):
         """Instantiate and persist new flow task."""
         flow_class = flow_task.flow_class
         task = flow_class.task_class(
-            process=prev_activation.process,
-            flow_task=flow_task,
-            token=token)
+            process=prev_activation.process, flow_task=flow_task, token=token
+        )
 
         activation = cls(task)
 
@@ -38,19 +37,36 @@ class ViewActivation(mixins.NextNodeActivationMixin, Activation):
         task.previous.add(prev_activation.task)
         return activation
 
-    @Activation.status.transition(source=STATUS.NEW, target=STATUS.ASSIGNED)
+    @Activation.status.transition(
+        source=STATUS.NEW,
+        target=STATUS.ASSIGNED,
+        permission=lambda activation, user: activation.flow_task.can_assign(
+            user, activation.task
+        ),
+    )
     def assign(self, user):
         """Assign user to the task."""
         self.task.owner = user
         self.task.save()
 
-    @Activation.status.transition(source=STATUS.ASSIGNED, target=STATUS.NEW)
+    @Activation.status.transition(
+        source=STATUS.ASSIGNED,
+        target=STATUS.NEW,
+        permission=lambda activation, user: activation.flow_task.can_unassign(
+            user, activation.task
+        ),
+    )
     def unassign(self):
         """Remove user from the task assignment."""
         self.task.owner = None
         self.task.save()
 
-    @Activation.status.transition(source=STATUS.ASSIGNED)
+    @Activation.status.transition(
+        source=STATUS.ASSIGNED,
+        permission=lambda activation, user: activation.flow_task.can_unassign(
+            user, activation.task
+        ),
+    )
     def reassign(self, user=None):
         """Reassign to another user."""
         if user:
@@ -59,24 +75,40 @@ class ViewActivation(mixins.NextNodeActivationMixin, Activation):
 
     @Activation.status.super()
     def activate(self):
-        """ Do nothing on sync call"""
+        """Do nothing on sync call"""
 
-    @Activation.status.transition(source=STATUS.ASSIGNED, target=STATUS.STARTED)
+    @Activation.status.transition(
+        label='Execute',
+        source=STATUS.ASSIGNED,
+        target=STATUS.STARTED,
+        permission=lambda activation, user: activation.flow_task.can_execute(
+            user, activation.task
+        ),
+    )
     def start(self, request):
         # TODO request.GET['started']
         self.task.started = now()
 
     @Activation.status.transition(source=STATUS.STARTED, target=STATUS.DONE)
     def complete(self):
-        """ Complete task and create next."""
+        """Complete task and create next."""
         super().complete.original()
 
-    @Activation.status.transition(source=STATUS.STARTED)
+    @Activation.status.transition(
+        source=STATUS.STARTED,
+        permission=lambda activation, user: activation.flow_task.can_execute(
+            user, activation.task
+        ),
+    )
     def execute(self):
         self.complete()
         self.activate_next()
 
-    @Activation.status.transition(source=[STATUS.NEW, STATUS.ASSIGNED], target=STATUS.CANCELED)
+    @Activation.status.transition(
+        source=[STATUS.NEW, STATUS.ASSIGNED],
+        target=STATUS.CANCELED,
+        permission=has_manage_permission,
+    )
     def cancel(self):
         self.task.finished = now()
         self.task.save()
@@ -92,26 +124,25 @@ class ViewActivation(mixins.NextNodeActivationMixin, Activation):
 
 class View(
     mixins.NextNodeMixin,
-    mixins.NodeCancelMixin,
     mixins.NodePermissionMixin,
-    mixins.NodeUndoMixin,
-    Node
+    Node,
 ):
     """User task."""
+
     activation_class = ViewActivation
 
-    task_type = 'HUMAN'
+    task_type = "HUMAN"
 
     shape = {
-        'width': 150,
-        'height': 100,
-        'text-align': 'middle',
-        'svg': """
+        "width": 150,
+        "height": 100,
+        "text-align": "middle",
+        "svg": """
             <rect class="task" width="150" height="100" rx="5" ry="5"/>
-        """
+        """,
     }
 
-    bpmn_element = 'userTask'
+    bpmn_element = "userTask"
 
     def __init__(self, view, undo_func=None, **kwargs):
         super().__init__()
@@ -145,7 +176,7 @@ class View(
         if callable(owner):
             owner = owner(activation)
         elif isinstance(owner, dict):
-            owner = get_user_model() ._default_manager.get(**owner)
+            owner = get_user_model()._default_manager.get(**owner)
         return owner
 
     def calc_owner_permission(self, activation):
@@ -161,7 +192,7 @@ class View(
             return self._owner_permission_obj(activation.process)
 
     def can_execute(self, user, task):
-        """Check user premition to execute the task."""
+        """Check user permission to execute the task."""
         return is_owner(task.owner, user)
 
     def can_assign(self, user, task):
@@ -186,7 +217,9 @@ class View(
             else:
                 obj = self._owner_permission_obj
 
-        return user.has_perm(task.owner_permission, obj=obj) or user.has_perm(task.owner_permission)
+        return user.has_perm(task.owner_permission, obj=obj) or user.has_perm(
+            task.owner_permission
+        )
 
     def can_unassign(self, user, task):
         """Check if user can unassign the task."""

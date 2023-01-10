@@ -29,9 +29,7 @@ class FunctionActivation(mixins.NextNodeActivationMixin, Activation):
 
 class Function(
     mixins.NextNodeMixin,
-    mixins.NodeCancelMixin,
     mixins.NodePermissionMixin,
-    mixins.NodeUndoMixin,
     Node
 ):
     """

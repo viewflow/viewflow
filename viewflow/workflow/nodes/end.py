@@ -44,7 +44,7 @@ class EndActivation(Activation):
         return []
 
 
-class End(mixins.NodeCancelMixin, mixins.NodeUndoMixin, Node):
+class End(Node):
     """
     End of the flow.
 

@@ -83,7 +83,7 @@
           <form method="POST">{% csrf_token %}
             <button type="submit" name="_cancel_process" value="1" class="mdc-button mdc-button--raised mdc-card__action mdc-card__action--button">
               <div class="mdc-button__ripple"></div>
-              <span class="mdc-button__label">Cancel</span> <!- todo perms -->
+              <span class="mdc-button__label">{% trans "Cancel" %}</span> <!- todo perms -->
             </button>
           </form>
         </div>

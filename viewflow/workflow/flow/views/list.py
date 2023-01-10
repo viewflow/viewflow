@@ -89,7 +89,7 @@ class FlowArchiveListView(mixins.ProcessViewTemplateNames, ListModelView):
         process_url = self.request.resolver_match.flow_viewset.reverse(
             "process_detail", args=[task.process_id]
         )
-        return mark_safe(f'<a href="{process_url}">{task.process.summary}</a>')
+        return mark_safe(f'<a href="{process_url}">{task.process.brief}</a>')
 
     @property
     def model(self):
@@ -115,6 +115,11 @@ class WorkflowTaskListView(ListModelView):
         return mark_safe(f'<a href="{task_url}">#{task.process_id}/{task.pk}</a>')
 
     task_id.short_description = _("#")
+
+    def flow_task(self, task):
+        return _(str(task.flow_task))
+    flow_task.short_description = _("Task")
+
 
     def process_brief(self, task):
         flow_viewset = task.flow_task.flow_class.parent

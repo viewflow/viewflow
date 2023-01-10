@@ -1,11 +1,13 @@
 from django.views.generic import RedirectView
 from django.urls import path
 from django.utils.http import url_has_allowed_host_and_scheme as is_safe_url
+from django.utils.translation import gettext_lazy as _
 
 from viewflow import viewprop
 from viewflow.utils import DEFAULT
 from viewflow.urls import Application, AppMenuMixin, Viewset, ViewsetMeta
 from ..status import STATUS
+from ..models import Task
 from . import views
 
 
@@ -365,7 +367,7 @@ class _IndexRedirectView(RedirectView):
 
 class NestedFlowsApp(AppMenuMixin, Application):
     app_name = "flows"
-    title = "Processes"
+    title = _("Processes")
     icon = "notes"
 
     """
@@ -471,3 +473,13 @@ class WorkflowAppViewset(BulkActionsViewsMixin, Application):
     @property
     def archive_path(self):
         return path("archive/", self.archive_view, name="archive")
+
+    def get_context_data(self, request):
+        inbox = Task.objects.inbox(self.flow_classes, request.user)
+
+        queue = Task.objects.queue(self.flow_classes, request.user)
+
+        return {
+            "user_inbox": inbox,
+            "user_queue": queue,
+        }

@@ -88,7 +88,7 @@
         {% block page-toolbar-actions %}
         {% if not user.is_authenticated %}
           {% url 'login' as login_url %}{% if login_url %}
-          <a class="mdc-button" href="{{ login_url }}?next={{ request.path }}" style="color:white">Login</a>
+          <a class="mdc-button" href="{{ login_url }}?next={{ request.path }}" style="color:white">{% trans "Login" %}</a>
           {% endif %}
         {% endif %}
         {% endblock %}

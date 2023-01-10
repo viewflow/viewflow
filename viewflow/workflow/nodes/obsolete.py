@@ -16,7 +16,6 @@ class ObsoleteActivation(Activation):
 
 
 class Obsolete(
-    mixins.NodeCancelMixin,
     Node
 ):
     """Missing node instance."""

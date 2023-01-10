@@ -48,8 +48,6 @@ class SplitActivation(Activation):
 
 
 class Split(
-    mixins.NodeUndoMixin,
-    mixins.NodeCancelMixin,
     Node,
 ):
     """Parallel split gateway."""

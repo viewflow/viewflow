@@ -2,9 +2,13 @@
 
 from .actions import (
     AssignTaskView,
-    CancelProcessView,
-    BulkUnassignTasksActionView,
     BulkAssignTasksActionView,
+    BulkUnassignTasksActionView,
+    CancelProcessView,
+    CancelTaskView,
+    ReviveTaskView,
+    UnassignTaskView,
+    UndoTaskView,
 )
 from .chart import FlowChartView
 from .create import CreateProcessView, CreateArtifactView
@@ -32,6 +36,7 @@ __all__ = (
     "BulkAssignTasksActionView",
     "BulkUnassignTasksActionView",
     "CancelProcessView",
+    "CancelTaskView",
     "CreateArtifactView",
     "CreateProcessView",
     "DashboardProcessListView",
@@ -45,9 +50,12 @@ __all__ = (
     "FlowQueueListView",
     "IndexTaskView",
     "ProcessViewTemplateNames",
+    "ReviveTaskView",
     "SuccessMessageMixin",
     "TaskSuccessUrlMixin",
     "TaskViewTemplateNames",
+    "UnassignTaskView",
+    "UndoTaskView",
     "UpdateArtifactView",
     "UpdateProcessView",
     "UserIndexTaskView",

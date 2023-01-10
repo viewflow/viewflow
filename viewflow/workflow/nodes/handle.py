@@ -42,8 +42,6 @@ class HandleActivation(mixins.NextNodeActivationMixin, Activation):
 
 class Handle(
     mixins.NextNodeMixin,
-    mixins.NodeUndoMixin,
-    mixins.NodeCancelMixin,
     Node
 ):
     """

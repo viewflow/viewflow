@@ -105,7 +105,7 @@ class DashboardTaskListView(
     task_id.short_description = _('#')
 
     def process_summary(self, task):
-        return task.process.coerced.summary
+        return task.process.coerced.brief
 
     @property
     def model(self):

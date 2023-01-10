@@ -20,16 +20,18 @@ const copyTargets = [
     src: [
       'node_modules//@hotwired/turbo/dist/turbo.es2017-umd.js',
       `node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js`,
+      `node_modules/perfect-scrollbar/dist/perfect-scrollbar.min.js.map`,
       `node_modules/trix/dist/trix.js`,
       'node_modules/smartcrop/smartcrop.js',
       `node_modules/vis-network/dist/vis-network.min.js`,
+      `node_modules/vis-network/dist/vis-network.min.js.map`,
     ],
     dest: 'js/',
   },
   {
     src: [
       'node_modules/perfect-scrollbar/css/perfect-scrollbar.css',
-      `node_modules/vis-network/dist/vis-network.min.css`,
+      `node_modules/vis-network/dist/dist/vis-network.min.css`,
       `node_modules/trix/dist/trix.css`,
     ],
     dest: 'css/',

@@ -4,11 +4,6 @@
 {{ block.super }}
 <link href="{% static 'viewflow/css/contrib/swagger-ui.css' %}" rel="stylesheet">
 <script src="{% static 'viewflow/js/contrib/swagger-ui-bundle.js' %}"></script>
-{% if not debug %}
-<script src="{% static 'viewflow/js/viewflow-contrib-swagger.min.js' %}"></script>
-{% else %}
-<script src="{% static 'viewflow/js/viewflow-contrib-swagger.js' %}"></script>
-{% endif %}
 {% endblock js %}
 
 

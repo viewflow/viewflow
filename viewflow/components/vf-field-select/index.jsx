@@ -20,7 +20,7 @@ const defaultProps = {
   'optgroups': undefined,
   'required': false,
   'trailingIcon': undefined,
-  'value': undefined,
+  'value': '',
 };
 
 
@@ -90,7 +90,7 @@ const VSelectField = customElement('vf-field-select', defaultProps, (props, {ele
 
   const labelClasses = cc({
     'mdc-floating-label': true,
-    'mdc-floating-label--float-above': props.value !== undefined,
+    'mdc-floating-label--float-above': props.value !== '',
     'mdc-floating-label--required': props.required,
   });
 

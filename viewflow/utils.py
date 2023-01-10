@@ -155,8 +155,8 @@ def update_wrapper_view(view, origin_view, flow_task=None, flow_class=None):
         view_class = view.view_class = origin_view.view_class
     if hasattr(origin_view, "cls"):  # django restframework generic view
         view_class = view.cls = origin_view.cls
-    if hasattr(origin_view, "view_initkwargs"):  # both 八(＾□＾*)
-        view.view_initkwargs = origin_view.initkwargs or {}
+    # if hasattr(origin_view, "view_initkwargs"):  # both 八(＾□＾*)
+    #    view.view_initkwargs = origin_view.initkwargs or {}
 
         # poor-man dependency injection. Mostly b/c of dumb restframework BaseSchemaGenerator.create_view impl
         if flow_class and hasattr(view_class, "flow_class"):

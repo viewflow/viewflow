@@ -3,7 +3,7 @@
   <div class="mdc-list-group">
     <h3 class="vf-page__menu-subheader mdc-list-group__subheader">
       {% if site.parent %}
-        {{ site.title }}
+        {% trans site.title %}
       {% else %}
         {% trans 'Applications' %}
       {% endif %}
@@ -18,7 +18,7 @@
     {% reverse app 'index' as index_url %}
     <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ index_url }}"{% if app.turbo_disabled or viewset.turbo_disabled %} data-turbo="false"{% endif %}>
       <span class="mdc-list-item__start">{{ app.icon }}</span>
-      <span class="mdc-list-item__content">{{ app.title }}</span>
+      <span class="mdc-list-item__content">{% trans app.title %}</span>
     </a>
     {% endif %}{% empty %}
     <div class="mdc-list-item" style="height:auto; color: red">

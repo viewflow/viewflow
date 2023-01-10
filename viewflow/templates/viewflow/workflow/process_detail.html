@@ -5,11 +5,11 @@
 {% block content %}
 <div class="mdc-layout-grid vf-page__grid">
   <div class="mdc-layout-grid__inner">
-    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-9-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone">
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone">
       <div class="mdc-card vf-card">
         <section class="vf-card__header">
           <h1 class="vf-card__title">
-              {{ process.summary }}
+              {{ process.brief }}
           </h1>
           <h2 class="vf-card__breadcrumbs">
               <a href="{% reverse viewset 'index' %}">{{ view.flow_class.process_title }}</a>
@@ -37,11 +37,11 @@
                     <a href="{{ task_url }}">{{ task.process.id }}/{{ task.id }}</a>
                   </td>
                   <td class="mdc-data-table__cell">
-                    <a href="{{ task_url }}">{{ task.summary|default:task.flow_task }}</a>
+                    <a href="{{ task_url }}">{{ task.brief|default:task.flow_task }}</a>
                   </td>
                 {% else %}
                   <td>{{ task.process.id }}/{{ task.id }}</td>
-                  <td>{{ task.summary|default:task.flow_task }}</td>
+                  <td>{{ task.brief|default:task.flow_task }}</td>
                 {% endif%}
                  <td class="mdc-data-table__cell">{{ task.owner|default:"" }}</td>
                  <td class="mdc-data-table__cell">{{ task.created }}</td>
@@ -49,47 +49,21 @@
                  <td class="mdc-data-table__cell">{{ task.get_status_display }}</td>
               </tr>
               {% endfor %}
+            </tbody>
           </table>
         </div>
         <div class="mdc-card__actions vf-card__actions">
-          <vf-dialog style="margin-right:auto">
-            <a href="#" class="mdc-button mdc-card__action mdc-card__action--button vf-dialog__trigger">
-              <div class="mdc-button__ripple"></div>
-              <span class="mdc-button__label">Flow</span>
-            </a>
-            <div class="mdc-dialog mdc-dialog--fullscreen">
-              <div class="mdc-dialog__container">
-                <div class="mdc-dialog__surface"
-                  role="alertdialog"
-                  aria-modal="true"
-                  aria-labelledby="Flow Graph">
-                  <div class="mdc-dialog__content">
-                    <h4 class="mdc-typography mdc-typography--headline5" style="margin-bottom:8px">{% trans 'Flow graph' %}</h4>
-                    <img src="{% reverse process.flow_class 'process_chart' process.pk %}" alt="flow graph"/>
-                  </div>
-                  <div class="mdc-dialog__actions">
-                    <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="accept">
-                      <div class="mdc-button__ripple"></div>
-                      <span class="mdc-button__label">{% trans 'Close' %}</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <div class="mdc-dialog__scrim"></div>
-            </div>
-          </vf-dialog>
-
           {% if process.status == 'NEW' %}
-          <a href="{% reverse viewset 'process_cancel' process.pk %}"class="mdc-button mdc-button--raised mdc-card__action mdc-card__action--button">
+          <a href="{% reverse viewset 'process_cancel' process.pk %}" class="mdc-button mdc-button--raised mdc-card__action mdc-card__action--button">
             <div class="mdc-button__ripple"></div>
-            <span class="mdc-button__label">Cancel</span> <!- todo perms -->
+            <span class="mdc-button__label">{% trans "Cancel" %}</span> <!- todo perms -->
           </a>
           {% endif %}
         </div>
       </div>
     </div>
     {% block panel-cell %}
-    <div class="mdc-layout-grid__cell {% block panel-cell-span %}mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone{% endblock %}">
+    <div class="mdc-layout-grid__cell {% block panel-cell-span %}mdc-layout-grid__cell--span-4-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone{% endblock %}">
       {% include_process_data process %}
     </div>
     {% endblock panel-cell %}

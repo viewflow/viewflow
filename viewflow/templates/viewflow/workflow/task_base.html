@@ -1,0 +1,50 @@
+{% extends request.resolver_match.app.base_template_name|default:'viewflow/workflow/base_page.html' %}
+{% load i18n viewflow workflow %}
+
+{% block content %}{% with process=request.activation.process task=request.activation.task %}
+<div class="mdc-layout-grid vf-page__grid">
+  <div class="mdc-layout-grid__inner">
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone">
+      <div class="mdc-card vf-card">
+        <section class="vf-card__header">
+          <h1 class="vf-card__title">
+              {{ task.flow_task.task_description|default:task.flow_task.task_title }}
+          </h1>
+          <h2 class="vf-card__breadcrumbs">
+            {% block breadcrumbs_items %}
+              <a href="{% reverse viewset 'index' %}">{{ process.flow_class.process_title }}</a>
+              <a href="{% reverse viewset 'process_detail' process.pk %}">#{{ process.pk }}</a>
+              <a href="{% reverse task.flow_task 'detail' process.pk task.pk %}">{{ task.flow_task.task_title }} #{{ task.pk}}</a>
+            {% endblock %}
+          </h2>
+        </section>
+
+        <section class="vf-card__body">
+          <div class="mdc-layout-grid" style="padding-top: 0;padding-left: 16px;padding-right:16px;">
+            <div class="mdc-layout-grid__inner">
+              <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+                <md-outlined-text-field label="Brief" icon="description" disabled value="{{ task.brief }}" style="width:100%"></md-outlined-text-field>
+              </div>
+              <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                <md-outlined-text-field label="Owner" icon="account_box" disabled value="{{ task.owner|default:"Unassigned" }}" style="width:100%"></md-outlined-text-field>
+              </div>
+              <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+                <md-outlined-text-field label="Permission" icon="lock" disabled value="{{ task.owner_permission }} {{ task.owner_permission_obj|default:"" }}" style="width:100%"></md-outlined-text-field>
+              </div>
+              {% block task_content %}{% endblock %}
+            </div>
+          </div>
+        </section>
+        <section class="mdc-card__actions vf-card__actions">
+          {% block task_actions %}{% endblock %}
+        </section>
+      </div>
+    </div>
+    {% block panel-cell %}
+    <div class="mdc-layout-grid__cell {% block panel-cell-span %}mdc-layout-grid__cell--span-4-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone{% endblock %}">
+      {% include_process_data request.activation.process %}
+    </div>
+    {% endblock panel-cell %}
+  </div>
+</div>
+{% endwith %}{% endblock %}

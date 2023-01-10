@@ -15,7 +15,7 @@
     {% reverse viewset 'index' as index_url %}{% if index_url %}
     <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ index_url }}" {% if app.turbo_disabled or viewset.turbo_disabled %} data-turbo="false"{% endif %}>
       <span class="mdc-list-item__start">{% if viewset.icon %}{{ viewset.icon }}{% else %}<i class="material-icons">view_carousel</i>{% endif %}</span>
-      <span class="mdc-list-item__content">{{ viewset.title }}</span>
+      <span class="mdc-list-item__content">{% trans viewset.title %}</span>
     </a>
     {% endif %}
     {% endif %}{% empty %}{% block viewset_links_notfound %}

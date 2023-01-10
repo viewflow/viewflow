@@ -5,13 +5,6 @@
 {% for url in dash_scripts_urls %}
 <script src="{% static  url %}"></script>
 {% endfor %}
-{% if not debug %}
-<link href="{% static 'viewflow/css/viewflow-contrib-plotly.min.css' %}" rel="stylesheet">
-<script src="{% static 'viewflow/js/viewflow-contrib-plotly.min.js' %}"></script>
-{% else %}
-<link href="{% static 'viewflow/css/viewflow-contrib-plotly.css' %}" rel="stylesheet">
-<script src="{% static 'viewflow/js/viewflow-contrib-plotly.js' %}"></script>
-{% endif %}
 {% endblock js %}
 
 {% block content %}

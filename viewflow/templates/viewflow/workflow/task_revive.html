@@ -1,0 +1,21 @@
+{% extends 'viewflow/workflow/task_base.html' %}
+{% load i18n viewflow workflow %}
+
+{% block breadcrumbs_items %}
+  {{ block.super }}
+  <a>{% trans 'Revive' %}</a>
+{% endblock %}
+
+{% block task_actions %}
+<vf-form>
+  <form class="vf-form" method="POST" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+    {% csrf_token %}
+    <button class="mdc-button mdc-card__action mdc-card__action--button mdc-button--raised mdc-button--touch">
+      <span class="mdc-button__ripple"></span>
+      <span class="mdc-button__touch"></span>
+      <span class="mdc-button__focus-ring"></span>
+      <span class="mdc-button__label">{% trans 'Revive' %}</span>
+    </button>
+  </form>
+</vf-form>
+{% endblock %}

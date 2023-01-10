@@ -76,19 +76,18 @@ class FlowAdminMixin(object):
 
     @property
     def media(self):
-        extra = '' if settings.DEBUG else '.min'
+        extra = '.min'  # '' if settings.DEBUG else '.min'
 
         return super().media + Media(
             css={
                 'screen': (
                     'viewflow/css/vis-network%s.css' % extra,
-                    'viewflow/css/viewflow-admin%s.css' % extra,
+                    'viewflow/css/viewflow%s.css' % extra,
                 )
             },
             js=[
                 'viewflow/js/vis-network%s.js' % extra,
-                'viewflow/js/viewflow-admin%s.js' % extra,
-                'viewflow/js/viewflow-vis%s.js' % extra,
+                'viewflow/js/viewflow%s.js' % extra,
             ]
         )
 
@@ -173,7 +172,7 @@ class FlowAdminMixin(object):
 
         context = {
             **self.admin_site.each_context(request),
-            'title': _('%s %s') % (transition.label, opts.verbose_name),
+            'title': _('%(label)s %(name)s') % ({'label': transition.label, 'name': opts.verbose_name}),
             'adminform': adminForm,
             'object_id': object_id,
             'original': obj,

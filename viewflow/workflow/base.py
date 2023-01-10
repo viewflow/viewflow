@@ -6,6 +6,7 @@ from urllib.parse import non_hierarchical
 from django.apps import apps
 from django.db import transaction
 from django.urls import include, path
+from django.urls.exceptions import NoReverseMatch
 from django.utils.timezone import now
 
 from viewflow.utils import LazySingletonDescriptor, camel_case_to_title, strip_suffixes
@@ -135,9 +136,23 @@ class Node(Viewset):
             self.task_result_template = result_template
         return self
 
-    def get_available_actions(self, task, user):
+    def _get_transition_url(self, activation, transition):
+        url_name = transition.slug
+        if url_name == 'start':
+            url_name = 'execute'
+
+        return activation.flow_task.reverse(url_name, args=[activation.process.pk, activation.task.pk])
+
+    def get_available_actions(self, activation, user):
         """ List of {name, url} actions available for the current user """
-        return []
+        transitions = activation.get_available_transitions(user)
+        for transition in transitions:
+            try:
+                url = self._get_transition_url(activation, transition)
+            except NoReverseMatch:
+                pass
+            else:
+                yield transition.label, url
 
 
 class FlowMetaClass(ViewsetMeta):

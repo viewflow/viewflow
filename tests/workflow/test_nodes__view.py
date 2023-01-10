@@ -21,14 +21,22 @@ class Test(TestCase):  # noqa: D101
 
         # start
         process = TestWorkflow.start.run()
+        start_task = process.task_set.filter(flow_task=TestWorkflow.start).first()
+        with start_task.activation() as activation:
+            transitions = activation.get_available_transitions(self.admin)
+            self.assertEqual([], transitions)
+
+        # approve task created
         task = process.task_set.filter(flow_task=TestWorkflow.approve).first()
         self.assertIsNotNone(task)
         self.assertEqual(task.flow_task_type, 'HUMAN')
         self.assertEqual(task.status, STATUS.NEW)
         self.assertIsNone(task.owner)
         self.assertEqual(task.owner_permission, 'viewflow.can_approve_process')
-
         self.assertIn(task, TestWorkflow.task_class.objects.user_queue(self.admin))
+        with task.activation() as activation:
+            transitions = activation.get_available_transitions(self.admin)
+            self.assertEqual(['assign', 'cancel'], [transition.slug for transition in transitions])
 
         # execute unassigned node fails
         execute_url = TestWorkflow.approve.reverse('execute', args=[process.pk, task.pk])

@@ -6,7 +6,6 @@ from viewflow.workflow.exceptions import FlowRuntimeError
 from viewflow.workflow.activation import Activation
 
 from . import mixins
-from ..activation import Activation, leading_tasks_canceled
 from ..status import STATUS
 
 
@@ -35,11 +34,7 @@ class SwitchActivation(Activation):
         yield self.next_task._create(self, self.task.token)
 
 
-class Switch(
-    mixins.NodeUndoMixin,
-    mixins.NodeCancelMixin,
-    Node,
-):
+class Switch(Node):
     """
     Gateway that selects one of the outgoing node.
 

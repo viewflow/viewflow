@@ -97,3 +97,9 @@ vf-page-search {
     }
   }
 }
+
+
+a.vf-link, a:visited.vf-link {
+  text-decoration: none;
+  color: var(--mdc-theme-primary, #3f51b5);
+}

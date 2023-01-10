@@ -3,6 +3,7 @@ from functools import update_wrapper
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import transaction
 from django.shortcuts import get_object_or_404
+from viewflow.fsm import TransitionNotAllowed
 
 
 def wrap_task_view(self, origin_view, permission=None):
@@ -28,7 +29,10 @@ def wrap_task_view(self, origin_view, permission=None):
             with transaction.atomic(), self.flow_class.lock(process_pk):
                 return call_with_activation()
         else:
-            return call_with_activation()
+            try:
+                return call_with_activation()
+            except TransitionNotAllowed as e:
+                raise PermissionDenied(','.join(e.args))
 
     update_wrapper(view, origin_view)
     return view
@@ -76,7 +80,10 @@ def wrap_view(flow_task, origin_view):
             with flow_task.flow_class.lock(process_pk), transaction.atomic():
                 return call_with_activation()
         else:
-            return call_with_activation()
+            try:
+                return call_with_activation()
+            except TransitionNotAllowed as e:
+                raise PermissionDenied(','.join(e.args))
 
     update_wrapper(view, origin_view)
     return view

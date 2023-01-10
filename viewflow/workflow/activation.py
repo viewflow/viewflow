@@ -11,7 +11,7 @@ from .status import STATUS, PROCESS
 
 def parent_tasks_completed(activation):
     """Canceled task could be recreated iff all parent task was not cancelled."""
-    previous = activation.task.previous.values('status')
+    previous = activation.task.previous.values("status")
     completed = (STATUS.DONE, STATUS.REVIVED)
     return all(lambda task: task.status in completed, previous)
 
@@ -24,6 +24,10 @@ def leading_tasks_canceled(activation):
 
 def process_not_cancelled(activation):
     return activation.process.status != PROCESS.CANCELED
+
+
+def has_manage_permission(activation, user):
+    return activation.flow_class.instance.has_manage_permission(user)
 
 
 class Activation(object):
@@ -74,6 +78,7 @@ class Activation(object):
 
         Handle and propagate exception depending on activation context state.
         """
+
         @contextmanager
         def guard():
             try:
@@ -88,6 +93,7 @@ class Activation(object):
                     # TODO Event task_failed.send(sender=self.flow_class, process=self.process, task=self.task)
                 else:
                     raise
+
         return guard()
 
     @classmethod
@@ -95,9 +101,7 @@ class Activation(object):
         """Instantiate and persist new flow task."""
         flow_class = flow_task.flow_class
         task = flow_class.task_class(
-            process=prev_activation.process,
-            flow_task=flow_task,
-            token=token
+            process=prev_activation.process, flow_task=flow_task, token=token
         )
         task.save()
         task.previous.add(prev_activation.task)
@@ -105,11 +109,15 @@ class Activation(object):
 
     @status.transition(source=STATUS.NEW)
     def activate(self):
-        raise NotImplementedError(f"{self.__class__.__name__} class should override act() method")
+        raise NotImplementedError(
+            f"{self.__class__.__name__} class should override act() method"
+        )
 
     @status.transition(source=STATUS.DONE)
     def create_next(self):
-        raise NotImplementedError(f"{self.__class__.__name__} class should override create_next() method")
+        raise NotImplementedError(
+            f"{self.__class__.__name__} class should override create_next() method"
+        )
 
     @status.transition(source=STATUS.NEW, target=STATUS.DONE)
     def complete(self):
@@ -140,22 +148,25 @@ class Activation(object):
         self._activate_next(activations)
 
     @status.transition(
-        source=STATUS.DONE, target=STATUS.CANCELED, conditions=[leading_tasks_canceled]
+        source=STATUS.DONE,
+        target=STATUS.CANCELED,
+        conditions=[leading_tasks_canceled],
+        permission=has_manage_permission,
     )
     def undo(self):
         self.task.finished = now()
         self.task.save()
 
-    @status.transition(source=STATUS.CANCELED, target=STATUS.DONE)
+    @status.transition(
+        source=STATUS.CANCELED, target=STATUS.REVIVED, permission=has_manage_permission
+    )
     def revive(self):
         """
         Recreate and activate cancelled task
         """
         flow_class = self.flow_class
         task = flow_class.task_class(
-            process=self.process,
-            flow_task=self.flow_task,
-            token=self.task.token
+            process=self.process, flow_task=self.flow_task, token=self.task.token
         )
         task.save()
 
@@ -167,4 +178,7 @@ class Activation(object):
         self._activate_next(activations)
 
     def get_outgoing_transitions(self) -> List[fsm.Transition]:
-        return Activation.status.get_outgoing_transitions(self.status)
+        return self.__class__.status.get_outgoing_transitions(self.status)
+
+    def get_available_transitions(self, user) -> List[fsm.Transition]:
+        return self.__class__.status.get_available_transitions(self, self.status, user)

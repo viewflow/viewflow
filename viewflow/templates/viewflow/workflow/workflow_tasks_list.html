@@ -20,16 +20,16 @@
           <h4 class="mdc-typography mdc-typography--headline5" style="margin-bottom:8px">{% trans 'New process' %}</h4>
           <div>
             {% for flow_class, start_nodes in view.flows_start_nodes.items %}
-              <h5 class="mdc-typography mdc-typography--headline6" style="margin-bottom:8px">{{ flow_class.process_title }}</h5>
-              <div style="display:flex;flex-direction:row;gap:20px;">
-                <div>
-                {{ flow_class.process_description|default:"" }}
+              <h5 class="mdc-typography mdc-typography--headline6" style="margin-bottom:8px">{% trans flow_class.process_title %}</h5>
+              <div style="display:flex;flex-direction:row;gap:20px;align-items: stretch;">
+                <div style="flex-grow:1">
+                  {% trans flow_class.process_description|default:"" %}
                 </div>
                 <div>
                 {% for start_node in start_nodes %}
                 <a href="{% reverse start_node 'execute' %}" class="mdc-button mdc-dialog__button mdc-button--raised">
                   <div class="mdc-button__ripple"></div>
-                  <span class="mdc-button__label">{{ start_node }}</span>
+                  <span class="mdc-button__label">{% trans start_node.task_title|default:start_node %}</span>
                 </a>
                 {% endfor %}
               </div>
@@ -37,16 +37,6 @@
             {% endfor %}
           </div>
         </div>
-        <!--div class="mdc-dialog__actions">
-          <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="cancel">
-            <div class="mdc-button__ripple"></div>
-            <span class="mdc-button__label">Cancel</span>
-          </button>
-          <button type="button" class="mdc-button mdc-dialog__button" data-mdc-dialog-action="discard">
-            <div class="mdc-button__ripple"></div>
-            <span class="mdc-button__label">Discard</span>
-          </button>
-        </div-->
       </div>
     </div>
     <div class="mdc-dialog__scrim"></div>

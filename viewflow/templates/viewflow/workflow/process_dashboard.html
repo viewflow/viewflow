@@ -55,7 +55,7 @@
                       #{{ task.process_id}}/{{ task.pk }}
                     </h2>
                     <h3 class="mdc-typography mdc-typography--subtitle2" style="margin:0;color: rgba(0,0,0,.54);color: var(--mdc-theme-text-secondary-on-background,rgba(0,0,0,.54));">
-                      {{ task.summary }}
+                      {{ task.brief }}
                     </h3>
                     <div class="vf-dashboard__card-detail">
                       <label>{% trans 'Created' %}</label>
@@ -71,17 +71,17 @@
                     {%if task|can_execute:request.user %}
                       <a class="mdc-button" style="align-self: flex-end;" href="{% reverse task.flow_task 'execute' task.process_id task.pk %}">
                         <div class="mdc-button__ripple"></div>
-                        <span class="mdc-button__label">{% trans 'Execute'%}</a>
+                        <span class="mdc-button__label">{% trans 'Execute'%}</span>
                       </a>
                     {% elif task|can_assign:request.user %}
                       <a class="mdc-button" style="align-self: flex-end;" href="{% reverse task.flow_task 'assign' task.process_id task.pk %}">
                         <div class="mdc-button__ripple"></div>
-                        <span class="mdc-button__label">{% trans 'Assign'%}</a>
+                        <span class="mdc-button__label">{% trans 'Assign'%}</span>
                       </a>
                     {% elif task|can_view:request.user %}
                       <a class="mdc-button" style="align-self: flex-end;" href="{% reverse task.flow_task 'detail' task.process_id task.pk %}">
                         <div class="mdc-button__ripple"></div>
-                        <span class="mdc-button__label">{% trans 'View'%}</a>
+                        <span class="mdc-button__label">{% trans 'View'%}</span>
                       </a>
                     {% endif %}
                   </div>
@@ -101,6 +101,30 @@
         <div class="column">
           <span class="column-title">{% trans 'Finished' %}</span>
           <div class="column-content">
+            {% for task in finished %}
+              {% if forloop.last and forloop.counter == view.MAX_ROWS %}
+              <div style="text-align:center"><i class="material-icons">more_horiz</i></div>
+              {% else %}
+                <div class="mdc-card" style="padding:15px;margin-top:10px;margin-botton:5px">
+                  <div style="display: flex;flex-direction: column">
+                    <h2 class="mdc-typography mdc-typography--headline6" style="margin:0">
+                      #{{ task.process_id}}/{{ task.pk }}
+                    </h2>
+                    <h3 class="mdc-typography mdc-typography--subtitle2" style="margin:0;color: rgba(0,0,0,.54);color: var(--mdc-theme-text-secondary-on-background,rgba(0,0,0,.54));">
+                      {{ task.brief }}
+                    </h3>
+                    <div class="vf-dashboard__card-detail">
+                      <label>{% trans 'Created' %}</label>
+                      {{ task.created }}
+                    </div>
+                    <a class="mdc-button" style="align-self: flex-end;" href="{% reverse task.process.flow_class 'process_detail' task.process_id  %}">
+                      <div class="mdc-button__ripple"></div>
+                      <span class="mdc-button__label">{% trans 'View'%}</span>
+                    </a>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
           </div>
         </div>
         {% endif %}

@@ -3,8 +3,16 @@ import './index.scss';
 
 export class VDash extends HTMLElement {
   connectedCallback() {
-    this.renderer = new window.DashRenderer();
+    this.start()
     window.addEventListener('turbo:before-render', this.onPageChange);
+  }
+
+  start() {
+    if(!window.DashRenderer) {
+      setTimeout(() => this.start(), 300)
+    } else {
+      this.renderer = new window.DashRenderer();
+    }
   }
 
   disconnectedCallback() {
@@ -13,7 +21,7 @@ export class VDash extends HTMLElement {
 
   onPageChange = () => {
     this.renderer = null;
-    window.ReactDOM.unmountComponentAtNode(document.getElementById('react-entry-point'));
+    // window.ReactDOM.unmountComponentAtNode(document.getElementById('react-entry-point'));
   }
 }
 

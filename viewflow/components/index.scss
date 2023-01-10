@@ -4,6 +4,7 @@
 @use "@material/chips/styles" as chips;
 @use "@material/chips/deprecated/mdc-chips";
 @use "@material/circular-progress/mdc-circular-progress";
+@use "@material/data-table/data-table";
 @use "@material/dialog";
 @use "@material/drawer";
 @use "@material/fab";
@@ -41,6 +42,8 @@
 @include dialog.core-styles;
 @include fab.core-styles;
 @include form-field.core-styles;
+@include data-table.core-styles;
+@include data-table.theme-baseline;
 @include drawer.core-styles;
 @include drawer.dismissible-core-styles;
 @include drawer.modal-core-styles;

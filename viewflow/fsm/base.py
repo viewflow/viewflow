@@ -80,7 +80,7 @@ class Transition(object):
     def has_perm(self, instance: object, user: UserModel) -> bool:
         """Check the permission of the transition."""
         if self.permission is None:
-            return True
+            return False
         elif callable(self.permission):
             return self.permission(instance, user)
         elif isinstance(self.permission, ThisObject):
@@ -331,6 +331,13 @@ class StateDescriptor(object):
             or (transition.source == State.ANY and transition.target != state)
         ]
 
+    def get_available_transitions(self, flow, state: State, user):
+        return [
+            transition
+            for transition in self.get_outgoing_transitions(state)
+            if transition.conditions_met(flow)
+            if transition.has_perm(flow, user)
+        ]
 
 class State(object):
     """State slot field."""

@@ -1,0 +1,749 @@
+# Viewflow - The low-code for developers with yesterday's deadline
+# Copyright (C) 2023 Mikhail Podgurskiy
+# This file is distributed under the same license as the Viewflow package.
+# Mikhail Podgurskiy <mikhail@viewflow.io>, 2023.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Viewflow\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-01-07 10:45+0000\n"
+"Language: fr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n > 1);\n"
+
+#: contrib/admin/__init__.py:34
+msgid "Administration"
+msgstr "Administration"
+
+#: contrib/auth.py:318
+msgid "Fantastic!"
+msgstr "Fantastique!"
+
+#: contrib/auth.py:319
+msgid "That looks awesome!"
+msgstr "Ça a l'air génial!"
+
+#: contrib/auth.py:320
+msgid "You are looking very well today!"
+msgstr "Vous avez l'air très bien aujourd'hui!"
+
+#: contrib/auth.py:321
+msgid "I totally admire your spontaneity."
+msgstr "J'admire totalement votre spontanéité."
+
+#: contrib/auth.py:322
+msgid "I like your new haircut."
+msgstr "J'aime ta nouvelle coupe de cheveux."
+
+#: contrib/auth.py:323
+msgid "What a beautiful costume!"
+msgstr "Quel beau costume!"
+
+#: contrib/auth.py:324
+msgid "You look very good in that suit"
+msgstr "Tu es très bien dans ce costume."
+
+#: contrib/auth.py:325
+msgid "I love your style."
+msgstr "J'aime votre style."
+
+#: contrib/auth.py:326
+msgid "I love your hair today"
+msgstr "J'aime tes cheveux aujourd'hui"
+
+#: contrib/auth.py:327
+msgid "That color looks great on you!"
+msgstr "Cette couleur te va à merveille !"
+
+#: contrib/import_export/views.py:11
+msgid "Format"
+msgstr ""
+
+#: forms/renderers.py:176 forms/renderers.py:222
+msgid "YYYY"
+msgstr "AAAA"
+
+#: forms/renderers.py:177 forms/renderers.py:223 forms/renderers.py:226
+#: forms/renderers.py:287
+msgid "MM"
+msgstr ""
+
+#: forms/renderers.py:178 forms/renderers.py:224
+msgid "DD"
+msgstr "JJ"
+
+#: forms/renderers.py:225 forms/renderers.py:286 forms/renderers.py:289
+msgid "HH"
+msgstr ""
+
+#: forms/renderers.py:227 forms/renderers.py:288
+msgid "SS"
+msgstr ""
+
+#: forms/renderers.py:290
+msgid "AM/PM"
+msgstr ""
+
+#: fsm/admin.py:136 fsm/rest.py:132 fsm/viewset.py:87
+msgid "Transition is not allowed"
+msgstr "La transition n'est pas autorisée"
+
+#: fsm/admin.py:175
+#, python-format
+msgid "%(label)s %(name)s"
+msgstr ""
+
+#: fsm/rest.py:126
+msgid "Invalid transition"
+msgstr "Transition invalide"
+
+#: templates/400.html:4 templates/400.html:6
+msgid "Bad Request"
+msgstr "Mauvaise demande"
+
+#: templates/400.html:15 templates/404.html:15 templates/500.html:16
+#: templates/registration/password_change_done.html:11
+#: templates/registration/password_change_done.html:33
+#: templates/registration/password_change_form.html:13
+#: templates/registration/password_reset_done.html:12
+#: templates/registration/profile.html:18
+msgid "View site"
+msgstr "Voir site"
+
+#: templates/403.html:4 templates/403.html:6
+msgid "Access Forbidden"
+msgstr "Accès interdit"
+
+#: templates/403.html:11
+msgid "You are not logged in"
+msgstr "Vous n'êtes pas connecté"
+
+#: templates/403.html:16
+#, python-format
+msgid "%(user)s have no rights to access this page"
+msgstr "%(user)s n'ont pas le droit d'accéder à cette page"
+
+#: templates/403.html:27 templates/registration/login.html:8
+#: templates/registration/login.html:10 templates/registration/login.html:19
+#: templates/registration/password_reset_complete.html:12
+msgid "Log in"
+msgstr "Connection"
+
+#: templates/403.html:29
+msgid "Log in as another user"
+msgstr "Se connecter en tant qu'autre utilisateur"
+
+#: templates/404.html:4 templates/404.html:6
+msgid "Page not found"
+msgstr "Page non trouvée"
+
+#: templates/404.html:10
+msgid "We're sorry, but the requested page could not be found."
+msgstr "Nous sommes désolés, mais la page demandée n'a pas pu être trouvée."
+
+#: templates/500.html:4 templates/500.html:6
+msgid "Server error"
+msgstr "Erreur de serveur"
+
+#: templates/500.html:11
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"Il y a eu une erreur. Elle a été signalée aux administrateurs du site par "
+"email et devrait être corrigé sous peu. Merci de votre patience."
+
+#: templates/admin/fsm_change_list.html:10
+#, python-format
+msgid "Recover deleted %(name)s"
+msgstr "Récupérer les %(name)s supprimés"
+
+#: templates/admin/fsm_change_list.html:20
+msgid "Graph"
+msgstr "Graphique"
+
+#: templates/admin/fsm_change_list.html:31
+#: templates/viewflow/includes/list_filter.html:4
+#: templates/viewflow/includes/list_filter.html:10
+msgid "Filter"
+msgstr "Filtre"
+
+#: templates/admin/fsm_transition_form.html:18
+msgid "Home"
+msgstr "Accueil"
+
+#: templates/admin/fsm_transition_form.html:32
+msgid "Please correct the error below."
+msgstr "Veuillez corriger l'erreur ci-dessous."
+
+#: templates/admin/fsm_transition_form.html:32
+msgid "Please correct the errors below."
+msgstr "Veuillez corriger les erreurs ci-dessous."
+
+#: templates/admin/fsm_transition_form.html:54
+msgid "Yes, I’m sure"
+msgstr "Oui, je suis sûre."
+
+#: templates/admin/fsm_transition_form.html:55
+msgid "No, take me back"
+msgstr "Non, ramène-moi."
+
+#: templates/registration/logged_out.html:4
+msgid "Logout"
+msgstr "Déconnexion"
+
+#: templates/registration/logged_out.html:6
+#: templates/viewflow/base_page.html:61
+msgid "Log out"
+msgstr "Déconnexion"
+
+#: templates/registration/logged_out.html:10
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "Merci de passer un peu de temps sur le site Web aujourd'hui."
+
+#: templates/registration/logged_out.html:18
+msgid "Log in again"
+msgstr "Connectez-vous à nouveau"
+
+#: templates/registration/login.html:11
+msgid "Viewflow Demo suite"
+msgstr "Suite de démonstrations Viewflow"
+
+#: templates/registration/login.html:25
+msgid "Reset password"
+msgstr "Réinitialiser le mot de passe"
+
+#: templates/registration/password_change_done.html:5
+#: templates/registration/password_change_done.html:17
+#: templates/registration/password_change_form.html:6
+#: templates/registration/password_change_form.html:19
+#: templates/registration/profile.html:4 templates/registration/profile.html:11
+#: templates/registration/profile.html:25 templates/viewflow/base_page.html:54
+msgid "Profile"
+msgstr "Profil"
+
+#: templates/registration/password_change_done.html:30
+msgid "Your password was changed."
+msgstr "Votre mot de passe a été modifié."
+
+#: templates/registration/password_change_form.html:41
+#: templates/registration/profile.html:74
+#: templates/viewflow/includes/object_detail_card.html:41
+#: templates/viewflow/views/form.html:35
+msgid "Change"
+msgstr "Changement"
+
+#: templates/registration/password_reset_complete.html:10
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr ""
+"Votre mot de passe a été défini.  Vous pouvez vous connecter maintenant."
+
+#: templates/registration/password_reset_confirm.html:12
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"Veuillez entrer votre nouveau mot de passe deux fois afin que nous puissions "
+"vérifier que vous l'avez tapé correctement."
+
+#: templates/registration/password_reset_confirm.html:19
+msgid "Change my password"
+msgstr "Changer mon mot de passe"
+
+#: templates/registration/password_reset_confirm.html:26
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"Le lien de réinitialisation du mot de passe n'était pas valide, peut-être "
+"parce qu'il a déjà été utilisé.  Veuillez demander une nouvelle "
+"réinitialisation du mot de passe."
+
+#: templates/registration/password_reset_done.html:9
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"Nous vous avons envoyé par e-mail les instructions pour définir votre mot de "
+"passe, si un compte existe avec l'email que vous avez entré. Vous devriez "
+"les recevoir sous peu."
+
+#: templates/registration/password_reset_done.html:10
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"Si vous ne recevez pas d'email, vérifiez que vous avez bien entré l'adresse "
+"avec laquelle vous vous êtes inscrit, et vérifiez votre dossier spam."
+
+#: templates/registration/password_reset_form.html:9
+msgid ""
+"Forgotten your password? Enter your email address below, and we’ll email "
+"instructions for setting a new one."
+msgstr ""
+" Vous avez oublié votre mot de passe ? Entrez votre adresse e-mail ci-"
+"dessous, et nous vous enverrons par e-mail les instructions pour en créer un "
+"nouveau."
+
+#: templates/registration/password_reset_form.html:16
+#: templates/viewflow/workflow/process_cancel.html:16
+#: templates/viewflow/workflow/process_cancel.html:86
+#: templates/viewflow/workflow/process_detail.html:59
+#: templates/viewflow/workflow/task_cancel.html:6
+#: templates/viewflow/workflow/task_cancel.html:17
+msgid "Cancel"
+msgstr "Annuler"
+
+#: templates/registration/password_reset_form.html:17
+msgid "Reset"
+msgstr "Réinitialiser"
+
+#: templates/registration/profile.html:55
+msgid "Change password"
+msgstr "Modifier le mot de passe"
+
+#: templates/registration/profile.html:59
+msgid "Edit"
+msgstr "Modifier"
+
+#: templates/registration/profile.html:82
+msgid "Submit"
+msgstr "Soumettre"
+
+#: templates/viewflow/base_page.html:91
+msgid "Login"
+msgstr "Connexion"
+
+#: templates/viewflow/contrib/import_export/export_action.html:14
+#: templates/viewflow/contrib/import_export/export_action.html:40
+msgid "Export"
+msgstr "Exportation"
+
+#: templates/viewflow/contrib/import_export/export_action.html:23
+#, python-format
+msgid ""
+"\n"
+"                    Export the %(name)s\n"
+"                    "
+msgid_plural ""
+"\n"
+"                    Export the %(objects_count)s %(plural_name)s\n"
+"                  "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/viewflow/contrib/import_export/export_action.html:29
+#, python-format
+msgid ""
+"\n"
+"                    Export all %(plural_name)s\n"
+"                  "
+msgstr ""
+
+#: templates/viewflow/contrib/import_export/export_action.html:39
+#: templates/viewflow/includes/app_menu.html:10
+#: templates/viewflow/includes/site_menu.html:14
+#: templates/viewflow/views/delete_action.html:45
+#: templates/viewflow/workflow/tasks_assign.html:46
+#: templates/viewflow/workflow/tasks_unassign.html:46
+msgid "Back"
+msgstr "Dos"
+
+#: templates/viewflow/includes/list_bulk_actions.html:12
+msgid "Pick an action"
+msgstr "Choisissez une action"
+
+#: templates/viewflow/includes/site_menu.html:8
+msgid "Applications"
+msgstr "Applications"
+
+#: templates/viewflow/views/confirm_delete.html:23
+#: templates/viewflow/views/delete_action.html:15
+#: templates/viewflow/views/delete_action.html:46
+msgid "Delete"
+msgstr "Supprimer"
+
+#: templates/viewflow/views/confirm_delete.html:32
+#, python-format
+msgid ""
+"\"%(escaped_object)s\" and all of the following related items will be deleted"
+msgstr ""
+
+#: templates/viewflow/views/delete_action.html:25
+#, python-format
+msgid ""
+"\n"
+"                    Are you sure you want to delete the %(name)s and related "
+"items?\n"
+"                    "
+msgid_plural ""
+"\n"
+"                    Are you sure you want to delete the %(objects_count)s "
+"%(plural_name)s and related items?\n"
+"                  "
+msgstr[0] ""
+msgstr[1] ""
+
+#: templates/viewflow/views/delete_action.html:31
+#, python-format
+msgid ""
+"\n"
+"                    Are you sure you want to delete all %(plural_name)s and "
+"related items?\n"
+"                  "
+msgstr ""
+
+#: templates/viewflow/views/form.html:21
+msgid "New"
+msgstr "Nouveau"
+
+#: templates/viewflow/views/form.html:35
+msgid "Add"
+msgstr "Ajouter"
+
+#: templates/viewflow/views/transition.html:36
+msgid "Confirm"
+msgstr "Confirmer"
+
+#: templates/viewflow/workflow/flow_menu.html:7
+msgid "Dashboard"
+msgstr "Tableau de bord"
+
+#: templates/viewflow/workflow/flow_menu.html:11
+#: templates/viewflow/workflow/tasks_unassign.html:13
+#: templates/viewflow/workflow/workflow_menu.html:7 workflow/rest/filters.py:56
+msgid "Inbox"
+msgstr "Boîte"
+
+#: templates/viewflow/workflow/flow_menu.html:16
+#: templates/viewflow/workflow/tasks_assign.html:13
+#: templates/viewflow/workflow/workflow_menu.html:12
+#: workflow/rest/filters.py:57
+msgid "Queue"
+msgstr ""
+
+#: templates/viewflow/workflow/flow_menu.html:21
+#: templates/viewflow/workflow/workflow_menu.html:17
+#: workflow/rest/filters.py:58
+msgid "Archive"
+msgstr "Archives"
+
+#: templates/viewflow/workflow/process_dashboard.html:32
+msgid "No rights to execute"
+msgstr "Aucun droit d'exécution"
+
+#: templates/viewflow/workflow/process_dashboard.html:61
+#: templates/viewflow/workflow/process_dashboard.html:117
+#: templates/viewflow/workflow/tasks_assign.html:29
+#: templates/viewflow/workflow/tasks_unassign.html:29 workflow/models.py:29
+#: workflow/models.py:91
+msgid "Created"
+msgstr "Créé"
+
+#: templates/viewflow/workflow/process_dashboard.html:66 workflow/models.py:92
+msgid "Assigned"
+msgstr "Assigné"
+
+#: templates/viewflow/workflow/process_dashboard.html:74
+#: templates/viewflow/workflow/task.html:25
+#: templates/viewflow/workflow/task.html:48
+msgid "Execute"
+msgstr "Exécuter"
+
+#: templates/viewflow/workflow/process_dashboard.html:79
+#: templates/viewflow/workflow/task_assign.html:6
+#: templates/viewflow/workflow/task_assign.html:23
+#: templates/viewflow/workflow/tasks_assign.html:14
+msgid "Assign"
+msgstr "Affecter"
+
+#: templates/viewflow/workflow/process_dashboard.html:84
+#: templates/viewflow/workflow/process_dashboard.html:122 views/create.py:50
+#: views/update.py:60
+msgid "View"
+msgstr "Voir"
+
+#: templates/viewflow/workflow/process_dashboard.html:94
+msgid "Show all"
+msgstr "Afficher tous"
+
+#: templates/viewflow/workflow/process_dashboard.html:102
+#: templates/viewflow/workflow/process_detail.html:27 workflow/models.py:30
+#: workflow/models.py:94
+msgid "Finished"
+msgstr "Fini"
+
+#: templates/viewflow/workflow/process_dashboard.html:137
+#: templates/viewflow/workflow/process_list.html:8
+#: templates/viewflow/workflow/task_list.html:8 workflow/models.py:251
+msgid "Process list"
+msgstr "Liste des processus"
+
+#: templates/viewflow/workflow/process_detail.html:23
+#: workflow/flow/views/dashboard.py:105 workflow/flow/views/list.py:26
+#: workflow/flow/views/list.py:56 workflow/flow/views/list.py:86
+#: workflow/flow/views/list.py:117
+msgid "#"
+msgstr ""
+
+#: templates/viewflow/workflow/process_detail.html:24
+msgid "Description"
+msgstr ""
+
+#: templates/viewflow/workflow/process_detail.html:25 workflow/models.py:120
+msgid "Owner"
+msgstr "Propriétaire"
+
+#: templates/viewflow/workflow/process_detail.html:26 workflow/models.py:93
+msgid "Started"
+msgstr "Démarré"
+
+#: templates/viewflow/workflow/process_detail.html:28 workflow/models.py:23
+#: workflow/models.py:84
+msgid "Status"
+msgstr "Statut"
+
+#: templates/viewflow/workflow/start.html:21
+#: templates/viewflow/workflow/start.html:44
+#: templates/viewflow/workflow/workflow_tasks_list.html:8
+msgid "Start"
+msgstr "Début"
+
+#: templates/viewflow/workflow/start.html:38
+msgid "Start and continue"
+msgstr "Commencer et continuer"
+
+#: templates/viewflow/workflow/task.html:42
+msgid "Execute and continue"
+msgstr "Exécuter et continuer"
+
+#: templates/viewflow/workflow/task_assign.html:17
+msgid "Assign and continue"
+msgstr "Attribuer et poursuivre"
+
+#: templates/viewflow/workflow/task_detail.html:21
+msgid "Previous tasks"
+msgstr "Previous tasks"
+
+#: templates/viewflow/workflow/task_detail.html:26
+msgid "No previous tasks"
+msgstr "Aucune tâche antérieure"
+
+#: templates/viewflow/workflow/task_detail.html:31
+msgid "Next tasks"
+msgstr "Tâches suivantes"
+
+#: templates/viewflow/workflow/task_detail.html:36
+msgid "No next tasks"
+msgstr "Aucune tâche suivante"
+
+#: templates/viewflow/workflow/task_revive.html:6
+#: templates/viewflow/workflow/task_revive.html:17
+msgid "Revive"
+msgstr "Revive"
+
+#: templates/viewflow/workflow/task_unassign.html:6
+#: templates/viewflow/workflow/task_unassign.html:17
+#: templates/viewflow/workflow/tasks_unassign.html:14
+msgid "Unassign"
+msgstr "Désaffecter"
+
+#: templates/viewflow/workflow/task_undo.html:6
+#: templates/viewflow/workflow/task_undo.html:17
+msgid "Undo"
+msgstr "Annuler"
+
+#: templates/viewflow/workflow/tasks_assign.html:11
+#: workflow/flow/views/list.py:165
+msgid "Assign selected tasks"
+msgstr "Assigner les tâches sélectionnées"
+
+#: templates/viewflow/workflow/tasks_assign.html:26
+#: templates/viewflow/workflow/tasks_unassign.html:26
+#: workflow/flow/views/list.py:121 workflow/models.py:81 workflow/models.py:279
+msgid "Task"
+msgstr "Tâche"
+
+#: templates/viewflow/workflow/tasks_assign.html:27
+#: templates/viewflow/workflow/tasks_unassign.html:27
+msgid "Brief"
+msgstr "Brief"
+
+#: templates/viewflow/workflow/tasks_assign.html:28
+#: templates/viewflow/workflow/tasks_unassign.html:28
+msgid "Process brief"
+msgstr "Résumé du processus"
+
+#: templates/viewflow/workflow/tasks_assign.html:47
+#: templates/viewflow/workflow/tasks_unassign.html:47
+msgid "confirm"
+msgstr "confirmer"
+
+#: templates/viewflow/workflow/tasks_unassign.html:11
+#: workflow/flow/views/list.py:143
+msgid "Unassign selected tasks"
+msgstr "Désaffecter les tâches sélectionnées"
+
+#: templates/viewflow/workflow/workflow_tasks_list.html:20
+msgid "New process"
+msgstr "Nouveau processus"
+
+#: views/create.py:53
+#, python-brace-format
+msgid "The {obj} was added successfully. {link}"
+msgstr "L'objet {obj} a été ajouté avec succès. {link}"
+
+#: views/delete.py:83
+#, python-brace-format
+msgid "The {obj} was deleted successfully."
+msgstr "L'objet {obj} a été supprimé avec succès."
+
+#: views/update.py:63
+#, python-brace-format
+msgid "The {obj} was changed successfully. {link}"
+msgstr "L'objet {obj} a été modifié avec succès. {link}"
+
+#: workflow/apps.py:10
+msgid "Workflow"
+msgstr ""
+
+#: workflow/flow/views/actions.py:29
+#, python-brace-format
+msgid "Task {task} has been assigned."
+msgstr "La tâche {task} a été assignée."
+
+#: workflow/flow/views/actions.py:51
+#, python-brace-format
+msgid "Task {task} has been unassigned."
+msgstr "La tâche {task} a été désassignée."
+
+#: workflow/flow/views/actions.py:73
+#, python-brace-format
+msgid "Task {task} has been canceled."
+msgstr "La tâche {task} a été annulée."
+
+#: workflow/flow/views/actions.py:95
+#, python-brace-format
+msgid "Task {task} has been undone."
+msgstr "La tâche {task} a été annulée."
+
+#: workflow/flow/views/actions.py:117
+#, python-brace-format
+msgid "Task {task} has been revived."
+msgstr "La tâche {task} a été réactivée."
+
+#: workflow/flow/views/actions.py:152
+#, python-brace-format
+msgid "Process #{self.object.pk} can not be canceled."
+msgstr "Le processus #{self.object.pk} ne peut pas être annulé."
+
+#: workflow/flow/views/actions.py:161
+#, python-brace-format
+msgid "Process #{self.object.pk} has been canceled."
+msgstr "Le processus #{self.object.pk} a été annulé."
+
+#: workflow/flow/views/create.py:16
+#, python-brace-format
+msgid "Process {process} has been started."
+msgstr "Le processus {process} a été lancé."
+
+#: workflow/flow/views/detail.py:40
+msgid "You have no rights to view this task"
+msgstr "Le processus {process} a été lancé."
+
+#: workflow/flow/views/update.py:16 workflow/flow/views/update.py:36
+#, python-brace-format
+msgid "Task {task} has been completed."
+msgstr "La tâche {task} a été complétée."
+
+#: workflow/flow/viewset.py:370
+msgid "Processes"
+msgstr "Processus"
+
+#: workflow/models.py:21
+msgid "Flow"
+msgstr "Débit"
+
+#: workflow/models.py:82
+msgid "Type"
+msgstr "Type"
+
+#: workflow/models.py:97 workflow/models.py:110
+msgid "Previous"
+msgstr "Précédent"
+
+#: workflow/models.py:99
+msgid "Token"
+msgstr "Jeton"
+
+#: workflow/models.py:106
+msgid "External Task ID"
+msgstr "ID de tâche externe"
+
+#: workflow/models.py:127
+msgid "Permission"
+msgstr ""
+
+#: workflow/models.py:250 workflow/models.py:260
+msgid "Process"
+msgstr "Processus"
+
+#: workflow/models.py:280
+msgid "Tasks"
+msgstr "Tâches"
+
+#: workflow/rest/filters.py:31 workflow/rest/filters.py:59
+msgid "Active"
+msgstr "Actif"
+
+#: workflow/rest/filters.py:32
+msgid "Canceled"
+msgstr "Annulé"
+
+#: workflow/rest/filters.py:33
+msgid "Completed"
+msgstr "Complété"
+
+#: workflow/status.py:6 workflow/status.py:13
+msgctxt "STATUS"
+msgid "Canceled"
+msgstr "Annulé"
+
+#: workflow/status.py:7 workflow/status.py:14
+msgctxt "STATUS"
+msgid "Done"
+msgstr "Terminé"
+
+#: workflow/status.py:8 workflow/status.py:16
+msgctxt "STATUS"
+msgid "New"
+msgstr "Nouveau"
+
+#: workflow/status.py:12
+msgctxt "STATUS"
+msgid "Assigned"
+msgstr "Assigné"
+
+#: workflow/status.py:15
+msgctxt "STATUS"
+msgid "Error"
+msgstr "Erreur"
+
+#: workflow/status.py:17
+msgctxt "STATUS"
+msgid "Revived"
+msgstr "Ressuscité"
+
+#: workflow/status.py:18
+msgctxt "STATUS"
+msgid "Scheduled"
+msgstr "Programmé"
+
+#: workflow/status.py:19
+msgctxt "STATUS"
+msgid "Started"
+msgstr "Démarré"

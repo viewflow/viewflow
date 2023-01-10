@@ -25,12 +25,100 @@ class AssignTaskView(
     """
 
     form_class = forms.Form
-    template_filename = "assign.html"
+    template_filename = "task_assign.html"
     success_message = _("Task {task} has been assigned.")
 
     def form_valid(self, *args, **kwargs):
         """If the form is valid, save the associated model and finish the task."""
         self.request.activation.assign(self.request.user)
+        return super().form_valid(*args, **kwargs)
+
+
+class UnassignTaskView(
+    mixins.SuccessMessageMixin,
+    mixins.TaskSuccessUrlMixin,
+    mixins.TaskViewTemplateNames,
+    generic.FormView,
+):
+    """
+    Default unassign view for flow task.
+
+    Get confirmation from user, and unassign task
+    """
+
+    form_class = forms.Form
+    template_filename = "task_unassign.html"
+    success_message = _("Task {task} has been unassigned.")
+
+    def form_valid(self, *args, **kwargs):
+        """If the form is valid, save the associated model and unassign the task."""
+        self.request.activation.unassign()
+        return super().form_valid(*args, **kwargs)
+
+
+class CancelTaskView(
+    mixins.SuccessMessageMixin,
+    mixins.TaskSuccessUrlMixin,
+    mixins.TaskViewTemplateNames,
+    generic.FormView,
+):
+    """
+    Default unassign view for flow task.
+
+    Get confirmation from user, and unassign task
+    """
+
+    form_class = forms.Form
+    template_filename = "task_cancel.html"
+    success_message = _("Task {task} has been canceled.")
+
+    def form_valid(self, *args, **kwargs):
+        """If the form is valid, save the associated model and cancels the task."""
+        self.request.activation.cancel()
+        return super().form_valid(*args, **kwargs)
+
+
+class UndoTaskView(
+    mixins.SuccessMessageMixin,
+    mixins.TaskSuccessUrlMixin,
+    mixins.TaskViewTemplateNames,
+    generic.FormView,
+):
+    """
+    Default undo view for flow task.
+
+    Get confirmation from user, and undo the task
+    """
+
+    form_class = forms.Form
+    template_filename = "task_undo.html"
+    success_message = _("Task {task} has been undone.")
+
+    def form_valid(self, *args, **kwargs):
+        """If the form is valid, save the associated model and undo the task."""
+        self.request.activation.undo()
+        return super().form_valid(*args, **kwargs)
+
+
+class ReviveTaskView(
+    mixins.SuccessMessageMixin,
+    mixins.TaskSuccessUrlMixin,
+    mixins.TaskViewTemplateNames,
+    generic.FormView,
+):
+    """
+    Default review view for flow task.
+
+    Get confirmation from user, and revives task
+    """
+
+    form_class = forms.Form
+    template_filename = "task_revive.html"
+    success_message = _("Task {task} has been revived.")
+
+    def form_valid(self, *args, **kwargs):
+        """If the form is valid, save the associated model and revives the task."""
+        self.request.activation.revive()
         return super().form_valid(*args, **kwargs)
 
 

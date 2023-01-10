@@ -1,10 +1,20 @@
+# Copyright (c) 2017-2020, Mikhail Podgurskiy
+# All Rights Reserved.
+
+# This work is dual-licensed under AGPL defined in file 'LICENSE' with
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
+# which is part of this source code package.
+from urllib.parse import quote as urlquote
+
 from django.contrib import messages
+from django.utils.html import format_html
 from django.urls.exceptions import NoReverseMatch
 
 
 class SuccessMessageMixin(object):
-    """Send a notification with link to the current process or task. """
-    success_message = ''
+    """Send a notification with link to the current process or task."""
+
+    success_message = ""
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -18,19 +28,19 @@ class SuccessMessageMixin(object):
         process, task = activation.process, activation.task
 
         try:
-            process_url = process.flow_class.instance.reverse('process_detail', args=[process.pk])
-            process_link = f'<a href="{process_url}">#{process.pk}</a>'
+            process_url = process.flow_class.instance.reverse(
+                "process_detail", args=[process.pk]
+            )
+            process_link = format_html(
+                '<a href="{}">#{}</a>', urlquote(process_url), process.pk
+            )
         except NoReverseMatch:
-            process_link = f'#{process.pk}'
+            process_link = f"#{process.pk}"
 
-        task_url = task.flow_task.reverse('index', args=[process.pk, task.pk])
-        task_link = f'<a href="{task_url}">#{task.pk}</a>'
+        task_url = task.flow_task.reverse("index", args=[process.pk, task.pk])
+        task_link = format_html('<a href="{}">#{}</a>', urlquote(task_url), task.pk)
 
-        return self.success_message % dict(
-            cleaned_data,
-            process=process_link,
-            task=task_link
-        )
+        return format_html(self.success_message, process=process_link, task=task_link)
 
 
 class TaskSuccessUrlMixin(object):
@@ -40,19 +50,20 @@ class TaskSuccessUrlMixin(object):
         """Continue on task or redirect back to task list."""
         if self.success_url is None:
             match = self.request.resolver_match
-            if hasattr(match, 'viewset') and hasattr(match.viewset, 'get_success_url'):
+            if hasattr(match, "viewset") and hasattr(match.viewset, "get_success_url"):
                 return match.viewset.get_success_url(self.request)
 
             activation = self.request.activation
-            return activation.flow_task.reverse('detail', args=[
-                activation.process.pk, activation.task.pk
-            ])
+            return activation.flow_task.reverse(
+                "detail", args=[activation.process.pk, activation.task.pk]
+            )
 
         return super().get_success_url()
 
 
 class ProcessViewTemplateNames(object):
     """List of templates for a process view."""
+
     template_filename = None
 
     def get_template_names(self):
@@ -60,15 +71,16 @@ class ProcessViewTemplateNames(object):
             opts = self.flow_class.instance
 
             return (
-                f'{opts.app_label}/{opts.flow_label}/{self.template_filename}',
-                f'viewflow/workflow/{self.template_filename}'
+                f"{opts.app_label}/{opts.flow_label}/{self.template_filename}",
+                f"viewflow/workflow/{self.template_filename}",
             )
         else:
             return [self.template_name]
 
 
 class TaskViewTemplateNames(object):
-    """List of templates for a task view. """
+    """List of templates for a task view."""
+
     template_filename = None
 
     def get_template_names(self):
@@ -78,9 +90,9 @@ class TaskViewTemplateNames(object):
             assert not self.template_name
 
             return (
-                f'{opts.app_label}/{opts.app_label}/{flow_task.name}_{self.template_filename}',
-                f'{opts.app_label}/{opts.flow_label}/{self.template_filename}',
-                f'viewflow/workflow/{self.template_filename}'
+                f"{opts.app_label}/{opts.app_label}/{flow_task.name}_{self.template_filename}",
+                f"{opts.app_label}/{opts.flow_label}/{self.template_filename}",
+                f"viewflow/workflow/{self.template_filename}",
             )
         else:
             return [self.template_name]

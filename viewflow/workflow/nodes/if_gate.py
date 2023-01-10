@@ -20,11 +20,7 @@ class IfActivation(Activation):
             yield next_node._create(self, self.task.token)
 
 
-class If(
-    mixins.NodeUndoMixin,
-    mixins.NodeCancelMixin,
-    Node,
-):
+class If(Node):
     """If gateway, activate one of outgoing node."""
     activation_class = IfActivation
 

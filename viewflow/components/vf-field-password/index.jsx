@@ -19,7 +19,7 @@ const defaultProps = {
   'placeholder': undefined,
   'required': false,
   'type': 'password',
-  'value': undefined,
+  'value': '',
 };
 
 const VPasswordField = customElement('vf-field-password', defaultProps, (props, {element}) => {

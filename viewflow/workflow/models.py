@@ -186,10 +186,13 @@ class AbstractTask(models.Model):
             template_content = self.flow_task.task_summary_template
 
         if not template_content:
-            return self.flow_task.task_description
+            template_content = self.flow_task.task_description
 
         if not template_content:
-            template_content = "{{ flow_class.task_title }} - {{ task.status }}"
+            template_content = self.flow_task.task_title
+
+        if not template_content:
+            template_content = "{{ flow_task }}/{{ task.status }}"
 
         return Template(force_str(template_content)).render(
             Context(
