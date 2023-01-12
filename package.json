@@ -12,7 +12,7 @@
     "@babel/plugin-proposal-class-properties": "^7.16.7",
     "@babel/preset-react": "^7.16.7",
     "@web/dev-server": "^0.1.31",
-    "babel-core": "^4.7.16",
+    "babel-core": "^6.26.3",
     "babel-preset-solid": "^1.5.4",
     "classcat": "^5.0.3",
     "eslint": "^8.14.0",
