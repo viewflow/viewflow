@@ -483,7 +483,16 @@ and modifications of Viewflow. You can find the commercial license terms in COMM
 
 ## Changelog
 
-[2022-11-XX] Work in progress
+2.0.0b1 2023-01-23
+------------------
+- Combined with django-material/django-fsm/jsonstore as a single package
+- Switched to Google Material Components instead of MaterializeCSS
+- Switched to hotwire/turbo instead of Turbolinks
+- New Class-based URL configurations
+- Composite FK support for legacy database for Django ORM
+- Plotly dashboards integration
+- Improved order of subsequent workflow tasks activations
+- Many more improvements and fixes
 
 [build]: https://img.shields.io/github/actions/workflow/status/viewflow/viewflow/django.yml?branch=main
 [coverage]: https://img.shields.io/coveralls/github/viewflow/viewflow/v2
