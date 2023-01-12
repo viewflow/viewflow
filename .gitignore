@@ -1,5 +1,4 @@
 *.pyc
-.build
 .media
 .mypy_cache
 .tox
@@ -8,11 +7,14 @@
 .vscode
 avatars/
 build
+coverage
 html
 dist
+django_viewflow.egg-info
 django_viewflow_pro.egg-info
 MANIFEST
 db*.sqlite3
+db*.sqlite3-journal
 node_modules/
 docs/_build/**
 npm-debug.log
