@@ -43,7 +43,7 @@ Full documentation for the PRO version available at http://docs-next.viewflow.io
 
 ## Demo
 
-http://demo-next.viewflow.io/
+http://demo.viewflow.io/
 
 ## Cookbook
 
