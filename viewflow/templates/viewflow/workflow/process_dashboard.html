@@ -26,13 +26,13 @@
                   {% if node_data.can_execute %}
                   <a class="mdc-button" href="{% reverse node_data.node 'execute' %}" style="align-self: flex-end;">
                     <div class="mdc-button__ripple"></div>
-                    <span class="mdc-button__label">{{ node_data.node.task_title|default:"Start" }}</span>
+                    <span class="mdc-button__label">{{ node_data.node.task_title }}</span>
                   </a> {# TODO Dropdown menu with other start actions #}
                   {% else %}
                   <div title="{% trans 'No rights to execute' %}" style="align-self: flex-end;">
                   <button class="mdc-button" disabled>
                     <div class="mdc-button__ripple"></div>
-                    <span class="mdc-button__label">{{ node_data.node.task_title|default:"Start" }}</span>
+                    <span class="mdc-button__label">{{ node_data.node.task_title }}</span>
                   </button></div>
                   {% endif %}
                 {% endfor %}
@@ -101,6 +101,7 @@
         <div class="column">
           <span class="column-title">{% trans 'Finished' %}</span>
           <div class="column-content">
+            <vf-perfect-scroll></vf-perfect-scroll>
             {% for task in finished %}
               {% if forloop.last and forloop.counter == view.MAX_ROWS %}
               <div style="text-align:center"><i class="material-icons">more_horiz</i></div>

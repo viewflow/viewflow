@@ -88,8 +88,8 @@ class Node(Viewset):
     @name.setter
     def name(self, value):
         self.app_name = value
-        if self.task_title is None:
-            self.task_title = value.title()
+        if not self.task_title:
+            self.task_title = value.replace("_", " ").title()
 
     def _get_resolver_extra(self):
         return {"node": self}
@@ -125,7 +125,9 @@ class Node(Viewset):
         """Create new task instance."""
         return self.activation_class.create(self, prev_activation, token)
 
-    def Annotation(self, title=None, description=None, summary_template=None, result_template=None):
+    def Annotation(
+        self, title=None, description=None, summary_template=None, result_template=None
+    ):
         if title is not None:
             self.task_title = title
         if description is not None:
@@ -138,13 +140,15 @@ class Node(Viewset):
 
     def _get_transition_url(self, activation, transition):
         url_name = transition.slug
-        if url_name == 'start':
-            url_name = 'execute'
+        if url_name == "start":
+            url_name = "execute"
 
-        return activation.flow_task.reverse(url_name, args=[activation.process.pk, activation.task.pk])
+        return activation.flow_task.reverse(
+            url_name, args=[activation.process.pk, activation.task.pk]
+        )
 
     def get_available_actions(self, activation, user):
-        """ List of {name, url} actions available for the current user """
+        """List of {name, url} actions available for the current user"""
         transitions = activation.get_available_transitions(user)
         for transition in transitions:
             try:
@@ -158,6 +162,7 @@ class Node(Viewset):
 class FlowMetaClass(ViewsetMeta):
     def __str__(self):
         from .fields import get_flow_ref
+
         return get_flow_ref(self)
 
 
@@ -262,9 +267,9 @@ class Flow(Viewset, metaclass=FlowMetaClass):
         module = "{}.{}".format(self.__module__, self.__class__.__name__)
         app_config = apps.get_containing_app_config(module)
 
-        subpath = module[len(app_config.module.__name__) + 1:]
+        subpath = module[len(app_config.module.__name__) + 1 :]
         if subpath.startswith("flows."):
-            subpath = subpath[len("flows."):]
+            subpath = subpath[len("flows.") :]
         if subpath.endswith("Flow"):
             subpath = subpath[: -len("Flow")]
 
@@ -284,11 +289,15 @@ class Flow(Viewset, metaclass=FlowMetaClass):
 
     def has_view_permission(self, user, obj=None):
         opts = self.process_class._meta
-        return user.is_authenticated and user.has_perm(f"{opts.app_label}.view_{ opts.model_name}")
+        return user.is_authenticated and user.has_perm(
+            f"{opts.app_label}.view_{ opts.model_name}"
+        )
 
     def has_manage_permission(self, user, obj=None):
         opts = self.process_class._meta
-        return user.is_authenticated and user.has_perm(f"{opts.app_label}.manage_{ opts.model_name}")
+        return user.is_authenticated and user.has_perm(
+            f"{opts.app_label}.manage_{ opts.model_name}"
+        )
 
     def _get_urls(self):
         urlpatterns = super()._get_urls()
@@ -328,6 +337,7 @@ class Flow(Viewset, metaclass=FlowMetaClass):
         If user is not None, returns only permitted nodes for the provided user
         """
         from .nodes import Start
+
         return [
             node
             for node in cls.instance.nodes()
@@ -336,7 +346,7 @@ class Flow(Viewset, metaclass=FlowMetaClass):
         ]
 
     def get_available_process_actions(self, process, user=None):
-        """ List of {name, url} process actions available for the current user """
+        """List of {name, url} process actions available for the current user"""
         # TODO process cancel
         return []
 
@@ -347,17 +357,19 @@ class Flow(Viewset, metaclass=FlowMetaClass):
             )
 
             activations = [
-                task.flow_task.activation_class(task)
-                for task in active_tasks
+                task.flow_task.activation_class(task) for task in active_tasks
             ]
 
             not_cancellable = [
-                activation for activation in activations
+                activation
+                for activation in activations
                 if not activation.cancel.can_proceed()
             ]
             if not_cancellable:
                 raise FlowRuntimeError(
-                    "Can't cancel {}".format(','.join(activation.task for activation in not_cancellable))
+                    "Can't cancel {}".format(
+                        ",".join(activation.task for activation in not_cancellable)
+                    )
                 )
 
             for activation in activations:

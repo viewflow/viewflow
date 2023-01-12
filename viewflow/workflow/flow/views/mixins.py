@@ -48,7 +48,7 @@ class TaskSuccessUrlMixin(object):
 
     def get_success_url(self):
         """Continue on task or redirect back to task list."""
-        if self.success_url is None:
+        if getattr(self, "success_url", None) is None:
             match = self.request.resolver_match
             if hasattr(match, "viewset") and hasattr(match.viewset, "get_success_url"):
                 return match.viewset.get_success_url(self.request)
