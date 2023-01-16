@@ -6,6 +6,7 @@ GIT VERSION
 -----------
 
 - Virtual json fields got support in .values() and .values_list() queryset
+- Add missing .js.map static files
 
 2.0.0b1 2023-01-23
 ------------------
