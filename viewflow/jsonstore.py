@@ -2,15 +2,16 @@
 # All Rights Reserved.
 
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
-# LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 
 import copy
+import json
 from datetime import date, datetime
 from functools import partialmethod
 
 from django.core.exceptions import FieldError
-from django.db.models import fields
+from django.db.models import fields, DEFERRED
 from django.utils import dateparse, timezone
 
 
@@ -27,7 +28,7 @@ class JSONFieldDescriptor(object):
         json_value = getattr(instance, self.field.json_field_name)
         if isinstance(json_value, dict):
             value = json_value.get(self.field.attname, None)
-            if hasattr(self.field, 'from_json'):
+            if hasattr(self.field, "from_json"):
                 value = self.field.from_json(value)
             return value
         return None
@@ -39,7 +40,7 @@ class JSONFieldDescriptor(object):
         else:
             json_value = {}
 
-        if hasattr(self.field, 'to_json'):
+        if hasattr(self.field, "to_json"):
             value = self.field.to_json(value)
 
         if not value and self.field.blank and not self.field.null:
@@ -55,11 +56,12 @@ class JSONFieldDescriptor(object):
 
 class JSONFieldMixin(object):
     """
-    Override django.db.model.fields.Field.contribute_to_class
+        Override django.db.model.fields.Field.contribute_to_class
     to make a field always private, and register custom access descriptor
     """
+
     def __init__(self, *args, **kwargs):
-        self.json_field_name = kwargs.pop('json_field_name', 'data')
+        self.json_field_name = kwargs.pop("json_field_name", "data")
         super(JSONFieldMixin, self).__init__(*args, **kwargs)
 
     def contribute_to_class(self, cls, name, private_only=False):
@@ -74,8 +76,13 @@ class JSONFieldMixin(object):
             setattr(cls, self.attname, descriptor)
 
         if self.choices is not None:
-            setattr(cls, 'get_%s_display' % self.name,
-                    partialmethod(cls._get_FIELD_display, field=self))
+            setattr(
+                cls,
+                "get_%s_display" % self.name,
+                partialmethod(cls._get_FIELD_display, field=self),
+            )
+
+        self.column = self.json_field_name
 
         # def on_model_init(sender, name=name, **kwargs):
         #     """ Initialize default values """
@@ -86,6 +93,9 @@ class JSONFieldMixin(object):
         #             setattr(instance, name, field.get_default())
 
         # post_init.connect(on_model_init, sender=cls, weak=False)
+
+    def get_default(self):
+        return DEFERRED
 
     def get_lookup(self, lookup_name):
         # Always return None, to make get_transform been called
@@ -104,18 +114,30 @@ class JSONFieldMixin(object):
                 lhs.output_field = self.json_field
                 transform = self.transform(lhs, **kwargs)
                 transform._original_get_lookup = transform.get_lookup
-                transform.get_lookup = lambda name: transform._original_get_lookup(self.original_lookup)
+                transform.get_lookup = lambda name: transform._original_get_lookup(
+                    self.original_lookup
+                )
                 return transform
 
         json_field = self.model._meta.get_field(self.json_field_name)
         transform = json_field.get_transform(self.name)
         if transform is None:
             raise FieldError(
-                "JSONField '%s' has no support for key '%s' %s lookup" %
-                (self.json_field_name, self.name, name)
+                "JSONField '%s' has no support for key '%s' %s lookup"
+                % (self.json_field_name, self.name, name)
             )
 
         return TransformFactoryWrapper(json_field, transform, name)
+
+    def convert_json_value(self, value, expression, connection):
+        if isinstance(value, str):
+            return json.loads(value)[self.name]
+        return value
+
+    def get_db_converters(self, connection):
+        converters = super().get_db_converters(connection)
+        converters += [self.convert_json_value]
+        return converters
 
 
 class BooleanField(JSONFieldMixin, fields.BooleanField):
@@ -132,7 +154,7 @@ class DateField(JSONFieldMixin, fields.DateField):
     def to_json(self, value):
         if value:
             assert isinstance(value, (datetime, date))
-            return value.strftime('%Y-%m-%d')
+            return value.strftime("%Y-%m-%d")
 
     def from_json(self, value):
         if value is not None:

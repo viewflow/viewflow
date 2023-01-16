@@ -2,6 +2,11 @@
 Changelog
 =========
 
+GIT VERSION
+-----------
+
+- Virtual json fields got support in .values() and .values_list() queryset
+
 2.0.0b1 2023-01-23
 ------------------
 - Combined with django-material/django-fsm/jsonstore as a single package
