@@ -249,6 +249,10 @@ class Process(AbstractProcess):
         ordering = ["-created"]
         verbose_name = _("Process")
         verbose_name_plural = _("Process list")
+        
+        indexes = [
+            models.Index(fields=["artifact_content_type", "artifact_object_id"]),
+        ] 
 
 
 class Task(AbstractTask):
