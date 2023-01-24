@@ -12,6 +12,7 @@ from functools import partialmethod
 
 from django.core.exceptions import FieldError
 from django.db.models import fields, DEFERRED
+from django.db.models import JSONField as BaseJSONField
 from django.utils import dateparse, timezone
 
 
@@ -218,4 +219,8 @@ class TimeField(JSONFieldMixin, fields.TimeField):
 
 
 class URLField(JSONFieldMixin, fields.URLField):
+    pass
+
+
+class JSONField(JSONFieldMixin, BaseJSONField):
     pass

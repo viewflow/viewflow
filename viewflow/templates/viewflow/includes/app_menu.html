@@ -1,7 +1,7 @@
 {% load i18n viewflow %}
 <vf-page-menu-navigation class="mdc-list">
   <div class="mdc-list-group">
-    <h3 class="vf-page__menu-subheader mdc-list-group__subheader">{{ app.title }}</h3>
+    {% if app.title %}<h3 class="vf-page__menu-subheader mdc-list-group__subheader">{{ app.title }}</h3>{% endif %}
     {% block viewset_links %}
     {% if app.parent and app.parent != site %}
       {% reverse app.parent 'index' as parent_index %}{% if parent_index %}
