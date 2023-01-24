@@ -35,6 +35,10 @@ class ViewActivation(mixins.NextNodeActivationMixin, Activation):
 
         task.save()
         task.previous.add(prev_activation.task)
+
+        if flow_task._on_create is not None:
+            flow_task._on_create(activation)
+
         return activation
 
     @Activation.status.transition(
@@ -78,7 +82,7 @@ class ViewActivation(mixins.NextNodeActivationMixin, Activation):
         """Do nothing on sync call"""
 
     @Activation.status.transition(
-        label='Execute',
+        label="Execute",
         source=STATUS.ASSIGNED,
         target=STATUS.STARTED,
         permission=lambda activation, user: activation.flow_task.can_execute(
@@ -148,6 +152,11 @@ class View(
         super().__init__()
         self._view = view
         self._undo_func = undo_func
+        self._on_create = None
+
+    def _resolve(self, instance):
+        super()._resolve(instance)
+        self._on_create = this.resolve(instance, self._on_create)
 
     """
     Task assign permissions
@@ -166,6 +175,23 @@ class View(
             self._owner = owner
         else:
             self._owner = owner_kwargs
+        return self
+
+    def onCreate(self, ref):
+        """
+        Call a function when task created::
+
+            class MyFlow(Flow):
+                approve = flow.View(...).OnCreate(this.on_approve_created)
+
+                def on_approve_created(self, activation):
+                    if activation.task.owner:
+                        send_mail(
+                            'View task assigned to you','Here is the message.',
+                            'from@example.com', [activation.task.owner.email]
+                        )
+        """
+        self._on_create = ref
         return self
 
     def calc_owner(self, activation):
