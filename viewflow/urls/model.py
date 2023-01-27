@@ -10,8 +10,13 @@ from django.urls import path
 from viewflow.urls import AppMenuMixin, Viewset, ViewsetMeta
 from viewflow.utils import DEFAULT, Icon, first_not_default, has_object_perm, viewprop
 from viewflow.views import (
-    Action, CreateModelView, DeleteBulkActionView, DeleteModelView,
-    DetailModelView, ListModelView, UpdateModelView,
+    Action,
+    CreateModelView,
+    DeleteBulkActionView,
+    DeleteModelView,
+    DetailModelView,
+    ListModelView,
+    UpdateModelView,
 )
 
 
@@ -25,32 +30,34 @@ class BaseModelViewset(Viewset):
 
     def __getattribute__(self, name):
         attr = super(BaseModelViewset, self).__getattribute__(name)
-        if name == 'title' and attr is None:
+        if name == "title" and attr is None:
             return self.model._meta.verbose_name_plural.capitalize()
         return attr
 
     def filter_kwargs(self, view_class, **kwargs):
         result = {
-            'model': self.model,
-            'viewset': self,
-            'queryset': self.queryset,
-            **kwargs
+            "model": self.model,
+            "viewset": self,
+            "queryset": self.queryset,
+            **kwargs,
         }
         return {
-            name: value for name, value in result.items()
+            name: value
+            for name, value in result.items()
             if hasattr(view_class, name)
             if value is not DEFAULT
         }
 
     @property
     def index_path(self):
-        return path('', self.list_view, name='index')
+        return path("", self.list_view, name="index")
 
     """
     List
     """
     list_view_class = ListModelView
     list_columns = DEFAULT
+    list_paginate_by = DEFAULT
     list_object_link_columns = DEFAULT
     list_page_actions = DEFAULT
     list_filterset_class = DEFAULT
@@ -58,9 +65,9 @@ class BaseModelViewset(Viewset):
     list_search_fields = DEFAULT
 
     def has_view_permission(self, user, obj=None):
-        if has_object_perm(user, 'view', self.model, obj=obj):
+        if has_object_perm(user, "view", self.model, obj=obj):
             return True
-        if hasattr(self, 'has_change_permission'):
+        if hasattr(self, "has_change_permission"):
             return self.has_change_permission(user, obj=obj)
         return False
 
@@ -69,13 +76,14 @@ class BaseModelViewset(Viewset):
 
     def get_list_view_kwargs(self, **kwargs):
         view_kwargs = {
-            'columns': self.list_columns,
-            'object_link_columns': self.list_object_link_columns,
-            'filterset_class': self.list_filterset_class,
-            'filter_fields': self.list_filter_fields,
-            'search_fields': self.list_search_fields,
+            "columns": self.list_columns,
+            "paginate_by": self.list_paginate_by,
+            "object_link_columns": self.list_object_link_columns,
+            "filterset_class": self.list_filterset_class,
+            "filter_fields": self.list_filter_fields,
+            "search_fields": self.list_search_fields,
             **self.list_view_kwargs,
-            **kwargs
+            **kwargs,
         }
         return self.filter_kwargs(self.list_view_class, **view_kwargs)
 
@@ -89,7 +97,7 @@ class BaseModelViewset(Viewset):
 
     @property
     def list_path(self):
-        return path('', self.list_view, name='list')
+        return path("", self.list_view, name="list")
 
 
 class ListBulkActionsMixin(metaclass=ViewsetMeta):
@@ -97,10 +105,7 @@ class ListBulkActionsMixin(metaclass=ViewsetMeta):
 
     def get_list_bulk_actions(self, request, *actions):
         if self.list_bulk_actions is not DEFAULT:
-            actions = (
-                *self.list_bulk_actions,
-                *actions
-            )
+            actions = (*self.list_bulk_actions, *actions)
         return actions
 
 
@@ -111,23 +116,29 @@ class CreateViewMixin(metaclass=ViewsetMeta):
     create_form_widgets = DEFAULT
 
     def has_add_permission(self, user):
-        return has_object_perm(user, 'add', self.model)
+        return has_object_perm(user, "add", self.model)
 
     def get_create_view_kwargs(self, **kwargs):
         view_kwargs = {
-            'form_class': first_not_default(self.create_form_class, getattr(self, 'form_class', DEFAULT)),
-            'form_widgets': first_not_default(self.create_form_widgets, getattr(self, 'form_widgets', DEFAULT)),
-            'layout': first_not_default(self.create_form_layout, getattr(self, 'form_layout', DEFAULT)),
+            "form_class": first_not_default(
+                self.create_form_class, getattr(self, "form_class", DEFAULT)
+            ),
+            "form_widgets": first_not_default(
+                self.create_form_widgets, getattr(self, "form_widgets", DEFAULT)
+            ),
+            "layout": first_not_default(
+                self.create_form_layout, getattr(self, "form_layout", DEFAULT)
+            ),
             **self.create_view_kwargs,
-            **kwargs
+            **kwargs,
         }
         return self.filter_kwargs(self.create_view_class, **view_kwargs)
 
     def get_list_page_actions(self, request, *actions):
         add_action = Action(
             name="Add new",
-            url=self.reverse('add'),
-            icon=Icon('add_circle', class_="material-icons mdc-list-item__graphic")
+            url=self.reverse("add"),
+            icon=Icon("add_circle", class_="material-icons mdc-list-item__graphic"),
         )
         return super().get_list_page_actions(request, *(add_action, *actions))
 
@@ -141,7 +152,7 @@ class CreateViewMixin(metaclass=ViewsetMeta):
 
     @property
     def create_path(self):
-        return path('add/', self.create_view, name='add')
+        return path("add/", self.create_view, name="add")
 
 
 class UpdateViewMixin(metaclass=ViewsetMeta):
@@ -157,15 +168,17 @@ class UpdateViewMixin(metaclass=ViewsetMeta):
     form_widgets = DEFAULT
 
     def has_change_permission(self, user, obj=None):
-        return has_object_perm(user, 'change', self.model, obj=obj)
+        return has_object_perm(user, "change", self.model, obj=obj)
 
     def get_update_view_kwargs(self, **kwargs):
         view_kwargs = {
-            'form_class': first_not_default(self.update_form_class, self.form_class),
-            'form_widgets': first_not_default(self.update_form_widgets, self.form_widgets),
-            'layout': first_not_default(self.update_form_layout, self.form_layout),
+            "form_class": first_not_default(self.update_form_class, self.form_class),
+            "form_widgets": first_not_default(
+                self.update_form_widgets, self.form_widgets
+            ),
+            "layout": first_not_default(self.update_form_layout, self.form_layout),
             **self.update_view_kwargs,
-            **kwargs
+            **kwargs,
         }
         return self.filter_kwargs(self.update_view_class, **view_kwargs)
 
@@ -179,33 +192,36 @@ class UpdateViewMixin(metaclass=ViewsetMeta):
 
     @property
     def update_path(self):
-        return path('<path:pk>/change/', self.update_view, name='change')
+        return path("<path:pk>/change/", self.update_view, name="change")
 
     def get_update_page_actions(self, request, obj, *actions):
         if self.update_page_actions is not DEFAULT:
-            actions = (
-                *self.update_page_actions,
-                *actions
-            )
+            actions = (*self.update_page_actions, *actions)
         return actions
 
 
-class ModelViewset(ListBulkActionsMixin, CreateViewMixin, UpdateViewMixin, AppMenuMixin, BaseModelViewset):
+class ModelViewset(
+    ListBulkActionsMixin,
+    CreateViewMixin,
+    UpdateViewMixin,
+    AppMenuMixin,
+    BaseModelViewset,
+):
     """List/Create/Update/Delete for a model."""
 
     def get_object_url(self, request, obj):
         if self.has_change_permission(request.user, obj):
-            return self.reverse('change', args=[obj.pk])
+            return self.reverse("change", args=[obj.pk])
 
     def get_success_url(self, request, obj=None):
-        return self.reverse('index')
+        return self.reverse("index")
 
 
 class DeleteViewMixin(metaclass=ViewsetMeta):
     delete_view_class = DeleteModelView
 
     def has_delete_permission(self, user, obj=None):
-        return has_object_perm(user, 'delete', self.model, obj=obj)
+        return has_object_perm(user, "delete", self.model, obj=obj)
 
     """
     Bulk delete
@@ -214,10 +230,10 @@ class DeleteViewMixin(metaclass=ViewsetMeta):
 
     def get_bulk_delete_view_kwargs(self, **kwargs):
         view_kwargs = {
-            'filterset_class': self.list_filterset_class,
-            'filter_fields': self.list_filter_fields,
+            "filterset_class": self.list_filterset_class,
+            "filter_fields": self.list_filter_fields,
             **self.bulk_delete_view_kwargs,
-            **kwargs
+            **kwargs,
         }
         return self.filter_kwargs(self.bulk_delete_view_class, **view_kwargs)
 
@@ -231,14 +247,14 @@ class DeleteViewMixin(metaclass=ViewsetMeta):
 
     @property
     def bulk_delete_path(self):
-        return path('action/delete/', self.bulk_delete_view, name='bulk_delete')
+        return path("action/delete/", self.bulk_delete_view, name="bulk_delete")
 
     def get_list_bulk_actions(self, request, *actions):
         if self.has_delete_permission(request.user):
             bulk_delete_action = Action(
                 name="Delete selected objects",
-                url=self.reverse('bulk_delete'),
-                icon=Icon('delete', class_="material-icons mdc-list-item__graphic")
+                url=self.reverse("bulk_delete"),
+                icon=Icon("delete", class_="material-icons mdc-list-item__graphic"),
             )
             actions = (bulk_delete_action, *actions)
         return super().get_list_bulk_actions(request, *actions)
@@ -246,11 +262,9 @@ class DeleteViewMixin(metaclass=ViewsetMeta):
     """
     Delete single object
     """
+
     def get_delete_view_kwargs(self, **kwargs):
-        view_kwargs = {
-            **self.delete_view_kwargs,
-            **kwargs
-        }
+        view_kwargs = {**self.delete_view_kwargs, **kwargs}
         return self.filter_kwargs(self.delete_view_class, **view_kwargs)
 
     @viewprop
@@ -263,17 +277,17 @@ class DeleteViewMixin(metaclass=ViewsetMeta):
 
     @property
     def delete_path(self):
-        return path('<path:pk>/delete/', self.delete_view, name='delete')
+        return path("<path:pk>/delete/", self.delete_view, name="delete")
 
     def get_update_page_actions(self, request, obj, *actions):
         if self.has_delete_permission(request.user):
             actions = (
                 Action(
                     name="Delete",
-                    url=self.reverse('delete', args=[obj.pk]),
-                    icon=Icon('delete', class_="material-icons mdc-list-item__graphic")
+                    url=self.reverse("delete", args=[obj.pk]),
+                    icon=Icon("delete", class_="material-icons mdc-list-item__graphic"),
                 ),
-                *actions
+                *actions,
             )
         return super().get_update_page_actions(request, obj, *actions)
 
@@ -281,12 +295,12 @@ class DeleteViewMixin(metaclass=ViewsetMeta):
 class DetailViewMixin(metaclass=ViewsetMeta):
     def get_object_url(self, request, obj):
         if self.has_view_permission(request.user, obj):
-            return self.reverse('detail', args=[obj.pk])
+            return self.reverse("detail", args=[obj.pk])
 
     def get_success_url(self, request, obj=None):
         if obj is not None and obj.pk is not None:
-            return self.reverse('detail', args=[obj.pk])
-        return self.reverse('index')
+            return self.reverse("detail", args=[obj.pk])
+        return self.reverse("index")
 
     """
     Detail
@@ -296,10 +310,7 @@ class DetailViewMixin(metaclass=ViewsetMeta):
     detail_page_object_actions = DEFAULT
 
     def get_detail_view_kwargs(self, **kwargs):
-        view_kwargs = {
-            **self.detail_view_kwargs,
-            **kwargs
-        }
+        view_kwargs = {**self.detail_view_kwargs, **kwargs}
         return self.filter_kwargs(self.detail_view_class, **view_kwargs)
 
     @viewprop
@@ -312,22 +323,22 @@ class DetailViewMixin(metaclass=ViewsetMeta):
 
     @property
     def detail_path(self):
-        return path('<path:pk>/detail/', self.detail_view, name='detail')
+        return path("<path:pk>/detail/", self.detail_view, name="detail")
 
     def get_detail_page_actions(self, request, obj, *actions):
-        if hasattr(self, 'has_delete_permission') and self.has_delete_permission(request.user):
+        if hasattr(self, "has_delete_permission") and self.has_delete_permission(
+            request.user
+        ):
             actions = (
                 Action(
                     name="Delete",
-                    url=self.reverse('delete', args=[obj.pk]),
-                    icon=Icon('delete', class_="material-icons mdc-list-item__graphic")),
-                *actions
+                    url=self.reverse("delete", args=[obj.pk]),
+                    icon=Icon("delete", class_="material-icons mdc-list-item__graphic"),
+                ),
+                *actions,
             )
         if self.detail_page_actions is not DEFAULT:
-            actions = (
-                *self.detail_page_actions,
-                *actions
-            )
+            actions = (*self.detail_page_actions, *actions)
         return actions
 
     def get_detail_page_object_actions(self, request, obj, *actions):
@@ -336,7 +347,9 @@ class DetailViewMixin(metaclass=ViewsetMeta):
         return actions
 
 
-class ReadonlyModelViewset(DetailViewMixin, ListBulkActionsMixin, AppMenuMixin, BaseModelViewset):
+class ReadonlyModelViewset(
+    DetailViewMixin, ListBulkActionsMixin, AppMenuMixin, BaseModelViewset
+):
     """
     Readonly model viewset with List and object details view only
     """

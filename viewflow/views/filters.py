@@ -21,17 +21,17 @@ class FilterableViewMixin(object):
 
     def get_filterset_kwargs(self, filterset_class):
         """
-        Returns the keyword arguments for instanciating the filterset.
+        Returns the keyword arguments for instantiating the filterset.
         """
         kwargs = {}
 
-        if self.viewset is not None and hasattr(self.viewset, 'get_filterset_kwargs'):
+        if self.viewset is not None and hasattr(self.viewset, "get_filterset_kwargs"):
             kwargs = self.viewset.get_filterset_kwargs(self.request)
 
         return {
             **kwargs,
-            'data': self.request.GET or None,
-            'request': self.request,
+            "data": self.request.GET or None,
+            "request": self.request,
         }
 
     def get_filterset(self, filterset_class, queryset):
