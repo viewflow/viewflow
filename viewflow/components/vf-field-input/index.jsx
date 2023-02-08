@@ -55,7 +55,9 @@ const Input = (props) => {
   });
 
   onCleanup(() => {
-    textfield.destroy();
+    if (textfield) {
+      textfield.destroy();
+    }
   });
 
   return (

@@ -47,7 +47,9 @@ const VDateField = customElement('vf-field-date', defaultProps, (props, {element
   });
 
   onCleanup(() => {
-    dialog.destroy();
+    if(dialog) {
+      dialog.destroy();
+    }
   });
 
 

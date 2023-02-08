@@ -50,7 +50,9 @@ const VSelectField = customElement('vf-field-select', defaultProps, (props, {ele
   });
 
   onCleanup(() => {
-    mdcSelect.destroy();
+    if (mdcSelect) {
+      mdcSelect.destroy();
+    }
   });
 
   const items = (optgroups) => {

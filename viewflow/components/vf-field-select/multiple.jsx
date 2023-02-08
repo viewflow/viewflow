@@ -153,7 +153,9 @@ const VSelectMultipleField = customElement('vf-field-select-multiple', defaultPr
   });
 
   onCleanup(() => {
-    mdcSelect.destroy();
+    if (mdcSelect) {
+      mdcSelect.destroy();
+    }
   });
 
   const items = (optgroups) => { // todo checkboxes

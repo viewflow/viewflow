@@ -31,7 +31,9 @@ const VCheckboxField = customElement('vf-field-checkbox', defaultProps, (props, 
   });
 
   onCleanup(() => {
-    checkbox.destroy();
+    if(checkbox) {
+      checkbox.destroy();
+    }
   });
 
   return (

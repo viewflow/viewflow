@@ -20,7 +20,9 @@ const VLinearProgress = customElement('vf-linear-progress', {}, (props, {element
   });
 
   onCleanup(() => {
-    progress.destroy();
+    if (progress) {
+      progress.destroy();
+    }
   });
 
   return (

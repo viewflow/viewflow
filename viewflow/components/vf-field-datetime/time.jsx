@@ -89,7 +89,9 @@ const VTimeField = customElement('vf-field-time', defaultProps, (props, {element
   });
 
   onCleanup(() => {
-    dialog.destroy();
+    if (dialog) {
+      dialog.destroy();
+    }
   });
 
 

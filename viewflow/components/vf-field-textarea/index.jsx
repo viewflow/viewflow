@@ -33,7 +33,9 @@ const VTextareaField = customElement('vf-field-textarea', defaultProps, (props, 
   });
 
   onCleanup(() => {
-    textfield.destroy();
+    if (textfield) {
+      textfield.destroy();
+    }
   });
 
   return (

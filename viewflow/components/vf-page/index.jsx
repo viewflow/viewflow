@@ -72,7 +72,9 @@ export class VPage extends HTMLElement {
     const rootClasses = this._drawerEl.classList;
 
     if (window.innerWidth < 992 && !rootClasses.contains('mdc-drawer--modal')) {
-      this._mdcDrawer.destroy();
+      if (this._mdcDrawer) {
+        this._mdcDrawer.destroy();
+      }
       this._drawerEl.classList.remove('mdc-drawer--dismissible');
       this._drawerEl.classList.remove('mdc-drawer--open');
       this._drawerEl.classList.add('mdc-drawer--modal');
@@ -80,7 +82,9 @@ export class VPage extends HTMLElement {
       this._contentEl.classList.remove('mdc-drawer-app-content');
       this._mdcDrawer = drawer.MDCDrawer.attachTo(this._drawerEl);
     } else if (window.innerWidth >= 992 && !rootClasses.contains('mdc-drawer--dismissible')) {
-      this._mdcDrawer.destroy();
+      if (this._mdcDrawer) {
+        this._mdcDrawer.destroy();
+      }
       this._drawerEl.classList.remove('mdc-drawer--modal');
       this._scrimEl.remove();
       this._drawerEl.classList.add('mdc-drawer--dismissible');
@@ -306,7 +310,9 @@ export class VDialog extends HTMLElement {
   }
 
   disconnectedCallback() {
-    this._mdcDialog.destroy();
+    if (this._mdcDialog) {
+      this._mdcDialog.destroy();
+    }
     this._triggerEl.removeEventListener('click', this.onTriggerClick);
   }
 
