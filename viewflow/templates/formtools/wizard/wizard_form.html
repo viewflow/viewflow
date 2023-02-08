@@ -1,0 +1,20 @@
+{% extends 'viewflow/views/form.html' %}
+{% load i18n %}
+
+{% block form-header-title %}
+<h1 class="vf-card__title">
+  TODO
+</h1>
+{% endblock %}
+{% block breadcrumbs_items %}TODO{% endblock %}
+
+{% block form-actions-list %}
+{{ wizard.management_form }}
+
+{% if wizard.steps.prev %}
+<button class="mdc-button mdc-card__action mdc-card__action--button" name="wizard_goto_step" type="submit" value="{{ wizard.steps.first }}">{% trans "first step" %}</button>
+<button class="mdc-button mdc-card__action mdc-card__action--button" name="wizard_goto_step" type="submit" value="{{ wizard.steps.prev }}">{% trans "prev step" %}</button>
+{% endif %}
+<button class="mdc-button mdc-card__action mdc-card__action--button mdc-button--raised" type="submit">Submit</button>
+{% endblock %}
+

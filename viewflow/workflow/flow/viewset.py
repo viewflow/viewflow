@@ -19,13 +19,9 @@ class BaseFlowViewsMixin(metaclass=ViewsetMeta):
         self._flow_class = flow_class
 
     def filter_kwargs(self, view_class, **kwargs):
-        result = {"flow_class": self._flow_class, "viewset": self, **kwargs}
-        return {
-            name: value
-            for name, value in result.items()
-            if hasattr(view_class, name)
-            if value is not DEFAULT
-        }
+        return super().filter_kwargs(
+            view_class, **{"flow_class": self._flow_class, "viewset": self, **kwargs}
+        )
 
     """
     Permissions
@@ -352,7 +348,7 @@ class _IndexRedirectView(RedirectView):
 
             for flow_class in self.viewset.parent.flow_classes:
                 if flow_class.instance.has_view_permission(self.request.user):
-                    redirect = flow_class.instance.reverse('index')
+                    redirect = flow_class.instance.reverse("index")
                     break
 
             if redirect is None:
@@ -405,13 +401,9 @@ class WorkflowAppViewset(BulkActionsViewsMixin, Application):
         }
 
     def filter_kwargs(self, view_class, **kwargs):
-        result = {"flow_classes": self.flow_classes, "viewset": self, **kwargs}
-        return {
-            name: value
-            for name, value in result.items()
-            if hasattr(view_class, name)
-            if value is not DEFAULT
-        }
+        return super().filter_kwargs(
+            view_class, **{"flow_classes": self.flow_classes, "viewset": self, **kwargs}
+        )
 
     """
     Permissions

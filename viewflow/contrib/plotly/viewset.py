@@ -15,26 +15,18 @@ class Dashboard(AppMenuMixin, Viewset):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._registed_callbacks = []
+        self._registered_callbacks = []
 
     @cached_property
     def dash_app(self):
-        app = Dash("app", requests_pathname_prefix=self.reverse('index'))
+        app = Dash("app", requests_pathname_prefix=self.reverse("index"))
         app.layout = self.layout
-        for func, args, kwargs in self._registed_callbacks:
+        for func, args, kwargs in self._registered_callbacks:
             app.callback(*args, **kwargs)(func)
         return app
 
     def filter_kwargs(self, view_class, **kwargs):
-        result = {
-            'viewset': self,
-            **kwargs
-        }
-        return {
-            name: value for name, value in result.items()
-            if hasattr(view_class, name)
-            if value is not DEFAULT
-        }
+        return super().filter_kwargs(view_class, **{"viewset": self, **kwargs})
 
     """
     Dashboard View
@@ -43,7 +35,7 @@ class Dashboard(AppMenuMixin, Viewset):
 
     @property
     def index_path(self):
-        return path('', self.dashboard_view, name='index')
+        return path("", self.dashboard_view, name="index")
 
     @viewprop
     def dashboard_view_kwargs(self):
@@ -51,9 +43,9 @@ class Dashboard(AppMenuMixin, Viewset):
 
     def get_dashboard_view_kwargs(self, **kwargs):
         view_kwargs = {
-            'template_name': self.dashboard_template_name,
+            "template_name": self.dashboard_template_name,
             **self.dashboard_view_kwargs,
-            **kwargs
+            **kwargs,
         }
         return self.filter_kwargs(self.dashboard_view_class, **view_kwargs)
 
@@ -64,23 +56,30 @@ class Dashboard(AppMenuMixin, Viewset):
     """
     Dash endpoints
     """
+
     @property
     def layout_path(self):
-        return path('_dash-layout/', views.layout_endpoint, {'viewset': self})
+        return path("_dash-layout/", views.layout_endpoint, {"viewset": self})
 
     @property
     def dependencies_path(self):
-        return path('_dash-dependencies/', views.dependencies_endpoint, {'viewset': self})
+        return path(
+            "_dash-dependencies/", views.dependencies_endpoint, {"viewset": self}
+        )
 
     @property
     def update_component_path(self):
-        return path('_dash-update-component', views.update_component_endpoint, {'viewset': self})
+        return path(
+            "_dash-update-component", views.update_component_endpoint, {"viewset": self}
+        )
 
     """
     Callback
     """
+
     def callback(self, *args, **kwargs):
         def decorator(func):
-            self._registed_callbacks.append((func, args, kwargs))
+            self._registered_callbacks.append((func, args, kwargs))
             return func
+
         return decorator

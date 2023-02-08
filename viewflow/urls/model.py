@@ -35,18 +35,15 @@ class BaseModelViewset(Viewset):
         return attr
 
     def filter_kwargs(self, view_class, **kwargs):
-        result = {
-            "model": self.model,
-            "viewset": self,
-            "queryset": self.queryset,
-            **kwargs,
-        }
-        return {
-            name: value
-            for name, value in result.items()
-            if hasattr(view_class, name)
-            if value is not DEFAULT
-        }
+        return super().filter_kwargs(
+            view_class,
+            **{
+                "model": self.model,
+                "viewset": self,
+                "queryset": self.queryset,
+                **kwargs,
+            }
+        )
 
     @property
     def index_path(self):

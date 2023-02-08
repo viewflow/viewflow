@@ -14,7 +14,7 @@ from django.views.generic import RedirectView
 from django.urls import URLPattern, URLResolver, include, path, reverse
 from django.urls.resolvers import RoutePattern
 
-from viewflow.utils import camel_case_to_underscore, strip_suffixes
+from viewflow.utils import camel_case_to_underscore, strip_suffixes, DEFAULT
 
 
 class _UrlName(str):
@@ -263,6 +263,14 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
 
     def _get_resolver_extra(self):
         return {"viewset": self}
+
+    def filter_kwargs(self, view_class, **kwargs):
+        return {
+            name: value
+            for name, value in kwargs.items()
+            if hasattr(view_class, name)
+            if value is not DEFAULT
+        }
 
     @property
     def urls(self):
