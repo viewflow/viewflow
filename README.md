@@ -54,7 +54,7 @@ data. Viewflow provides a Process model as the base model for your process
 instances. You can add your own fields to the model using jsonstore fields to
 avoid model inheritance and additional joins:
 
-.. code-block:: python
+```python
 
     from viewflow import jsonstore
     from viewflow.workflow.models import Process
@@ -67,6 +67,7 @@ avoid model inheritance and additional joins:
 
         class Meta:
             proxy = True
+```
 
 2. Create a new flow definition file flows.py
 
@@ -76,7 +77,7 @@ We'll define three steps in the workflow: start, bake, and deliver. We'll
 use CreateProcessView and UpdateProcessView to create and update the process
 data from PizzaOrder:
 
-.. code-block:: python
+```python
 
     from viewflow import this
     from viewflow.workflow import flow
@@ -100,13 +101,14 @@ data from PizzaOrder:
         ).Next(this.end)
 
         end = flow.End()
+```
 
 3. Add the flow to your URL configuration:
 
 Finally, add the PizzaFlow to your URL configuration. You can use the Site and
 FlowAppViewset classes to register your workflow with the pre-built frontend.
 
-.. code-block:: python
+```python
 
     from viewflow.contrib.auth import AuthViewset
     from viewflow.urls import Application, Site
@@ -123,6 +125,8 @@ FlowAppViewset classes to register your workflow with the pre-built frontend.
         path("accounts/", AuthViewset().urls),
         path("", site.urls),
     ]
+
+```
 
 4. Run migrations and access the workflow through the pre-built frontend.
 
