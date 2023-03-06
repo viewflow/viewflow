@@ -1,4 +1,4 @@
-# Viewflow - Reusable component library for Business Applications
+# Viewflow - Reusable component library
 
 **The low-code for developers with yesterday's deadline**
 
@@ -54,6 +54,8 @@ data. Viewflow provides a Process model as the base model for your process
 instances. You can add your own fields to the model using jsonstore fields to
 avoid model inheritance and additional joins:
 
+.. code-block:: python
+
     from viewflow import jsonstore
     from viewflow.workflow.models import Process
 
@@ -73,6 +75,8 @@ this example, we'll create a PizzaFlow class that inherits from flow.Flow.
 We'll define three steps in the workflow: start, bake, and deliver. We'll
 use CreateProcessView and UpdateProcessView to create and update the process
 data from PizzaOrder:
+
+.. code-block:: python
 
     from viewflow import this
     from viewflow.workflow import flow
@@ -101,6 +105,8 @@ data from PizzaOrder:
 
 Finally, add the PizzaFlow to your URL configuration. You can use the Site and
 FlowAppViewset classes to register your workflow with the pre-built frontend.
+
+.. code-block:: python
 
     from viewflow.contrib.auth import AuthViewset
     from viewflow.urls import Application, Site
