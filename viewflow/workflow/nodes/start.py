@@ -109,7 +109,12 @@ class Start(
         self._undo_func = undo_func
 
     def can_execute(self, user, task=None):
-        """Check user permission to start a flow."""
+        """
+        Check whether the user is authorized to start a flow.
+
+        This method checks whether the user is authorized to start a flow based on the
+        owner and owner permission attributes.
+        """
         if not user.is_authenticated:
             return False
 

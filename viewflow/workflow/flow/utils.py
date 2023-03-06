@@ -25,14 +25,14 @@ def wrap_task_view(self, origin_view, permission=None):
 
             return origin_view(request, *args, **kwargs)
 
-        if request.method == "POST":
-            with transaction.atomic(), self.flow_class.lock(process_pk):
+        try:
+            if request.method == "POST":
+                with transaction.atomic(), self.flow_class.lock(process_pk):
+                    return call_with_activation()
+            else:
                 return call_with_activation()
-        else:
-            try:
-                return call_with_activation()
-            except TransitionNotAllowed as e:
-                raise PermissionDenied(','.join(e.args))
+        except TransitionNotAllowed as e:
+            raise PermissionDenied(",".join(e.args))
 
     update_wrapper(view, origin_view)
     return view
@@ -59,11 +59,12 @@ def wrap_start_view(flow_task, origin_view):
 
 def wrap_view(flow_task, origin_view):
     """Create wrapper around orig_view to inject request.activation."""
+
     def view(request, *args, **kwargs):
-        process_pk, task_pk = kwargs.get('process_pk'), kwargs.get('task_pk')
+        process_pk, task_pk = kwargs.get("process_pk"), kwargs.get("task_pk")
         if process_pk is None or task_pk is None:
             raise ImproperlyConfigured(
-                'Task view URL path should contain <int:process_pk> and <int:task_pk> parameters'
+                "Task view URL path should contain <int:process_pk> and <int:task_pk> parameters"
             )
 
         def call_with_activation():
@@ -76,14 +77,14 @@ def wrap_view(flow_task, origin_view):
             request.activation.start(request)
             return origin_view(request, *args, **kwargs)
 
-        if request.method == "POST":
-            with flow_task.flow_class.lock(process_pk), transaction.atomic():
+        try:
+            if request.method == "POST":
+                with flow_task.flow_class.lock(process_pk), transaction.atomic():
+                    return call_with_activation()
+            else:
                 return call_with_activation()
-        else:
-            try:
-                return call_with_activation()
-            except TransitionNotAllowed as e:
-                raise PermissionDenied(','.join(e.args))
+        except TransitionNotAllowed as e:
+            raise PermissionDenied(",".join(e.args))
 
     update_wrapper(view, origin_view)
     return view

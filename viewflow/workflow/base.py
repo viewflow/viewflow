@@ -58,7 +58,7 @@ class Edge(object):
 
 class Node(Viewset):
     """
-    Base class for flow task.
+    Base class for a flow task definition.
 
     :keyword task_type: Human readable task type
     :keyword activation_class: Activation implementation specific for this node
@@ -95,11 +95,21 @@ class Node(Viewset):
         return {"node": self}
 
     def _outgoing(self):
-        """Outgoing edge iterator."""
+        """
+        Get an iterator over the outgoing edges of this node.
+
+        :returns: An iterator over the outgoing edges of this node.
+        :rtype: iterator
+        """
         raise NotImplementedError
 
     def _incoming(self):
-        """Incoming edge iterator."""
+        """
+        Get an iterator over the incoming edges of this node.
+
+        :returns: An iterator over the incoming edges of this node.
+        :rtype: iterator
+        """
         return iter(self._incoming_edges)
 
     def __str__(self):
@@ -108,6 +118,7 @@ class Node(Viewset):
         return super(Node, self).__str__()
 
     def _resolve(self, instance):
+
         """Node class should resolve other nodes this-references here.
 
         Called as soon as node instances infatuated, but before
@@ -116,18 +127,36 @@ class Node(Viewset):
 
     def _ready(self):
         """
-        Called when flow class setup finished.
+        Called when the flow class setup is finished.
 
-        Subclasses could perform additional initialization here.
+        Subclasses can perform additional initialization here.
         """
 
     def _create(self, prev_activation, token):
-        """Create new task instance."""
+        """
+        Create a new task instance.
+
+        :param prev_activation: The previous activation in the flow.
+        :type prev_activation: Activation
+        :param token: The token to use for the new task instance.
+        :type token: str
+        :returns: The new activation instance.
+        :rtype: Activation
+        """
         return self.activation_class.create(self, prev_activation, token)
 
     def Annotation(
         self, title=None, description=None, summary_template=None, result_template=None
     ):
+        """
+        Sets annotation for the node.
+
+        :param title: The title for the task
+        :param description: The description for the task
+        :param summary_template: The template for the task summary
+        :param result_template: The template for the task result
+        :return: The node instance with the updated annotation values
+        """
         if title is not None:
             self.task_title = title
         if description is not None:
@@ -148,7 +177,16 @@ class Node(Viewset):
         )
 
     def get_available_actions(self, activation, user):
-        """List of {name, url} actions available for the current user"""
+        """
+        Returns a list of available actions for the given user on the current node.
+
+        :param activation: The current activation instance.
+        :type activation: viewflow.models.Activation
+        :param user: The user to check actions for.
+        :type user: django.contrib.auth.models.User
+        :return: A list of available actions as a tuple of (name, url).
+        :rtype: list
+        """
         transitions = activation.get_available_transitions(user)
         for transition in transitions:
             try:
@@ -167,7 +205,15 @@ class FlowMetaClass(ViewsetMeta):
 
 
 class Flow(Viewset, metaclass=FlowMetaClass):
-    """Base class for flow definition."""
+    """
+    Base class for defining a task in a flow.
+
+    :param task_type: A human-readable string describing the task type.
+    :type task_type: str
+    :param activation_class: The activation class to use for this node. If not
+        specified, a default activation class will be used.
+    :type activation_class: class
+    """
 
     instance = None
 
@@ -181,6 +227,13 @@ class Flow(Viewset, metaclass=FlowMetaClass):
     process_result_template = ""
 
     def __init_subclass__(cls, **kwargs):
+        """
+        Create a new node instance.
+
+        :param activation_class: The activation class to use for this node.
+        :type activation_class: class
+        :param kwargs: Additional keyword arguments to pass to the superclass.
+        """
         super().__init_subclass__(**kwargs)
         cls.instance = LazySingletonDescriptor()
 
