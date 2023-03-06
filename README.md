@@ -1,4 +1,4 @@
-# Viewflow - Reusable component library
+# Viewflow
 
 **The low-code for developers with yesterday's deadline**
 
