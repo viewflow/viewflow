@@ -1,0 +1,525 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-03-07 11:16+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+
+msgid "Administration"
+msgstr "إدارة"
+
+msgid "Fantastic!"
+msgstr "رائع!"
+
+msgid "That looks awesome!"
+msgstr "هذا مذهل!"
+
+msgid "You are looking very well today!"
+msgstr ""
+
+msgid "I totally admire your spontaneity."
+msgstr ""
+
+msgid "I like your new haircut."
+msgstr ""
+
+msgid "What a beautiful costume!"
+msgstr ""
+
+msgid "You look very good in that suit"
+msgstr ""
+
+msgid "I love your style."
+msgstr ""
+
+msgid "I love your hair today"
+msgstr ""
+
+msgid "That color looks great on you!"
+msgstr ""
+
+msgid "YYYY"
+msgstr ""
+
+msgid "MM"
+msgstr ""
+
+msgid "DD"
+msgstr ""
+
+msgid "HH"
+msgstr ""
+
+msgid "SS"
+msgstr ""
+
+msgid "AM/PM"
+msgstr ""
+
+msgid "Transition is not allowed"
+msgstr "هذا الانتقال غير مسموح"
+
+#, python-format
+msgid "%(label)s %(name)s"
+msgstr "%(name)s %(label)s"
+
+msgid "Bad Request"
+msgstr "طلب خاطئ"
+
+msgid "View site"
+msgstr "عرض الموقع"
+
+msgid "Access Forbidden"
+msgstr "الدخول غير مسموح"
+
+msgid "You are not logged in"
+msgstr "أنت لم تسجل الدخول"
+
+#, python-format
+msgid "%(user)s have no rights to access this page"
+msgstr "المستخدم ليس لديه صلاحيات للوصول لهذه الصفحة %(user)s"
+
+msgid "Log in"
+msgstr "تسجيل دخول"
+
+msgid "Log in as another user"
+msgstr "تسجيل دخول من حساب آخر"
+
+msgid "Page not found"
+msgstr "الصفحة غير موجودة"
+
+msgid "We're sorry, but the requested page could not be found."
+msgstr "مع الأسف,الصفحة المطلوبة غير موجودة"
+
+msgid "Server error"
+msgstr "خطأ من المخدّم"
+
+msgid ""
+"There's been an error. It's been reported to the site administrators via "
+"email and should be fixed shortly. Thanks for your patience."
+msgstr ""
+"يوجد خطأ ما,وتم إبلاغ ادارة الموقع بها وجاري العمل على إصلاحها. شكرا لتفهمكم"
+
+#, python-format
+msgid "Recover deleted %(name)s"
+msgstr "استعادة العنصر المحذوف %(name)s"
+
+msgid "Graph"
+msgstr "رسم بياني"
+
+msgid "Filter"
+msgstr "تصفية"
+
+msgid "Home"
+msgstr "الصفحة الرئيسية"
+
+msgid "Please correct the error below."
+msgstr "يرجى تصحيح الخطأ أدناه"
+
+msgid "Please correct the errors below."
+msgstr "يرجى تصحيح الأخطاء أدناه"
+
+msgid "Yes, I’m sure"
+msgstr "نعم,أنا متأكد"
+
+msgid "No, take me back"
+msgstr "لا,عودة للخلف"
+
+msgid "first step"
+msgstr "الخطوة الأولى"
+
+msgid "prev step"
+msgstr "الخطوة السابقة"
+
+msgid "Logout"
+msgstr "تسجيل حروج"
+
+msgid "Log out"
+msgstr "تسجيل حروج"
+
+msgid "Thanks for spending some quality time with the Web site today."
+msgstr "شكرا لتمضيتكم وقتاً جيداً في موقعنا اليوم"
+
+msgid "Log in again"
+msgstr "تسجيل الدخول مرة أخرى"
+
+msgid "Viewflow Demo suite"
+msgstr "القسم التجريبي Viewflow"
+
+msgid "Reset password"
+msgstr "اعادة تعيين كلمة السر"
+
+msgid "Profile"
+msgstr "الملف الشخصي"
+
+msgid "Your password was changed."
+msgstr "تم تغيير كلمة السر"
+
+msgid "Change"
+msgstr "تعديل"
+
+msgid "Your password has been set.  You may go ahead and log in now."
+msgstr "تم إعادة تعيين كلمة السر.يمكنك المتابعة وتسجيل الدخول حالاً "
+
+msgid ""
+"Please enter your new password twice so we can verify you typed it in "
+"correctly."
+msgstr ""
+"الرجاء ادخال كلمة السر مرتين حتى يمكننا التحقق من أن كتابتها تمت بشكل صحيح"
+
+msgid "Change my password"
+msgstr "تغيير كلمة السر"
+
+msgid ""
+"The password reset link was invalid, possibly because it has already been "
+"used.  Please request a new password reset."
+msgstr ""
+"رابط إعادة تعيين كلمة السر غير صالح,ربما قد تم استخدامه مسبقا. الرجاء إعادة "
+"طلب لتعين كلمة سر جديدة"
+
+msgid ""
+"We’ve emailed you instructions for setting your password, if an account "
+"exists with the email you entered. You should receive them shortly."
+msgstr ""
+"لقد أرسلنا بريد الكتروني يتضمن تعليمات اعادة تعيين كلمة السر.إن كان هناك "
+"حساب مرتبط بالعنوان الذي أدخلته,ستتلقى التعليمات قريبا"
+
+msgid ""
+"If you don’t receive an email, please make sure you’ve entered the address "
+"you registered with, and check your spam folder."
+msgstr ""
+"إن لم تتلقى رسالة,يرجى التأكد من أنك أدخلت العنوان الذي سجلت به مسبقا,كذلك "
+"تفحص صندوق الرسائل الغير الهامة"
+
+msgid ""
+"Forgotten your password? Enter your email address below, and we’ll email "
+"instructions for setting a new one."
+msgstr ""
+"هل نسيت كلمة السر ؟ ادخل عنوان بريدك الالكتروني وسوف نراسلك بالتعليمات "
+"لإعادة تعيين كلمة سر جديدة"
+
+msgid "Cancel"
+msgstr "إلغاء"
+
+msgid "Reset"
+msgstr "إعادة تعيين"
+
+msgid "Change password"
+msgstr "تغيير كلمة السر"
+
+msgid "Edit"
+msgstr "تعديل"
+
+msgid "Submit"
+msgstr "إرسال"
+
+msgid "Login"
+msgstr "تسجيل دخول"
+
+msgid "Export"
+msgstr "تصدير"
+
+#, python-format
+msgid ""
+"\n"
+"                    Export the %(name)s\n"
+"                    "
+msgid_plural ""
+"\n"
+"                    Export the %(objects_count)s %(plural_name)s\n"
+"                  "
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"\n"
+"                    Export all %(plural_name)s\n"
+"                  "
+msgstr ""
+
+msgid "Back"
+msgstr "عودة للخلف"
+
+msgid "Pick an action"
+msgstr "حدد الإجراء"
+
+msgid "Applications"
+msgstr "تطبيقات"
+
+msgid "Delete"
+msgstr "حذف"
+
+#, python-format
+msgid ""
+"\"%(escaped_object)s\" and all of the following related items will be deleted"
+msgstr ""
+
+#, python-format
+msgid ""
+"\n"
+"                    Are you sure you want to delete the %(name)s and related "
+"items?\n"
+"                    "
+msgid_plural ""
+"\n"
+"                    Are you sure you want to delete the %(objects_count)s "
+"%(plural_name)s and related items?\n"
+"                  "
+msgstr[0] ""
+msgstr[1] ""
+
+#, python-format
+msgid ""
+"\n"
+"                    Are you sure you want to delete all %(plural_name)s and "
+"related items?\n"
+"                  "
+msgstr ""
+
+msgid "New"
+msgstr "جديد"
+
+msgid "Add"
+msgstr "أضف"
+
+msgid "Save"
+msgstr "حفظ"
+
+msgid "Confirm"
+msgstr "تأكيد"
+
+msgid "Assign"
+msgstr "تعيين"
+
+msgid "Assign and continue"
+msgstr "تعيين متابعة"
+
+msgid "Dashboard"
+msgstr "لوحة التحكم"
+
+msgid "Inbox"
+msgstr "صندوق الوارد"
+
+msgid "Queue"
+msgstr "رتل"
+
+msgid "Archive"
+msgstr "أرشيف"
+
+msgid "No rights to execute"
+msgstr "لايوجد أذونات تنفيذ"
+
+msgid "Created"
+msgstr "تم الإنشاء"
+
+msgid "Assigned"
+msgstr "تم التعيين"
+
+msgid "Execute"
+msgstr "تنفيذ"
+
+msgid "View"
+msgstr "معاينة"
+
+msgid "Show all"
+msgstr "إظهار الكل"
+
+msgid "Finished"
+msgstr "تم الانتهاء"
+
+msgid "Process list"
+msgstr "قائمة العمليات"
+
+msgid "#"
+msgstr ""
+
+msgid "Description"
+msgstr "وصف"
+
+msgid "Owner"
+msgstr "المالك"
+
+msgid "Started"
+msgstr "تم البدأ"
+
+msgid "Status"
+msgstr "الحالة"
+
+msgid "Start"
+msgstr "ابدأ"
+
+msgid "Start and continue"
+msgstr "ابدأ وتابع"
+
+msgid "Execute and continue"
+msgstr "نفذ وتابع"
+
+msgid "Previous tasks"
+msgstr "المهام السابقة"
+
+msgid "No previous tasks"
+msgstr "لا بوجد مهام سابقة"
+
+msgid "Next tasks"
+msgstr "المهام التالية"
+
+msgid "No next tasks"
+msgstr "لا يوجد مهام تالية"
+
+msgid "Revive"
+msgstr "تفعيل"
+
+msgid "Unassign"
+msgstr "إلغاء التعيين"
+
+msgid "Undo"
+msgstr "تراجع عن الإجراء"
+
+msgid "Assign selected tasks"
+msgstr "تعيين المهام المحددة"
+
+msgid "Task"
+msgstr "مهمة"
+
+msgid "Brief"
+msgstr "موجز"
+
+msgid "Process brief"
+msgstr "موجز العملية"
+
+msgid "confirm"
+msgstr "تأكيد"
+
+msgid "Unassign selected tasks"
+msgstr "الغاء تعيين المهام المحددة"
+
+msgid "New process"
+msgstr "عملية جديدة"
+
+#, python-brace-format
+msgid "The {obj} was added successfully. {link}"
+msgstr "{link} بنجاح {obj} تم اضافة العنصر "
+
+#, python-brace-format
+msgid "The {obj} was deleted successfully."
+msgstr "تم حذف العنصر {obj} بنجاح"
+
+#, python-brace-format
+msgid "The {obj} was changed successfully. {link}"
+msgstr "بشكل صحيح {obj} تم حذف العنصر {link}"
+
+msgid "Workflow"
+msgstr "سير العمل"
+
+#, python-brace-format
+msgid "Task {task} has been assigned."
+msgstr "تم تعيين المهمة {task}"
+
+#, python-brace-format
+msgid "Task {task} has been unassigned."
+msgstr "تم الغاء تعيين المهمة {task}"
+
+#, python-brace-format
+msgid "Task {task} has been canceled."
+msgstr "تم الغاء المهمة {task}"
+
+#, python-brace-format
+msgid "Task {task} has been undone."
+msgstr "تم التراجع عن المهمة {task} "
+
+#, python-brace-format
+msgid "Task {task} has been revived."
+msgstr "تم تفعيل المهمة {task}"
+
+#, python-brace-format
+msgid "Process #{self.object.pk} can not be canceled."
+msgstr "لا يمكن الغاء العملية #{self.object.pk}"
+
+#, python-brace-format
+msgid "Process #{self.object.pk} has been canceled."
+msgstr "تم الغاء العملية #{self.object.pk}"
+
+#, python-brace-format
+msgid "Process {process} has been started."
+msgstr "تم بدأ العملية {process}"
+
+msgid "You have no rights to view this task"
+msgstr "ليس لديك أذونات لمعاينة هذه المهمة"
+
+#, python-brace-format
+msgid "Task {task} has been completed."
+msgstr "تم اكمال المهمة {task}"
+
+msgid "Processes"
+msgstr "العمليات"
+
+msgid "Flow"
+msgstr "سبر العمل"
+
+msgid "Type"
+msgstr "نوع"
+
+msgid "Previous"
+msgstr "السابق"
+
+msgid "Token"
+msgstr ""
+
+msgid "External Task ID"
+msgstr ""
+
+msgid "Permission"
+msgstr "أذونات"
+
+msgid "Process"
+msgstr "العملية"
+
+msgid "Tasks"
+msgstr "المهام"
+
+msgctxt "STATUS"
+msgid "Canceled"
+msgstr "ملغاة"
+
+msgctxt "STATUS"
+msgid "Done"
+msgstr "تمت"
+
+msgctxt "STATUS"
+msgid "New"
+msgstr "جديدة"
+
+msgctxt "STATUS"
+msgid "Assigned"
+msgstr "معينة"
+
+msgctxt "STATUS"
+msgid "Error"
+msgstr "خطأ"
+
+msgctxt "STATUS"
+msgid "Revived"
+msgstr "مفعلة"
+
+msgctxt "STATUS"
+msgid "Scheduled"
+msgstr "مجدولة"
+
+msgctxt "STATUS"
+msgid "Started"
+msgstr "بدأت"
