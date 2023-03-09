@@ -153,17 +153,22 @@ https://github.com/viewflow/cookbook
 
 ## License
 
-Viewflow is an Open Source project licensed under the terms of
-the AGPL license - `The GNU Affero General Public License v3.0
-<http://www.gnu.org/licenses/agpl-3.0.html>`_ with the Additional Permissions
-described in `LICENSE_EXCEPTION <./LICENSE_EXCEPTION>`_
+Viewflow is an Open Source project licensed under the terms of the AGPL license - [The GNU Affero General Public License v3.0](http://www.gnu.org/licenses/agpl-3.0.html) with the Additional Permissions
+described in [LICENSE_EXCEPTION](./LICENSE_EXCEPTION)
 
-You can read more about AGPL at `AGPL FAQ <http://www.affero.org/oagf.html>`_
-This package license scheme follow GCC Runtime library licensing. If you use Linux already, this package license likely won't bring anything new to your stack.
+The AGPL license with Additional Permissions is a free software license that
+allows commercial use and distribution of the software. It is similar to the GNU
+GCC Runtime Library license, and it includes additional permissions that make it
+more friendly for commercial development.
 
-Viewflow PRO has a commercial-friendly license allowing private forks
-and modifications of Viewflow. You can find the commercial license terms in COMM-LICENSE.
+You can read more about AGPL and its compatibility with commercial use at the
+[AGPL FAQ](http://www.affero.org/oagf.html)
 
+If you use Linux already, this package license likely won't bring anything new to your stack.
+
+Viewflow PRO has a commercial-friendly license allowing private forks and
+modifications of Viewflow. You can find the commercial license terms in
+[COMM-LICENSE](./COMM-LICENSE).
 
 ## Changelog
 
