@@ -4,9 +4,10 @@
 
 [![build]][build] [![coverage]][coverage] [![pypi-version]][pypi] [![py-versions]][pypi]
 
-Viewflow is a low-code, reusable component library designed to help developers quickly create comprehensive business applications with minimal effort. Built on top of Django, Viewflow is accessible for developers experienced in these technologies. Its pre-built components for user management, workflows, and reporting accelerate development while providing flexibility to customize and integrate with existing systems.
 
-Like Django, Viewflow is shipped as a single package with batteries included, and each part can be used independently or together to create full-featured business applications in just a few lines of code.
+Viewflow is a low-code, reusable component library for creating comprehensive business applications with ease. Built on top of Django, Viewflow simplifies development by providing pre-built components for user management, workflows, and reporting, while still offering flexibility to customize and integrate with existing systems.
+
+With Viewflow, you can create full-featured business applications in just a few lines of code using its reusable component library. It's shipped as a single package with batteries included, and each part of Viewflow can be used independently of the others, but they all work well together.
 
 
 Viewflow comes in two flavors:
