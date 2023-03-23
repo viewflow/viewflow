@@ -2,7 +2,7 @@
 {% load i18n static viewflow %}
 
 {% block extrahead %}
-<link href="{% static 'viewflow/fonts/simple-icons/simple-icons.min.css' %}" rel="stylesheet">
+  <link href="{% static 'viewflow/fonts/simple-icons/simple-icons.min.css' %}" rel="stylesheet">
 {% endblock %}
 
 {% block title %}{% trans 'Log in' %} - {{ block.super }}{% endblock %}
@@ -11,35 +11,35 @@
 {% block lockscreen-sidebar-header-subtitle %}{% trans 'Viewflow Demo suite' %}{% endblock %}
 
 {% block lockscreen-sidebar-content %}
-<vf-form>
-  <form class="vf-form" method="POST">
-    {% csrf_token %}
-    {% render form %}
-    <button type="submit" class="mdc-button mdc-button--raised vf-page-lockscreen__sidebar-content-action">
-      {% trans 'Log in' %}
-    </button>
+  <vf-form>
+    <form class="vf-form" method="POST">
+      {% csrf_token %}
+      {% render form %}
+      <button type="submit" class="mdc-button mdc-button--raised vf-page-lockscreen__sidebar-content-action">
+        {% trans 'Log in' %}
+      </button>
 
-    {% url 'password_reset' as reset_url %}
-    {% if reset_url %}
-    <a href="{{ reset_url }}" class="mdc-typography vf-page-lockscreen-reset-link">
-      {% trans 'Reset password' %}
-    </a>
-    {% endif %}
-  </form>
-</vf-form>
+      {% url 'password_reset' as reset_url %}
+      {% if reset_url %}
+        <a href="{{ reset_url }}" class="mdc-typography vf-page-lockscreen-reset-link">
+          {% trans 'Reset password' %}
+        </a>
+      {% endif %}
+    </form>
+  </vf-form>
 {% endblock %}
 
 {% block lockscreen-sidebar-footer %}
   {% block lockscreen-sidebar-socialaccount %}
-  {% with viewset.get_allauth_prodivers as socialaccount_providers %}
-  {% if socialaccount_providers %}
-  <div style="margin-top:-150px">
-    <ul class="vf-page-lockscreen__socialaccount">
-      {% include "registration/provider_list.html" with process="login" %}
-    </ul>
-  </div>
-  {% endif %}
-  {% endwith %}
+    {% with viewset.get_allauth_prodivers as socialaccount_providers %}
+      {% if socialaccount_providers %}
+        <div style="margin-top:-150px">
+          <ul class="vf-page-lockscreen__socialaccount">
+            {% include "registration/provider_list.html" with process="login" %}
+          </ul>
+        </div>
+      {% endif %}
+    {% endwith %}
   {% endblock lockscreen-sidebar-socialaccount %}
 {% endblock %}
 

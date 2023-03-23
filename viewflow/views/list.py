@@ -40,20 +40,20 @@ class BaseColumn(object):
         self.attr_name = attr_name
 
     def get_value(self, obj):
-        raise NotImplementedError('subclasses must implement this method.')
+        raise NotImplementedError("subclasses must implement this method.")
 
     def header(self):
-        raise NotImplementedError('subclasses must implement this method')
+        raise NotImplementedError("subclasses must implement this method")
 
     def column_type(self):
-        raise NotImplementedError('subclasses must implement this method')
+        raise NotImplementedError("subclasses must implement this method")
 
     def orderby(self):
-        raise NotImplementedError('subclasses must implement this method')
+        raise NotImplementedError("subclasses must implement this method")
 
     def format_value(self, obj, value):
         if value is None:
-            return ''
+            return ""
         elif isinstance(value, datetime.datetime):
             return formats.localize(timezone.template_localtime(value))
         elif isinstance(value, (datetime.date, datetime.time)):
@@ -61,7 +61,7 @@ class BaseColumn(object):
         elif isinstance(value, (int, float, decimal.Decimal)):
             return formats.number_format(value)
         elif isinstance(value, (list, tuple)):
-            return ', '.join(force_str(v) for v in value)
+            return ", ".join(force_str(v) for v in value)
         else:
             return force_str(value)
 
@@ -72,16 +72,14 @@ class ModelFieldColumn(BaseColumn):
 
     Field verbose name would be use as a label.
     """
+
     NUMBER_FIELD_TYPES = (
         models.IntegerField,
         models.DecimalField,
         models.FloatField,
     )
 
-    BOOLEAN_FIELD_TYPES = (
-        models.BooleanField,
-        models.NullBooleanField
-    )
+    BOOLEAN_FIELD_TYPES = (models.BooleanField, models.NullBooleanField)
 
     def __init__(self, model_field):
         super().__init__(model_field.name)
@@ -99,24 +97,24 @@ class ModelFieldColumn(BaseColumn):
 
     def column_type(self):
         if isinstance(self.model_field, ModelFieldColumn.NUMBER_FIELD_TYPES):
-            return 'numeric'
+            return "numeric"
         elif isinstance(self.model_field, ModelFieldColumn.BOOLEAN_FIELD_TYPES):
-            return 'boolean'
-        return 'text'
+            return "boolean"
+        return "text"
 
     def orderby(self):
         return self.attr_name
 
     def format_value(self, obj, value):
-        if getattr(self.model_field, 'flatchoices', None):
-            return dict(self.model_field.flatchoices).get(value, '')
+        if getattr(self.model_field, "flatchoices", None):
+            return dict(self.model_field.flatchoices).get(value, "")
         elif isinstance(self.model_field, ModelFieldColumn.BOOLEAN_FIELD_TYPES):
             if value is None:
-                return Icon('indeterminate_check_box')
+                return Icon("indeterminate_check_box")
             elif value is True:
-                return Icon('check_box')
+                return Icon("check_box")
             else:
-                return Icon('check_box_outline_blank')
+                return Icon("check_box_outline_blank")
         else:
             return super().format_value(obj, value)
 
@@ -129,16 +127,17 @@ class DataSourceColumn(BaseColumn):
     For a callable, to get the value it would be called with model
     instance.
     """
+
     def __init__(self, data_source, attr_name, verbose_name=None):
         super().__init__(attr_name)
         self.verbose_name = verbose_name
         self.data_source = data_source
 
     def _get_attr_boolean(self):
-        return _get_method_attr(self.data_source, self.attr_name, 'boolean', False)
+        return _get_method_attr(self.data_source, self.attr_name, "boolean", False)
 
     def _get_attr_empty_value(self):
-        return _get_method_attr(self.data_source, self.attr_name, 'empty_value')
+        return _get_method_attr(self.data_source, self.attr_name, "empty_value")
 
     def get_value(self, obj):
         attr = getattr(self.data_source, self.attr_name)
@@ -158,29 +157,31 @@ class DataSourceColumn(BaseColumn):
             if hasattr(attr.fget, "short_description"):
                 return attr.fget.short_description
             else:
-                return pretty_name(attr.fget.__name__)
+                return pretty_name(self.attr_name)
         elif callable(attr):
             return "--" if attr.__name__ == "<lambda>" else pretty_name(attr.__name__)
         else:
             return pretty_name(self.attr_name)
 
     def column_type(self):
-        is_boolean = _get_method_attr(self.data_source, self.attr_name, 'boolean', None)
+        is_boolean = _get_method_attr(self.data_source, self.attr_name, "boolean", None)
         if is_boolean:
-            return 'boolean'
-        return _get_method_attr(self.data_source, self.attr_name, 'column_type', 'text')
+            return "boolean"
+        return _get_method_attr(self.data_source, self.attr_name, "column_type", "text")
 
     def orderby(self):
-        return _get_method_attr(self.data_source, self.attr_name, 'orderby_column', None)
+        return _get_method_attr(
+            self.data_source, self.attr_name, "orderby_column", None
+        )
 
     def format_value(self, obj, value):
         if self._get_attr_boolean():
             if value is None:
-                return Icon('indeterminate_check_box')
+                return Icon("indeterminate_check_box")
             elif value is True:
-                return Icon('check_box')
+                return Icon("check_box")
             else:
-                return Icon('check_box_outline_blank')
+                return Icon("check_box_outline_blank")
         else:
             return super().format_value(obj, value)
 
@@ -192,6 +193,7 @@ class ObjectAttrColumn(DataSourceColumn):
     If object attribute is a callable, to get the value it would be
     called without any arguments.
     """
+
     def get_value(self, obj):
         attr = getattr(obj, self.attr_name)
         if callable(attr):
@@ -201,7 +203,7 @@ class ObjectAttrColumn(DataSourceColumn):
 
 class OrderableListViewMixin(object):
     ordering = None
-    ordering_kwarg = '_orderby'
+    ordering_kwarg = "_orderby"
 
     def get_ordering(self):
         """Return the field or fields to use for ordering the queryset."""
@@ -209,16 +211,20 @@ class OrderableListViewMixin(object):
 
         # url query parameter
         if self.ordering_kwarg in self.request.GET:
-            params = self.request.GET[self.ordering_kwarg].split(',')
+            params = self.request.GET[self.ordering_kwarg].split(",")
             for param in params:
-                _, prefix, param_name = param.rpartition('-')
+                _, prefix, param_name = param.rpartition("-")
                 column_def = self.list_columns.get(param_name)
                 if column_def:
                     column_ordering = column_def.orderby()
                     if column_ordering:
-                        if hasattr(column_ordering, 'as_sql'):
-                            ordering.append(column_ordering.desc() if prefix == '-' else column_ordering.asc())
-                        elif column_ordering.startswith('-') and prefix == '-':
+                        if hasattr(column_ordering, "as_sql"):
+                            ordering.append(
+                                column_ordering.desc()
+                                if prefix == "-"
+                                else column_ordering.asc()
+                            )
+                        elif column_ordering.startswith("-") and prefix == "-":
                             ordering.append(column_ordering[1:])
                         else:
                             ordering.append(prefix + column_ordering)
@@ -242,16 +248,22 @@ class OrderableListViewMixin(object):
 
         # ordered by the url query
         if self.ordering_kwarg in self.request.GET:
-            params = self.request.GET[self.ordering_kwarg].split(',')
+            params = self.request.GET[self.ordering_kwarg].split(",")
             for param in params:
-                _, param_prefix, param_name = param.rpartition('-')
+                _, param_prefix, param_name = param.rpartition("-")
                 column_def = self.list_columns.get(param_name)
                 if column_def:
                     column_ordering = column_def.orderby()
                     if column_ordering is not None and isinstance(column_ordering, str):
                         # TODO support custom OrderBy expressions
-                        _, column_order_prefix, column_orderby = column_ordering.rpartition('-')
-                        ordering[column_def] = 'asc' if column_order_prefix == param_prefix else 'desc'
+                        (
+                            _,
+                            column_order_prefix,
+                            column_orderby,
+                        ) = column_ordering.rpartition("-")
+                        ordering[column_def] = (
+                            "asc" if column_order_prefix == param_prefix else "desc"
+                        )
         else:
             # ordered by explicit self.ordering definition or by queryset.order_by
             raw_ordering = []
@@ -263,16 +275,22 @@ class OrderableListViewMixin(object):
                 raw_ordering.extend(self.queryset.query.order_by)
 
             for param in raw_ordering:
-                _, param_prefix, param_name = param.rpartition('-')
+                _, param_prefix, param_name = param.rpartition("-")
                 for column_def in self.list_columns.values():
                     if column_def in ordering:  # column order already found
                         continue
                     column_ordering = column_def.orderby()
                     if column_ordering is not None and isinstance(column_ordering, str):
                         # TODO support custom OrderBy expressions
-                        _, column_order_prefix, column_orderby = column_ordering.rpartition('-')
+                        (
+                            _,
+                            column_order_prefix,
+                            column_orderby,
+                        ) = column_ordering.rpartition("-")
                         if param_name == column_orderby:
-                            ordering[column_def] = 'asc' if column_order_prefix == param_prefix else 'desc'
+                            ordering[column_def] = (
+                                "asc" if column_order_prefix == param_prefix else "desc"
+                            )
 
         return ordering
 
@@ -281,7 +299,7 @@ class BulkActionsMixin(object):
     bulk_actions = None
 
     def get_bulk_actions(self, *actions):
-        if self.viewset is not None and hasattr(self.viewset, 'get_list_bulk_actions'):
+        if self.viewset is not None and hasattr(self.viewset, "get_list_bulk_actions"):
             actions = self.viewset.get_list_bulk_actions(self.request) + actions
         if self.bulk_actions:
             actions = self.bulk_actions + actions
@@ -302,14 +320,13 @@ class BaseListModelView(generic.ListView):
         if self.viewset is not None:
             return self.viewset.has_view_permission(user, obj=obj)
         else:
-            return (
-                has_object_perm(user, 'view', self.model, obj=obj)
-                or has_object_perm(user, 'change', self.model, obj=obj)
-            )
+            return has_object_perm(
+                user, "view", self.model, obj=obj
+            ) or has_object_perm(user, "change", self.model, obj=obj)
 
     def get_columns(self):
         if self.columns is None:
-            return ['__str__']
+            return ["__str__"]
         return self.columns
 
     @lru_cache(maxsize=None)
@@ -323,7 +340,9 @@ class BaseListModelView(generic.ListView):
 
         # object printable string representation
         if attr_name == "__str__":
-            return ObjectAttrColumn(self.model, attr_name, opts.verbose_name.capitalize())
+            return ObjectAttrColumn(
+                self.model, attr_name, opts.verbose_name.capitalize()
+            )
 
         # a method from view or viewset
         data_sources = [self, self.viewset] if self.viewset is not None else [self]
@@ -346,10 +365,12 @@ class BaseListModelView(generic.ListView):
         raise ValueError("Can't found datasource for {} column".format(attr_name))
 
     def get_object_url(self, obj):
-        if self.viewset is not None and hasattr(self.viewset, 'get_object_url'):
+        if self.viewset is not None and hasattr(self.viewset, "get_object_url"):
             return self.viewset.get_object_url(self.request, obj)
         else:
-            if hasattr(obj, 'get_absolute_url') and self.has_view_perm(self.request.user, obj):
+            if hasattr(obj, "get_absolute_url") and self.has_view_perm(
+                self.request.user, obj
+            ):
                 return obj.get_absolute_url()
 
     @cached_property
@@ -370,17 +391,20 @@ class BaseListModelView(generic.ListView):
     def get_page_data(self, page):
         """Formated page data for a table.
 
-       Returned data is a list of list of cell values zipped with column definitions.
-       [[(column, value), (column, value), ...], ...]
+        Returned data is a list of list of cell values zipped with column definitions.
+        [[(column, value), (column, value), ...], ...]
         """
         for obj in page:
             yield obj, [
-                (column_def, self.format_value(obj, column_def, column_def.get_value(obj)))
+                (
+                    column_def,
+                    self.format_value(obj, column_def, column_def.get_value(obj)),
+                )
                 for column_def in self.list_columns.values()
             ]
 
     def get_page_actions(self, *actions):
-        if self.viewset is not None and hasattr(self.viewset, 'get_list_page_actions'):
+        if self.viewset is not None and hasattr(self.viewset, "get_list_page_actions"):
             actions = self.viewset.get_list_page_actions(self.request) + actions
         if self.page_actions:
             actions = self.page_actions + actions
@@ -388,7 +412,7 @@ class BaseListModelView(generic.ListView):
 
     @viewprop
     def queryset(self):
-        if self.viewset is not None and hasattr(self.viewset, 'get_queryset'):
+        if self.viewset is not None and hasattr(self.viewset, "get_queryset"):
             return self.viewset.get_queryset(self.request)
         return None
 
@@ -403,8 +427,10 @@ class BaseListModelView(generic.ListView):
         if self.template_name is None:
             opts = self.model._meta
             return [
-                '{}/{}{}.html'.format(opts.app_label, opts.model_name, self.template_name_suffix),
-                'viewflow/views/list.html',
+                "{}/{}{}.html".format(
+                    opts.app_label, opts.model_name, self.template_name_suffix
+                ),
+                "viewflow/views/list.html",
             ]
         return [self.template_name]
 
@@ -415,12 +441,14 @@ class BaseListModelView(generic.ListView):
         return super().dispatch(request, *args, **kwargs)
 
 
-@method_decorator(login_required, name='dispatch')
-class ListModelView(BulkActionsMixin,
-                    FilterableViewMixin,
-                    OrderableListViewMixin,
-                    SearchableViewMixin,
-                    BaseListModelView):
+@method_decorator(login_required, name="dispatch")
+class ListModelView(
+    BulkActionsMixin,
+    FilterableViewMixin,
+    OrderableListViewMixin,
+    SearchableViewMixin,
+    BaseListModelView,
+):
     """
     Render some list of objects.
     """

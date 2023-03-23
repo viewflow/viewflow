@@ -8,44 +8,44 @@
 {% endblock %}
 
 {% block task_content %}
-<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
-  <md-outlined-text-field label="Created" icon="schedule" disabled value="{{ task.created|timesince }}" style="width:100%"></md-outlined-text-field>
-</div>
-<div class="mdc-layout-grid__cell  mdc-layout-grid__cell--span-4">
-  <md-outlined-text-field label="Assigned" icon="update" disabled value="{{ task.assigned|timesince }}" style="width:100%"></md-outlined-text-field>
-</div>
-<div class="mdc-layout-grid__cell  mdc-layout-grid__cell--span-4">
-  <md-outlined-text-field label="Finished" icon="watch_later" disabled value="{{ task.finished|timesince }}" style="width:100%"></md-outlined-text-field>
-</div>
-<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-  <h4 class="mdc-typography mdc-typography--headline5" style="margin-bottom:10px">{% trans "Previous tasks" %}</h4>
-  <div>
-    {% for prev_task in task.previous.all %}
-      <a class="mdc-typography mdc-typography--subtitle1" href="{% reverse prev_task.flow_task 'index' process.pk prev_task.pk %}">{{ prev_task.flow_task.task_description|default:prev_task.flow_task }}</a>{% if not forloop.last %}, {% endif %}
-    {% empty %}
-    <span class="mdc-typography mdc-typography--subtitle1" style="color:grey">{% trans "No previous tasks" %}</span>
-    {% endfor %}
+  <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-4">
+    <md-outlined-text-field label="Created" icon="schedule" disabled value="{{ task.created|timesince }}" style="width:100%"></md-outlined-text-field>
   </div>
-</div>
-<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
-  <h4 class="mdc-typography mdc-typography--headline5"  style="margin-bottom:10px">{% trans "Next tasks" %}</h4>
-  <div>
-    {% for next_task in task.leading.all %}
-    <a class="mdc-typography mdc-typography--subtitle1" href="{% reverse next_task.flow_task 'index' process.pk next_task.pk %}">{{ prev_task.next_task.task_description|default:next_task.flow_task }}</a>{% if not forloop.last %}, {% endif %}
-    {% empty %}
-    <span class="mdc-typography mdc-typography--subtitle1" style="color:grey">{% trans "No next tasks" %}</span>
-    {% endfor %}
+  <div class="mdc-layout-grid__cell  mdc-layout-grid__cell--span-4">
+    <md-outlined-text-field label="Assigned" icon="update" disabled value="{{ task.assigned|timesince }}" style="width:100%"></md-outlined-text-field>
   </div>
-</div>
+  <div class="mdc-layout-grid__cell  mdc-layout-grid__cell--span-4">
+    <md-outlined-text-field label="Finished" icon="watch_later" disabled value="{{ task.finished|timesince }}" style="width:100%"></md-outlined-text-field>
+  </div>
+  <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+    <h4 class="mdc-typography mdc-typography--headline5" style="margin-bottom:10px">{% trans "Previous tasks" %}</h4>
+    <div>
+      {% for prev_task in task.previous.all %}
+        <a class="mdc-typography mdc-typography--subtitle1" href="{% reverse prev_task.flow_task 'index' process.pk prev_task.pk %}">{{ prev_task.flow_task.task_description|default:prev_task.flow_task }}</a>{% if not forloop.last %}, {% endif %}
+      {% empty %}
+        <span class="mdc-typography mdc-typography--subtitle1" style="color:grey">{% trans "No previous tasks" %}</span>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-6">
+    <h4 class="mdc-typography mdc-typography--headline5"  style="margin-bottom:10px">{% trans "Next tasks" %}</h4>
+    <div>
+      {% for next_task in task.leading.all %}
+        <a class="mdc-typography mdc-typography--subtitle1" href="{% reverse next_task.flow_task 'index' process.pk next_task.pk %}">{{ prev_task.next_task.task_description|default:next_task.flow_task }}</a>{% if not forloop.last %}, {% endif %}
+      {% empty %}
+        <span class="mdc-typography mdc-typography--subtitle1" style="color:grey">{% trans "No next tasks" %}</span>
+      {% endfor %}
+    </div>
+  </div>
 {% endblock %}
 
 {% block task_actions %}
-{% for label, url in view.get_actions %}
-<a class="mdc-button mdc-button--touch" href="{{ url }}">
-  <span class="mdc-button__ripple"></span>
-  <span class="mdc-button__touch"></span>
-  <span class="mdc-button__focus-ring"></span>
-  <span class="mdc-button__label">{% trans label %}</span>
-</a>
-{% endfor %}
+  {% for label, url in view.get_actions %}
+    <a class="mdc-button mdc-button--touch" href="{{ url }}">
+      <span class="mdc-button__ripple"></span>
+      <span class="mdc-button__touch"></span>
+      <span class="mdc-button__focus-ring"></span>
+      <span class="mdc-button__label">{% trans label %}</span>
+    </a>
+  {% endfor %}
 {% endblock %}

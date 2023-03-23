@@ -1,112 +1,112 @@
 {% extends 'viewflow/base.html' %}{% load i18n viewflow %}
 
 {% block body %}
-<vf-page-scroll-fix></vf-page-scroll-fix>
-<vf-page class="vf-page">
-  {% block page-menu %}{% if site and user.is_authenticated %}
-  <aside class="vf-page__menu mdc-drawer mdc-drawer--dismissible">
-    {% block page-menu-header %}
-    <header class="mdc-drawer__header vf-page__menu-header">
-      <div class="vf-page__menu-header-content">
-        {% block page-menu-avatar %}
-          <img class="vf-page__menu-avatar" src="{{ request.user|user_avatar_url }}" alt="{{ request.user.get_full_name|default:request.user.get_username|title }}">
-        {% endblock %}
-        <div class="vf-page__menu-info">
-          <div class="vf-page__menu-user">
-            {% block page-menu-user-info %}
-              <div class="vf-page__menu-title">
-                {{ request.user.get_full_name|default:request.user.get_username|title }}
+  <vf-page-scroll-fix></vf-page-scroll-fix>
+  <vf-page class="vf-page">
+    {% block page-menu %}{% if site and user.is_authenticated %}
+      <aside class="vf-page__menu mdc-drawer mdc-drawer--dismissible">
+        {% block page-menu-header %}
+          <header class="mdc-drawer__header vf-page__menu-header">
+            <div class="vf-page__menu-header-content">
+              {% block page-menu-avatar %}
+                <img class="vf-page__menu-avatar" src="{{ request.user|user_avatar_url }}" alt="{{ request.user.get_full_name|default:request.user.get_username|title }}">
+              {% endblock %}
+              <div class="vf-page__menu-info">
+                <div class="vf-page__menu-user">
+                  {% block page-menu-user-info %}
+                    <div class="vf-page__menu-title">
+                      {{ request.user.get_full_name|default:request.user.get_username|title }}
+                    </div>
+                    {% if request.user.email != request.user.get_username %}
+                      <div class="vf-page__menu-subtitle">{{ request.user.email}}</div>
+                    {% endif %}
+                  {% endblock page-menu-user-info %}
+                </div>
+                <div class="vf-page__menu-toggle">
+                  <button class="mdc-button vf-page__menu-toggle-button">
+                    <i class="material-icons">arrow_drop_down</i>
+                  </button>
+                </div>
               </div>
-              {% if request.user.email != request.user.get_username %}
-              <div class="vf-page__menu-subtitle">{{ request.user.email}}</div>
-              {% endif %}
-            {% endblock page-menu-user-info %}
-          </div>
-          <div class="vf-page__menu-toggle">
-            <button class="mdc-button vf-page__menu-toggle-button">
-              <i class="material-icons">arrow_drop_down</i>
-            </button>
-          </div>
-        </div>
-      </div>
-    </header>
-    {% endblock page-menu-header %}
-    {% block page-menu-content %}
-    <nav class="mdc-drawer__content">
-      <div class="mdc-list">
-        {% block page-menu-primary %}
-        <div class="vf-page__menu-primary">
-          {% block page-menu-app %}
-          {% if app and app.menu_template_name %}{% include app.menu_template_name %}{% endif %}
-          {% if site and site.menu_template_name %}{% include site.menu_template_name %}{% endif %}
-          {% endblock %}
-        </div>
-        {% endblock page-menu-primary %}
-        {% block page-menu-secondary %}
-        <div class="vf-page__menu-secondary">
-          {% block page-menu-user %}
-          <vf-page-menu-navigation class="mdc-list">
-            {% block page-menu-user-actions %}
-              {% url 'profile' as profile_url %}
-              {% if profile_url %}
-              <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ profile_url }}"  {% if viewset.turbo_disabled %} data-turbo="false"{% endif %}>
-                <span class="mdc-list-item__start"><i class="material-icons">account_box</i></span>
-                <span class="mdc-list-item__content">{% trans 'Profile' %}</span>
-              </a>
-              {% endif %}
-              {% url 'logout' as logout_url %}
-              {% if logout_url %}
-              <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ logout_url }}" {% if viewset.turbo_disabled %} data-turbo="false"{% endif %}>
-                <span class="mdc-list-item__start"><i class="material-icons">exit_to_app</i></span>
-                <span class="mdc-list-item__content">{% trans 'Log out' %}</span>
-              </a>
-              {% endif %}
-            {% endblock %}
-          </vf-page-menu-navigation>
-          {% endblock page-menu-user %}
-        </div>
-        {% endblock page-menu-secondary %}
-      </div>
-    </nav>
-    {% endblock page-menu-content %}
-  </aside>
-  {% endif %}{% endblock page-menu %}
-  {% block page-body %}
-  <div class="vf-page__body mdc-drawer-app-content">
-    {% block page-toolbar %}
-    <header class="mdc-top-app-bar vf-page__body-toolbar">
-      <div class="mdc-top-app-bar__row">
-        <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
-          {% if site and user.is_authenticated %}
-          <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button vf-page__menu-toggle" aria-label="Open navigation menu" data-turbo="false">menu</button>
-          {% endif %}
-          <span class="mdc-top-app-bar__title">
-            {% block page-title %}{{ app.title|default:site.title|default:"Django Material" }}{% endblock %}
-          </span>
-        </section>
-        <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end">
-        {% block page-toolbar-actions %}
-        {% if not user.is_authenticated %}
-          {% url 'login' as login_url %}{% if login_url %}
-          <a class="mdc-button" href="{{ login_url }}?next={{ request.path }}" style="color:white">{% trans "Login" %}</a>
-          {% endif %}
-        {% endif %}
+            </div>
+          </header>
+        {% endblock page-menu-header %}
+        {% block page-menu-content %}
+          <nav class="mdc-drawer__content">
+            <div class="mdc-list">
+              {% block page-menu-primary %}
+                <div class="vf-page__menu-primary">
+                  {% block page-menu-app %}
+                    {% if app and app.menu_template_name %}{% include app.menu_template_name %}{% endif %}
+                    {% if site and site.menu_template_name %}{% include site.menu_template_name %}{% endif %}
+                  {% endblock %}
+                </div>
+              {% endblock page-menu-primary %}
+              {% block page-menu-secondary %}
+                <div class="vf-page__menu-secondary">
+                  {% block page-menu-user %}
+                    <vf-page-menu-navigation class="mdc-list">
+                      {% block page-menu-user-actions %}
+                        {% url 'profile' as profile_url %}
+                        {% if profile_url %}
+                          <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ profile_url }}"  {% if viewset.turbo_disabled %} data-turbo="false"{% endif %}>
+                            <span class="mdc-list-item__start"><i class="material-icons">account_box</i></span>
+                            <span class="mdc-list-item__content">{% trans 'Profile' %}</span>
+                          </a>
+                        {% endif %}
+                        {% url 'logout' as logout_url %}
+                        {% if logout_url %}
+                          <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ logout_url }}" {% if viewset.turbo_disabled %} data-turbo="false"{% endif %}>
+                            <span class="mdc-list-item__start"><i class="material-icons">exit_to_app</i></span>
+                            <span class="mdc-list-item__content">{% trans 'Log out' %}</span>
+                          </a>
+                        {% endif %}
+                      {% endblock %}
+                    </vf-page-menu-navigation>
+                  {% endblock page-menu-user %}
+                </div>
+              {% endblock page-menu-secondary %}
+            </div>
+          </nav>
+        {% endblock page-menu-content %}
+      </aside>
+    {% endif %}{% endblock page-menu %}
+    {% block page-body %}
+      <div class="vf-page__body mdc-drawer-app-content">
+        {% block page-toolbar %}
+          <header class="mdc-top-app-bar vf-page__body-toolbar">
+            <div class="mdc-top-app-bar__row">
+              <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-start">
+                {% if site and user.is_authenticated %}
+                  <button class="material-icons mdc-top-app-bar__navigation-icon mdc-icon-button vf-page__menu-toggle" aria-label="Open navigation menu" data-turbo="false">menu</button>
+                {% endif %}
+                <span class="mdc-top-app-bar__title">
+                  {% block page-title %}{{ app.title|default:site.title|default:"Django Material" }}{% endblock %}
+                </span>
+              </section>
+              <section class="mdc-top-app-bar__section mdc-top-app-bar__section--align-end">
+                {% block page-toolbar-actions %}
+                  {% if not user.is_authenticated %}
+                    {% url 'login' as login_url %}{% if login_url %}
+                      <a class="mdc-button" href="{{ login_url }}?next={{ request.path }}" style="color:white">{% trans "Login" %}</a>
+                    {% endif %}
+                  {% endif %}
+                {% endblock %}
+              </section>
+            </div>
+          </header>
         {% endblock %}
-        </section>
-      </div>
-    </header>
-    {% endblock %}
-    {% block page-content %}
-    <main class="vf-page__content">
-      {% block content %}
-      <div class="mdc-list-item" style="height:auto; color: red; background:white; padding: 20px; margin: 20px; width: 100%">
-        <small>To place content here override {% templatetag  openblock %} block content {% templatetag  closeblock %} in your template</small>
-        </div>
+        {% block page-content %}
+          <main class="vf-page__content">
+            {% block content %}
+              <div class="mdc-list-item" style="height:auto; color: red; background:white; padding: 20px; margin: 20px; width: 100%">
+                <small>To place content here override {% templatetag  openblock %} block content {% templatetag  closeblock %} in your template</small>
+              </div>
 
-      {% endblock %}
-    </main>
-    {% endblock %}
-  </div>
-  {% endblock page-body %}
-</vf-page>
+            {% endblock %}
+          </main>
+        {% endblock %}
+      </div>
+    {% endblock page-body %}
+  </vf-page>
 {% endblock %}

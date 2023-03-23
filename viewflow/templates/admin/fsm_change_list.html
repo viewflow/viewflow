@@ -6,9 +6,9 @@
   {% if not is_popup and has_add_permission and has_change_permission %}
     {% url opts|admin_urlname:'recoverlist' as recover_url %}
     {% if recover_url %}
-    <li>
-      <a href="{{ recover_url }}" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a>
-    </li>
+      <li>
+        <a href="{{ recover_url }}" class="recoverlink">{% blocktrans with cl.opts.verbose_name_plural|escape as name %}Recover deleted {{name}}{% endblocktrans %}</a>
+      </li>
     {% endif %}
   {% endif %}
 
@@ -32,5 +32,5 @@
       {% for spec in cl.filter_specs %}{% admin_list_filter cl spec %}{% endfor %}
     {% endif %}
   </div>
-  {% endblock %}
+{% endblock %}
 

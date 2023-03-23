@@ -3,70 +3,70 @@
 
 
 {% block content %}
-<div class="mdc-layout-grid vf-page__grid">
-  <div class="mdc-layout-grid__inner">
-    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone">
-      <div class="mdc-card vf-card">
-        <section class="vf-card__header">
-          <h1 class="vf-card__title">
+  <div class="mdc-layout-grid vf-page__grid">
+    <div class="mdc-layout-grid__inner">
+      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone">
+        <div class="mdc-card vf-card">
+          <section class="vf-card__header">
+            <h1 class="vf-card__title">
               {{ process.brief }}
-          </h1>
-          <h2 class="vf-card__breadcrumbs">
+            </h1>
+            <h2 class="vf-card__breadcrumbs">
               <a href="{% reverse viewset 'index' %}">{{ view.flow_class.process_title }}</a>
               <a>#{{ process.pk }}</a>
-          </h2>
-        </section>
-        <div class="mdc-data-table">
-          <table class="mdc-data-table__table" style="width:100%">
-            <thead>
-              <tr class="mdc-data-table__header-row">
-                <th class="mdc-data-table__header-cell">{% trans '#' %}</th>
-                <th class="mdc-data-table__header-cell">{% trans 'Description' %}</th>
-                <th class="mdc-data-table__header-cell">{% trans 'Owner' %}</th>
-                <th class="mdc-data-table__header-cell">{% trans 'Started' %}</th>
-                <th class="mdc-data-table__header-cell">{% trans 'Finished' %}</th>
-                <th class="mdc-data-table__header-cell">{% trans 'Status' %}</th>
-              </tr>
-            </thead>
-            <tbody class="mdc-data-table__content">
-              {% for task in task_list %}
-              <tr class="mdc-data-table__row">
-                {% if task.flow_task|has_perm:request.user %}
-                  {% reverse task.flow_task 'index' process.pk task.pk as task_url %}
-                  <td class="mdc-data-table__cell">
-                    <a href="{{ task_url }}">{{ task.process.id }}/{{ task.id }}</a>
-                  </td>
-                  <td class="mdc-data-table__cell">
-                    <a href="{{ task_url }}">{{ task.brief|default:task.flow_task }}</a>
-                  </td>
-                {% else %}
-                  <td>{{ task.process.id }}/{{ task.id }}</td>
-                  <td>{{ task.brief|default:task.flow_task }}</td>
-                {% endif%}
-                 <td class="mdc-data-table__cell">{{ task.owner|default:"" }}</td>
-                 <td class="mdc-data-table__cell">{{ task.created }}</td>
-                 <td class="mdc-data-table__cell">{{ task.finished|default:"" }}</td>
-                 <td class="mdc-data-table__cell">{{ task.get_status_display }}</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
-        </div>
-        <div class="mdc-card__actions vf-card__actions">
-          {% if process.status == 'NEW' %}
-          <a href="{% reverse viewset 'process_cancel' process.pk %}" class="mdc-button mdc-button--raised mdc-card__action mdc-card__action--button">
-            <div class="mdc-button__ripple"></div>
-            <span class="mdc-button__label">{% trans "Cancel" %}</span> <!- todo perms -->
-          </a>
-          {% endif %}
+            </h2>
+          </section>
+          <div class="mdc-data-table">
+            <table class="mdc-data-table__table" style="width:100%">
+              <thead>
+                <tr class="mdc-data-table__header-row">
+                  <th class="mdc-data-table__header-cell">{% trans '#' %}</th>
+                  <th class="mdc-data-table__header-cell">{% trans 'Description' %}</th>
+                  <th class="mdc-data-table__header-cell">{% trans 'Owner' %}</th>
+                  <th class="mdc-data-table__header-cell">{% trans 'Started' %}</th>
+                  <th class="mdc-data-table__header-cell">{% trans 'Finished' %}</th>
+                  <th class="mdc-data-table__header-cell">{% trans 'Status' %}</th>
+                </tr>
+              </thead>
+              <tbody class="mdc-data-table__content">
+                {% for task in task_list %}
+                  <tr class="mdc-data-table__row">
+                    {% if task.flow_task|has_perm:request.user %}
+                      {% reverse task.flow_task 'index' process.pk task.pk as task_url %}
+                      <td class="mdc-data-table__cell">
+                        <a href="{{ task_url }}">{{ task.process.id }}/{{ task.id }}</a>
+                      </td>
+                      <td class="mdc-data-table__cell">
+                        <a href="{{ task_url }}">{{ task.brief|default:task.flow_task }}</a>
+                      </td>
+                    {% else %}
+                      <td>{{ task.process.id }}/{{ task.id }}</td>
+                      <td>{{ task.brief|default:task.flow_task }}</td>
+                    {% endif%}
+                    <td class="mdc-data-table__cell">{{ task.owner|default:"" }}</td>
+                    <td class="mdc-data-table__cell">{{ task.created }}</td>
+                    <td class="mdc-data-table__cell">{{ task.finished|default:"" }}</td>
+                    <td class="mdc-data-table__cell">{{ task.get_status_display }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          <div class="mdc-card__actions vf-card__actions">
+            {% if process.status == 'NEW' %}
+              <a href="{% reverse viewset 'process_cancel' process.pk %}" class="mdc-button mdc-button--raised mdc-card__action mdc-card__action--button">
+                <div class="mdc-button__ripple"></div>
+                <span class="mdc-button__label">{% trans "Cancel" %}</span> <!- todo perms -->
+              </a>
+            {% endif %}
+          </div>
         </div>
       </div>
+      {% block panel-cell %}
+        <div class="mdc-layout-grid__cell {% block panel-cell-span %}mdc-layout-grid__cell--span-4-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone{% endblock %}">
+          {% include_process_data process %}
+        </div>
+      {% endblock panel-cell %}
     </div>
-    {% block panel-cell %}
-    <div class="mdc-layout-grid__cell {% block panel-cell-span %}mdc-layout-grid__cell--span-4-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone{% endblock %}">
-      {% include_process_data process %}
-    </div>
-    {% endblock panel-cell %}
   </div>
-</div>
 {% endblock content %}

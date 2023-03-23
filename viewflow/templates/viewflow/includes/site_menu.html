@@ -9,21 +9,21 @@
       {% endif %}
     </h3>
     {% block back_link %}{% if site.parent %}{% reverse site.parent 'index' as parent_index %}{% if parent_index %}
-    <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ parent_index }}">
-      <i class="material-icons mdc-list-item__start">arrow_back</i>
-      <span class="mdc-list-item__content">{% trans 'Back' %}</span>
-    </a>
+      <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ parent_index }}">
+        <i class="material-icons mdc-list-item__start">arrow_back</i>
+        <span class="mdc-list-item__content">{% trans 'Back' %}</span>
+      </a>
     {% endif %}{% endif %}{% endblock %}
     {% block app_links %}{% for app in site.menu_items %}{% if app|has_perm:request.user %}
-    {% reverse app 'index' as index_url %}
-    <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ index_url }}"{% if app.turbo_disabled or viewset.turbo_disabled %} data-turbo="false"{% endif %}>
-      <span class="mdc-list-item__start">{{ app.icon }}</span>
-      <span class="mdc-list-item__content">{% trans app.title %}</span>
-    </a>
+      {% reverse app 'index' as index_url %}
+      <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ index_url }}"{% if app.turbo_disabled or viewset.turbo_disabled %} data-turbo="false"{% endif %}>
+        <span class="mdc-list-item__start">{{ app.icon }}</span>
+        <span class="mdc-list-item__content">{% trans app.title %}</span>
+      </a>
     {% endif %}{% empty %}
-    <div class="mdc-list-item" style="height:auto; color: red">
-    <small>No applications found.</small>
-    </div>
+      <div class="mdc-list-item" style="height:auto; color: red">
+        <small>No applications found.</small>
+      </div>
     {% endfor %}{% endblock %}
   </div>
 </vf-page-menu-navigation>

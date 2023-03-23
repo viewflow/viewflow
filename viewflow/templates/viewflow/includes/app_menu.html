@@ -3,26 +3,26 @@
   <div class="mdc-list-group">
     {% if app.title %}<h3 class="vf-page__menu-subheader mdc-list-group__subheader">{{ app.title }}</h3>{% endif %}
     {% block viewset_links %}
-    {% if app.parent and app.parent != site %}
-      {% reverse app.parent 'index' as parent_index %}{% if parent_index %}
-      <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ parent_index }}">
-        <span class="mdc-list-item__start"><i class="material-icons">arrow_back</i></span>
-        <span class="mdc-list-item__content">{% trans 'Back' %}</span>
-      </a>
+      {% if app.parent and app.parent != site %}
+        {% reverse app.parent 'index' as parent_index %}{% if parent_index %}
+          <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ parent_index }}">
+            <span class="mdc-list-item__start"><i class="material-icons">arrow_back</i></span>
+            <span class="mdc-list-item__content">{% trans 'Back' %}</span>
+          </a>
+        {% endif %}
       {% endif %}
-    {% endif %}
-    {% for viewset in app.menu_items %}{% if viewset|has_perm:request.user %}
-    {% reverse viewset 'index' as index_url %}{% if index_url %}
-    <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ index_url }}" {% if app.turbo_disabled or viewset.turbo_disabled %} data-turbo="false"{% endif %}>
-      <span class="mdc-list-item__start">{% if viewset.icon %}{{ viewset.icon }}{% else %}<i class="material-icons">view_carousel</i>{% endif %}</span>
-      <span class="mdc-list-item__content">{% trans viewset.title %}</span>
-    </a>
-    {% endif %}
-    {% endif %}{% empty %}{% block viewset_links_notfound %}
-    <div class="mdc-list-item" style="height:auto; color: red">
-    <small>No viewsets found. Please point `.menu_template_name` attribute of the Application class to custom menu template, or set `menu_template_name=None`</small>
-    </div>
-    {% endblock viewset_links_notfound %}{% endfor %}{% endblock %}
+      {% for viewset in app.menu_items %}{% if viewset|has_perm:request.user %}
+        {% reverse viewset 'index' as index_url %}{% if index_url %}
+          <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ index_url }}" {% if app.turbo_disabled or viewset.turbo_disabled %} data-turbo="false"{% endif %}>
+            <span class="mdc-list-item__start">{% if viewset.icon %}{{ viewset.icon }}{% else %}<i class="material-icons">view_carousel</i>{% endif %}</span>
+            <span class="mdc-list-item__content">{% trans viewset.title %}</span>
+          </a>
+        {% endif %}
+      {% endif %}{% empty %}{% block viewset_links_notfound %}
+        <div class="mdc-list-item" style="height:auto; color: red">
+          <small>No viewsets found. Please point `.menu_template_name` attribute of the Application class to custom menu template, or set `menu_template_name=None`</small>
+        </div>
+      {% endblock viewset_links_notfound %}{% endfor %}{% endblock %}
     {% block additional_links %}{% endblock %}
   </div>
   <div class="mdc-list-divider"></div>

@@ -1,31 +1,31 @@
 {% extends 'viewflow/base_page.html' %}{% load static %}
 
 {% block js %}
-{{ block.super }}
-{% for url in dash_scripts_urls %}
-<script src="{% static  url %}"></script>
-{% endfor %}
+  {{ block.super }}
+  {% for url in dash_scripts_urls %}
+    <script src="{% static  url %}"></script>
+  {% endfor %}
 {% endblock js %}
 
 {% block content %}
-<div class="mdc-layout-grid vf-page__grid mdc-drawer-app-content">
-  <div class="mdc-layout-grid__inner vf-page__grid-inner">
-    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-      <div class="mdc-card vf-card mdc-typography">
-        <section class="vf-card__header">
-          <h1 class="vf-card__title">{{ viewset.title }}</h1>
-        </section>
-        <section>
-          {{ dash_config_html|safe }}
-          <div id="react-entry-point">
-            <div class="_dash-loading" style="display: flex; align-items: center;flex-direction: column;">
-              {% include 'viewflow/material/circular_progress.html' %}
+  <div class="mdc-layout-grid vf-page__grid mdc-drawer-app-content">
+    <div class="mdc-layout-grid__inner vf-page__grid-inner">
+      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+        <div class="mdc-card vf-card mdc-typography">
+          <section class="vf-card__header">
+            <h1 class="vf-card__title">{{ viewset.title }}</h1>
+          </section>
+          <section>
+            {{ dash_config_html|safe }}
+            <div id="react-entry-point">
+              <div class="_dash-loading" style="display: flex; align-items: center;flex-direction: column;">
+                {% include 'viewflow/material/circular_progress.html' %}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
     </div>
   </div>
-</div>
-<vf-dash-unmount></vf-dash-unmount>
+  <vf-dash-unmount></vf-dash-unmount>
 {% endblock %}

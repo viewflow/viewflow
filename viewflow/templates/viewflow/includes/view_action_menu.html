@@ -1,17 +1,17 @@
 {% with actions=view.get_page_actions %}{% if actions %}
-<vf-card-menu class="mdc-menu-surface--anchor">
-  <button class="mdc-button vf-card__menu-trigger">
-    <i class="material-icons">more_vert</i>
-  </button>
-  <div class="mdc-menu mdc-menu-surface" tabindex="-1">
-    <ul class="mdc-list" role="menu" aria-hidden="true">
-      {% for action in actions %}
-      <li class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon" role="menuitem" tabindex="0" {% if action.url %}data-card-menu-href="{{ action.url }}"{% endif %}>
-        <span class="mdc-list-item__start">{{ action.icon|default:'' }}</span>
-        <span class="mdc-list-item__text mdc-list-item__content">{{ action.name }}</span>
-      </li>
-      {% endfor %}
-    </ul>
-  </div>
-</vf-card-menu>
+  <vf-card-menu class="mdc-menu-surface--anchor">
+    <button class="mdc-button vf-card__menu-trigger">
+      <i class="material-icons">more_vert</i>
+    </button>
+    <div class="mdc-menu mdc-menu-surface" tabindex="-1">
+      <ul class="mdc-list" role="menu" aria-hidden="true">
+        {% for action in actions %}
+          <li class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon" role="menuitem" tabindex="0" {% if action.url %}data-card-menu-href="{{ action.url }}"{% endif %}>
+            <span class="mdc-list-item__start">{{ action.icon|default:'' }}</span>
+            <span class="mdc-list-item__text mdc-list-item__content">{{ action.name }}</span>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </vf-card-menu>
 {% endif %}{% endwith %}

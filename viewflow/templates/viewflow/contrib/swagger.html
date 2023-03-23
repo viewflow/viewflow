@@ -1,26 +1,26 @@
 {% extends 'viewflow/base_page.html' %}{% load static viewflow %}
 
 {% block js %}
-{{ block.super }}
-<link href="{% static 'viewflow/css/contrib/swagger-ui.css' %}" rel="stylesheet">
-<script src="{% static 'viewflow/js/contrib/swagger-ui-bundle.js' %}"></script>
+  {{ block.super }}
+  <link href="{% static 'viewflow/css/contrib/swagger-ui.css' %}" rel="stylesheet">
+  <script src="{% static 'viewflow/js/contrib/swagger-ui-bundle.js' %}"></script>
 {% endblock js %}
 
 
 
 {% block content %}
-<style>
-.swagger-ui .info {
-  margin: 24px 0;
-}
-</style>
-<div class="mdc-layout-grid vf-page__grid mdc-drawer-app-content">
-  <div class="mdc-layout-grid__inner vf-page__grid-inner">
-    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
-      <div class="mdc-card vf-card mdc-typography">
-        <vf-swagger api-url="{{ api_url }}" csrf-token="{{ csrf_token }}" style="width:100%"></vf-swagger>
+  <style>
+    .swagger-ui .info {
+      margin: 24px 0;
+    }
+  </style>
+  <div class="mdc-layout-grid vf-page__grid mdc-drawer-app-content">
+    <div class="mdc-layout-grid__inner vf-page__grid-inner">
+      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+        <div class="mdc-card vf-card mdc-typography">
+          <vf-swagger api-url="{{ api_url }}" csrf-token="{{ csrf_token }}" style="width:100%"></vf-swagger>
+        </div>
       </div>
     </div>
   </div>
-</div>
 {% endblock content %}

@@ -2,16 +2,16 @@
 {% load i18n viewflow workflow %}
 
 {% block content %}
-<div class="mdc-layout-grid vf-page__grid vf-dashboard__grid" style="position:relative;margin-right:5px">
-  <vf-perfect-scroll></vf-perfect-scroll>
-  <div class="mdc-layout-grid__inner vf-page__grid-inner">
-    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12-desktop">
-      <div class="vf-dashboard">
+  <div class="mdc-layout-grid vf-page__grid vf-dashboard__grid" style="position:relative;margin-right:5px">
+    <vf-perfect-scroll></vf-perfect-scroll>
+    <div class="mdc-layout-grid__inner vf-page__grid-inner">
+      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12-desktop">
+        <div class="vf-dashboard">
 
-        <div class="column">
-          <span class="column-title">{{ view.flow_class }}</span>
-          <div class="column-content">
-            <div class="mdc-card" style="padding:20px;margin-top:10px;margin-botton:5px">
+          <div class="column">
+            <span class="column-title">{{ view.flow_class }}</span>
+            <div class="column-content">
+              <div class="mdc-card" style="padding:20px;margin-top:10px;margin-botton:5px">
                 {% if view.flow_class.process_description %}
                   <h6 class="mdc-typography--subtitle2" style="margin:0;font-weight: normal">{{ view.flow_class.process_description }}</h6>
                 {% endif %}
@@ -24,120 +24,120 @@
                 </vf-modal-trigger>
                 {% for node_data in start_nodes %}
                   {% if node_data.can_execute %}
-                  <a class="mdc-button" href="{% reverse node_data.node 'execute' %}" style="align-self: flex-end;">
-                    <div class="mdc-button__ripple"></div>
-                    <span class="mdc-button__label">{{ node_data.node.task_title }}</span>
-                  </a> {# TODO Dropdown menu with other start actions #}
+                    <a class="mdc-button" href="{% reverse node_data.node 'execute' %}" style="align-self: flex-end;">
+                      <div class="mdc-button__ripple"></div>
+                      <span class="mdc-button__label">{{ node_data.node.task_title }}</span>
+                    </a> {# TODO Dropdown menu with other start actions #}
                   {% else %}
-                  <div title="{% trans 'No rights to execute' %}" style="align-self: flex-end;">
-                  <button class="mdc-button" disabled>
-                    <div class="mdc-button__ripple"></div>
-                    <span class="mdc-button__label">{{ node_data.node.task_title }}</span>
-                  </button></div>
+                    <div title="{% trans 'No rights to execute' %}" style="align-self: flex-end;">
+                      <button class="mdc-button" disabled>
+                        <div class="mdc-button__ripple"></div>
+                        <span class="mdc-button__label">{{ node_data.node.task_title }}</span>
+                      </button></div>
                   {% endif %}
                 {% endfor %}
+              </div>
             </div>
           </div>
-        </div>
 
-        {% for column_data in columns %}
-        <div class="column">
-          <span class="column-title">{{ column_data.node.task_title|default:column_data.node }}</span>
-          <div class="column-content">
-            <vf-perfect-scroll></vf-perfect-scroll>
-            {% for task in column_data.tasks %}
-              {% if forloop.last and forloop.counter == view.MAX_ROWS %}
-              <div style="text-align:center"><i class="material-icons">more_horiz</i></div>
-              {% else %}
-                <div class="mdc-card" style="padding:15px;margin-top:10px;margin-botton:5px">
-                  <div style="display: flex;flex-direction: column">
-                    <h2 class="mdc-typography mdc-typography--headline6" style="margin:0">
-                      #{{ task.process_id}}/{{ task.pk }}
-                    </h2>
-                    <h3 class="mdc-typography mdc-typography--subtitle2" style="margin:0;color: rgba(0,0,0,.54);color: var(--mdc-theme-text-secondary-on-background,rgba(0,0,0,.54));">
-                      {{ task.brief }}
-                    </h3>
-                    <div class="vf-dashboard__card-detail">
-                      <label>{% trans 'Created' %}</label>
-                      {{ task.created }}
-                    </div>
-                    {% if task.owner %}
-                    <div class="vf-dashboard__card-detail">
-                      <label>{% trans 'Assigned' %}</label>
-                      {{ task.owner }}
-                    </div>
-                    {% endif %}
+          {% for column_data in columns %}
+            <div class="column">
+              <span class="column-title">{{ column_data.node.task_title|default:column_data.node }}</span>
+              <div class="column-content">
+                <vf-perfect-scroll></vf-perfect-scroll>
+                {% for task in column_data.tasks %}
+                  {% if forloop.last and forloop.counter == view.MAX_ROWS %}
+                    <div style="text-align:center"><i class="material-icons">more_horiz</i></div>
+                  {% else %}
+                    <div class="mdc-card" style="padding:15px;margin-top:10px;margin-botton:5px">
+                      <div style="display: flex;flex-direction: column">
+                        <h2 class="mdc-typography mdc-typography--headline6" style="margin:0">
+                          #{{ task.process_id}}/{{ task.pk }}
+                        </h2>
+                        <h3 class="mdc-typography mdc-typography--subtitle2" style="margin:0;color: rgba(0,0,0,.54);color: var(--mdc-theme-text-secondary-on-background,rgba(0,0,0,.54));">
+                          {{ task.brief }}
+                        </h3>
+                        <div class="vf-dashboard__card-detail">
+                          <label>{% trans 'Created' %}</label>
+                          {{ task.created }}
+                        </div>
+                        {% if task.owner %}
+                          <div class="vf-dashboard__card-detail">
+                            <label>{% trans 'Assigned' %}</label>
+                            {{ task.owner }}
+                          </div>
+                        {% endif %}
 
-                    {%if task|can_execute:request.user %}
-                      <a class="mdc-button" style="align-self: flex-end;" href="{% reverse task.flow_task 'execute' task.process_id task.pk %}">
-                        <div class="mdc-button__ripple"></div>
-                        <span class="mdc-button__label">{% trans 'Execute'%}</span>
-                      </a>
-                    {% elif task|can_assign:request.user %}
-                      <a class="mdc-button" style="align-self: flex-end;" href="{% reverse task.flow_task 'assign' task.process_id task.pk %}">
-                        <div class="mdc-button__ripple"></div>
-                        <span class="mdc-button__label">{% trans 'Assign'%}</span>
-                      </a>
-                    {% elif task|can_view:request.user %}
-                      <a class="mdc-button" style="align-self: flex-end;" href="{% reverse task.flow_task 'detail' task.process_id task.pk %}">
-                        <div class="mdc-button__ripple"></div>
-                        <span class="mdc-button__label">{% trans 'View'%}</span>
-                      </a>
-                    {% endif %}
-                  </div>
+                        {%if task|can_execute:request.user %}
+                          <a class="mdc-button" style="align-self: flex-end;" href="{% reverse task.flow_task 'execute' task.process_id task.pk %}">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">{% trans 'Execute'%}</span>
+                          </a>
+                        {% elif task|can_assign:request.user %}
+                          <a class="mdc-button" style="align-self: flex-end;" href="{% reverse task.flow_task 'assign' task.process_id task.pk %}">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">{% trans 'Assign'%}</span>
+                          </a>
+                        {% elif task|can_view:request.user %}
+                          <a class="mdc-button" style="align-self: flex-end;" href="{% reverse task.flow_task 'detail' task.process_id task.pk %}">
+                            <div class="mdc-button__ripple"></div>
+                            <span class="mdc-button__label">{% trans 'View'%}</span>
+                          </a>
+                        {% endif %}
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+              {% if column_data.tasks|length > 25 %}
+                <div class="column-action">
+                  <a href="{% reverse viewset 'task_list' %}?flow_task={{ column_data.node_ref|urlencode }}" style="color:#0c0c0c;text-decoration:none;font-family:Roboto">{% trans 'Show all' %}</a>
                 </div>
               {% endif %}
-            {% endfor %}
-          </div>
-          {% if column_data.tasks|length > 25 %}
-          <div class="column-action">
-            <a href="{% reverse viewset 'task_list' %}?flow_task={{ column_data.node_ref|urlencode }}" style="color:#0c0c0c;text-decoration:none;font-family:Roboto">{% trans 'Show all' %}</a>
-          </div>
+            </div>
+          {% endfor %}
+
+          {% if end_nodes %}
+            <div class="column">
+              <span class="column-title">{% trans 'Finished' %}</span>
+              <div class="column-content">
+                <vf-perfect-scroll></vf-perfect-scroll>
+                {% for task in finished %}
+                  {% if forloop.last and forloop.counter == view.MAX_ROWS %}
+                    <div style="text-align:center"><i class="material-icons">more_horiz</i></div>
+                  {% else %}
+                    <div class="mdc-card" style="padding:15px;margin-top:10px;margin-botton:5px">
+                      <div style="display: flex;flex-direction: column">
+                        <h2 class="mdc-typography mdc-typography--headline6" style="margin:0">
+                          #{{ task.process_id}}/{{ task.pk }}
+                        </h2>
+                        <h3 class="mdc-typography mdc-typography--subtitle2" style="margin:0;color: rgba(0,0,0,.54);color: var(--mdc-theme-text-secondary-on-background,rgba(0,0,0,.54));">
+                          {{ task.brief }}
+                        </h3>
+                        <div class="vf-dashboard__card-detail">
+                          <label>{% trans 'Created' %}</label>
+                          {{ task.created }}
+                        </div>
+                        <a class="mdc-button" style="align-self: flex-end;" href="{% reverse task.process.flow_class 'process_detail' task.process_id  %}">
+                          <div class="mdc-button__ripple"></div>
+                          <span class="mdc-button__label">{% trans 'View'%}</span>
+                        </a>
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endfor %}
+              </div>
+            </div>
           {% endif %}
         </div>
-        {% endfor %}
-
-        {% if end_nodes %}
-        <div class="column">
-          <span class="column-title">{% trans 'Finished' %}</span>
-          <div class="column-content">
-            <vf-perfect-scroll></vf-perfect-scroll>
-            {% for task in finished %}
-              {% if forloop.last and forloop.counter == view.MAX_ROWS %}
-              <div style="text-align:center"><i class="material-icons">more_horiz</i></div>
-              {% else %}
-                <div class="mdc-card" style="padding:15px;margin-top:10px;margin-botton:5px">
-                  <div style="display: flex;flex-direction: column">
-                    <h2 class="mdc-typography mdc-typography--headline6" style="margin:0">
-                      #{{ task.process_id}}/{{ task.pk }}
-                    </h2>
-                    <h3 class="mdc-typography mdc-typography--subtitle2" style="margin:0;color: rgba(0,0,0,.54);color: var(--mdc-theme-text-secondary-on-background,rgba(0,0,0,.54));">
-                      {{ task.brief }}
-                    </h3>
-                    <div class="vf-dashboard__card-detail">
-                      <label>{% trans 'Created' %}</label>
-                      {{ task.created }}
-                    </div>
-                    <a class="mdc-button" style="align-self: flex-end;" href="{% reverse task.process.flow_class 'process_detail' task.process_id  %}">
-                      <div class="mdc-button__ripple"></div>
-                      <span class="mdc-button__label">{% trans 'View'%}</span>
-                    </a>
-                  </div>
-                </div>
-              {% endif %}
-            {% endfor %}
-          </div>
-        </div>
-        {% endif %}
       </div>
     </div>
   </div>
-</div>
 
-<div style="position: fixed;right: 23px;bottom: 23px;padding-top: 15px;margin-bottom: 0;z-index: 997;">
-  <a href="{% reverse request.resolver_match.flow_viewset 'process_list' %}?status=NEW" style="color:white" class="mdc-fab" aria-label="{% trans 'Process list' %}">
-    <div class="mdc-fab__ripple"></div>
-    <span class="mdc-fab__icon material-icons">list</span>
-  </a>
-</div>
+  <div style="position: fixed;right: 23px;bottom: 23px;padding-top: 15px;margin-bottom: 0;z-index: 997;">
+    <a href="{% reverse request.resolver_match.flow_viewset 'process_list' %}?status=NEW" style="color:white" class="mdc-fab" aria-label="{% trans 'Process list' %}">
+      <div class="mdc-fab__ripple"></div>
+      <span class="mdc-fab__icon material-icons">list</span>
+    </a>
+  </div>
 {% endblock %}

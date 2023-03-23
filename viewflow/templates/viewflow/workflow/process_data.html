@@ -20,14 +20,14 @@
           </td>
         </tr>
         {% for field, field_name, value in process_data %}
-        {% if field.name != 'data' and field.name != 'flow_class' and field.name != 'artifact_object_id' and field.name != 'artifact_content_type'%}
-        <tr>
-          <th class="vf-list__table-header vf-list__table-header-text">{{ field_name }}</th>
-          <td>{{ value }}</td>
-        </tr>
-        {% endif %}
+          {% if field.name != 'data' and field.name != 'flow_class' and field.name != 'artifact_object_id' and field.name != 'artifact_content_type'%}
+            <tr>
+              <th class="vf-list__table-header vf-list__table-header-text">{{ field_name }}</th>
+              <td>{{ value }}</td>
+            </tr>
+          {% endif %}
         {% endfor %}
       </tbody>
     </table>
-</section>
+  </section>
 </div>

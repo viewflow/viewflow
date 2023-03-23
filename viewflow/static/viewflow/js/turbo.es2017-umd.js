@@ -1,6 +1,6 @@
 /*
-Turbo 7.2.2
-Copyright © 2022 37signals LLC
+Turbo 7.3.0
+Copyright © 2023 37signals LLC
  */
 (function (global, factory) {
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
@@ -93,15 +93,12 @@ Copyright © 2022 37signals LLC
     (function () {
         if ("submitter" in Event.prototype)
             return;
-        let prototype;
+        let prototype = window.Event.prototype;
         if ("SubmitEvent" in window && /Apple Computer/.test(navigator.vendor)) {
             prototype = window.SubmitEvent.prototype;
         }
         else if ("SubmitEvent" in window) {
             return;
-        }
-        else {
-            prototype = window.Event.prototype;
         }
         addEventListener("click", clickCaptured, true);
         Object.defineProperty(prototype, "submitter", {
@@ -119,13 +116,13 @@ Copyright © 2022 37signals LLC
         FrameLoadingStyle["lazy"] = "lazy";
     })(exports.FrameLoadingStyle || (exports.FrameLoadingStyle = {}));
     class FrameElement extends HTMLElement {
+        static get observedAttributes() {
+            return ["disabled", "complete", "loading", "src"];
+        }
         constructor() {
             super();
             this.loaded = Promise.resolve();
             this.delegate = new FrameElement.delegateConstructor(this);
-        }
-        static get observedAttributes() {
-            return ["disabled", "complete", "loading", "src"];
         }
         connectedCallback() {
             this.delegate.connect();
@@ -313,10 +310,6 @@ Copyright © 2022 37signals LLC
         }
     }
 
-    function isAction(action) {
-        return action == "advance" || action == "replace" || action == "restore";
-    }
-
     function activateScriptElement(element) {
         if (element.getAttribute("data-turbo-eval") == "false") {
             return element;
@@ -347,6 +340,7 @@ Copyright © 2022 37signals LLC
         const event = new CustomEvent(eventName, {
             cancelable,
             bubbles: true,
+            composed: true,
             detail,
         });
         if (target && target.isConnected) {
@@ -446,6 +440,9 @@ Copyright © 2022 37signals LLC
                 return history.pushState;
         }
     }
+    function isAction(action) {
+        return action == "advance" || action == "replace" || action == "restore";
+    }
     function getVisitAction(...elements) {
         const action = getAttribute("data-turbo-action", ...elements);
         return isAction(action) ? action : null;
@@ -466,6 +463,13 @@ Copyright © 2022 37signals LLC
         }
         element.setAttribute("content", content);
         return element;
+    }
+    function findClosestRecursively(element, selector) {
+        var _a;
+        if (element instanceof Element) {
+            return (element.closest(selector) ||
+                findClosestRecursively(element.assignedSlot || ((_a = element.getRootNode()) === null || _a === void 0 ? void 0 : _a.host), selector));
+        }
     }
 
     var FetchMethod;
@@ -514,9 +518,8 @@ Copyright © 2022 37signals LLC
             this.abortController.abort();
         }
         async perform() {
-            var _a, _b;
             const { fetchOptions } = this;
-            (_b = (_a = this.delegate).prepareHeadersForRequest) === null || _b === void 0 ? void 0 : _b.call(_a, this.headers, this);
+            this.delegate.prepareRequest(this);
             await this.allowRequestToBeIntercepted(fetchOptions);
             try {
                 this.delegate.requestStarted(this);
@@ -560,7 +563,7 @@ Copyright © 2022 37signals LLC
                 credentials: "same-origin",
                 headers: this.headers,
                 redirect: "follow",
-                body: this.isIdempotent ? null : this.body,
+                body: this.isSafe ? null : this.body,
                 signal: this.abortSignal,
                 referrer: (_a = this.delegate.referrer) === null || _a === void 0 ? void 0 : _a.href,
             };
@@ -570,8 +573,8 @@ Copyright © 2022 37signals LLC
                 Accept: "text/html, application/xhtml+xml",
             };
         }
-        get isIdempotent() {
-            return this.method == FetchMethod.get;
+        get isSafe() {
+            return this.method === FetchMethod.get;
         }
         get abortSignal() {
             return this.abortController.signal;
@@ -631,9 +634,6 @@ Copyright © 2022 37signals LLC
     }
 
     class StreamMessage {
-        constructor(fragment) {
-            this.fragment = importStreamElements(fragment);
-        }
         static wrap(message) {
             if (typeof message == "string") {
                 return new this(createDocumentFragment(message));
@@ -641,6 +641,9 @@ Copyright © 2022 37signals LLC
             else {
                 return message;
             }
+        }
+        constructor(fragment) {
+            this.fragment = importStreamElements(fragment);
         }
     }
     StreamMessage.contentType = "text/vnd.turbo-stream.html";
@@ -681,6 +684,9 @@ Copyright © 2022 37signals LLC
         }
     }
     class FormSubmission {
+        static confirmMethod(message, _element, _submitter) {
+            return Promise.resolve(confirm(message));
+        }
         constructor(delegate, formElement, submitter, mustRedirect = false) {
             this.state = FormSubmissionState.initialized;
             this.delegate = delegate;
@@ -693,9 +699,6 @@ Copyright © 2022 37signals LLC
             }
             this.fetchRequest = new FetchRequest(this, this.method, this.location, this.body, this.formElement);
             this.mustRedirect = mustRedirect;
-        }
-        static confirmMethod(message, _element, _submitter) {
-            return Promise.resolve(confirm(message));
         }
         get method() {
             var _a;
@@ -724,8 +727,8 @@ Copyright © 2022 37signals LLC
             var _a;
             return formEnctypeFromString(((_a = this.submitter) === null || _a === void 0 ? void 0 : _a.getAttribute("formenctype")) || this.formElement.enctype);
         }
-        get isIdempotent() {
-            return this.fetchRequest.isIdempotent;
+        get isSafe() {
+            return this.fetchRequest.isSafe;
         }
         get stringFormData() {
             return [...this.formData].reduce((entries, [name, value]) => {
@@ -754,11 +757,11 @@ Copyright © 2022 37signals LLC
                 return true;
             }
         }
-        prepareHeadersForRequest(headers, request) {
-            if (!request.isIdempotent) {
+        prepareRequest(request) {
+            if (!request.isSafe) {
                 const token = getCookieValue(getMetaContent("csrf-param")) || getMetaContent("csrf-token");
                 if (token) {
-                    headers["X-CSRF-Token"] = token;
+                    request.headers["X-CSRF-Token"] = token;
                 }
             }
             if (this.requestAcceptsTurboStreamResponse(request)) {
@@ -769,6 +772,7 @@ Copyright © 2022 37signals LLC
             var _a;
             this.state = FormSubmissionState.waiting;
             (_a = this.submitter) === null || _a === void 0 ? void 0 : _a.setAttribute("disabled", "");
+            this.setSubmitsWith();
             dispatch("turbo:submit-start", {
                 target: this.formElement,
                 detail: { formSubmission: this },
@@ -804,17 +808,46 @@ Copyright © 2022 37signals LLC
             var _a;
             this.state = FormSubmissionState.stopped;
             (_a = this.submitter) === null || _a === void 0 ? void 0 : _a.removeAttribute("disabled");
+            this.resetSubmitterText();
             dispatch("turbo:submit-end", {
                 target: this.formElement,
                 detail: Object.assign({ formSubmission: this }, this.result),
             });
             this.delegate.formSubmissionFinished(this);
         }
+        setSubmitsWith() {
+            if (!this.submitter || !this.submitsWith)
+                return;
+            if (this.submitter.matches("button")) {
+                this.originalSubmitText = this.submitter.innerHTML;
+                this.submitter.innerHTML = this.submitsWith;
+            }
+            else if (this.submitter.matches("input")) {
+                const input = this.submitter;
+                this.originalSubmitText = input.value;
+                input.value = this.submitsWith;
+            }
+        }
+        resetSubmitterText() {
+            if (!this.submitter || !this.originalSubmitText)
+                return;
+            if (this.submitter.matches("button")) {
+                this.submitter.innerHTML = this.originalSubmitText;
+            }
+            else if (this.submitter.matches("input")) {
+                const input = this.submitter;
+                input.value = this.originalSubmitText;
+            }
+        }
         requestMustRedirect(request) {
-            return !request.isIdempotent && this.mustRedirect;
+            return !request.isSafe && this.mustRedirect;
         }
         requestAcceptsTurboStreamResponse(request) {
-            return !request.isIdempotent || hasAttribute("data-turbo-stream", this.submitter, this.formElement);
+            return !request.isSafe || hasAttribute("data-turbo-stream", this.submitter, this.formElement);
+        }
+        get submitsWith() {
+            var _a;
+            return (_a = this.submitter) === null || _a === void 0 ? void 0 : _a.getAttribute("data-turbo-submits-with");
         }
     }
     function buildFormData(formElement, submitter) {
@@ -946,12 +979,17 @@ Copyright © 2022 37signals LLC
         return method != "dialog";
     }
     function submissionDoesNotTargetIFrame(form, submitter) {
-        const target = (submitter === null || submitter === void 0 ? void 0 : submitter.getAttribute("formtarget")) || form.target;
-        for (const element of document.getElementsByName(target)) {
-            if (element instanceof HTMLIFrameElement)
-                return false;
+        if ((submitter === null || submitter === void 0 ? void 0 : submitter.hasAttribute("formtarget")) || form.hasAttribute("target")) {
+            const target = (submitter === null || submitter === void 0 ? void 0 : submitter.getAttribute("formtarget")) || form.target;
+            for (const element of document.getElementsByName(target)) {
+                if (element instanceof HTMLIFrameElement)
+                    return false;
+            }
+            return true;
         }
-        return true;
+        else {
+            return true;
+        }
     }
 
     class View {
@@ -1049,8 +1087,8 @@ Copyright © 2022 37signals LLC
     }
 
     class FrameView extends View {
-        invalidate() {
-            this.element.innerHTML = "";
+        missing() {
+            this.element.innerHTML = `<strong class="turbo-frame-error">Content missing</strong>`;
         }
         get snapshot() {
             return new Snapshot(this.element);
@@ -1144,20 +1182,23 @@ Copyright © 2022 37signals LLC
                 event.shiftKey);
         }
         findLinkFromClickTarget(target) {
-            if (target instanceof Element) {
-                return target.closest("a[href]:not([target^=_]):not([download])");
-            }
+            return findClosestRecursively(target, "a[href]:not([target^=_]):not([download])");
         }
         getLocationForLink(link) {
             return expandURL(link.getAttribute("href") || "");
         }
     }
     function doesNotTargetIFrame(anchor) {
-        for (const element of document.getElementsByName(anchor.target)) {
-            if (element instanceof HTMLIFrameElement)
-                return false;
+        if (anchor.hasAttribute("target")) {
+            for (const element of document.getElementsByName(anchor.target)) {
+                if (element instanceof HTMLIFrameElement)
+                    return false;
+            }
+            return true;
         }
-        return true;
+        else {
+            return true;
+        }
     }
 
     class FormLinkClickObserver {
@@ -1176,10 +1217,14 @@ Copyright © 2022 37signals LLC
                 link.hasAttribute("data-turbo-method"));
         }
         followedLinkToLocation(link, location) {
-            const action = location.href;
             const form = document.createElement("form");
+            const type = "hidden";
+            for (const [name, value] of location.searchParams) {
+                form.append(Object.assign(document.createElement("input"), { type, name, value }));
+            }
+            const action = Object.assign(location, { search: "" });
             form.setAttribute("data-turbo", "true");
-            form.setAttribute("action", action);
+            form.setAttribute("action", action.href);
             form.setAttribute("hidden", "");
             const method = link.getAttribute("data-turbo-method");
             if (method)
@@ -1187,7 +1232,7 @@ Copyright © 2022 37signals LLC
             const turboFrame = link.getAttribute("data-turbo-frame");
             if (turboFrame)
                 form.setAttribute("data-turbo-frame", turboFrame);
-            const turboAction = link.getAttribute("data-turbo-action");
+            const turboAction = getVisitAction(link);
             if (turboAction)
                 form.setAttribute("data-turbo-action", turboAction);
             const turboConfirm = link.getAttribute("data-turbo-confirm");
@@ -1204,15 +1249,15 @@ Copyright © 2022 37signals LLC
     }
 
     class Bardo {
+        static async preservingPermanentElements(delegate, permanentElementMap, callback) {
+            const bardo = new this(delegate, permanentElementMap);
+            bardo.enter();
+            await callback();
+            bardo.leave();
+        }
         constructor(delegate, permanentElementMap) {
             this.delegate = delegate;
             this.permanentElementMap = permanentElementMap;
-        }
-        static preservingPermanentElements(delegate, permanentElementMap, callback) {
-            const bardo = new this(delegate, permanentElementMap);
-            bardo.enter();
-            callback();
-            bardo.leave();
         }
         enter() {
             for (const id in this.permanentElementMap) {
@@ -1280,8 +1325,8 @@ Copyright © 2022 37signals LLC
                 delete this.resolvingFunctions;
             }
         }
-        preservingPermanentElements(callback) {
-            Bardo.preservingPermanentElements(this, this.permanentElementMap, callback);
+        async preservingPermanentElements(callback) {
+            await Bardo.preservingPermanentElements(this, this.permanentElementMap, callback);
         }
         focusFirstAutofocusableElement() {
             const element = this.connectedSnapshot.firstAutofocusableElement;
@@ -1320,10 +1365,6 @@ Copyright © 2022 37signals LLC
     }
 
     class FrameRenderer extends Renderer {
-        constructor(delegate, currentSnapshot, newSnapshot, renderElement, isPreview, willRender = true) {
-            super(currentSnapshot, newSnapshot, renderElement, isPreview, willRender);
-            this.delegate = delegate;
-        }
         static renderElement(currentElement, newElement) {
             var _a;
             const destinationRange = document.createRange();
@@ -1335,6 +1376,10 @@ Copyright © 2022 37signals LLC
                 sourceRange.selectNodeContents(frameElement);
                 currentElement.appendChild(sourceRange.extractContents());
             }
+        }
+        constructor(delegate, currentSnapshot, newSnapshot, renderElement, isPreview, willRender = true) {
+            super(currentSnapshot, newSnapshot, renderElement, isPreview, willRender);
+            this.delegate = delegate;
         }
         get shouldRender() {
             return true;
@@ -1394,18 +1439,6 @@ Copyright © 2022 37signals LLC
     }
 
     class ProgressBar {
-        constructor() {
-            this.hiding = false;
-            this.value = 0;
-            this.visible = false;
-            this.trickle = () => {
-                this.setValue(this.value + Math.random() / 100);
-            };
-            this.stylesheetElement = this.createStylesheetElement();
-            this.progressElement = this.createProgressElement();
-            this.installStylesheetElement();
-            this.setValue(0);
-        }
         static get defaultCSS() {
             return unindent `
       .turbo-progress-bar {
@@ -1422,6 +1455,18 @@ Copyright © 2022 37signals LLC
         transform: translate3d(0, 0, 0);
       }
     `;
+        }
+        constructor() {
+            this.hiding = false;
+            this.value = 0;
+            this.visible = false;
+            this.trickle = () => {
+                this.setValue(this.value + Math.random() / 100);
+            };
+            this.stylesheetElement = this.createStylesheetElement();
+            this.progressElement = this.createProgressElement();
+            this.installStylesheetElement();
+            this.setValue(0);
         }
         show() {
             if (!this.visible) {
@@ -1593,10 +1638,6 @@ Copyright © 2022 37signals LLC
     }
 
     class PageSnapshot extends Snapshot {
-        constructor(element, headSnapshot) {
-            super(element);
-            this.headSnapshot = headSnapshot;
-        }
         static fromHTMLString(html = "") {
             return this.fromDocument(parseHTMLDocument(html));
         }
@@ -1605,6 +1646,10 @@ Copyright © 2022 37signals LLC
         }
         static fromDocument({ head, body }) {
             return new this(body, new HeadSnapshot(head));
+        }
+        constructor(element, headSnapshot) {
+            super(element);
+            this.headSnapshot = headSnapshot;
         }
         clone() {
             const clonedElement = this.element.cloneNode(true);
@@ -1866,6 +1911,8 @@ Copyright © 2022 37signals LLC
                 this.adapter.visitProposedToLocation(this.redirectedToLocation, {
                     action: "replace",
                     response: this.response,
+                    shouldCacheSnapshot: false,
+                    willRender: false,
                 });
                 this.followedRedirect = true;
             }
@@ -1875,11 +1922,12 @@ Copyright © 2022 37signals LLC
                 this.render(async () => {
                     this.cacheSnapshot();
                     this.performScroll();
+                    this.changeHistory();
                     this.adapter.visitRendered(this);
                 });
             }
         }
-        prepareHeadersForRequest(headers, request) {
+        prepareRequest(request) {
             if (this.acceptsStreamResponse) {
                 request.acceptResponseType(StreamMessage.contentType);
             }
@@ -2102,10 +2150,11 @@ Copyright © 2022 37signals LLC
 
     class CacheObserver {
         constructor() {
+            this.selector = "[data-turbo-temporary]";
+            this.deprecatedSelector = "[data-turbo-cache=false]";
             this.started = false;
-            this.removeStaleElements = ((_event) => {
-                const staleElements = [...document.querySelectorAll('[data-turbo-cache="false"]')];
-                for (const element of staleElements) {
+            this.removeTemporaryElements = ((_event) => {
+                for (const element of this.temporaryElements) {
                     element.remove();
                 }
             });
@@ -2113,14 +2162,24 @@ Copyright © 2022 37signals LLC
         start() {
             if (!this.started) {
                 this.started = true;
-                addEventListener("turbo:before-cache", this.removeStaleElements, false);
+                addEventListener("turbo:before-cache", this.removeTemporaryElements, false);
             }
         }
         stop() {
             if (this.started) {
                 this.started = false;
-                removeEventListener("turbo:before-cache", this.removeStaleElements, false);
+                removeEventListener("turbo:before-cache", this.removeTemporaryElements, false);
             }
+        }
+        get temporaryElements() {
+            return [...document.querySelectorAll(this.selector), ...this.temporaryElementsWithDeprecation];
+        }
+        get temporaryElementsWithDeprecation() {
+            const elements = document.querySelectorAll(this.deprecatedSelector);
+            if (elements.length) {
+                console.warn(`The ${this.deprecatedSelector} selector is deprecated and will be removed in a future version. Use ${this.selector} instead.`);
+            }
+            return [...elements];
         }
     }
 
@@ -2283,7 +2342,6 @@ Copyright © 2022 37signals LLC
             }
         }
         startVisit(locatable, restorationIdentifier, options = {}) {
-            this.lastVisit = this.currentVisit;
             this.stop();
             this.currentVisit = new Visit(this, expandURL(locatable), restorationIdentifier, Object.assign({ referrer: this.location }, options));
             this.currentVisit.start();
@@ -2321,7 +2379,7 @@ Copyright © 2022 37signals LLC
             if (formSubmission == this.formSubmission) {
                 const responseHTML = await fetchResponse.responseHTML;
                 if (responseHTML) {
-                    const shouldCacheSnapshot = formSubmission.method == FetchMethod.get;
+                    const shouldCacheSnapshot = formSubmission.isSafe;
                     if (!shouldCacheSnapshot) {
                         this.view.clearSnapshotCache();
                     }
@@ -2365,13 +2423,11 @@ Copyright © 2022 37signals LLC
             this.delegate.visitCompleted(visit);
         }
         locationWithActionIsSamePage(location, action) {
-            var _a;
             const anchor = getAnchor(location);
-            const lastLocation = ((_a = this.lastVisit) === null || _a === void 0 ? void 0 : _a.location) || this.view.lastRenderedLocation;
-            const currentAnchor = getAnchor(lastLocation);
+            const currentAnchor = getAnchor(this.view.lastRenderedLocation);
             const isRestorationToTop = action === "restore" && typeof anchor === "undefined";
             return (action !== "replace" &&
-                getRequestURL(location) === getRequestURL(lastLocation) &&
+                getRequestURL(location) === getRequestURL(this.view.lastRenderedLocation) &&
                 (isRestorationToTop || (anchor != null && anchor !== currentAnchor)));
         }
         visitScrolledToSamePageLocation(oldURL, newURL) {
@@ -2383,10 +2439,8 @@ Copyright © 2022 37signals LLC
         get restorationIdentifier() {
             return this.history.restorationIdentifier;
         }
-        getActionForFormSubmission(formSubmission) {
-            const { formElement, submitter } = formSubmission;
-            const action = getAttribute("data-turbo-action", submitter, formElement);
-            return isAction(action) ? action : "advance";
+        getActionForFormSubmission({ submitter, formElement }) {
+            return getVisitAction(submitter, formElement) || "advance";
         }
     }
 
@@ -2628,7 +2682,7 @@ Copyright © 2022 37signals LLC
         }
         async render() {
             if (this.willRender) {
-                this.replaceBody();
+                await this.replaceBody();
             }
         }
         finishRendering() {
@@ -2647,16 +2701,16 @@ Copyright © 2022 37signals LLC
             return this.newSnapshot.element;
         }
         async mergeHead() {
+            const mergedHeadElements = this.mergeProvisionalElements();
             const newStylesheetElements = this.copyNewHeadStylesheetElements();
             this.copyNewHeadScriptElements();
-            this.removeCurrentHeadProvisionalElements();
-            this.copyNewHeadProvisionalElements();
+            await mergedHeadElements;
             await newStylesheetElements;
         }
-        replaceBody() {
-            this.preservingPermanentElements(() => {
+        async replaceBody() {
+            await this.preservingPermanentElements(async () => {
                 this.activateNewBody();
-                this.assignNewBody();
+                await this.assignNewBody();
             });
         }
         get trackedElementsAreIdentical() {
@@ -2674,6 +2728,35 @@ Copyright © 2022 37signals LLC
             for (const element of this.newHeadScriptElements) {
                 document.head.appendChild(activateScriptElement(element));
             }
+        }
+        async mergeProvisionalElements() {
+            const newHeadElements = [...this.newHeadProvisionalElements];
+            for (const element of this.currentHeadProvisionalElements) {
+                if (!this.isCurrentElementInElementList(element, newHeadElements)) {
+                    document.head.removeChild(element);
+                }
+            }
+            for (const element of newHeadElements) {
+                document.head.appendChild(element);
+            }
+        }
+        isCurrentElementInElementList(element, elementList) {
+            for (const [index, newElement] of elementList.entries()) {
+                if (element.tagName == "TITLE") {
+                    if (newElement.tagName != "TITLE") {
+                        continue;
+                    }
+                    if (element.innerHTML == newElement.innerHTML) {
+                        elementList.splice(index, 1);
+                        return true;
+                    }
+                }
+                if (newElement.isEqualNode(element)) {
+                    elementList.splice(index, 1);
+                    return true;
+                }
+            }
+            return false;
         }
         removeCurrentHeadProvisionalElements() {
             for (const element of this.currentHeadProvisionalElements) {
@@ -2695,8 +2778,8 @@ Copyright © 2022 37signals LLC
                 inertScriptElement.replaceWith(activatedScriptElement);
             }
         }
-        assignNewBody() {
-            this.renderElement(this.currentElement, this.newElement);
+        async assignNewBody() {
+            await this.renderElement(this.currentElement, this.newElement);
         }
         get newHeadStylesheetElements() {
             return this.newHeadSnapshot.getStylesheetElementsNotInSnapshot(this.currentHeadSnapshot);
@@ -3113,8 +3196,8 @@ Copyright © 2022 37signals LLC
             }
         }
         elementIsNavigatable(element) {
-            const container = element.closest("[data-turbo]");
-            const withinFrame = element.closest("turbo-frame");
+            const container = findClosestRecursively(element, "[data-turbo]");
+            const withinFrame = findClosestRecursively(element, "turbo-frame");
             if (this.drive || withinFrame) {
                 if (container) {
                     return container.getAttribute("data-turbo") != "false";
@@ -3133,8 +3216,7 @@ Copyright © 2022 37signals LLC
             }
         }
         getActionForLink(link) {
-            const action = link.getAttribute("data-turbo-action");
-            return isAction(action) ? action : "advance";
+            return getVisitAction(link) || "advance";
         }
         get snapshot() {
             return this.view.snapshot;
@@ -3194,7 +3276,10 @@ Copyright © 2022 37signals LLC
             this.targetElements.forEach((e) => e.replaceWith(this.templateContent));
         },
         update() {
-            this.targetElements.forEach((e) => e.replaceChildren(this.templateContent));
+            this.targetElements.forEach((targetElement) => {
+                targetElement.innerHTML = "";
+                targetElement.append(this.templateContent);
+            });
         },
     };
 
@@ -3253,6 +3338,9 @@ Copyright © 2022 37signals LLC
         setFormMode: setFormMode,
         StreamActions: StreamActions
     });
+
+    class TurboFrameMissingError extends Error {
+    }
 
     class FrameController {
         constructor(element) {
@@ -3354,35 +3442,22 @@ Copyright © 2022 37signals LLC
             try {
                 const html = await fetchResponse.responseHTML;
                 if (html) {
-                    const { body } = parseHTMLDocument(html);
-                    const newFrameElement = await this.extractForeignFrameElement(body);
-                    if (newFrameElement) {
-                        const snapshot = new Snapshot(newFrameElement);
-                        const renderer = new FrameRenderer(this, this.view.snapshot, snapshot, FrameRenderer.renderElement, false, false);
-                        if (this.view.renderPromise)
-                            await this.view.renderPromise;
-                        this.changeHistory();
-                        await this.view.render(renderer);
-                        this.complete = true;
-                        session.frameRendered(fetchResponse, this.element);
-                        session.frameLoaded(this.element);
-                        this.fetchResponseLoaded(fetchResponse);
+                    const document = parseHTMLDocument(html);
+                    const pageSnapshot = PageSnapshot.fromDocument(document);
+                    if (pageSnapshot.isVisitable) {
+                        await this.loadFrameResponse(fetchResponse, document);
                     }
-                    else if (this.willHandleFrameMissingFromResponse(fetchResponse)) {
-                        console.warn(`A matching frame for #${this.element.id} was missing from the response, transforming into full-page Visit.`);
-                        this.visitResponse(fetchResponse.response);
+                    else {
+                        await this.handleUnvisitableFrameResponse(fetchResponse);
                     }
                 }
-            }
-            catch (error) {
-                console.error(error);
-                this.view.invalidate();
             }
             finally {
                 this.fetchResponseLoaded = () => { };
             }
         }
-        elementAppearedInViewport(_element) {
+        elementAppearedInViewport(element) {
+            this.proposeVisitIfNavigatedWithAction(element, element);
             this.loadSourceURL();
         }
         willSubmitFormLinkToLocation(link) {
@@ -3408,12 +3483,12 @@ Copyright © 2022 37signals LLC
             }
             this.formSubmission = new FormSubmission(this, element, submitter);
             const { fetchRequest } = this.formSubmission;
-            this.prepareHeadersForRequest(fetchRequest.headers, fetchRequest);
+            this.prepareRequest(fetchRequest);
             this.formSubmission.start();
         }
-        prepareHeadersForRequest(headers, request) {
+        prepareRequest(request) {
             var _a;
-            headers["Turbo-Frame"] = this.id;
+            request.headers["Turbo-Frame"] = this.id;
             if ((_a = this.currentNavigationElement) === null || _a === void 0 ? void 0 : _a.hasAttribute("data-turbo-stream")) {
                 request.acceptResponseType(StreamMessage.contentType);
             }
@@ -3429,7 +3504,6 @@ Copyright © 2022 37signals LLC
             this.resolveVisitPromise();
         }
         async requestFailedWithResponse(request, response) {
-            console.error(response);
             await this.loadResponse(response);
             this.resolveVisitPromise();
         }
@@ -3447,9 +3521,13 @@ Copyright © 2022 37signals LLC
             const frame = this.findFrameElement(formSubmission.formElement, formSubmission.submitter);
             frame.delegate.proposeVisitIfNavigatedWithAction(frame, formSubmission.formElement, formSubmission.submitter);
             frame.delegate.loadResponse(response);
+            if (!formSubmission.isSafe) {
+                session.clearCache();
+            }
         }
         formSubmissionFailedWithResponse(formSubmission, fetchResponse) {
             this.element.delegate.loadResponse(fetchResponse);
+            session.clearCache();
         }
         formSubmissionErrored(formSubmission, error) {
             console.error(error);
@@ -3477,6 +3555,24 @@ Copyright © 2022 37signals LLC
         willRenderFrame(currentElement, _newElement) {
             this.previousFrameElement = currentElement.cloneNode(true);
         }
+        async loadFrameResponse(fetchResponse, document) {
+            const newFrameElement = await this.extractForeignFrameElement(document.body);
+            if (newFrameElement) {
+                const snapshot = new Snapshot(newFrameElement);
+                const renderer = new FrameRenderer(this, this.view.snapshot, snapshot, FrameRenderer.renderElement, false, false);
+                if (this.view.renderPromise)
+                    await this.view.renderPromise;
+                this.changeHistory();
+                await this.view.render(renderer);
+                this.complete = true;
+                session.frameRendered(fetchResponse, this.element);
+                session.frameLoaded(this.element);
+                this.fetchResponseLoaded(fetchResponse);
+            }
+            else if (this.willHandleFrameMissingFromResponse(fetchResponse)) {
+                this.handleFrameMissingFromResponse(fetchResponse);
+            }
+        }
         async visit(url) {
             var _a;
             const request = new FetchRequest(this, FetchMethod.get, url, new URLSearchParams(), this.element);
@@ -3493,7 +3589,6 @@ Copyright © 2022 37signals LLC
         }
         navigateFrame(element, url, submitter) {
             const frame = this.findFrameElement(element, submitter);
-            this.pageSnapshot = PageSnapshot.fromElement(frame).clone();
             frame.delegate.proposeVisitIfNavigatedWithAction(frame, element, submitter);
             this.withCurrentNavigationElement(element, () => {
                 frame.src = url;
@@ -3501,7 +3596,8 @@ Copyright © 2022 37signals LLC
         }
         proposeVisitIfNavigatedWithAction(frame, element, submitter) {
             this.action = getVisitAction(submitter, element, frame);
-            if (isAction(this.action)) {
+            if (this.action) {
+                const pageSnapshot = PageSnapshot.fromElement(frame).clone();
                 const { visitCachedSnapshot } = frame.delegate;
                 frame.delegate.fetchResponseLoaded = (fetchResponse) => {
                     if (frame.src) {
@@ -3514,7 +3610,7 @@ Copyright © 2022 37signals LLC
                             willRender: false,
                             updateHistory: false,
                             restorationIdentifier: this.restorationIdentifier,
-                            snapshot: this.pageSnapshot,
+                            snapshot: pageSnapshot,
                         };
                         if (this.action)
                             options.action = this.action;
@@ -3528,6 +3624,10 @@ Copyright © 2022 37signals LLC
                 const method = getHistoryMethodForAction(this.action);
                 session.history.update(method, expandURL(this.element.src || ""), this.restorationIdentifier);
             }
+        }
+        async handleUnvisitableFrameResponse(fetchResponse) {
+            console.warn(`The response (${fetchResponse.statusCode}) from <turbo-frame id="${this.element.id}"> is performing a full page visit due to turbo-visit-control.`);
+            await this.visitResponse(fetchResponse.response);
         }
         willHandleFrameMissingFromResponse(fetchResponse) {
             this.element.setAttribute("complete", "");
@@ -3546,6 +3646,14 @@ Copyright © 2022 37signals LLC
                 cancelable: true,
             });
             return !event.defaultPrevented;
+        }
+        handleFrameMissingFromResponse(fetchResponse) {
+            this.view.missing();
+            this.throwFrameMissingError(fetchResponse);
+        }
+        throwFrameMissingError(fetchResponse) {
+            const message = `The response (${fetchResponse.statusCode}) did not contain the expected <turbo-frame id="${this.element.id}"> and will be ignored. To perform a full page visit instead, set turbo-visit-control to reload.`;
+            throw new TurboFrameMissingError(message);
         }
         async visitResponse(response) {
             const wrapped = new FetchResponse(response);
