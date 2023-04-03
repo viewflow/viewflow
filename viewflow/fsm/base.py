@@ -28,7 +28,9 @@ class TransitionNotAllowed(Exception):
 
 
 class Transition(object):
-    """State transition definition."""
+    """
+    A state transition definition.
+    """
 
     def __init__(
         self,
@@ -54,7 +56,7 @@ class Transition(object):
 
     @property
     def label(self) -> str:
-        """Transition human-readable label."""
+        """Return the human-readable label for the transition."""
         if self._label:
             return self._label
         else:
@@ -65,10 +67,11 @@ class Transition(object):
 
     @property
     def slug(self) -> str:
+        """Return the slugified version of the transition function name."""
         return self.func.__name__
 
     def conditions_met(self, instance: object) -> bool:
-        """Check that all associated conditions is True."""
+        """Check if all associated conditions are met for the transition."""
         conditions = [
             condition.resolve(instance.__class__)
             if isinstance(condition, ThisObject)
@@ -78,7 +81,7 @@ class Transition(object):
         return all(map(lambda condition: condition(instance), conditions))
 
     def has_perm(self, instance: object, user: UserModel) -> bool:
-        """Check the permission of the transition."""
+        """Check if the user has the required permission to execute the transition."""
         if self.permission is None:
             return False
         elif callable(self.permission):
@@ -234,7 +237,9 @@ class TransitionDescriptor(object):
         self._func = func
         self._transitions: Dict[StateValue, Transition] = {}
 
-    def __get__(self, instance: object, owner: Optional[Type[object]] = None) -> TransitionMethod | TransitionBoundMethod:
+    def __get__(
+        self, instance: object, owner: Optional[Type[object]] = None
+    ) -> TransitionMethod | TransitionBoundMethod:
         if instance:
             return TransitionBoundMethod(self._state, self._func, self, instance)
         else:
@@ -266,7 +271,9 @@ class SuperTransitionDescriptor(object):
         self._state = state
         self._func = func
 
-    def __get__(self, instance: object, owner: Optional[Type[object]] = None) -> TransitionBoundMethod | TransitionMethod:
+    def __get__(
+        self, instance: object, owner: Optional[Type[object]] = None
+    ) -> TransitionBoundMethod | TransitionMethod:
         if instance:
             return TransitionBoundMethod(
                 self._state,
@@ -338,6 +345,7 @@ class StateDescriptor(object):
             if transition.conditions_met(flow)
             if transition.has_perm(flow, user)
         ]
+
 
 class State(object):
     """State slot field."""
@@ -455,7 +463,7 @@ class State(object):
         return _wrapper
 
     class CONDITION(object):
-        """Boolean-like object to return value accompanied with a messsage from fsm conditions."""
+        """Boolean-like object to return value accompanied with a message from fsm conditions."""
 
         def __init__(self, is_true: bool, unmet: str = ""):
             self.is_true = is_true

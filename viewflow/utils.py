@@ -36,6 +36,10 @@ IS_DEV = settings.DEBUG or not hasattr(mail, "outbox")  # DEBUG or test mode
 
 
 def first_not_default(*args):
+    """
+    Return the first argument that is not the `DEFAULT` marker. If all arguments
+    are `DEFAULT`, return the last one.
+    """
     for arg in args:
         if arg is not DEFAULT:
             return arg
@@ -43,7 +47,10 @@ def first_not_default(*args):
 
 
 def camel_case_to_underscore(name):
-    """Convert camel cased SomeString to some_string"""
+    """
+    Convert a camel-cased string to an underscore-separated string.
+    For example, 'SomeString' becomes 'some_string'.
+    """
 
     return re.sub(
         "([a-z0-9])([A-Z])", r"\1_\2", re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
@@ -51,7 +58,10 @@ def camel_case_to_underscore(name):
 
 
 def camel_case_to_title(name):
-    """Convert camel cased 'SomeString' to 'Some string'"""
+    """
+    Convert a camel-cased string to a title-cased string.
+    For example, 'SomeString' becomes 'Some String'.
+    """
 
     return re.sub(
         "([a-z0-9])([A-Z])", r"\1 \2", re.sub("(.)([A-Z][a-z]+)", r"\1 \2", name)
@@ -59,6 +69,11 @@ def camel_case_to_title(name):
 
 
 def has_object_perm(user, short_perm_name, model, obj=None):
+    """
+    Check if the user has the specified permission for the given model. If an
+    object is provided, and user has no model-wide permission, check if the user
+    has the permission for that specific object instance.
+    """
     perm_name = auth.get_permission_codename(short_perm_name, model._meta)
     has_perm = user.has_perm(perm_name)
     if not has_perm and obj is not None:
@@ -67,9 +82,9 @@ def has_object_perm(user, short_perm_name, model, obj=None):
 
 
 def strip_suffixes(word, suffixes):
-    """Strip suffixes from the word.
-
-    Never strips whole word to empty string.
+    """
+    Strip the specified suffixes from the given word.
+    Never strip the whole word to an empty string.
     """
 
     for suffix in suffixes:
@@ -79,17 +94,23 @@ def strip_suffixes(word, suffixes):
 
 
 def strip_dict_keys_prefix(a_dict, prefix):
-    """Construct new dict, from source keys started with prefix."""
+    """
+    Construct a new dictionary from the keys of the provided dictionary that
+    start with the specified prefix.
+    """
 
     return {
-        key[len(prefix):]: value
+        key[len(prefix) :]: value
         for key, value in a_dict.items()
         if key.startswith(prefix)
     }
 
 
 def get_app_package(app_label):
-    """Return app package string."""
+    """
+    Returns the name of the package that contains the specified app or None if
+    the app is not found.
+    """
     app_config = apps.get_app_config(app_label)
     if not app_config:
         return None
@@ -97,7 +118,9 @@ def get_app_package(app_label):
 
 
 def get_containing_app_data(module):
-    """Return app label and package string."""
+    """
+    Returns the app label and package string for the specified module.
+    """
     app_config = apps.get_containing_app_config(module)
     if not app_config:
         return None, None
@@ -105,7 +128,10 @@ def get_containing_app_data(module):
 
 
 def is_owner(owner, user):
-    """Check user instances and subclasses for equality."""
+    """
+    Checks whether the specified user instance or subclass is equal to the
+    specified owner instance or subclass.
+    """
     return isinstance(user, owner.__class__) and owner.pk == user.pk
 
 
@@ -132,44 +158,10 @@ class viewprop(object):
         return "<view_property func={}>".format(self.fget)
 
 
-def create_wrapper_view(origin_view, flow_task=None, flow_class=None):
-    """Create a wrapper view with flow_task/flow_class injected."""
-
-    def view(request, *args, **kwargs):
-        if flow_class is not None:
-            request.flow_class = flow_class
-        if flow_task is not None:
-            request.flow_task = flow_task
-        return origin_view(request, *args, **kwargs)
-
-    return update_wrapper_view(
-        view, origin_view, flow_task=flow_task, flow_class=flow_class
-    )
-
-
-def update_wrapper_view(view, origin_view, flow_task=None, flow_class=None):
-    """Update a wrapper view to look like the wrapped origin_view."""
-
-    view_class = None
-    if hasattr(origin_view, "view_class"):  # django generic view
-        view_class = view.view_class = origin_view.view_class
-    if hasattr(origin_view, "cls"):  # django restframework generic view
-        view_class = view.cls = origin_view.cls
-    # if hasattr(origin_view, "view_initkwargs"):  # both 八(＾□＾*)
-    #    view.view_initkwargs = origin_view.initkwargs or {}
-
-        # poor-man dependency injection. Mostly b/c of dumb restframework BaseSchemaGenerator.create_view impl
-        if flow_class and hasattr(view_class, "flow_class"):
-            view.view_initkwargs["flow_task"] = flow_class
-        if flow_task and hasattr(view_class, "flow_task"):
-            view.view_initkwargs["flow_task"] = flow_task
-
-    update_wrapper(view, origin_view)
-    return view
-
-
 class LazySingletonDescriptor(object):
-    """Descriptor class for lazy singleton instance."""
+    """
+    Descriptor class that creates a lazy singleton instance.
+    """
 
     def __init__(self):  # noqa D102
         self.instance = None
@@ -181,6 +173,17 @@ class LazySingletonDescriptor(object):
 
 
 class Icon(object):
+    """
+    Class representing an HTML icon element.
+
+    Attributes:
+    -----------
+    icon_name : str
+        The name of the icon to use.
+    class_ : str, optional
+        The CSS class to apply to the icon element.
+    """
+
     def __init__(self, icon_name, class_=None):
         self.icon_name = icon_name
         self.class_ = class_ or ""
@@ -194,8 +197,13 @@ class Icon(object):
 
 
 def get_object_data(obj):
-    """List of object fields to display.
-    Choice fields values are expanded to readable choice label.
+    """
+    List of object fields to display. Choice fields values are expanded to
+    readable choice label.
+
+    Returns a list of (field, label, value) tuples for the fields of the given
+    object.
+
     """
     for field in obj._meta.fields:
         if isinstance(field, models.AutoField):
@@ -212,5 +220,5 @@ def get_object_data(obj):
         if value is not None:
             yield (field, field.verbose_name.capitalize(), value)
 
-    if hasattr(obj, 'artifact_object_id') and obj.artifact_object_id:
+    if hasattr(obj, "artifact_object_id") and obj.artifact_object_id:
         yield from get_object_data(obj.artifact)

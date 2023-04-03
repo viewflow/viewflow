@@ -67,6 +67,24 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
         #  with self.exception_guard(): TODO exception guard on join ??
         super().complete.original()
 
+    def cancel_active_tasks(self, active_tasks):
+        activations = [task.flow_task.activation_class(task) for task in active_tasks]
+
+        not_cancellable = [
+            activation
+            for activation in activations
+            if not activation.cancel.can_proceed()
+        ]
+        if not_cancellable:
+            raise FlowRuntimeError(
+                "Can't cancel {}".format(
+                    ",".join(activation.task for activation in not_cancellable)
+                )
+            )
+
+        for activation in activations:
+            activation.cancel()
+
     def is_done(self):
         """
         Check that process can be continued futher.
@@ -75,9 +93,6 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
 
         Join node would continue execution if all incoming tasks are DONE or CANCELED.
         """
-        if not self.flow_task._wait_all:
-            return True
-
         join_prefixes = set(
             prev.token.get_common_split_prefix(self.task.token, prev.pk)
             for prev in self.task.previous.exclude(status=STATUS.CANCELED).all()
@@ -90,14 +105,21 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
 
         join_token_prefix = next(iter(join_prefixes))
 
-        active = self.flow_class.task_class._default_manager.filter(
+        active_tasks = self.flow_class.task_class._default_manager.filter(
             process=self.process, token__startswith=join_token_prefix
         ).exclude(status__in=[STATUS.DONE, STATUS.CANCELED])
 
-        return not active.exists()
+        if self.flow_task._continue_on_condition:
+            continue_result = self.flow_task._continue_on_condition(self, active_tasks)
+            if continue_result:
+                self.cancel_active_tasks(active_tasks)
+                return True
 
+        return not active_tasks.exists()
 
-    @Activation.status.transition(source=[STATUS.NEW, STATUS.STARTED], target=STATUS.CANCELED)
+    @Activation.status.transition(
+        source=[STATUS.NEW, STATUS.STARTED], target=STATUS.CANCELED
+    )
     def cancel(self):
         self.task.finished = now()
         self.task.save()
@@ -111,7 +133,7 @@ class Join(
 
     activation_class = JoinActivation
 
-    task_type = 'JOIN'
+    task_type = "JOIN"
 
     shape = {
         "width": 50,
@@ -124,6 +146,10 @@ class Join(
 
     bpmn_element = "parallelGateway"
 
-    def __init__(self, wait_all=True, **kwargs):  # noqa D102
+    def __init__(self, continue_on_condition=None, **kwargs):  # noqa D102
         super(Join, self).__init__(**kwargs)
-        self._wait_all = wait_all
+        self._continue_on_condition = continue_on_condition
+
+    def _resolve(self, cls):
+        super()._resolve(cls)
+        self._continue_on_condition = this.resolve(cls, self._continue_on_condition)

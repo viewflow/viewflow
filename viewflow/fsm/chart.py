@@ -27,7 +27,22 @@ def get_state_label(state_value):
 
 def chart(flow_state: StateDescriptor, exclude_guards=True):
     """
-    Draw a chat of state stansitions
+    Draws a directed graph (digraph) of the state transitions defined in the
+    given `flow_state`.
+
+    Args:
+        flow_state (StateDescriptor): The state descriptor object.
+        exclude_guards (bool): Whether to exclude transitions with no target state.
+
+    Returns:
+        str: A string representation of the digraph in the DOT language.
+
+    The function uses the `flow_state` object to extract the transitions and the
+    states involved. It then generates a DOT language string, which can be used
+    with tools like Graphviz to produce an image of the graph.
+
+    Note that the function ignores the `State.USE_RETURN_VALUE` and `State.SELECT`
+    states for now, as these are not supported yet.
     """
     vertices: Set[StateValue] = set()
     postponed: List[Transition] = []
@@ -48,23 +63,30 @@ def chart(flow_state: StateDescriptor, exclude_guards=True):
 
     for transition in postponed:
         vertices.add(transition.target)
-        for vertice in vertices:
-            if transition.source == State.ANY and vertice == transition.target:
+        for vertex in vertices:
+            if transition.source == State.ANY and vertex == transition.target:
                 continue
-            edges.add((vertice, transition.target, transition))
+            edges.add((vertex, transition.target, transition))
 
     # build chart
-    vertices_definition = '  \n'.join([
-        '"%s" [label="%s"];' % (get_state_name(vertice), get_state_label(vertice))
-        for vertice in vertices
-    ])
+    vertices_definition = "  \n".join(
+        [
+            '"%s" [label="%s"];' % (get_state_name(vertex), get_state_label(vertex))
+            for vertex in vertices
+        ]
+    )
 
-    edges_definition = '  \n'.join([
-        f'"{source}" ->  "{target}" [label="{transition.label}"];'
-        for source, target, transition in edges
-    ])
+    edges_definition = "  \n".join(
+        [
+            f'"{source}" ->  "{target}" [label="{transition.label}"];'
+            for source, target, transition in edges
+        ]
+    )
 
     return """digraph {
 %s
 %s
-}""" % (vertices_definition, edges_definition,)
+}""" % (
+        vertices_definition,
+        edges_definition,
+    )

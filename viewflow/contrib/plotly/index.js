@@ -8,7 +8,7 @@ export class VDash extends HTMLElement {
   }
 
   start() {
-    if(!window.DashRenderer) {
+    if(!window.DashRenderer || !window.dash_html_components) {
       setTimeout(() => this.start(), 300)
     } else {
       this.renderer = new window.DashRenderer();

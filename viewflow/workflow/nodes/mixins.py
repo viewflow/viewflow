@@ -1,8 +1,4 @@
-from django.urls import path
-
-from viewflow import this, viewprop
-from viewflow.urls import ViewsetMeta
-from viewflow.utils import create_wrapper_view
+from viewflow import this
 
 from ..activation import Activation
 from ..status import STATUS
@@ -66,7 +62,7 @@ class NodePermissionMixin(object):
         """
         if permission is None and not auto_create:
             raise ValueError(
-                "Please specify existion permission name or mark as auto_create=True"
+                "Please specify existing permission name or mark as auto_create=True"
             )
 
         self._owner_permission = permission
