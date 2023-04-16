@@ -228,9 +228,9 @@ class FlowViewset(BaseFlowViewsMixin, AppMenuMixin, Viewset):
 
     @viewprop
     def app_name(self):
-        assert (
-            self._flow_class.instance.app_name
-        ), "Flow can't be connected to urlpatterns more than one time"
+        # assert (
+        #     self._flow_class.instance.app_name
+        # ), "Flow can't be connected to urlpatterns more than one time"
         return self._flow_class.instance.app_name
 
     @viewprop

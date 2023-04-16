@@ -18,7 +18,7 @@
     <div class="mdc-layout-grid__inner vf-page__grid-inner">
       <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
         <div class="mdc-card vf-card mdc-typography">
-          <vf-swagger api-url="{{ api_url }}" csrf-token="{{ csrf_token }}" style="width:100%"></vf-swagger>
+          <vf-swagger api-url="{{ api_url|default:"." }}" csrf-token="{{ csrf_token }}" style="width:100%"></vf-swagger>
         </div>
       </div>
     </div>
