@@ -6,6 +6,7 @@ from django.utils.timezone import now
 
 from viewflow import fsm
 from .context import context
+from .signals import flow_started, task_started, task_finished
 from .status import STATUS, PROCESS
 
 
@@ -124,6 +125,8 @@ class Activation(object):
         assert connection.in_atomic_block
         self.task.finished = now()
         self.task.save()
+        task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
+        flow_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
     def _activate_next(self, activations: set):
         while activations:

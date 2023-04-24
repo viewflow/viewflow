@@ -6,39 +6,82 @@ import django.utils.timezone
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('viewflow', '0009_merge'),
+        ("viewflow", "0009_merge"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='task',
-            name='comments',
+            model_name="task",
+            name="comments",
         ),
         migrations.AddField(
-            model_name='process',
-            name='parent_task',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='viewflow.task'),
+            model_name="process",
+            name="parent_task",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="viewflow.task",
+            ),
         ),
         migrations.AlterField(
-            model_name='process',
-            name='created',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Created'),
+            model_name="process",
+            name="created",
+            field=models.DateTimeField(
+                default=django.utils.timezone.now, verbose_name="Created"
+            ),
         ),
         migrations.AlterField(
-            model_name='process',
-            name='status',
-            field=models.CharField(choices=[('CANCELED', 'Canceled'), ('DONE', 'Done'), ('NEW', 'New')], default='NEW', max_length=50, verbose_name='Status'),
+            model_name="process",
+            name="status",
+            field=models.CharField(
+                choices=[("CANCELED", "Canceled"), ("DONE", "Done"), ("NEW", "New")],
+                default="NEW",
+                max_length=50,
+                verbose_name="Status",
+            ),
         ),
         migrations.AlterField(
-            model_name='task',
-            name='created',
-            field=models.DateTimeField(default=django.utils.timezone.now, verbose_name='Created'),
+            model_name="task",
+            name="created",
+            field=models.DateTimeField(
+                default=django.utils.timezone.now, verbose_name="Created"
+            ),
         ),
         migrations.AlterField(
-            model_name='task',
-            name='status',
-            field=models.CharField(choices=[('ASSIGNED', 'Assigned'), ('CANCELED', 'Canceled'), ('DONE', 'Done'), ('ERROR', 'Error'), ('NEW', 'New'), ('REVIVED', 'Revived'), ('SCHEDULED', 'Scheduled'), ('STARTED', 'Started')], db_index=True, default='NEW', max_length=50, verbose_name='Status'),
+            model_name="task",
+            name="status",
+            field=models.CharField(
+                choices=[
+                    ("ASSIGNED", "Assigned"),
+                    ("CANCELED", "Canceled"),
+                    ("DONE", "Done"),
+                    ("ERROR", "Error"),
+                    ("NEW", "New"),
+                    ("REVIVED", "Revived"),
+                    ("SCHEDULED", "Scheduled"),
+                    ("STARTED", "Started"),
+                ],
+                db_index=True,
+                default="NEW",
+                max_length=50,
+                verbose_name="Status",
+            ),
+        ),
+        migrations.AlterField(
+            model_name="process",
+            name="id",
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
+        ),
+        migrations.AlterField(
+            model_name="task",
+            name="id",
+            field=models.BigAutoField(
+                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+            ),
         ),
     ]

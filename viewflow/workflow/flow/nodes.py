@@ -179,6 +179,14 @@ class Split(
     revive_view_class = views.ReviveTaskView
 
 
+class SplitFirst(
+    mixins.NodeDetailMixin,
+    nodes.SplitFirst,
+):
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+
+
 class StartSubprocess(
     mixins.NodeDetailMixin,
     mixins.NodeCancelMixin,

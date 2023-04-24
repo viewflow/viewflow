@@ -98,3 +98,19 @@ class Split(
 
     def Always(self, node):
         return self.Next(node)
+
+
+class SplitFirst(
+    Split,
+):
+    """
+    TODO:
+
+    [ ] 1. Node
+    [ ] 2. Activation
+    [ ] 3. flow.Node
+    [ ] 4. Sample/Test
+    [ ] 5. Docs
+    """
+
+    # subsctiption?

@@ -7,7 +7,7 @@ from .if_gate import If, IfActivation
 from .job import AbstractJob, AbstractJobActivation
 from .join import Join, JoinActivation
 from .obsolete import Obsolete, ObsoleteActivation
-from .split import Split, SplitActivation
+from .split import Split, SplitActivation, SplitFirst
 from .start import Start, StartHandle, StartActivation
 from .subprocess import StartSubprocess, Subprocess, NSubprocess
 from .switch import Switch, SwitchActivation
@@ -31,6 +31,7 @@ __all__ = (
     "ObsoleteActivation",
     "Split",
     "SplitActivation",
+    "SplitFirst",
     "Start",
     "StartActivation",
     "StartHandle",
