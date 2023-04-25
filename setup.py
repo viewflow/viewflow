@@ -1,5 +1,6 @@
 import setuptools
 
+README = open("README.md", "r", encoding="utf-8").read()
 
 setuptools.setup(
     name="django-viewflow",
@@ -10,8 +11,8 @@ setuptools.setup(
     include_package_data=True,
     keywords=["django", "admin", "workflow", "fsm", "bpm", "bpmn"],
     license="AGPL",
-    long_description_content_type="text/markdown",
-    long_description=open("README.md", "r", encoding="utf-8").read(),
+    # long_description_content_type="text/markdown",
+    # long_description=README,
     packages=setuptools.find_packages(exclude=["tests*"]),
     python_requires=">=3.7",
     zip_safe=False,
