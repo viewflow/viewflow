@@ -3,27 +3,30 @@ from viewflow import this
 from ..activation import Activation, leading_tasks_canceled
 from ..base import Node
 from ..status import STATUS
+from ..signals import task_started, task_finished
 from . import mixins
 
 
 class HandleActivation(mixins.NextNodeActivationMixin, Activation):
     @Activation.status.super()
     def activate(self):
-        """ Do nothing on sync call"""
+        """Do nothing on sync call"""
 
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.STARTED)
     def run(self, func, **kwargs):
         self.task.started = now()
+        task_started.send(sender=self.flow_class, process=self.process, task=self.task)
         return func(self, **kwargs) if func else self.process
 
     @Activation.status.transition(source=STATUS.STARTED, target=STATUS.DONE)
     def complete(self):
-        """ Complete task and create next."""
+        """Complete task and create next."""
         super().complete.original()
 
     @Activation.status.transition(source=STATUS.STARTED)
     def execute(self):
         self.complete()
+        task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
         self.activate_next()
 
     @Activation.status.transition(
@@ -40,27 +43,24 @@ class HandleActivation(mixins.NextNodeActivationMixin, Activation):
         self.task.save()
 
 
-class Handle(
-    mixins.NextNodeMixin,
-    Node
-):
+class Handle(mixins.NextNodeMixin, Node):
     """
     Task to be executed outside of the flow.
     """
 
-    task_type = 'FUNCTION'
+    task_type = "FUNCTION"
     activation_class = HandleActivation
 
     shape = {
-        'width': 150,
-        'height': 100,
-        'text-align': 'middle',
-        'svg': """
+        "width": 150,
+        "height": 100,
+        "text-align": "middle",
+        "svg": """
             <rect class="task" width="150" height="100" rx="5" ry="5"/>
             <path class="task-marker"
                   d="m 15,20 c 10,-6 -8,-8 3,-15 l -9,0 c -11,7 7,9 -3,15 z
                      m -7,-12 l 5,0 m -4.5,3 l 4.5,0 m -3,3 l 5,0 m -4,3 l 5,0"/>
-        """
+        """,
     }
 
     bpmn_element = "scriptTask"

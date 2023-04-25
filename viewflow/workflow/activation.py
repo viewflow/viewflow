@@ -6,7 +6,7 @@ from django.utils.timezone import now
 
 from viewflow import fsm
 from .context import context
-from .signals import flow_started, task_started, task_finished
+from .signals import flow_started, task_started, task_finished, task_failed
 from .status import STATUS, PROCESS
 
 
@@ -91,7 +91,9 @@ class Activation(object):
                     self.task.finished = now()
                     self.set_status(STATUS.ERROR)
                     self.task.save()
-                    # TODO Event task_failed.send(sender=self.flow_class, process=self.process, task=self.task)
+                    task_failed.send(
+                        sender=self.flow_class, process=self.process, task=self.task
+                    )
                 else:
                     raise
 
@@ -126,7 +128,6 @@ class Activation(object):
         self.task.finished = now()
         self.task.save()
         task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
-        flow_started.send(sender=self.flow_class, process=self.process, task=self.task)
 
     def _activate_next(self, activations: set):
         while activations:

@@ -4,7 +4,7 @@ from django.utils.timezone import now
 from ..base import Node
 from ..activation import Activation, process_not_cancelled
 from ..status import STATUS, PROCESS
-from . import mixins
+from ..signals import task_started, task_finished, flow_finished
 
 
 class EndActivation(Activation):
@@ -26,6 +26,9 @@ class EndActivation(Activation):
         """
         with transaction.atomic(savepoint=True):
             self.task.started = now()
+            task_started.send(
+                sender=self.flow_class, process=self.process, task=self.task
+            )
 
             active_tasks_count = (
                 self.flow_class.task_class._default_manager.filter(
@@ -37,6 +40,14 @@ class EndActivation(Activation):
                 self.process.status = STATUS.DONE
                 self.process.finished = now()
                 self.process.save()
+
+            task_finished.send(
+                sender=self.flow_class, process=self.process, task=self.task
+            )
+            if active_tasks_count == 0:
+                flow_finished.send(
+                    sender=self.flow_class, process=self.process, task=self.task
+                )
 
     @Activation.status.super()
     def create_next(self):

@@ -5,6 +5,7 @@ from viewflow.utils import is_owner
 from ..base import Node
 from ..activation import Activation, has_manage_permission
 from ..status import STATUS
+from ..signals import task_started, task_finished
 from . import mixins
 
 
@@ -91,6 +92,7 @@ class ViewActivation(mixins.NextNodeActivationMixin, Activation):
     )
     def start(self, request):
         # TODO request.GET['started']
+        task_started.send(sender=self.flow_class, process=self.process, task=self.task)
         self.task.started = now()
 
     @Activation.status.transition(source=STATUS.STARTED, target=STATUS.DONE)
@@ -106,6 +108,7 @@ class ViewActivation(mixins.NextNodeActivationMixin, Activation):
     )
     def execute(self):
         self.complete()
+        task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
         self.activate_next()
 
     @Activation.status.transition(

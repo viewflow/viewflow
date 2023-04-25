@@ -2,9 +2,19 @@
 Changelog
 =========
 
-GIT VERSION
------------
+2.0.0.b3 2023-04-25
+-------------------
 
+- Fix migrations to BigAutoField
+- Reintroduce workflow task signals
+
+
+2.0.0.b2 2023-03-06
+-------------------
+
+- Revised and improved documentation https://docs-next.viewflow.io
+- Extend autocomplete mixins for the formtools wizard support
+- Add support for list_paginate_by count to the model viewset
 - Virtual json fields got support in .values() and .values_list() queryset
 - Add missing .js.map static files
 

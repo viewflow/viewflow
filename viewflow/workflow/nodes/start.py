@@ -5,6 +5,7 @@ from viewflow.utils import is_owner
 from ..base import Node
 from ..activation import Activation, leading_tasks_canceled, has_manage_permission
 from ..status import STATUS, PROCESS
+from ..signals import task_started, task_finished, flow_started
 from . import mixins
 
 
@@ -24,9 +25,18 @@ class StartActivation(mixins.NextNodeActivationMixin, Activation):
 
     @Activation.status.transition(source=STATUS.NEW)
     def execute(self):
+        task_started.send(sender=self.flow_class, process=self.process, task=self.task)
         self.process.save()
         with self.flow_class.lock(self.process.pk):
             self.complete()
+
+            task_finished.send(
+                sender=self.flow_class, process=self.process, task=self.task
+            )
+            flow_started.send(
+                sender=self.flow_class, process=self.process, task=self.task
+            )
+
             self.activate_next()
 
 
