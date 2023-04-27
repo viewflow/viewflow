@@ -2,6 +2,12 @@
 Changelog
 =========
 
+GIT VERSION
+-----------
+
+Introduce SplitFirst Node
+
+
 2.0.0.b3 2023-04-25
 -------------------
 

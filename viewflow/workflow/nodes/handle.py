@@ -26,7 +26,6 @@ class HandleActivation(mixins.NextNodeActivationMixin, Activation):
     @Activation.status.transition(source=STATUS.STARTED)
     def execute(self):
         self.complete()
-        task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
         self.activate_next()
 
     @Activation.status.transition(

@@ -29,14 +29,11 @@ class StartActivation(mixins.NextNodeActivationMixin, Activation):
         self.process.save()
         with self.flow_class.lock(self.process.pk):
             self.complete()
-
-            task_finished.send(
-                sender=self.flow_class, process=self.process, task=self.task
-            )
             flow_started.send(
-                sender=self.flow_class, process=self.process, task=self.task
+                sender=self.flow_class,
+                process=self.process,
+                task=self.task,
             )
-
             self.activate_next()
 
 

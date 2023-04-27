@@ -1,7 +1,11 @@
+from django.db import connection
+from django.utils.timezone import now
 from viewflow import this
 
 from ..activation import Activation
 from ..exceptions import FlowRuntimeError
+from ..signals import task_finished
+from ..status import STATUS
 from ..token import Token
 from ..base import Node, Edge
 from .join import Join
@@ -100,17 +104,83 @@ class Split(
         return self.Next(node)
 
 
+class SplitFirstActivation(SplitActivation):
+    """
+    Parallel split gateway activation. As soon as the first task is completed,
+    the remaining tasks are cancelled.
+    """
+
+    @Activation.status.transition(source=STATUS.NEW, target=STATUS.STARTED)
+    def activate(self):
+        self.task.started = now()
+        self.task.save()
+        super().activate.original()
+
+    @Activation.status.transition(source=STATUS.STARTED)
+    def create_next(self):
+        yield from super().create_next.original()
+
+    @Activation.status.transition(source=[STATUS.STARTED], target=STATUS.CANCELED)
+    def cancel(self):
+        self.task.finished = now()
+        self.task.save()
+
+    @Activation.status.transition(source=STATUS.STARTED, target=STATUS.DONE)
+    def done(self):
+        assert connection.in_atomic_block
+        self.task.finished = now()
+        self.task.save()
+        task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
+
+
 class SplitFirst(
     Split,
 ):
     """
-    TODO:
-
-    [ ] 1. Node
-    [ ] 2. Activation
-    [ ] 3. flow.Node
-    [ ] 4. Sample/Test
-    [ ] 5. Docs
+    Parallel split, as soon as the first task is completed, the remaining tasks
+    are cancelled.
     """
 
-    # subsctiption?
+    activation_class = SplitFirstActivation
+
+    def _ready(self):
+        task_finished.connect(self.on_task_done, sender=self.flow_class)
+
+    def _cancel_active_tasks(self, active_tasks):
+        activations = [task.flow_task.activation_class(task) for task in active_tasks]
+
+        not_cancellable = [
+            activation
+            for activation in activations
+            if not activation.cancel.can_proceed()
+        ]
+        if not_cancellable:
+            raise FlowRuntimeError(
+                "Can't cancel {}".format(
+                    ",".join(activation.task for activation in not_cancellable)
+                )
+            )
+
+        for activation in activations:
+            activation.cancel()
+
+    def on_task_done(self, **signal_kwargs):
+        task = signal_kwargs["task"]
+        outgoing_flow_tasks = [task.dst for task in self._outgoing()]
+        if task.flow_task in [flow_task for flow_task in outgoing_flow_tasks]:
+            split_task = self.flow_class.task_class._default_manager.get(
+                process=task.process, flow_task=self, status=STATUS.STARTED
+            )
+
+            activation = self.activation_class(split_task)
+
+            active_tasks = (
+                self.flow_class.task_class._default_manager.filter(
+                    process=task.process, flow_task__in=outgoing_flow_tasks
+                )
+                .exclude(status__in=[STATUS.DONE, STATUS.CANCELED])
+                .exclude(pk=task.pk)
+            )
+            self._cancel_active_tasks(active_tasks)
+
+            activation.done()
