@@ -40,6 +40,9 @@ def first_not_default(*args):
     Return the first argument that is not the `DEFAULT` marker. If all arguments
     are `DEFAULT`, return the last one.
     """
+    if not args:
+        return None
+
     for arg in args:
         if arg is not DEFAULT:
             return arg
@@ -74,7 +77,7 @@ def has_object_perm(user, short_perm_name, model, obj=None):
     object is provided, and user has no model-wide permission, check if the user
     has the permission for that specific object instance.
     """
-    perm_name = auth.get_permission_codename(short_perm_name, model._meta)
+    perm_name = f"{model._meta.app_label}.{auth.get_permission_codename(short_perm_name, model._meta)}"
     has_perm = user.has_perm(perm_name)
     if not has_perm and obj is not None:
         has_perm = user.has_perm(perm_name, obj=obj)
@@ -91,19 +94,6 @@ def strip_suffixes(word, suffixes):
         if word != suffix and word.endswith(suffix):
             word = word[: -len(suffix)]
     return word
-
-
-def strip_dict_keys_prefix(a_dict, prefix):
-    """
-    Construct a new dictionary from the keys of the provided dictionary that
-    start with the specified prefix.
-    """
-
-    return {
-        key[len(prefix) :]: value
-        for key, value in a_dict.items()
-        if key.startswith(prefix)
-    }
 
 
 def get_app_package(app_label):
