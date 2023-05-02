@@ -37,6 +37,17 @@ Viewflow-PRO
 
     pip install django-viewflow-pro  --extra-index-url https://pypi.viewflow.io/<licence_id>/simple/ --pre
 
+Add 'viewflow' and, in case you need workflow capabilities 'viewflow.workflow' to the INSTALLED_APPS settings.py
+
+```python
+    INSTALLED_APPS = [
+        ....
+        'viewflow',
+        'viewflow.workflow',
+    ]
+```
+
+
 ## Quick start
 
 Here's an example of how to create a simple pizza ordering workflow using Viewflow:
