@@ -20,6 +20,7 @@
         <span class="mdc-list-item__start">{{ app.icon }}</span>
         <span class="mdc-list-item__content">{% trans app.title %}</span>
       </a>
+      {% block app_links_extra %}{% endblock %}
     {% endif %}{% empty %}
       <div class="mdc-list-item" style="height:auto; color: red">
         <small>No applications found.</small>

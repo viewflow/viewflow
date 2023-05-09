@@ -4,7 +4,6 @@
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
 # LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
-
 import copy
 import types
 import warnings
@@ -14,7 +13,12 @@ from django.views.generic import RedirectView
 from django.urls import URLPattern, URLResolver, include, path, reverse
 from django.urls.resolvers import RoutePattern
 
-from viewflow.utils import camel_case_to_underscore, strip_suffixes, DEFAULT
+from viewflow.utils import (
+    camel_case_to_underscore,
+    strip_suffixes,
+    list_path_components,
+    DEFAULT,
+)
 
 
 class _UrlName(str):
@@ -69,6 +73,7 @@ class BaseViewset(object):
     app_name = None
     namespace = None
     parent_namespace = None
+    extra_kwargs = None
 
     def __init__(self):
         super().__init__()
@@ -207,6 +212,7 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
             attr_value = getattr(self.__class__, attr_name)
             if isinstance(attr_value, Route):
                 viewset = copy.copy(attr_value.viewset)
+                viewset.extra_kwargs = list_path_components(attr_value.prefix)
                 setattr(self, attr_name, Route(attr_value.prefix, viewset))
                 self._children.append(viewset)
 
@@ -217,7 +223,7 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
             value.viewset.parent = self
             patterns, app_name, namespace = value.viewset.urls
             pattern = path(
-                "{}/".format(value.prefix) if value.prefix else "",
+                value.prefix if value.prefix else "",
                 include((patterns, app_name), namespace=namespace),
             )
             return pattern
@@ -256,7 +262,7 @@ class Viewset(BaseViewset, metaclass=ViewsetMeta):
                     viewset
                 )
             urlpatterns.append(
-                self._create_url_pattern(route(viewset.app_name, viewset))
+                self._create_url_pattern(route(f"{viewset.app_name}/", viewset))
             )
 
         return urlpatterns

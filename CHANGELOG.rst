@@ -5,8 +5,8 @@ Changelog
 GIT VERSION
 -----------
 
-Introduce SplitFirst Node
-
+- Introduce SplitFirst Node
+- celery.Timer Node
 
 2.0.0.b3 2023-04-25
 -------------------

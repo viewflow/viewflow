@@ -11,13 +11,13 @@
               <h1 class="vf-card__title">{{ view.object }}</h1>
               {% block confirm-header-subtitle %}
                 <h2 class="vf-card__breadcrumbs">
-                  <a href="{% reverse viewset 'list' %}">{{ view.model|verbose_name_plural|title }}</a>
+                  <a href="{% current_viewset_reverse viewset 'list' %}">{{ view.model|verbose_name_plural|title }}</a>
                   {% if view.object.pk %}
-                    {% reverse viewset 'detail' view.object.pk as detail_url %}
+                    {% current_viewset_reverse viewset 'detail' view.object.pk as detail_url %}
                     {% if detail_url  %}
                       <a href="{{ detail_url }}">{{ view.object }}</a>
                     {% else %}
-                      <a href="{% reverse viewset 'change' view.object.pk %}">{{ view.object }}</a>
+                      <a href="{% current_viewset_reverse viewset 'change' view.object.pk %}">{{ view.object }}</a>
                     {% endif %}
                   {% endif %}
                   <a>{% trans 'Delete' %}</a>

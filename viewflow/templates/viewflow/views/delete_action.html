@@ -11,7 +11,7 @@
             <section class="vf-card__header">
               <h1 class="vf-card__title">{{ view.model|verbose_name_plural|title }}</h1>
               <h2 class="vf-card__breadcrumbs">
-                <a href="{% reverse viewset 'list' %}">{{ view.model|verbose_name_plural|title }}</a>
+                <a href="{% current_viewset_reverse viewset 'list' %}">{{ view.model|verbose_name_plural|title }}</a>
                 <a>{% trans 'Delete' %}</a>
               </h2>
             </section>

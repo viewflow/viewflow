@@ -40,7 +40,7 @@
         <ul class="mdc-list" role="listbox">
           {% for action in bulk_actions %}
             {% if action.viewname %}
-              <li class="mdc-list-item mdc-list-item--with-one-line" data-value="{% reverse viewset action.viewname %}?{{ view.filterset.data.urlencode }}" role="option">
+              <li class="mdc-list-item mdc-list-item--with-one-line" data-value="{% current_viewset_reverse viewset action.viewname %}?{{ view.filterset.data.urlencode }}" role="option">
             {% else %}
               <li class="mdc-list-item mdc-list-item--with-one-line" data-value="{{ action.url }}?{{ view.filterset.data.urlencode }}" role="option">
             {% endif %}

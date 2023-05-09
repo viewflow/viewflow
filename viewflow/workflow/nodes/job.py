@@ -1,12 +1,9 @@
 import uuid
-from contextlib import contextmanager
-from django.db import transaction
 from django.utils import timezone
 
 from ..activation import Activation
 from ..base import Node
-from ..exceptions import FlowRuntimeError
-from ..fields import get_flow_ref, import_flow_by_ref
+from ..fields import get_flow_ref
 from ..status import STATUS
 from . import mixins
 
@@ -20,7 +17,7 @@ class AbstractJobActivation(mixins.NextNodeActivationMixin, Activation):
             process=prev_activation.process,
             flow_task=flow_task,
             token=token,
-            external_task_id=str(uuid.uuid4())
+            external_task_id=str(uuid.uuid4()),
         )
         task.save()
         task.previous.add(prev_activation.task)
@@ -41,20 +38,17 @@ class AbstractJobActivation(mixins.NextNodeActivationMixin, Activation):
         self.activate_next()
 
     def ref(self):
-        return f'{get_flow_ref(self.flow_class)}/{self.process.pk}/{self.task.pk}'
+        return f"{get_flow_ref(self.flow_class)}/{self.process.pk}/{self.task.pk}"
 
 
-class AbstractJob(
-    mixins.NextNodeMixin,
-    Node
-):
-    task_type = 'JOB'
+class AbstractJob(mixins.NextNodeMixin, Node):
+    task_type = "JOB"
 
     shape = {
-        'width': 150,
-        'height': 100,
-        'text-align': 'middle',
-        'svg': """
+        "width": 150,
+        "height": 100,
+        "text-align": "middle",
+        "svg": """
             <rect class="task" width="150" height="100" rx="5" ry="5"/>
             <path class="task-label"
                   d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65
@@ -68,46 +62,7 @@ class AbstractJob(
                      c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46
                      c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5
                      s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/>
-        """
+        """,
     }
 
-    bpmn_element = 'scriptTask'
-
-    @staticmethod
-    @contextmanager
-    def activate(activation_ref):
-        try:
-            flow_ref, process_pk_ref, task_pk_ref = activation_ref.rsplit('/', 2)
-            process_pk, task_pk = int(process_pk_ref), int(task_pk_ref)
-        except ValueError as exc:
-            raise FlowRuntimeError(f'Invalid activation reference - "{activation_ref}"') from exc
-
-        flow_class = import_flow_by_ref(flow_ref)
-
-        # start
-        with transaction.atomic(), flow_class.lock(process_pk):
-            try:
-                task = flow_class.task_class.objects.get(pk=task_pk, process_id=process_pk)
-                if task.status == STATUS.CANCELED:
-                    return
-            except flow_class.task_class.DoesNotExist:
-                # There was rollback on job task created transaction,
-                # we don't need to do the job
-                return
-            else:
-                activation = task.flow_task.activation_class(task)
-                activation.start()
-
-        try:
-            yield activation  # long-running job without lock
-        except Exception as exc:
-            # error
-            with transaction.atomic(), flow_class.lock(process_pk):
-                activation = task.flow_task.activation_class(task)
-                activation.error(exc)
-            raise exc
-        else:
-            # success
-            with transaction.atomic(), flow_class.lock(process_pk):
-                activation = task.flow_task.activation_class(task)
-                activation.execute()
+    bpmn_element = "scriptTask"

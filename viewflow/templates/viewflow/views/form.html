@@ -25,9 +25,9 @@
               {% block form-header-subtitle %}
                 <h2 class="vf-card__breadcrumbs">
                   {% block breadcrumbs_items %}
-                    <a href="{% reverse viewset 'list' %}">{{ view.model|verbose_name_plural|title }}</a>
+                    <a href="{% current_viewset_reverse viewset 'list' %}">{{ view.model|verbose_name_plural|title }}</a>
                     {% if view.object.pk %}
-                      {% reverse viewset 'detail' view.object.pk as detail_url %}
+                      {% current_viewset_reverse viewset 'detail' view.object.pk as detail_url %}
                       {% if detail_url  %}
                         <a href="{{ detail_url }}">{{ view.object }}</a>
                       {% endif %}

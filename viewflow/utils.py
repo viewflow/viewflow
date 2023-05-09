@@ -6,17 +6,21 @@
 # which is part of this source code package.
 
 import re
-from functools import update_wrapper
+from typing import Any, Callable, Iterator, List, Optional, Tuple, Type, TypeVar
 
 from django.apps import apps
-from django.core import mail
 from django.conf import settings
 from django.contrib import auth
+from django.core import mail
 from django.db import models
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
 
 __all__ = ("has_object_perm", "viewprop", "DEFAULT", "first_not_default")
+
+
+T = TypeVar("T")
+TCallable = TypeVar("TCallable", bound=Callable[..., Any])
 
 
 class MARKER(object):
@@ -117,52 +121,66 @@ def get_containing_app_data(module):
     return app_config.label, app_config.module.__name__
 
 
-def is_owner(owner, user):
+def is_owner(owner: models.Model, user: models.Model) -> bool:
     """
     Checks whether the specified user instance or subclass is equal to the
     specified owner instance or subclass.
     """
-    return isinstance(user, owner.__class__) and owner.pk == user.pk
+    return isinstance(user, type(owner)) and owner.pk == user.pk
 
 
-class viewprop(object):
+class viewprop:
     """
     A property that can be overridden.
+
+    The viewprop class is a descriptor that works similarly to the built-in
+    `property` decorator but allows its value to be overridden on instances
+    of the class it is used in.
     """
 
-    def __init__(self, func):
+    def __init__(self, func: Any):
         self.__doc__ = getattr(func, "__doc__")
         self.fget = func
 
-    def __get__(self, obj, objtype=None):
+    def __get__(self, obj: Optional[Any], objtype: Optional[Type[Any]] = None) -> Any:
         if obj is None:
             return self
         if self.fget.__name__ not in obj.__dict__:
             obj.__dict__[self.fget.__name__] = self.fget(obj)
         return obj.__dict__[self.fget.__name__]
 
-    def __set__(self, obj, value):
+    def __set__(self, obj: Any, value: Any) -> None:
         obj.__dict__[self.fget.__name__] = value
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return "<view_property func={}>".format(self.fget)
 
 
-class LazySingletonDescriptor(object):
+class LazySingletonDescriptor:
     """
     Descriptor class that creates a lazy singleton instance.
+
+    This descriptor can be used as a class attribute, and the first time the
+    attribute is accessed, it creates an instance of the class. Subsequent
+    accesses return the same instance, effectively making the class a singleton.
     """
 
-    def __init__(self):  # noqa D102
-        self.instance = None
+    def __init__(self) -> None:  # noqa D102
+        self.instance: Optional[T] = None
 
-    def __get__(self, instance=None, owner=None):
+    def __get__(
+        self,
+        instance: Optional[T] = None,
+        owner: Optional[Type[T]] = None,
+    ) -> T:
         if self.instance is None:
+            if owner is None:
+                raise ValueError("Owner class not provided")
             self.instance = owner()
         return self.instance
 
 
-class Icon(object):
+class Icon:
     """
     Class representing an HTML icon element.
 
@@ -174,11 +192,11 @@ class Icon(object):
         The CSS class to apply to the icon element.
     """
 
-    def __init__(self, icon_name, class_=None):
+    def __init__(self, icon_name: str, class_: Optional[str] = None):
         self.icon_name = icon_name
         self.class_ = class_ or ""
 
-    def __str__(self):
+    def __str__(self) -> str:
         icon_name = conditional_escape(self.icon_name)
         class_name = conditional_escape(self.class_)
         return mark_safe(
@@ -186,7 +204,7 @@ class Icon(object):
         )
 
 
-def get_object_data(obj):
+def get_object_data(obj: models.Model) -> Iterator[Tuple[models.Field, str, Any]]:
     """
     List of object fields to display. Choice fields values are expanded to
     readable choice label.
@@ -212,3 +230,23 @@ def get_object_data(obj):
 
     if hasattr(obj, "artifact_object_id") and obj.artifact_object_id:
         yield from get_object_data(obj.artifact)
+
+
+PATH_PARAMETER_COMPONENT_RE = re.compile(
+    r"<(?:(?P<converter>[^>:]+):)?(?P<parameter>[^>]+)>"
+)
+
+
+def list_path_components(route: str) -> List[str]:
+    """
+    Extract keyword arguments from a Django path expression, which are used as
+    input parameters for a view function.
+
+    Example Usage:
+
+     >>> list_path_components('/prefix/<str:pk>')
+     ['pk']
+     >>> list_path_components('<str:pk>/<int:id>')
+     ['pk', 'id']
+    """
+    return [match["parameter"] for match in PATH_PARAMETER_COMPONENT_RE.finditer(route)]

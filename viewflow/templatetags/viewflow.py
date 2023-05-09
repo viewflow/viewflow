@@ -15,8 +15,7 @@ from django.utils.html import conditional_escape
 
 from viewflow.contrib import auth
 from viewflow.forms import FormLayout
-from viewflow.urls import Site, Viewset
-
+from viewflow.urls import Site, Viewset, current_viewset_reverse
 
 register = template.Library()
 
@@ -53,13 +52,9 @@ def _resolve_args(context, args, kwargs):
     return args, kwargs
 
 
-@register.tag("reverse")
-class ViewsetURLNode(template.Node):
+class BaseViewsetURLNode(template.Node):
     """
-    Reverse a url to a view within viewset
-
-    Example::
-        {% reverse viewset viewname args kwargs %}
+    Base class for reversing a url to a view within a viewset
     """
 
     def __init__(self, parser, token):
@@ -97,8 +92,8 @@ class ViewsetURLNode(template.Node):
 
         url = ""
         try:
-            url = viewset.reverse(
-                view_name, args=args, kwargs=kwargs, current_app=current_app
+            url = self._reverse_url(
+                viewset, view_name, args, kwargs, current_app, context
             )
         except NoReverseMatch:
             if self.variable_name is None:
@@ -111,6 +106,36 @@ class ViewsetURLNode(template.Node):
             if context.autoescape:
                 url = conditional_escape(url)
             return url
+
+
+@register.tag("reverse")
+class ViewsetURLNode(BaseViewsetURLNode):
+    """
+    Reverse a url to a view within viewset
+
+    Example::
+        {% reverse viewset viewname args kwargs %}
+    """
+
+    def _reverse_url(self, viewset, view_name, args, kwargs, current_app, context):
+        return viewset.reverse(
+            view_name, args=args, kwargs=kwargs, current_app=current_app
+        )
+
+
+@register.tag("current_viewset_reverse")
+class CurrentViewsetURLNode(BaseViewsetURLNode):
+    """
+    Reverse a url to a view within viewset
+
+    Example::
+        {% current_viewset_reverse viewset viewname args kwargs %}
+    """
+
+    def _reverse_url(self, viewset, view_name, args, kwargs, current_app, context):
+        return current_viewset_reverse(
+            context.request, viewset, view_name, args=args, kwargs=kwargs
+        )
 
 
 @register.tag("render")
