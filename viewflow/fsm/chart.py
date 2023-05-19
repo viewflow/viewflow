@@ -69,17 +69,17 @@ def chart(flow_state: StateDescriptor, exclude_guards=True):
             edges.add((vertex, transition.target, transition))
 
     # build chart
-    vertices_definition = "  \n".join(
+    vertices_definition = "\n".join(
         [
             '"%s" [label="%s"];' % (get_state_name(vertex), get_state_label(vertex))
-            for vertex in vertices
+            for vertex in sorted(vertices)
         ]
     )
 
-    edges_definition = "  \n".join(
+    edges_definition = "\n".join(
         [
-            f'"{source}" ->  "{target}" [label="{transition.label}"];'
-            for source, target, transition in edges
+            f'"{source}" -> "{target}" [label="{transition.label}"];'
+            for source, target, transition in sorted(edges)
         ]
     )
 

@@ -150,6 +150,11 @@ export class VPageMenuNavigation extends HTMLElement {
           .redirectedToLocation.href.substring(
               window.location.origin.length,
           );
+    } else if (Turbo.navigator.currentVisit && Turbo.navigator.currentVisit.location) {
+      currentPath = Turbo.navigator.currentVisit
+          .location.href.substring(
+              window.location.origin.length,
+          );
     }
 
     const navItems = [].slice.call(

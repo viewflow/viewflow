@@ -60,6 +60,7 @@ class BaseModelViewset(Viewset):
     list_filterset_class = DEFAULT
     list_filter_fields = DEFAULT
     list_search_fields = DEFAULT
+    list_ordering_fields = DEFAULT
 
     def has_view_permission(self, user, obj=None):
         if has_object_perm(user, "view", self.model, obj=obj):
@@ -79,6 +80,7 @@ class BaseModelViewset(Viewset):
             "filterset_class": self.list_filterset_class,
             "filter_fields": self.list_filter_fields,
             "search_fields": self.list_search_fields,
+            "ordering": self.list_ordering_fields,
             **self.list_view_kwargs,
             **kwargs,
         }

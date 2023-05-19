@@ -7,6 +7,7 @@ GIT VERSION
 
 - Introduce SplitFirst Node
 - celery.Timer Node
+- expose list_ordering_fields in a ModelViewset
 
 2.0.0.b3 2023-04-25
 -------------------

@@ -1,0 +1,22 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+
+{% block dark-mode-vars %}
+  <meta name="turbo-cache-control" content="no-cache">
+  <script src="{% static "admin/js/fixEventListeners.js" %}"></script>
+  {{ block.super }}
+{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script type="module">
+    import hotwiredTurbo from 'https://cdn.skypack.dev/@hotwired/turbo';
+  </script>
+  <style>
+   .turbo-progress-bar ~ body,
+   .turbo-progress-bar ~ body * {
+     cursor: wait !important;
+    }
+  }
+  </style>
+{% endblock %}

@@ -471,7 +471,7 @@ class State(object):
 
         @property
         def message(self) -> str:
-            return self.message if self.unmet else ""
+            return self.unmet if not self.is_true else ""
 
         def __bool__(self) -> bool:
             return self.is_true
