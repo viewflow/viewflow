@@ -173,6 +173,12 @@ class BaseFlowViewsMixin(metaclass=ViewsetMeta):
                 back_url = "/"
             return back_url
 
+        if hasattr(request, "session") and "vf-pin-location" in request.session:
+            back_url = request.session.get("vf-pin-location", "")
+            if not is_safe_url(url=back_url, allowed_hosts={request.get_host()}):
+                back_url = "/"
+            return back_url
+
         return self.reverse("process_detail", args=[request.activation.process.pk])
 
 

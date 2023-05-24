@@ -10,7 +10,11 @@ from viewflow.workflow.models import Task
 from . import filters, mixins
 
 
-class FlowInboxListView(mixins.ProcessViewTemplateNames, ListModelView):
+class FlowInboxListView(
+    mixins.StoreRequestPathMixin,
+    mixins.ProcessViewTemplateNames,
+    ListModelView,
+):
     """List of current user assigned tasks of a flow"""
 
     flow_class = None
@@ -41,7 +45,11 @@ class FlowInboxListView(mixins.ProcessViewTemplateNames, ListModelView):
         ).order_by("-created")
 
 
-class FlowQueueListView(mixins.ProcessViewTemplateNames, ListModelView):
+class FlowQueueListView(
+    mixins.StoreRequestPathMixin,
+    mixins.ProcessViewTemplateNames,
+    ListModelView,
+):
     """List of current user available tasks of a flow"""
 
     columns = ("task_id", "flow_task", "brief", "created")
@@ -71,7 +79,11 @@ class FlowQueueListView(mixins.ProcessViewTemplateNames, ListModelView):
         )
 
 
-class FlowArchiveListView(mixins.ProcessViewTemplateNames, ListModelView):
+class FlowArchiveListView(
+    mixins.StoreRequestPathMixin,
+    mixins.ProcessViewTemplateNames,
+    ListModelView,
+):
     """List of current user completed tasks of a flow."""
 
     columns = ("task_id", "brief", "created", "finished", "process_summary")
@@ -105,7 +117,7 @@ class FlowArchiveListView(mixins.ProcessViewTemplateNames, ListModelView):
         ).order_by("-created")
 
 
-class WorkflowTaskListView(ListModelView):
+class WorkflowTaskListView(mixins.StoreRequestPathMixin, ListModelView):
     flow_classes = None
     model = Task
     template_name = "viewflow/workflow/workflow_tasks_list.html"
@@ -118,8 +130,8 @@ class WorkflowTaskListView(ListModelView):
 
     def flow_task(self, task):
         return _(str(task.flow_task))
-    flow_task.short_description = _("Task")
 
+    flow_task.short_description = _("Task")
 
     def process_brief(self, task):
         flow_viewset = task.flow_task.flow_class.parent
@@ -139,9 +151,7 @@ class WorkflowInboxListView(WorkflowTaskListView):
 
     columns = ("task_id", "flow_task", "brief", "process_brief", "created")
     bulk_actions = (
-        Action(
-            name=_("Unassign selected tasks"), viewname="tasks_unassign"
-        ),
+        Action(name=_("Unassign selected tasks"), viewname="tasks_unassign"),
     )
 
     filterset_class = filters.FlowUserTaskListFilter
@@ -160,11 +170,8 @@ class WorkflowQueueListView(WorkflowTaskListView):
 
     columns = ("task_id", "process_brief", "flow_task", "brief", "created")
     filterset_class = filters.FlowUserTaskListFilter
-    bulk_actions = (
-        Action(
-            name=_("Assign selected tasks"), viewname="tasks_assign"
-        ),
-    )
+    bulk_actions = (Action(name=_("Assign selected tasks"), viewname="tasks_assign"),)
+
     @viewprop
     def queryset(self):
         return self.model._default_manager.queue(self.flow_classes, self.request.user)

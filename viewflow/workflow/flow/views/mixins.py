@@ -96,3 +96,9 @@ class TaskViewTemplateNames(object):
             )
         else:
             return [self.template_name]
+
+
+class StoreRequestPathMixin:
+    def dispatch(self, request, *args, **kwargs):
+        request.session["vf-pin-location"] = request.get_full_path()
+        return super().dispatch(request, *args, **kwargs)
