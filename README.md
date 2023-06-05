@@ -179,11 +179,18 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
-2.0.0.b3 2023-04-25
+2.0.0.b4 2023-06-05
 -------------------
 
-- Fix migrations to BigAutoField
-- Reintroduce workflow task signals
+- New flow.SplitFirst Node
+- New celery.Timer Node
+- Expose REST API with drf-spectacular
+- Expose list_ordering_fields in a ModelViewset
+- Retain history and return to the Inbox/Queue list views after completing a flow task
+- Enable smooth page transitions in Chrome/Safari
+- Hotwire/Turbo integration for Django Admin with viewflow.contrib.admin app
+- Resolved issue with viewflow.fsm reporting unmet condition messages
+
 
 
 [build]: https://img.shields.io/github/actions/workflow/status/viewflow/viewflow/django.yml?branch=main

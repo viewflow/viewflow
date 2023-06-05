@@ -2,12 +2,17 @@
 Changelog
 =========
 
-GIT VERSION
------------
+2.0.0.b4 2023-06-05
+-------------------
 
-- Introduce SplitFirst Node
-- celery.Timer Node
-- expose list_ordering_fields in a ModelViewset
+- New flow.SplitFirst Node
+- New celery.Timer Node
+- Expose REST API with drf-spectacular
+- Expose list_ordering_fields in a ModelViewset
+- Retain history and return to the Inbox/Queue list views after completing a flow task
+- Enable smooth page transitions in Chrome/Safari
+- Hotwire/Turbo integration for Django Admin with viewflow.contrib.admin app
+- Resolved issue with viewflow.fsm reporting unmet condition messages
 
 2.0.0.b3 2023-04-25
 -------------------
@@ -70,14 +75,14 @@ GIT VERSION
 1.8.1 2021-01-15
 ----------------
 
-* Fix this-referencies for flow.Functon task loader
+* Fix this-references for flow.Function task loader
 
 
 1.8.0 2021-01-07
 ----------------
 
 * Clean Django 4.0 warnings
-* Allow flow.Handler redifinition with inheritance
+* Allow flow.Handler redefinition with inheritance
 
 
 1.7.0 2020-11-18
@@ -89,7 +94,7 @@ GIT VERSION
 1.6.1 2020-05-13
 ----------------
 
-* Fix autopermission creation for flow.View nodes
+* Fix auto permission creation for flow.View nodes
 * Make django-rest-swagger requirements optional
 * Fix REST Charts on python 3+
 
@@ -101,19 +106,19 @@ GIT VERSION
 * Add process.artifact and task.artifact generic fk fields for default models
 * Add process.data and task.data generic json field for default models
 * Add View().OnCreate(...) callback support
-* Allow to overide flow view access by Flow.has_view_permission method
+* Allow to override flow view access by Flow.has_view_permission method
 
 
 1.5.3 2019-04-23
 ----------------
 
-* Resolve this-referencies for Split and Switch nodes conditions
+* Resolve this-references for Split and Switch nodes conditions
 
 
 1.5.1 2019-02-25
 ----------------
 
-* Task description field became rendered as django template with {{ process }} and {{ task }} variable avaiable
+* Task description field became rendered as django template with {{ process }} and {{ task }} variable available
 
 
 1.5.0 2019-02-13
@@ -141,8 +146,8 @@ GIT VERSION
 1.2.5 2018-05-07
 ----------------
 
-* Fix process desccription translation on django 2.0
-* Fix process dumpdata on django 2.0
+* Fix process description translation on django 2.0
+* Fix process dump data on django 2.0
 * [PRO] Frontend - fix page scroll on graph model open
 
 
@@ -150,7 +155,7 @@ GIT VERSION
 ----------------
 
 * Fix admin actions menu
-* Fix this-referennce usage in If-node condition.
+* Fix this-reference usage in If-node condition.
 * [PRO] Expose Celery Retry task action
 * [PRO] Fix obsolete node url resolve
 
@@ -172,7 +177,7 @@ GIT VERSION
 
 * Django 1.11 support
 * Open-sourced Python 2.7 support
-* Added AGPL licence additional permissions (allows to link with commercial software)
+* Added AGPL license additional permissions (allows to link with commercial software)
 * Localization added: German/French/Spanish/Korean/Chinese
 * Improved task detail UI in frontend
 * Frontend - task management menu fix
