@@ -2,6 +2,11 @@
 Changelog
 =========
 
+GIT VERSION
+-----------
+
+- Alow attach layout to forms in default form rendering template
+
 2.0.0.b4 2023-06-05
 -------------------
 
