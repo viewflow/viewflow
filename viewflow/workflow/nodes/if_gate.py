@@ -7,6 +7,7 @@ from . import mixins
 
 class IfActivation(Activation):
     """Conditionally activate one of outgoing nodes."""
+
     _condition_result = None
 
     @Activation.status.super()
@@ -15,27 +16,32 @@ class IfActivation(Activation):
 
     @Activation.status.super()
     def create_next(self):
-        next_node = self.flow_task._on_true if self._condition_result else self.flow_task._on_false
+        next_node = (
+            self.flow_task._on_true
+            if self._condition_result
+            else self.flow_task._on_false
+        )
         if next_node:
             yield next_node._create(self, self.task.token)
 
 
 class If(Node):
     """If gateway, activate one of outgoing node."""
+
     activation_class = IfActivation
 
-    task_type = 'EXCLUSIVE_GATEWAY'
+    task_type = "EXCLUSIVE_GATEWAY"
 
     shape = {
-        'width': 50,
-        'height': 50,
-        'svg': """
+        "width": 50,
+        "height": 50,
+        "svg": """
             <path class="gateway" d="M25,0L50,25L25,50L0,25L25,0"/>
             <text class="gateway-marker" font-size="16px" x="25" y="31">X</text>
-        """
+        """,
     }
 
-    bpmn_element = 'exclusiveGateway'
+    bpmn_element = "exclusiveGateway"
 
     def __init__(self, cond, **kwargs):
         super().__init__(**kwargs)
@@ -44,8 +50,8 @@ class If(Node):
         self._on_false = None
 
     def _outgoing(self):
-        yield Edge(src=self, dst=self._on_true, edge_class='cond_true')
-        yield Edge(src=self, dst=self._on_false, edge_class='cond_false')
+        yield Edge(src=self, dst=self._on_true, edge_class="cond_true")
+        yield Edge(src=self, dst=self._on_false, edge_class="cond_false")
 
     def _resolve(self, instance):
         super()._resolve(instance)
