@@ -88,7 +88,7 @@ class AbstractTask(models.Model):
         max_length=50,
     )
 
-    created = models.DateTimeField(_("Created"), default=timezone.now)
+    created = models.DateTimeField(_("Created"), default=timezone.now, db_index=True)
     assigned = models.DateTimeField(_("Assigned"), blank=True, null=True)
     started = models.DateTimeField(_("Started"), blank=True, null=True)
     finished = models.DateTimeField(_("Finished"), blank=True, null=True)
@@ -249,6 +249,9 @@ class Process(AbstractProcess):
         ordering = ["-created"]
         verbose_name = _("Process")
         verbose_name_plural = _("Process list")
+        indexes = [
+            models.Index(fields=["artifact_content_type", "artifact_object_id"]),
+        ]
 
 
 class Task(AbstractTask):
