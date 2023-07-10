@@ -2,10 +2,13 @@
 Changelog
 =========
 
-GIT VERSION
------------
+2.0.0.b5 2023-07-10
+-------------------
 
 - Alow attach layout to forms in default form rendering template
+- Fix subprocess node activation
+- Added db indexes for workflow models
+- Improve workflow REST API support
 
 2.0.0.b4 2023-06-05
 -------------------

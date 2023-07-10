@@ -179,17 +179,13 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
-2.0.0.b4 2023-06-05
+2.0.0.b5 2023-07-10
 -------------------
 
-- New flow.SplitFirst Node
-- New celery.Timer Node
-- Expose REST API with drf-spectacular
-- Expose list_ordering_fields in a ModelViewset
-- Retain history and return to the Inbox/Queue list views after completing a flow task
-- Enable smooth page transitions in Chrome/Safari
-- Hotwire/Turbo integration for Django Admin with viewflow.contrib.admin app
-- Resolved issue with viewflow.fsm reporting unmet condition messages
+- Alow attach layout to forms in default form rendering template
+- Fix subprocess node activation
+- Added db indexes for workflow models
+- Improve workflow REST API support
 
 
 

@@ -34,7 +34,11 @@ class DashboardView(
 
     def get_context_data(self, **kwargs):
         sorted_nodes, _ = chart.topsort(self.flow_class)
-        nodes = [node for node in sorted_nodes if node.task_type in ["HUMAN", "JOB"]]
+        nodes = [
+            node
+            for node in sorted_nodes
+            if node.task_type in ["HUMAN", "JOB", "SUBPROCESS"]
+        ]
 
         start_nodes = [
             {"node": node, "can_execute": node.can_execute(self.request.user)}

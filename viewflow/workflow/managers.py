@@ -8,6 +8,7 @@ from django.db.models.constants import LOOKUP_SEP
 from django.db.models.query import ModelIterable
 
 from .status import STATUS
+from .utils import get_next_process_task
 
 
 def _available_flows(flow_classes, user):
@@ -257,22 +258,28 @@ class TaskQuerySet(QuerySet):
         Prefer assigned tasks first, if not, return first task from user queue
         """
 
-        # first try to find an assigned task
-        task = self.filter(process=process, owner=user, status=STATUS.ASSIGNED).first()
+        # task inside a same process
+        task = get_next_process_task(self, process, user)
 
-        # lookup for a task in a queue
+        # task inside subprocess
         if task is None:
-            task = (
-                self.user_queue(user).filter(process=process, status=STATUS.NEW).first()
-            )
+            subprocess_task = self.filter(process__parent_task__process=process).first()
+            if subprocess_task:
+                task = get_next_process_task(self, subprocess_task.process, user)
 
-        # lookup for a job
-        if task is None:
-            task = (
-                self.filter(process=process, flow_task_type='JOB', status__in=[
-                    STATUS.NEW, STATUS.SCHEDULED, STATUS.STARTED
-                ]).first()
-            )
+        # task inside parent process
+        if task is None and process.parent_task_id:
+            task = get_next_process_task(self, process.parent_task.process, user)
+
+        # task inside other subprocesses of parent task
+        if task is None and process.parent_task_id:
+            processes = process.__class__._default_manager.filter(
+                parent_task__process=process.parent_task.process
+            ).exclude(pk=process.pk)
+            for sub_process in processes:
+                task = get_next_process_task(self, sub_process, user)
+                if task:
+                    break
 
         return task
 
