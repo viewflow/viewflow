@@ -52,7 +52,22 @@ Add 'viewflow' and, in case you need workflow capabilities 'viewflow.workflow' t
 
 Here's an example of how to create a simple pizza ordering workflow using Viewflow:
 
-1. Create a model to store process data
+1. Add an app to your django project
+
+```bash
+    python3 manage.py startapp my_pizza
+```
+
+2. Add the new app to INSTALLED_APPS in settings.py
+
+```python
+    INSTALLED_APPS = [
+        ....
+        'my_pizza',
+    ]
+```
+
+3. Create a model in the new app to store process data
 
 Before creating the workflow, you'll need to define a model to store the process
 data. Viewflow provides a Process model as the base model for your process
@@ -68,13 +83,14 @@ avoid model inheritance and additional joins:
         customer_name = jsonstore.CharField(max_length=250)
         address = jsonstore.TextField()
         toppings = jsonstore.TextField()
-        tips_received = json_Store.IntegerField(default=0)
+        tips_received = jsonstore.IntegerField(default=0)
+        baking_time = jsonstore.IntegerField(default=15)
 
         class Meta:
             proxy = True
 ```
 
-2. Create a new flow definition file flows.py
+4. Create a new flow definition file `flows.py``
 
 Next, create a new flow definition file *flows.py* and define your workflow. In
 this example, we'll create a PizzaFlow class that inherits from flow.Flow.
@@ -87,6 +103,8 @@ data from PizzaOrder:
     from viewflow import this
     from viewflow.workflow import flow
     from viewflow.workflow.flow.views import CreateProcessView, UpdateProcessView
+
+    from .models import PizzaOrder
 
     class PizzaFlow(flow.Flow):
         process_class = PizzaOrder
@@ -117,6 +135,7 @@ FlowAppViewset classes to register your workflow with the pre-built frontend.
 
     from viewflow.contrib.auth import AuthViewset
     from viewflow.urls import Application, Site
+    from viewflow.workflow.flow import FlowAppViewset
     from my_pizza.flows import PizzaFlow
 
     site = Site(
@@ -127,17 +146,25 @@ FlowAppViewset classes to register your workflow with the pre-built frontend.
     )
 
     urlpatterns = [
+        ...
         path("accounts/", AuthViewset().urls),
         path("", site.urls),
     ]
 
 ```
 
-4. Run migrations and access the workflow through the pre-built frontend.
+4. Make and Run migrations to create the necessary database tables
 
-Run migrations to create the necessary database tables, then start your Django
-server and access the workflow through the pre-built frontend. You should be
-able to create and track pizza orders with the workflow.
+```bash
+    python manage.py makemigrations my_pizza
+    python manage.py migrate my_pizza
+```
+
+5. Access the workflow through the pre-built frontend.
+
+Start your Django server and login to access the workflow through the
+pre-built frontend. You should be able to create and track pizza orders with
+the workflow.
 
 ## Documentation
 
