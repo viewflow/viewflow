@@ -68,7 +68,8 @@ avoid model inheritance and additional joins:
         customer_name = jsonstore.CharField(max_length=250)
         address = jsonstore.TextField()
         toppings = jsonstore.TextField()
-        tips_received = json_Store.IntegerField(default=0)
+        tips_received = jsonstore.IntegerField(default=0)
+        baking_time = jsonstore.IntegerField(default=10)
 
         class Meta:
             proxy = True
@@ -87,6 +88,7 @@ data from PizzaOrder:
     from viewflow import this
     from viewflow.workflow import flow
     from viewflow.workflow.flow.views import CreateProcessView, UpdateProcessView
+    from .models import PizzaOrder
 
     class PizzaFlow(flow.Flow):
         process_class = PizzaOrder
@@ -115,8 +117,10 @@ FlowAppViewset classes to register your workflow with the pre-built frontend.
 
 ```python
 
+    from django.urls import path
     from viewflow.contrib.auth import AuthViewset
     from viewflow.urls import Application, Site
+    from viewflow.workflow.flow import FlowAppViewset
     from my_pizza.flows import PizzaFlow
 
     site = Site(
@@ -133,9 +137,9 @@ FlowAppViewset classes to register your workflow with the pre-built frontend.
 
 ```
 
-4. Run migrations and access the workflow through the pre-built frontend.
+4. Make and run migrations and access the workflow through the pre-built frontend.
 
-Run migrations to create the necessary database tables, then start your Django
+Make and run migrations to create the necessary database tables, then start your Django
 server and access the workflow through the pre-built frontend. You should be
 able to create and track pizza orders with the workflow.
 
