@@ -3,7 +3,7 @@
 
 {% block content %}{% with process=request.activation.process task=request.activation.task %}
   <div class="mdc-layout-grid vf-page__grid">
-    <div class="mdc-layout-grid__inner">
+    <div class="mdc-layout-grid__inner vf-page__grid-inner">
       <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-8-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone">
         <div class="mdc-card vf-card">
           <section class="vf-card__header">
@@ -42,7 +42,14 @@
       </div>
       {% block panel-cell %}
         <div class="mdc-layout-grid__cell {% block panel-cell-span %}mdc-layout-grid__cell--span-4-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone{% endblock %}">
-          {% include_process_data request.activation.process %}
+          <div class="mdc-layout-grid__inner vf-page__grid-inner">
+            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+              {% include_process_data request.activation.process %}
+            </div>
+            <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+              {% include_task_data request.activation.task %}
+            </div>
+          </div>
         </div>
       {% endblock panel-cell %}
     </div>

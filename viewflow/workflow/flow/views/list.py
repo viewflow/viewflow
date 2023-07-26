@@ -19,6 +19,7 @@ class FlowInboxListView(
 
     flow_class = None
     template_filename = "process_tasks_list.html"
+    title = _('Inbox')
 
     columns = ("task_id", "flow_task", "brief", "created")
     filterset_class = filters.FlowUserTaskListFilter
@@ -56,6 +57,7 @@ class FlowQueueListView(
     filterset_class = filters.FlowUserTaskListFilter
     flow_class = None
     template_filename = "process_tasks_list.html"
+    title = _('Queue')
 
     def task_id(self, task):
         task_url = task.flow_task.reverse("index", args=[task.process_id, task.pk])
@@ -90,6 +92,7 @@ class FlowArchiveListView(
     filterset_class = filters.FlowArchiveListFilter
     flow_class = None
     template_filename = "process_tasks_list.html"
+    title = _('Archive')
 
     def task_id(self, task):
         task_url = task.flow_task.reverse("index", args=[task.process_id, task.pk])
@@ -153,6 +156,7 @@ class WorkflowInboxListView(WorkflowTaskListView):
     bulk_actions = (
         Action(name=_("Unassign selected tasks"), viewname="tasks_unassign"),
     )
+    title = _('Inbox')
 
     filterset_class = filters.FlowUserTaskListFilter
 
@@ -171,6 +175,7 @@ class WorkflowQueueListView(WorkflowTaskListView):
     columns = ("task_id", "process_brief", "flow_task", "brief", "created")
     filterset_class = filters.FlowUserTaskListFilter
     bulk_actions = (Action(name=_("Assign selected tasks"), viewname="tasks_assign"),)
+    title = _('Queue')
 
     @viewprop
     def queryset(self):
@@ -182,6 +187,7 @@ class WorkflowArchiveListView(WorkflowTaskListView):
 
     columns = ("task_id", "flow_task", "brief", "process_brief", "created", "finished")
     filterset_class = filters.FlowArchiveListFilter
+    title = _('Archive')
 
     @viewprop
     def queryset(self):

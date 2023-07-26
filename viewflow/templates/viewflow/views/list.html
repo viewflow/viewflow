@@ -15,7 +15,11 @@
           <div class="mdc-card vf-card">
             {% block list-header %}
               <section class="vf-card__header">
-                {% block list-header-title %}<h1 class="vf-card__title">{{ view.model|verbose_name_plural|title }}</h1>{% endblock %}
+                {% block list-header-title %}<h1 class="vf-card__title">
+                  {% if view.title %}{{ view.title }}
+                  {% else %}{{ view.model|verbose_name_plural|title }}
+                  {% endif %}
+                </h1>{% endblock %}
                 {% block list-header-subtitle %}{% endblock %}
                 {% block list-header-menu %}
                   <div class="vf-card__menu">

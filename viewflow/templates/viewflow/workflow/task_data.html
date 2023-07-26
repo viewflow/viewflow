@@ -1,0 +1,26 @@
+{% if artifact_data %}
+<div class="mdc-card vf-card">
+  <section class="vf-card__header">
+    <h1 class="vf-card__title">{{ task.artifact }}</h1>
+  </section>
+  <section class="vf-card__body">
+    <table class="vf-list__table">
+      <tbody>
+        {% for field, field_name, value in artifact_data %}
+            {% if field.name != 'process' and field.name != 'task' %}
+            <tr>
+              <th class="vf-list__table-header vf-list__table-header-text">{{ field_name }}</th>
+              <td>{{ value }}</td>
+            </tr>
+          {% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+</div>
+{% endif %}
+
+
+{% if data %}
+{{ data }}
+{% endif %}
