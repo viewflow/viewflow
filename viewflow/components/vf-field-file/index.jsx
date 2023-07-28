@@ -18,7 +18,7 @@ const defaultProps = {
   'name': undefined,
   'placeholder': undefined,
   'required': false,
-  'value': undefined,
+  'value': '',
   'multiple': undefined,
 };
 

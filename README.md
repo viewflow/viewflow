@@ -183,14 +183,10 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
-2.0.0.b5 2023-07-10
+2.0.0.b6 2023-07-28
 -------------------
 
-- Alow attach layout to forms in default form rendering template
-- Fix subprocess node activation
-- Added db indexes for workflow models
-- Improve workflow REST API support
-
+- Fix label for File and Image fields
 
 
 [build]: https://img.shields.io/github/actions/workflow/status/viewflow/viewflow/django.yml?branch=main

@@ -15,7 +15,7 @@
               </h2>
             </section>
             <vf-form>
-              <form class="vf-form" method="POST" data-turbo="false">
+              <form class="vf-form" method="POST" data-turbo="false" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
                 {% csrf_token %}
                 <section class="vf-card__form">
                   <h3 class="vf-card__alert">

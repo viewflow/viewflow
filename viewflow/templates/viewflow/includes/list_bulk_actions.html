@@ -54,7 +54,7 @@
   </div>
 </div>
 <vf-form>
-  <form action="." method="post" class="vf-list__action-form">
+  <form action="." method="post" class="vf-list__action-form" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
     {% csrf_token %}
     <button type="submit" class="vf-list__action-button mdc-button mdc-button--dense mdc-button--raised">GO</button>
   </form>

@@ -3,7 +3,7 @@
   <nav class="mdc-drawer__content">
     <h4 class="vf-list__filter-title">{% trans "Filter" %}</h4>
     <vf-form>
-      <form method="GET" class="vf-list__filter-form">
+      <form method="GET" class="vf-list__filter-form" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
         {% render view.filterset.form %}
         <input type="hidden" name="{{ view.ordering_kwarg }}" value="{{ request.GET|list_order:view }}">
         <div class="v_list__filter-actions">

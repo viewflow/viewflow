@@ -80,7 +80,7 @@
           </div>
 
           <div class="mdc-card__actions vf-card__actions">
-            <form method="POST">{% csrf_token %}
+            <form method="POST" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>{% csrf_token %}
               <button type="submit" name="_cancel_process" value="1" class="mdc-button mdc-button--raised mdc-card__action mdc-card__action--button">
                 <div class="mdc-button__ripple"></div>
                 <span class="mdc-button__label">{% trans "Cancel" %}</span> <!- todo perms -->
