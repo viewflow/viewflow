@@ -7,7 +7,25 @@ from . import views, mixins, utils
 
 class Start(mixins.NodeDetailMixin, mixins.NodeUndoMixin, nodes.Start):
     """
-    The Start node in a flow.
+    The ``Start`` node in a flow.
+
+    This node is used as the initial step in a flow by a user.
+
+    `Live Demo <https://demo.viewflow.io/workflow/flows/helloworld/start/>`_ /
+    `Cookbook sample <https://github.com/viewflow/cookbook/blob/main/workflow101/helloworld/flows.py>`_
+
+    .. code-block:: python
+
+        class MyFlow(flow.Flow):
+            start = (
+                flow.Start(views.CreateProcessView.as_view(fields=["text"]))
+                .Annotation(title=_("New message"))
+                .Permission(auto_create=True)
+                .Next(this.approve)
+            )
+
+            ...
+
     """
 
     index_view_class = views.IndexTaskView
@@ -28,6 +46,26 @@ class Start(mixins.NodeDetailMixin, mixins.NodeUndoMixin, nodes.Start):
 
 
 class StartHandle(mixins.NodeDetailMixin, mixins.NodeUndoMixin, nodes.StartHandle):
+    """
+    The ``Start`` handle node in a flow.
+
+    This node is used as the initial step in a flow from code
+
+    .. code-block:: python
+
+        class MyFlow(flow.Flow):
+            start = flow.StartHandle(this.on_start_process).Next(this.approve)
+
+            def start_process(self, activation, sample=False):
+                activation.process.sample = sample
+                return activation.process
+
+            ...
+
+        process = MyFlow.start.run(sample=True)
+
+    """
+
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
     undo_view_class = views.UndoTaskView
@@ -36,6 +74,21 @@ class StartHandle(mixins.NodeDetailMixin, mixins.NodeUndoMixin, nodes.StartHandl
 class End(
     mixins.NodeDetailMixin, mixins.NodeUndoMixin, mixins.NodeReviveMixin, nodes.End
 ):
+    """
+    The ``End`` node in a flow.
+
+    This node serves as the terminal point of a flow
+
+    .. code-block:: python
+
+        class MyFlow(flow.Flow):
+            ...
+
+            approved = this.End()
+            rejected = this.End()
+
+    """
+
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
     undo_view_class = views.UndoTaskView
@@ -49,6 +102,31 @@ class View(
     mixins.NodeReviveMixin,
     nodes.View,
 ):
+    """
+    Represents a user-interaction node within a flow
+
+    .. code-block:: python
+
+        class MyFlow(flow.Flow):
+            ...
+
+            approve = (
+                flow.View(views.UpdateProcessView.as_view(fields=["approved"]))
+                .Annotation(
+                    title=_("Approve"),
+                    description=_("Supervisor approvement"),
+                    summary_template=_("Message review required"),
+                    result_template=_(
+                        "Message was {{ process.approved|yesno:'Approved,Rejected' }}"
+                    ),
+                )
+                .Permission(auto_create=True)
+                .Next(this.check_approve)
+            )
+
+            ...
+    """
+
     index_view_class = views.UserIndexTaskView
     detail_view_class = views.DetailTaskView
     cancel_view_class = views.CancelTaskView
@@ -119,6 +197,24 @@ class View(
 class If(
     mixins.NodeDetailMixin, mixins.NodeUndoMixin, mixins.NodeReviveMixin, nodes.If
 ):
+    """
+    The  If-gate
+
+    .. code-block:: python
+
+        class MyFlow(flow.Flow):
+            ...
+
+            check_approve = (
+                flow.If(lambda activation: activation.process.approved)
+                .Annotation(title=_("Approvement check"))
+                .Then(this.send)
+                .Else(this.end)
+            )
+
+     .       ...
+    """
+
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
     undo_view_class = views.UndoTaskView
@@ -138,6 +234,22 @@ class Handle(
     mixins.NodeReviveMixin,
     nodes.Handle,
 ):
+    """
+    Represents a task executed from the other parts of code
+
+    Usage:
+    To define a handle in a flow and run it:
+
+    .. code-block:: python
+
+        class MyFlow(flow.Flow):
+            ...
+            my_handle = flow.Handle().Next(this.join_gate)
+
+        task = task=process.task_set.get(flow_task=MyFlow.my_handle, status=STATUS.NEW),
+        MyFlow.my_handle.run(task)
+    """
+
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
     cancel_view_class = views.CancelTaskView

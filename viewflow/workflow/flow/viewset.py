@@ -222,7 +222,16 @@ class BulkActionsViewsMixin(metaclass=ViewsetMeta):
 
 
 class FlowViewset(BaseFlowViewsMixin, AppMenuMixin, Viewset):
-    """Basic flow viewset."""
+    """
+    Basic flow viewset to include single flow into url patterns
+
+    Usage:
+
+    .. code-block:: python
+
+        urlpatterns = [path("my_flow/", FlowViewset(MyFlow).urls)]
+
+    """
 
     def _get_urls(self):
         own_patterns = super()._get_urls()
@@ -248,7 +257,28 @@ class FlowViewset(BaseFlowViewsMixin, AppMenuMixin, Viewset):
 
 
 class FlowAppViewset(BaseFlowViewsMixin, BulkActionsViewsMixin, Application):
-    """Viewset includes flow as an separate App into Site."""
+    """
+    Viewset includes flow as an separate App into Site.
+
+    `Cookbook sample <https://github.com/viewflow/cookbook/blob/main/workflow101/config/urls.py>`_
+
+    Usage:
+
+    .. code-block:: python
+
+        site = Site(
+            viewsets=[
+                FlowAppViewset(
+                    ShipmentFlow,
+                    icon="local_shipping",
+                    viewsets=[
+                        ShipmentCRUDViewset()
+                    ]
+            ]
+        )
+
+        urlpatterns = [path("", site.urls)]
+    """
 
     menu_template_name = "viewflow/workflow/flow_menu.html"
     base_template_name = "viewflow/workflow/base_page.html"
@@ -385,7 +415,30 @@ class NestedFlowsApp(AppMenuMixin, Application):
 
 
 class WorkflowAppViewset(BulkActionsViewsMixin, Application):
-    """ """
+    """
+    Viewset includes multiples flow with common Inbox/Queue/Archive views as an
+    separate App into Site.
+
+    `Life demo
+    <https://demo.viewflow.io/workflow/inbox/>`_
+
+    Usage:
+
+    .. code-block:: python
+
+        site = Site(
+            viewsets=[
+                WorkflowAppViewset(
+                    flow_viewsets=[
+                        FlowViewset(HelloWorldFlow, icon="assignment"),
+                        FlowViewset(ShipmentFlow, icon="local_shipping"),
+                        FlowViewset(DynamicSplitFlow, icon="tune"),
+                    ]
+            ]
+        )
+
+        urlpatterns = [path("", site.urls)]
+    """
 
     app_name = "workflow"
     icon = "assignment"

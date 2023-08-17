@@ -33,6 +33,7 @@
     "@hotwired/turbo": "^7.3.0",
     "@material/textfield": "^14.0.0",
     "@material/web": "^0.1.0-alpha.2",
+    "@open-wc/lit-helpers": "^0.6.0",
     "material-components-web": "^14.0.0",
     "material-icons": "^1.13.3",
     "perfect-scrollbar": "^1.5.5",

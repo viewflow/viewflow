@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "module": "ESNext",
+    "module": "ES6",
     "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "declaration": false,
    "outDir": "./types",
@@ -18,7 +18,8 @@
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "target": "ES5",
   },
   "include": ["viewflow/js/**/*.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]

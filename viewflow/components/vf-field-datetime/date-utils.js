@@ -72,7 +72,8 @@ export default class VFDateUtils {
             result += value.getFullYear();
             break;
           case 'I':
-            result += ('0' + (value.getHours()%12)).slice(-2);
+            const twelveHour = value.getHours() % 12 || 12;
+            result += ('0' + twelveHour).slice(-2);
             break;
           case 'H':
             result += ('0' + value.getHours()).slice(-2);
@@ -84,7 +85,7 @@ export default class VFDateUtils {
             result += ('0' + value.getSeconds()).slice(-2);
             break;
           case 'p':
-            result += value.getHours() > 12 ? 'pm': 'am';
+            result += value.getHours() >= 12 ? 'pm': 'am';
         }
         i++;
       } else {
@@ -110,6 +111,12 @@ export default class VFDateUtils {
           break;
         case '%Y':
           year = date[i];
+          break;
+        case '%b':
+          month = VFDateUtils.monthsOfYearAbbr.indexOf(date[i]);
+          if (month === -1) {
+            throw new Error(`Invalid month abbreviation: ${date[i]}`);
+          }
           break;
       }
     }

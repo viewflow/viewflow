@@ -7,7 +7,7 @@ import cc from 'classcat';
 
 import './index.scss';
 
-const defaultProps = {
+export const defaultProps = {
   'autofocus': undefined,
   'disabled': false,
   'error': undefined,
@@ -24,6 +24,7 @@ const defaultProps = {
   'trailingIcon': undefined,
   'type': 'text',
   'value': '',
+  'readonly': undefined
 };
 
 const HelpText = (props) => {
@@ -100,6 +101,7 @@ const Input = (props) => {
         type={ props.type }
         tabindex={ props.tabIndex }
         value={ props.value }
+        readonly= {props.readonly }
         aria-labelledby={ props.id + '_label' }
         oninput={props.onInput}
         onChange={props.onChange}

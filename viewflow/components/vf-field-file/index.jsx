@@ -61,7 +61,9 @@ const VFileInputField = customElement('vf-field-file', defaultProps, (props, {el
         <input
           class="vf-field__file-input"
           multiple={props.multiple}
-          type="file" {...props}
+          type="file"
+          {...props}
+          value=""
           name={props.name}
           id={props.id}
           required={props.required}
