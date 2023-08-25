@@ -2,6 +2,15 @@
 Changelog
 =========
 
+2.0.0.b7 2023-08-25
+-------------------
+
+- Fix pre-populated file field value
+- Improvements for depended select widget
+- Add total  counter widget
+- Improve wizard template default breadcrumbs
+- Support for %b date format
+
 2.0.0.b6 2023-07-28
 -------------------
 

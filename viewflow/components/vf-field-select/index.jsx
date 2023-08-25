@@ -84,6 +84,14 @@ const VSelectField = customElement('vf-field-select', defaultProps, (props, {ele
     }
     setTimeout(() => {
       if (mdcSelect) {
+        mdcSelect.destroy()
+        mdcSelect = new select.MDCSelect(control);
+        const event = new CustomEvent('change', {
+          bubbles: true,
+          detail: {index: -1, value: undefined},
+        });
+        element.dispatchEvent(event);
+
         mdcSelect.layoutOptions();
       }
     });

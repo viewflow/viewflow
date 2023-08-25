@@ -183,10 +183,13 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
-2.0.0.b6 2023-07-28
--------------------
+### 2.0.0.b7 2023-08-25
 
-- Fix label for File and Image fields
+- Fix pre-populated file field value
+- Improvements for depended select widget
+- Add total  counter widget
+- Improve wizard template default breadcrumbs
+- Support for %b date format
 
 
 [build]: https://img.shields.io/github/actions/workflow/status/viewflow/viewflow/django.yml?branch=main

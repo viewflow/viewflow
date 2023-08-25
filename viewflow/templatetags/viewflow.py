@@ -16,6 +16,7 @@ from django.utils.html import conditional_escape
 from viewflow.contrib import auth
 from viewflow.forms import FormLayout
 from viewflow.urls import Site, Viewset, current_viewset_reverse
+from viewflow.utils import camel_case_to_title
 
 register = template.Library()
 
@@ -285,7 +286,7 @@ def list_column_order(column_def, list_view):
 
 @register.filter
 def list_page_data(page, list_view):
-    """Formated page data for a table.
+    """Formatted page data for a table.
 
     Returned data is a list of list of cell values zipped with column definitions.
     [[(column, value), (column, value), ...], ...]
@@ -296,3 +297,23 @@ def list_page_data(page, list_view):
 @register.filter
 def list_order(request_kwargs, list_view):
     return request_kwargs.get(list_view.ordering_kwarg, "")
+
+
+@register.filter(name="class_title")
+def class_title(obj):
+    # If title attribute exists, return it
+    if hasattr(obj, "title"):
+        return obj.title
+
+    # Otherwise, process class name
+    class_name = obj.__class__.__name__
+
+    # Remove "Form" and "Wizard" substrings
+    cleaned_name = (
+        class_name.replace("Form", "").replace("Wizard", "").replace("View", "")
+    )
+
+    if cleaned_name:
+        return camel_case_to_title(cleaned_name)
+    else:
+        return camel_case_to_title(class_name)

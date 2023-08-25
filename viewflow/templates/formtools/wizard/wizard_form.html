@@ -1,12 +1,16 @@
 {% extends 'viewflow/views/form.html' %}
-{% load i18n %}
+{% load i18n viewflow %}
 
 {% block form-header-title %}
   <h1 class="vf-card__title">
-    TODO
+    {{ view|class_title }}
   </h1>
 {% endblock %}
-{% block breadcrumbs_items %}TODO{% endblock %}
+{% block breadcrumbs_items %}
+<a>{{ viewset|class_title }}</a>
+<a>{{ view|class_title }}</a>
+<a>{{ form|class_title }}</a>
+{% endblock %}
 
 {% block form-actions-list %}
   {{ wizard.management_form }}
