@@ -120,7 +120,7 @@ export default class VFDateUtils {
           break;
       }
     }
-    return new Date(Date.UTC(year, month, day));
+    return new Date(year, month, day, 0, 0, 0);
   }
 
   static daysInMonth(year, month) {

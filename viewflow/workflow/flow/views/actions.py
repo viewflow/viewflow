@@ -116,9 +116,16 @@ class ReviveTaskView(
     template_filename = "task_revive.html"
     success_message = _("Task {task} has been revived.")
 
+    def get_success_url(self):
+        if hasattr(self, "new_task"):
+            return self.new_task.flow_task.reverse(
+                "index", args=[self.new_task.process_id, self.new_task.pk]
+            )
+        return super().get_get_success_url()
+
     def form_valid(self, *args, **kwargs):
         """If the form is valid, save the associated model and revives the task."""
-        self.request.activation.revive()
+        self.new_task = self.request.activation.revive()
         return super().form_valid(*args, **kwargs)
 
 
@@ -152,7 +159,7 @@ class CancelProcessView(mixins.ProcessViewTemplateNames, generic.DetailView):
                 _("Process #{self.object.pk} can not be canceled."),
                 fail_silently=True,
             )
-            return HttpResponseRedirect('../')
+            return HttpResponseRedirect("../")
         elif "_cancel_process" in request.POST:
             self.object.flow_class.instance.cancel(self.object)
             messages.add_message(
@@ -161,7 +168,7 @@ class CancelProcessView(mixins.ProcessViewTemplateNames, generic.DetailView):
                 _("Process #{self.object.pk} has been canceled."),
                 fail_silently=True,
             )
-            return HttpResponseRedirect('../')
+            return HttpResponseRedirect("../")
         else:
             return self.get(request, *args, **kwargs)
 

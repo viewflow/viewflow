@@ -2,6 +2,19 @@
 Changelog
 =========
 
+2.0.0.b8 2023-09-29
+-------------------
+
+- Fixed default values for jsonstore fields in forms.
+- Pre-built workflow views now accept the layout option for forms.
+- Improved success redirects for workflow action views.
+- Enabled the 'Undo' action for celery.Job.
+- Extended celery.Job activation to allow its use within the start and end tasks of celery.chord.
+- Stored error traces and local variables in task.data JSON for failed celery.Job tasks.
+- Enhanced handling of obsolete nodes.
+- Fixed the JS calendar date shift issue for time zones with negative time offsets.
+
+
 2.0.0.b7 2023-08-25
 -------------------
 

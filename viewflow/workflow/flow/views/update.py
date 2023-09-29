@@ -1,20 +1,21 @@
 from django.http import HttpResponseRedirect
 from django.views import generic
 from django.utils.translation import gettext_lazy as _
-
+from viewflow.views import FormLayoutMixin
 from . import mixins
 
 
 class UpdateProcessView(
+    FormLayoutMixin,
     mixins.SuccessMessageMixin,
     mixins.TaskSuccessUrlMixin,
     mixins.TaskViewTemplateNames,
-    generic.UpdateView
+    generic.UpdateView,
 ):
     """Default view to update a process"""
 
-    success_message = _('Task {task} has been completed.')
-    template_filename = 'task.html'
+    success_message = _("Task {task} has been completed.")
+    template_filename = "task.html"
 
     def get_object(self):
         """Return the process for the task activation."""
@@ -28,13 +29,14 @@ class UpdateProcessView(
 
 
 class UpdateArtifactView(
+    FormLayoutMixin,
     mixins.SuccessMessageMixin,
     mixins.TaskSuccessUrlMixin,
     mixins.TaskViewTemplateNames,
-    generic.UpdateView
+    generic.UpdateView,
 ):
-    success_message = _('Task {task} has been completed.')
-    template_filename = 'task.html'
+    success_message = _("Task {task} has been completed.")
+    template_filename = "task.html"
 
     def get_object(self):
         """Return the process for the task activation."""

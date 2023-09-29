@@ -8,6 +8,7 @@
 .venv*
 .coverage
 .vscode
+cookbook/_articles/chatgpt/subtitles/
 avatars/
 build
 coverage

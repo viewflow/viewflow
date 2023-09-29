@@ -28,6 +28,7 @@
               {% endblock %}
               {% block form-header-menu %}{% endblock %}
             </section>
+            {% block form %}
             <vf-form>
               <form class="vf-form" method="POST" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
                 {% csrf_token %}
@@ -50,6 +51,7 @@
                 </section>
               </form>
             </vf-form>
+            {% endblock %}
           </div>
         </div>
       {% endblock form-cell %}

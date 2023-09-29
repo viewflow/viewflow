@@ -223,7 +223,7 @@ class AbstractTask(models.Model):
 class Process(AbstractProcess):
     """Default viewflow Process model."""
 
-    data = models.JSONField(null=True, blank=True)
+    data = models.JSONField(default=dict, blank=True)
 
     parent_task = models.ForeignKey(
         blank=True,
@@ -263,7 +263,7 @@ class Task(AbstractTask):
         verbose_name=_("Process"),
     )
 
-    data = models.JSONField(null=True, blank=True)
+    data = models.JSONField(default=dict, blank=True)
 
     # task artifact reference
     artifact = GenericForeignKey("artifact_content_type", "artifact_object_id")

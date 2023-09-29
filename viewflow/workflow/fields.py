@@ -45,6 +45,9 @@ def import_task_by_ref(task_strref):
 @lru_cache(maxsize=None)
 def get_task_ref(flow_task):
     """Convert task to the string reference suitable to store in the db."""
+    # fmt: off
+    if flow_task is None or flow_task.flow_class is None:
+        return None
     module = flow_task.flow_class.__module__
     app_label, app_package = get_containing_app_data(module)
     if app_label is None:

@@ -29,7 +29,7 @@
                 <form class="vf-form" method="POST" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
                   {% csrf_token %}
                   <section class="vf-card__form">
-                    {% render form form.layout %}
+                    {% if view.layout %}{% render form view.layout %}{% else %}{% render form form.layout %}{% endif %}
                   </section>
                   <section class="mdc-card__actions vf-card__actions">
                     <button class="mdc-button mdc-card__action mdc-card__action--button mdc-button--touch" name='_continue' value="1">

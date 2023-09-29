@@ -40,7 +40,7 @@ class Activation(object):
     automata.
     """
 
-    status = fsm.State(STATUS, default=STATUS.NEW)
+    status: fsm.State = fsm.State(STATUS, default=STATUS.NEW)
 
     def __init__(self, task):
         """Instantiate an activation."""
@@ -162,7 +162,9 @@ class Activation(object):
         self.task.save()
 
     @status.transition(
-        source=STATUS.CANCELED, target=STATUS.REVIVED, permission=has_manage_permission
+        source=[STATUS.CANCELED, STATUS.ERROR],
+        target=STATUS.REVIVED,
+        permission=has_manage_permission,
     )
     def revive(self):
         """
@@ -180,6 +182,7 @@ class Activation(object):
 
         activations = set([type(self)(task)])
         self._activate_next(activations)
+        return task
 
     def get_outgoing_transitions(self) -> List[fsm.Transition]:
         return self.__class__.status.get_outgoing_transitions(self.status)

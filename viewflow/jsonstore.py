@@ -28,9 +28,14 @@ class JSONFieldDescriptor(object):
             return self
         json_value = getattr(instance, self.field.json_field_name)
         if isinstance(json_value, dict):
-            value = json_value.get(self.field.attname, None)
-            if hasattr(self.field, "from_json"):
-                value = self.field.from_json(value)
+            if self.field.attname in json_value:
+                value = json_value.get(self.field.attname, None)
+                if hasattr(self.field, "from_json"):
+                    value = self.field.from_json(value)
+            elif self.field.default and self.field.default != fields.NOT_PROVIDED:
+                value = self.field.default
+            else:
+                value = None
             return value
         return None
 
@@ -95,12 +100,19 @@ class JSONFieldMixin(object):
 
         # post_init.connect(on_model_init, sender=cls, weak=False)
 
+    # tOod why?
     def get_default(self):
         return DEFERRED
 
     def get_lookup(self, lookup_name):
         # Always return None, to make get_transform been called
         return None
+
+    def formfield(self, **kwargs):
+        if self.has_default():
+            if not callable(self.default):
+                kwargs["initial"] = self._get_default()
+        return super().formfield(**kwargs)
 
     def get_transform(self, name):
         class TransformFactoryWrapper:

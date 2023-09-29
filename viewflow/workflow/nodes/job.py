@@ -1,9 +1,13 @@
+import json
+import traceback
 import uuid
+
 from django.utils import timezone
 
 from ..activation import Activation
 from ..base import Node
 from ..fields import get_flow_ref
+from ..signals import task_failed
 from ..status import STATUS
 from . import mixins
 
@@ -28,6 +32,10 @@ class AbstractJobActivation(mixins.NextNodeActivationMixin, Activation):
         self.task.started = timezone.now()
         self.task.save()
 
+    @Activation.status.transition(source=STATUS.STARTED)
+    def resume(self):
+        pass
+
     @Activation.status.transition(source=STATUS.STARTED, target=STATUS.DONE)
     def complete(self):
         super().complete.original()
@@ -36,6 +44,27 @@ class AbstractJobActivation(mixins.NextNodeActivationMixin, Activation):
     def execute(self):
         self.complete()
         self.activate_next()
+
+    @Activation.status.transition(source=STATUS.STARTED, target=STATUS.ERROR)
+    def error(self, exception):
+        if not self.task.data:
+            self.task.data = {}
+
+        tb = exception.__traceback__
+        while tb.tb_next:
+            tb = tb.tb_next
+        serialized_locals = json.dumps(
+            tb.tb_frame.f_locals, default=lambda obj: str(obj)
+        )
+
+        self.task.data["_exception"] = {
+            "title": str(exception),
+            "traceback": traceback.format_exc(),
+            "locals": json.loads(serialized_locals),
+        }
+        self.task.finished = timezone.now()
+        self.task.save()
+        task_failed.send(sender=self.flow_class, process=self.process, task=self.task)
 
     def ref(self):
         return f"{get_flow_ref(self.flow_class)}/{self.process.pk}/{self.task.pk}"

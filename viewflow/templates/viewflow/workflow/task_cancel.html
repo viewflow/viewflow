@@ -8,7 +8,7 @@
 
 {% block task_actions %}
   <vf-form>
-    <form class="vf-form" method="POST" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %}>
+    <form class="vf-form" method="POST" {% if form.is_multipart %} enctype="multipart/form-data"{% endif %} action="?back={% reverse viewset 'process_detail' process.pk %}">
       {% csrf_token %}
       <button class="mdc-button mdc-card__action mdc-card__action--button mdc-button--raised mdc-button--touch">
         <span class="mdc-button__ripple"></span>
