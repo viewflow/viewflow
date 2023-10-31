@@ -21,15 +21,15 @@ msgstr "Administration"
 
 #: contrib/auth.py:318
 msgid "Fantastic!"
-msgstr "Fantastique!"
+msgstr "Fantastique !"
 
 #: contrib/auth.py:319
 msgid "That looks awesome!"
-msgstr "Ça a l'air génial!"
+msgstr "Ça a l'air génial !"
 
 #: contrib/auth.py:320
 msgid "You are looking very well today!"
-msgstr "Vous avez l'air très bien aujourd'hui!"
+msgstr "Vous avez l'air très bien aujourd'hui !"
 
 #: contrib/auth.py:321
 msgid "I totally admire your spontaneity."
@@ -41,7 +41,7 @@ msgstr "J'aime ta nouvelle coupe de cheveux."
 
 #: contrib/auth.py:323
 msgid "What a beautiful costume!"
-msgstr "Quel beau costume!"
+msgstr "Quel beau costume !"
 
 #: contrib/auth.py:324
 msgid "You look very good in that suit"
@@ -120,18 +120,18 @@ msgstr "Accès interdit"
 
 #: templates/403.html:11
 msgid "You are not logged in"
-msgstr "Vous n'êtes pas connecté"
+msgstr "Vous n'êtes pas connecté(e)"
 
 #: templates/403.html:16
 #, python-format
 msgid "%(user)s have no rights to access this page"
-msgstr "%(user)s n'ont pas le droit d'accéder à cette page"
+msgstr "%(user)s n'a pas le droit d'accéder à cette page"
 
 #: templates/403.html:27 templates/registration/login.html:8
 #: templates/registration/login.html:10 templates/registration/login.html:19
 #: templates/registration/password_reset_complete.html:12
 msgid "Log in"
-msgstr "Connection"
+msgstr "Connexion"
 
 #: templates/403.html:29
 msgid "Log in as another user"
@@ -170,7 +170,7 @@ msgstr "Graphique"
 #: templates/viewflow/includes/list_filter.html:4
 #: templates/viewflow/includes/list_filter.html:10
 msgid "Filter"
-msgstr "Filtre"
+msgstr "Filtrer"
 
 #: templates/admin/fsm_transition_form.html:18
 msgid "Home"
@@ -186,7 +186,7 @@ msgstr "Veuillez corriger les erreurs ci-dessous."
 
 #: templates/admin/fsm_transition_form.html:54
 msgid "Yes, I’m sure"
-msgstr "Oui, je suis sûre."
+msgstr "Oui, je suis sûr(e)."
 
 #: templates/admin/fsm_transition_form.html:55
 msgid "No, take me back"
@@ -203,11 +203,11 @@ msgstr "Déconnexion"
 
 #: templates/registration/logged_out.html:10
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Merci de passer un peu de temps sur le site Web aujourd'hui."
+msgstr "Merci d'avoir passé un peu de temps sur le site web aujourd'hui."
 
 #: templates/registration/logged_out.html:18
 msgid "Log in again"
-msgstr "Connectez-vous à nouveau"
+msgstr "Se connecter à nouveau"
 
 #: templates/registration/login.html:11
 msgid "Viewflow Demo suite"
@@ -235,7 +235,7 @@ msgstr "Votre mot de passe a été modifié."
 #: templates/viewflow/includes/object_detail_card.html:41
 #: templates/viewflow/views/form.html:35
 msgid "Change"
-msgstr "Changement"
+msgstr "Changer"
 
 #: templates/registration/password_reset_complete.html:10
 msgid "Your password has been set.  You may go ahead and log in now."
@@ -277,7 +277,7 @@ msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Si vous ne recevez pas d'email, vérifiez que vous avez bien entré l'adresse "
+"Si vous ne recevez pas d'e-mail, vérifiez que vous avez bien entré l'adresse "
 "avec laquelle vous vous êtes inscrit, et vérifiez votre dossier spam."
 
 #: templates/registration/password_reset_form.html:9
@@ -321,7 +321,7 @@ msgstr "Connexion"
 #: templates/viewflow/contrib/import_export/export_action.html:14
 #: templates/viewflow/contrib/import_export/export_action.html:40
 msgid "Export"
-msgstr "Exportation"
+msgstr "Exporter"
 
 #: templates/viewflow/contrib/import_export/export_action.html:23
 #, python-format
@@ -335,6 +335,9 @@ msgid_plural ""
 "                  "
 msgstr[0] ""
 msgstr[1] ""
+"\n"
+"                    Exporter les %(objects_count)s %(plural_name)s\n"
+"                  "
 
 #: templates/viewflow/contrib/import_export/export_action.html:29
 #, python-format
@@ -343,6 +346,9 @@ msgid ""
 "                    Export all %(plural_name)s\n"
 "                  "
 msgstr ""
+"\n"
+"                    Exporter tous les %(plural_name)s\n"
+"                  "
 
 #: templates/viewflow/contrib/import_export/export_action.html:39
 #: templates/viewflow/includes/app_menu.html:10
@@ -351,7 +357,7 @@ msgstr ""
 #: templates/viewflow/workflow/tasks_assign.html:46
 #: templates/viewflow/workflow/tasks_unassign.html:46
 msgid "Back"
-msgstr "Dos"
+msgstr "Retour"
 
 #: templates/viewflow/includes/list_bulk_actions.html:12
 msgid "Pick an action"
@@ -372,6 +378,7 @@ msgstr "Supprimer"
 msgid ""
 "\"%(escaped_object)s\" and all of the following related items will be deleted"
 msgstr ""
+"\"%(escaped_object)s\" et tous les éléments associés vont être supprimés"
 
 #: templates/viewflow/views/delete_action.html:25
 #, python-format
@@ -387,6 +394,10 @@ msgid_plural ""
 "                  "
 msgstr[0] ""
 msgstr[1] ""
+"\n"
+"                    Voulez-vous vraiment supprimer les %(objects_count)s "
+"%(plural_name)s et les éléments associés ?\n"
+"                  "
 
 #: templates/viewflow/views/delete_action.html:31
 #, python-format
@@ -396,6 +407,10 @@ msgid ""
 "related items?\n"
 "                  "
 msgstr ""
+"\n"
+"                    Voulez-vous vraiment supprimer tous les %(plural_name)s et "
+"les éléments associés ?\n"
+"                  "
 
 #: templates/viewflow/views/form.html:21
 msgid "New"
@@ -424,7 +439,7 @@ msgstr "Boîte"
 #: templates/viewflow/workflow/workflow_menu.html:12
 #: workflow/rest/filters.py:57
 msgid "Queue"
-msgstr ""
+msgstr "File"
 
 #: templates/viewflow/workflow/flow_menu.html:21
 #: templates/viewflow/workflow/workflow_menu.html:17
@@ -511,7 +526,7 @@ msgstr "Statut"
 #: templates/viewflow/workflow/start.html:44
 #: templates/viewflow/workflow/workflow_tasks_list.html:8
 msgid "Start"
-msgstr "Début"
+msgstr "Commencer"
 
 #: templates/viewflow/workflow/start.html:38
 msgid "Start and continue"
@@ -527,7 +542,7 @@ msgstr "Attribuer et poursuivre"
 
 #: templates/viewflow/workflow/task_detail.html:21
 msgid "Previous tasks"
-msgstr "Previous tasks"
+msgstr "Tâches précédentes"
 
 #: templates/viewflow/workflow/task_detail.html:26
 msgid "No previous tasks"
@@ -544,7 +559,7 @@ msgstr "Aucune tâche suivante"
 #: templates/viewflow/workflow/task_revive.html:6
 #: templates/viewflow/workflow/task_revive.html:17
 msgid "Revive"
-msgstr "Revive"
+msgstr "Réactiver"
 
 #: templates/viewflow/workflow/task_unassign.html:6
 #: templates/viewflow/workflow/task_unassign.html:17
@@ -571,7 +586,7 @@ msgstr "Tâche"
 #: templates/viewflow/workflow/tasks_assign.html:27
 #: templates/viewflow/workflow/tasks_unassign.html:27
 msgid "Brief"
-msgstr "Brief"
+msgstr "Résumé"
 
 #: templates/viewflow/workflow/tasks_assign.html:28
 #: templates/viewflow/workflow/tasks_unassign.html:28
@@ -639,12 +654,12 @@ msgstr "La tâche {task} a été réactivée."
 #: workflow/flow/views/actions.py:152
 #, python-brace-format
 msgid "Process #{self.object.pk} can not be canceled."
-msgstr "Le processus #{self.object.pk} ne peut pas être annulé."
+msgstr "Le processus n°{self.object.pk} ne peut pas être annulé."
 
 #: workflow/flow/views/actions.py:161
 #, python-brace-format
 msgid "Process #{self.object.pk} has been canceled."
-msgstr "Le processus #{self.object.pk} a été annulé."
+msgstr "Le processus n°{self.object.pk} a été annulé."
 
 #: workflow/flow/views/create.py:16
 #, python-brace-format
@@ -666,7 +681,7 @@ msgstr "Processus"
 
 #: workflow/models.py:21
 msgid "Flow"
-msgstr "Débit"
+msgstr "Flux"
 
 #: workflow/models.py:82
 msgid "Type"
@@ -736,7 +751,7 @@ msgstr "Erreur"
 #: workflow/status.py:17
 msgctxt "STATUS"
 msgid "Revived"
-msgstr "Ressuscité"
+msgstr "Réactivé"
 
 #: workflow/status.py:18
 msgctxt "STATUS"
