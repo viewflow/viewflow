@@ -33,21 +33,21 @@ class AuthenticationForm(auth_forms.AuthenticationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.fields['username'].widget = forms.TextInput(
-            attrs={'autofocus': True, 'leading-icon': 'account_box'},
+        self.fields["username"].widget = forms.TextInput(
+            attrs={"autofocus": True, "leading-icon": "account_box"},
         )
-        self.fields['password'].widget = forms.PasswordInput(
-            attrs={'leading-icon': 'lock'}
+        self.fields["password"].widget = forms.PasswordInput(
+            attrs={"leading-icon": "lock"}
         )
 
 
-@method_decorator(user_passes_test(lambda u: u.is_authenticated), name='dispatch')
+@method_decorator(user_passes_test(lambda u: u.is_authenticated), name="dispatch")
 class ProfileView(generic.DetailView):
-    template_name = 'registration/profile.html'
+    template_name = "registration/profile.html"
 
     def get_object_data(self):
         for field in self.object._meta.fields:
-            if field.name in ['password']:
+            if field.name in ["password"]:
                 continue
             if isinstance(field, models.AutoField):
                 continue
@@ -69,45 +69,62 @@ class ProfileView(generic.DetailView):
     def post(self, request, *args, **kwargs):
         class AvatarForm(forms.Form):
             avatar = forms.FileField(required=True)
+
         form = AvatarForm(request.POST, request.FILES)
         if form.is_valid():
-            file_name = 'avatars/{}.png'.format(request.user.pk)
+            file_name = "avatars/{}.png".format(request.user.pk)
             if default_storage.exists(file_name):
                 default_storage.delete(file_name)
-            default_storage.save(file_name, form.cleaned_data['avatar'], max_length=512 * 1024)
-            key = make_template_fragment_key('django-viewflow-avatar', [request.user.pk])
+            default_storage.save(
+                file_name, form.cleaned_data["avatar"], max_length=512 * 1024
+            )
+            key = make_template_fragment_key(
+                "django-viewflow-avatar", [request.user.pk]
+            )
             cache.delete(key)
-            messages.add_message(self.request, messages.SUCCESS, random.choice(GREETINGS), fail_silently=True)
+            messages.add_message(
+                self.request,
+                messages.SUCCESS,
+                random.choice(GREETINGS),
+                fail_silently=True,
+            )
         else:
-            message = ''.join(
-                f"{field}: " + ''.join(error['message'] for error in errors)
+            message = "".join(
+                f"{field}: " + "".join(error["message"] for error in errors)
                 for field, errors in form.errors.get_json_data(escape_html=True).items()
             )
-            messages.add_message(self.request, messages.ERROR, message, fail_silently=True)
+            messages.add_message(
+                self.request, messages.ERROR, message, fail_silently=True
+            )
         return self.get(request, *args, **kwargs)
 
 
 def get_user_avatar_url(user):
     """Lookup for user avatar, on the media files."""
 
-    key = make_template_fragment_key('django-viewflow-avatar', [user.pk])
+    key = make_template_fragment_key("django-viewflow-avatar", [user.pk])
     url = cache.get(key)
-    if url is not None and 'LocMemCache' not in settings.CACHES.get('default', {}).get('BACKEND'):
+    if url is not None and "LocMemCache" not in settings.CACHES.get("default", {}).get(
+        "BACKEND"
+    ):
         return url
 
-    file_name = 'avatars/{}.png'.format(user.pk)
+    file_name = "avatars/{}.png".format(user.pk)
     if default_storage.exists(file_name):
         try:
             modified = default_storage.get_modified_time(file_name)
         except NotImplementedError:
             modified = datetime.now()
-        url = default_storage.url(file_name) + "?timestamp={}".format(modified.timestamp())
+        url = default_storage.url(file_name) + "?timestamp={}".format(
+            modified.timestamp()
+        )
     else:
-        if apps.is_installed('django.contrib.staticfiles'):
+        if apps.is_installed("django.contrib.staticfiles"):
             from django.contrib.staticfiles.storage import staticfiles_storage
-            url = staticfiles_storage.url('viewflow/img/user.png')
+
+            url = staticfiles_storage.url("viewflow/img/user.png")
         else:
-            url = urljoin(settings.STATIC_URL, 'viewflow/img/user.png')
+            url = urljoin(settings.STATIC_URL, "viewflow/img/user.png")
 
     cache.set(key, url)
     return url
@@ -129,9 +146,9 @@ class AuthViewset(Viewset):
 
     def __init__(self, *, allow_password_change=True, with_profile_view=True, **kwargs):
         """
-            Initialize the viewset.
+        Initialize the viewset.
 
-            :param allow_password_change=True: enable password change/reset views
+        :param allow_password_change=True: enable password change/reset views
         """
         super().__init__(**kwargs)
         self.allow_password_change = allow_password_change
@@ -143,9 +160,7 @@ class AuthViewset(Viewset):
     login_view_class = views.LoginView
 
     def get_login_view_kwargs(self, **kwargs):
-        result = {
-            'form_class': AuthenticationForm
-        }
+        result = {"form_class": AuthenticationForm}
         result.update(kwargs)
         return result
 
@@ -155,7 +170,7 @@ class AuthViewset(Viewset):
 
     @property
     def login_path(self):
-        return path('login/', self.login_view, name='login')
+        return path("login/", self.login_view, name="login")
 
     """
     Logout
@@ -171,7 +186,7 @@ class AuthViewset(Viewset):
 
     @property
     def logout_path(self):
-        return path('logout/', self.logout_view, name='logout')
+        return path("logout/", self.logout_view, name="logout")
 
     """
     Password Change
@@ -189,8 +204,8 @@ class AuthViewset(Viewset):
     def pass_change_path(self):
         if self.allow_password_change:
             return path(
-                'password_change/', self.pass_change_view,
-                name='password_change')
+                "password_change/", self.pass_change_view, name="password_change"
+            )
 
     """
     Password Change Done
@@ -202,14 +217,18 @@ class AuthViewset(Viewset):
 
     @viewprop
     def pass_change_done_view(self):
-        return self.pass_change_done_view_class.as_view(**self.get_pass_change_done_view_kwargs())
+        return self.pass_change_done_view_class.as_view(
+            **self.get_pass_change_done_view_kwargs()
+        )
 
     @property
     def pass_change_done_path(self):
         if self.allow_password_change:
             return path(
-                'password_change/done/', self.pass_change_done_view,
-                name='password_change_done')
+                "password_change/done/",
+                self.pass_change_done_view,
+                name="password_change_done",
+            )
 
     """
     Password Reset Request
@@ -226,9 +245,7 @@ class AuthViewset(Viewset):
     @property
     def pass_reset_path(self):
         if self.allow_password_change:
-            return path(
-                'password_reset/', self.pass_reset_view,
-                name='password_reset')
+            return path("password_reset/", self.pass_reset_view, name="password_reset")
 
     """
     Password Reset Request Done
@@ -240,14 +257,18 @@ class AuthViewset(Viewset):
 
     @viewprop
     def pass_reset_done_view(self):
-        return self.pass_reset_done_view_class.as_view(**self.get_pass_reset_done_view_kwargs())
+        return self.pass_reset_done_view_class.as_view(
+            **self.get_pass_reset_done_view_kwargs()
+        )
 
     @property
     def pass_reset_done_path(self):
         if self.allow_password_change:
             return path(
-                'password_reset/done/', self.pass_reset_done_view,
-                name='password_reset_done')
+                "password_reset/done/",
+                self.pass_reset_done_view,
+                name="password_reset_done",
+            )
 
     """
     Password Reset Request Confirm
@@ -259,14 +280,18 @@ class AuthViewset(Viewset):
 
     @viewprop
     def pass_reset_confirm_view(self):
-        return self.pass_reset_confirm_view_class.as_view(**self.get_pass_reset_confirm_view_kwargs())
+        return self.pass_reset_confirm_view_class.as_view(
+            **self.get_pass_reset_confirm_view_kwargs()
+        )
 
     @property
     def pass_reset_confirm_path(self):
         if self.allow_password_change:
             return path(
-                'reset/<uidb64>/<token>/', self.pass_reset_confirm_view,
-                name='password_reset_confirm')
+                "reset/<uidb64>/<token>/",
+                self.pass_reset_confirm_view,
+                name="password_reset_confirm",
+            )
 
     """
     Password Request Request Confirmed
@@ -278,14 +303,19 @@ class AuthViewset(Viewset):
 
     @viewprop
     def pass_reset_complete_view(self):
-        return self.pass_reset_complete_view_class.as_view(**self.get_pass_reset_complete_view_kwargs())
+        return self.pass_reset_complete_view_class.as_view(
+            **self.get_pass_reset_complete_view_kwargs()
+        )
 
     @property
     def pass_reset_complete_path(self):
         if self.allow_password_change:
             return path(
-                'reset/done/', self.pass_reset_complete_view,
-                name='password_reset_complete')
+                "reset/done/",
+                self.pass_reset_complete_view,
+                name="password_reset_complete",
+            )
+
     """
     Profile
     """
@@ -301,28 +331,30 @@ class AuthViewset(Viewset):
     @property
     def profile_path(self):
         if self.with_profile_view:
-            return path('profile/', self.profile_view, name='profile')
+            return path("profile/", self.profile_view, name="profile")
 
     """
     Django-allauth integration
     """
-    def get_allauth_prodivers(self):
+
+    def get_allauth_providers(self):
         try:
             from allauth.socialaccount import providers
-            return providers.registry.get_list()
+
+            return providers.registry.get_class_list()
         except ImportError:
             return []
 
 
 GREETINGS = [
-    _('Fantastic!'),
-    _('That looks awesome!'),
-    _('You are looking very well today!'),
-    _('I totally admire your spontaneity.'),
-    _('I like your new haircut.'),
-    _('What a beautiful costume!'),
-    _('You look very good in that suit'),
-    _('I love your style.'),
-    _('I love your hair today'),
-    _('That color looks great on you!'),
+    _("Fantastic!"),
+    _("That looks awesome!"),
+    _("You are looking very well today!"),
+    _("I totally admire your spontaneity."),
+    _("I like your new haircut."),
+    _("What a beautiful costume!"),
+    _("You look very good in that suit"),
+    _("I love your style."),
+    _("I love your hair today"),
+    _("That color looks great on you!"),
 ]

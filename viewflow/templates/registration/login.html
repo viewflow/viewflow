@@ -31,7 +31,7 @@
 
 {% block lockscreen-sidebar-footer %}
   {% block lockscreen-sidebar-socialaccount %}
-    {% with viewset.get_allauth_prodivers as socialaccount_providers %}
+    {% with viewset.get_allauth_providers as socialaccount_providers %}
       {% if socialaccount_providers %}
         <div style="margin-top:-150px">
           <ul class="vf-page-lockscreen__socialaccount">
