@@ -1,7 +1,7 @@
 vf-field-select,
 vf-field-select-multiple {
   .vf-field__row {
-    height: 76px;
+    min-height: 76px;
   }
 
   .mdc-select {
@@ -10,7 +10,9 @@ vf-field-select-multiple {
 
   .mdc-select-helper-text {
     color: rgba(0, 0, 0, 0.6);
-    margin-top: -4px;
+    margin-top: -6px;
+    margin-bottom: 6px;
+    font-size: 10px;
   }
 
   .mdc-select--invalid:not(.mdc-select--disabled) + .mdc-select-helper-text {
