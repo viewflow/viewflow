@@ -13,7 +13,9 @@ def include_process_data(context, process):
     flow_class = process.flow_class
 
     template_names = (
-        "{}/{}/process_data.html".format(flow_class.app_label, flow_class.flow_label),
+        "{}/{}/process_data.html".format(
+            flow_class.instance.app_label, flow_class.instance.flow_label
+        ),
         "viewflow/workflow/process_data.html",
     )
     template = select_template(template_names)
@@ -35,9 +37,13 @@ def include_task_data(context, task):
 
     template_names = (
         "{}/{}/{}_task_data.html".format(
-            task.flow_task.name, flow_class.app_label, flow_class.flow_label
+            task.flow_task.name,
+            flow_class.instance.app_label,
+            flow_class.instance.flow_label,
         ),
-        "{}/{}/task_data.html".format(flow_class.app_label, flow_class.flow_label),
+        "{}/{}/task_data.html".format(
+            flow_class.instance.app_label, flow_class.instance.flow_label
+        ),
         "viewflow/workflow/task_data.html",
     )
     template = select_template(template_names)
