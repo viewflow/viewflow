@@ -110,11 +110,11 @@ class ModelFieldColumn(BaseColumn):
             return dict(self.model_field.flatchoices).get(value, "")
         elif isinstance(self.model_field, ModelFieldColumn.BOOLEAN_FIELD_TYPES):
             if value is None:
-                return Icon("indeterminate_check_box")
+                return ""  # Icon("remove")
             elif value is True:
-                return Icon("check_box")
+                return Icon("check")
             else:
-                return Icon("check_box_outline_blank")
+                return Icon("close")
         else:
             return super().format_value(obj, value)
 
@@ -177,11 +177,11 @@ class DataSourceColumn(BaseColumn):
     def format_value(self, obj, value):
         if self._get_attr_boolean():
             if value is None:
-                return Icon("indeterminate_check_box")
+                return " "  # Icon("indeterminate_check_box")
             elif value is True:
-                return Icon("check_box")
+                return Icon("check")
             else:
-                return Icon("check_box_outline_blank")
+                return Icon("close")
         else:
             return super().format_value(obj, value)
 
