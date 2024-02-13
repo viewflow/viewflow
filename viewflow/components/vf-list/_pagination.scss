@@ -1,3 +1,5 @@
+@import '@material/typography/mixins.scss';
+
 .vf-list__pagination {
   height: 56px;
   line-height: 56px;
@@ -7,6 +9,7 @@
 }
 
 .vf-list__pagination-summary {
+  @include mdc-typography("subtitle1");
   font-size: 14px;
 }
 
