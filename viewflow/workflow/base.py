@@ -1,7 +1,6 @@
 import copy
 from collections import defaultdict
 from textwrap import dedent
-from urllib.parse import non_hierarchical
 
 from django.apps import apps
 from django.db import transaction
