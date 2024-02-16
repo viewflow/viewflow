@@ -21,56 +21,56 @@ class Test(TestCase):
         content = Template(
             "{% load viewflow %}{% get_absolute_url site user %}"
         ).render(context)
-        self.assertEqual(f"/model/{self.user.pk}/change/", content)
+        self.assertEqual(f"/user/{self.user.pk}/change/", content)
 
         content = Template(
             "{% load viewflow %}{% get_absolute_url site user as var%}{{ var }}"
         ).render(context)
-        self.assertEqual(f"/model/{self.user.pk}/change/", content)
+        self.assertEqual(f"/user/{self.user.pk}/change/", content)
 
     def test_reverse(self):
-        context = Context({"request": self.request, "viewset": site.viewsets[0], "user": self.user})
+        context = Context(
+            {"request": self.request, "viewset": site.viewsets[0], "user": self.user}
+        )
         context.request = self.request
 
         content = Template(
             "{% load viewflow %}{% reverse viewset 'change' user.pk %}"
         ).render(context)
-        self.assertEqual(f"/model/{self.user.pk}/change/", content)
+        self.assertEqual(f"/user/{self.user.pk}/change/", content)
 
         content = Template(
             "{% load viewflow %}{% reverse viewset 'change' user.pk as var %}{{ var }}"
         ).render(context)
-        self.assertEqual(f"/model/{self.user.pk}/change/", content)
+        self.assertEqual(f"/user/{self.user.pk}/change/", content)
 
         content = Template(
             "{% load viewflow %}{% reverse viewset 'change' pk=user.pk %}"
         ).render(context)
-        self.assertEqual(f"/model/{self.user.pk}/change/", content)
+        self.assertEqual(f"/user/{self.user.pk}/change/", content)
 
     def test_get_verbose_name(self):
         context = Context({"model": User})
-        content = Template(
-            "{% load viewflow %}{{ model|verbose_name }}"
-        ).render(context)
+        content = Template("{% load viewflow %}{{ model|verbose_name }}").render(
+            context
+        )
         self.assertEqual("user", content)
 
         context = Context({"user": self.user})
-        content = Template(
-            "{% load viewflow %}{{ user|verbose_name }}"
-        ).render(context)
+        content = Template("{% load viewflow %}{{ user|verbose_name }}").render(context)
         self.assertEqual("user", content)
 
     def test_get_verbose_name_plural(self):
         context = Context({"model": User})
-        content = Template(
-            "{% load viewflow %}{{ model|verbose_name_plural }}"
-        ).render(context)
+        content = Template("{% load viewflow %}{{ model|verbose_name_plural }}").render(
+            context
+        )
         self.assertEqual("users", content)
 
         context = Context({"user": self.user})
-        content = Template(
-            "{% load viewflow %}{{ user|verbose_name_plural }}"
-        ).render(context)
+        content = Template("{% load viewflow %}{{ user|verbose_name_plural }}").render(
+            context
+        )
         self.assertEqual("users", content)
 
     def _test_list_column_order(self):

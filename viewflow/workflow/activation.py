@@ -6,7 +6,7 @@ from django.utils.timezone import now
 
 from viewflow import fsm
 from .context import context
-from .signals import flow_started, task_started, task_finished, task_failed
+from .signals import task_finished, task_failed
 from .status import STATUS, PROCESS
 
 

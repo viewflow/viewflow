@@ -32,6 +32,8 @@ class BaseModelViewset(Viewset):
         attr = super(BaseModelViewset, self).__getattribute__(name)
         if name == "title" and attr is None:
             return self.model._meta.verbose_name_plural.capitalize()
+        elif name == "app_name" and attr is None:
+            return self.model._meta.object_name.lower()
         return attr
 
     def filter_kwargs(self, view_class, **kwargs):
