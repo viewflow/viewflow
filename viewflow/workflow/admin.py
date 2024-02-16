@@ -8,6 +8,7 @@ class TaskInline(admin.TabularInline):
     model = Task
     fields = ["flow_task", "flow_task_type", "status", "token", "owner"]
     readonly_fields = ["flow_task", "flow_task_type", "status", "token"]
+    autocomplete_fields = ["owner"]
 
     def has_add_permission(self, request, obj=None):
         """Disable manually task creation."""
@@ -77,6 +78,7 @@ class TaskAdmin(admin.ModelAdmin):
         "previous",
         "token",
     ]
+    autocomplete_fields = ["owner"]
 
     def has_add_permission(self, request, obj=None):
         """Disable manually task creation."""
