@@ -34,6 +34,7 @@ import './vf-workflow';
 import {VCardMenu} from './vf-card';
 import {VCheckboxField} from './vf-field-checkbox';
 import {VDateField, VInlineCalendarField, VTimeField} from './vf-field-datetime';
+import {VFileInputField} from './vf-field-file';
 import {VInputField} from './vf-field-input';
 import {VPasswordField} from './vf-field-password';
 import {VSelectField, VSelectMultipleField} from './vf-field-select';
