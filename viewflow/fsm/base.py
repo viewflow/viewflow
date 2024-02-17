@@ -24,12 +24,12 @@ from .typing import (
 
 
 class TransitionNotAllowed(Exception):
-    """Raised when a transition is not allowed."""
+    """Exception raised when a state transition is not permitted."""
 
 
-class Transition(object):
+class Transition:
     """
-    A state transition definition.
+    Represents a state transition with associated conditions and permissions.
     """
 
     def __init__(
@@ -71,19 +71,21 @@ class Transition(object):
         return self.func.__name__
 
     def conditions_met(self, instance: object) -> bool:
-        """Check if all associated conditions are met for the transition."""
+        """Checks if all conditions are met for this transition."""
         conditions = [
-            condition.resolve(instance.__class__)
-            if isinstance(condition, ThisObject)
-            else condition
+            (
+                condition.resolve(instance.__class__)
+                if isinstance(condition, ThisObject)
+                else condition
+            )
             for condition in self.conditions
         ]
         return all(map(lambda condition: condition(instance), conditions))
 
     def has_perm(self, instance: object, user: UserModel) -> bool:
-        """Check if the user has the required permission to execute the transition."""
+        """Checks if the given user has permission to perform this transition."""
         if self.permission is None:
-            return False
+            return False  # No permission required
         elif callable(self.permission):
             return self.permission(instance, user)
         elif isinstance(self.permission, ThisObject):
@@ -93,7 +95,7 @@ class Transition(object):
             raise ValueError(f"Unknown permission type {type(self.permission)}")
 
 
-class TransitionMethod(object):
+class TransitionMethod:
     """Unbound transition method wrapper.
 
     Provides shortcut to enumerate all method transitions, ex::
@@ -126,12 +128,12 @@ class TransitionMethod(object):
         return self._func.__name__
 
 
-class TransitionBoundMethod(object):
+class TransitionBoundMethod:
     """Instance method wrapper that performs the transition."""
 
     do_not_call_in_templates = True
 
-    class Wrapper(object):
+    class Wrapper:
         """Wrapper context object, to simplify __call__ method debug"""
 
         def __init__(self, parent: "TransitionBoundMethod", kwargs: Mapping[str, Any]):
@@ -227,7 +229,7 @@ class TransitionBoundMethod(object):
         return self._descriptor.get_transitions()
 
 
-class TransitionDescriptor(object):
+class TransitionDescriptor:
     """Base transition definition descriptor."""
 
     do_not_call_in_templates = True
@@ -264,7 +266,7 @@ class TransitionDescriptor(object):
         return transition
 
 
-class SuperTransitionDescriptor(object):
+class SuperTransitionDescriptor:
     do_not_call_in_templates = True
 
     def __init__(self, state: State, func: TransitionFunction):  # noqa D102
@@ -300,7 +302,7 @@ class SuperTransitionDescriptor(object):
         return super_method._descriptor
 
 
-class StateDescriptor(object):
+class StateDescriptor:
     """Class-bound value for a state descriptor.
 
     Provides shortcut to enumerate all class transitions, ex::
@@ -347,7 +349,7 @@ class StateDescriptor(object):
         ]
 
 
-class State(object):
+class State:
     """State slot field."""
 
     ANY = MARKER("ANY")
@@ -408,7 +410,7 @@ class State(object):
         conditions: Optional[List[Condition]] = None,
         permission: Optional[Permission] = None,
     ) -> Any:
-        """Transition method decorator."""
+        """Decorator to mark a method as a state transition."""
 
         def _wrapper(func: Any) -> Any:
             if isinstance(func, TransitionDescriptor):
@@ -462,7 +464,7 @@ class State(object):
 
         return _wrapper
 
-    class CONDITION(object):
+    class CONDITION:
         """Boolean-like object to return value accompanied with a message from fsm conditions."""
 
         def __init__(self, is_true: bool, unmet: str = ""):

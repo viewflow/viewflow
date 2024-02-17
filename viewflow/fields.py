@@ -22,13 +22,12 @@ class CompositeKey(models.AutoField):
 
     class Key(dict):
         """Dictionary with json-compatible string conversion."""
+
         def __str__(self):
             return json.dumps(self)
 
         def __hash__(self):
-            return hash(
-                tuple(self[key] for key in sorted(self.keys()))
-            )
+            return hash(tuple(self[key] for key in sorted(self.keys())))
 
     def __init__(self, columns: List[str], **kwargs):
         self.columns = columns
@@ -39,9 +38,9 @@ class CompositeKey(models.AutoField):
         self.model = cls
         self.concrete = False
         self.editable = False
-        self.column = self.columns[0]            # for default order_by
+        self.column = self.columns[0]  # for default order_by
         cls._meta.add_field(self, private=True)  # virtual field
-        cls._meta.setup_pk(self)                 # acts as pk
+        cls._meta.setup_pk(self)  # acts as pk
 
         if not getattr(cls, self.attname, None):
             setattr(cls, self.attname, self)
@@ -49,9 +48,7 @@ class CompositeKey(models.AutoField):
         def delete(inst, using=None, keep_parents=False):
             using = using or router.db_for_write(self.model, instance=inst)
 
-            signals.pre_delete.send(
-                sender=cls, instance=inst, using=using
-            )
+            signals.pre_delete.send(sender=cls, instance=inst, using=using)
 
             query = cls._default_manager.filter(**self.__get__(inst))
             query._raw_delete(using)
@@ -59,9 +56,7 @@ class CompositeKey(models.AutoField):
             for column in self.columns:
                 setattr(inst, column, None)
 
-            signals.post_delete.send(
-                sender=cls, instance=inst, using=using
-            )
+            signals.post_delete.send(sender=cls, instance=inst, using=using)
 
         cls.delete = delete
 
@@ -71,6 +66,8 @@ class CompositeKey(models.AutoField):
     def to_python(self, value):
         if value is None or isinstance(value, CompositeKey.Key):
             return value
+        if isinstance(value, dict):
+            return value
         return CompositeKey.Key(json.loads(value))
 
     def to_json(self, value):
@@ -78,8 +75,8 @@ class CompositeKey(models.AutoField):
             result = value.isoformat()
             if value.microsecond:
                 result = result[:23] + result[26:]
-            if result.endswith('+00:00'):
-                result = result[:-6] + 'Z'
+            if result.endswith("+00:00"):
+                result = result[:-6] + "Z"
             return result
         elif isinstance(value, datetime.date):
             return value.isoformat()
@@ -103,12 +100,14 @@ class CompositeKey(models.AutoField):
         if instance is None:
             return self
 
-        return CompositeKey.Key({
-            column: self.to_json(
-                self.model._meta.get_field(column).value_from_object(instance)
-            )
-            for column in self.columns
-        })
+        return CompositeKey.Key(
+            {
+                column: self.to_json(
+                    self.model._meta.get_field(column).value_from_object(instance)
+                )
+                for column in self.columns
+            }
+        )
 
     def __set__(self, instance, value):
         """
@@ -119,7 +118,7 @@ class CompositeKey(models.AutoField):
 
 @CompositeKey.register_lookup
 class Exact(models.Lookup):
-    lookup_name = 'exact'
+    lookup_name = "exact"
 
     def as_sql(self, compiler, connection):
         fields = [
@@ -127,10 +126,7 @@ class Exact(models.Lookup):
             for column in self.lhs.field.columns
         ]
 
-        lookup_classes = [
-            field.get_lookup('exact')
-            for field in fields
-        ]
+        lookup_classes = [field.get_lookup("exact") for field in fields]
 
         lookups = [
             lookup_class(field.get_col(self.lhs.alias), self.rhs[column])

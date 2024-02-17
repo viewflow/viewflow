@@ -1,6 +1,6 @@
 from django.utils.timezone import now
 from viewflow.this_object import this
-from ..activation import Activation, leading_tasks_canceled
+from ..activation import Activation
 from ..base import Node
 from ..exceptions import FlowRuntimeError
 from ..status import STATUS
@@ -12,7 +12,7 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
 
     def __init__(self, *args, **kwargs):  # noqa D102
         self.next_task = None
-        super(JoinActivation, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     @classmethod
     def create(cls, flow_task, prev_activation, token):
@@ -87,7 +87,7 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
 
     def is_done(self):
         """
-        Check that process can be continued futher.
+        Check that process can be continued further.
 
         Join check the all task state in db with the common token prefix.
 
@@ -147,7 +147,7 @@ class Join(
     bpmn_element = "parallelGateway"
 
     def __init__(self, continue_on_condition=None, **kwargs):  # noqa D102
-        super(Join, self).__init__(**kwargs)
+        super().__init__(**kwargs)
         self._continue_on_condition = continue_on_condition
 
     def _resolve(self, cls):
