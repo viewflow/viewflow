@@ -1,7 +1,7 @@
 # Copyright (c) 2017-2020, Mikhail Podgurskiy
 # All Rights Reserved.
 
-# This work is licensed under the Commercial licence defined in file
+# This work is licensed under the Commercial license defined in file
 # 'COMM_LICENSE', which is part of this source code package.
 
 from django.db.models.query import QuerySet
@@ -11,7 +11,7 @@ from rest_framework.response import Response
 
 class FlowGraphView(APIView):
     flow_state_field = None
-    lookup_field = 'pk'
+    lookup_field = "pk"
     lookup_url_kwarg = None
     queryset = None
 
@@ -42,7 +42,7 @@ class FlowGraphView(APIView):
         return obj
 
     def get_flow_graph(self, obj=None):
-        raise NotImplementedError
+        raise NotImplementedError("Subclasses must implement `get_flow_graph` method.")
 
     def get(self, request, format=None):
         obj = self.get_object()

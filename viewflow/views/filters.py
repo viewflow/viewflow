@@ -7,6 +7,7 @@ class FilterableViewMixin(object):
     """
 
     filterset_class = None
+    filterset_initial = None
     filter_fields = None
     strict_filter = False
 
@@ -28,9 +29,20 @@ class FilterableViewMixin(object):
         if self.viewset is not None and hasattr(self.viewset, "get_filterset_kwargs"):
             kwargs = self.viewset.get_filterset_kwargs(self.request)
 
+        # filterset initial
+        data = self.request.GET or None
+        if self.filterset_initial:
+            if data is None:
+                data = self.filterset_initial
+            else:
+                data = data.copy()
+                for key, value in self.filterset_initial.items():
+                    if key not in data:
+                        data[key] = value
+
         return {
             **kwargs,
-            "data": self.request.GET or None,
+            "data": data,
             "request": self.request,
         }
 

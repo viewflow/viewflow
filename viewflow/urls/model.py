@@ -60,6 +60,7 @@ class BaseModelViewset(Viewset):
     list_object_link_columns = DEFAULT
     list_page_actions = DEFAULT
     list_filterset_class = DEFAULT
+    list_filterset_initial = DEFAULT
     list_filter_fields = DEFAULT
     list_search_fields = DEFAULT
     list_ordering_fields = DEFAULT
@@ -80,6 +81,7 @@ class BaseModelViewset(Viewset):
             "paginate_by": self.list_paginate_by,
             "object_link_columns": self.list_object_link_columns,
             "filterset_class": self.list_filterset_class,
+            "filterset_initial": self.list_filterset_initial,
             "filter_fields": self.list_filter_fields,
             "search_fields": self.list_search_fields,
             "ordering": self.list_ordering_fields,

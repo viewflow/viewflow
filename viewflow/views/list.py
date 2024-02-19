@@ -389,7 +389,7 @@ class BaseListModelView(generic.ListView):
         return result
 
     def get_page_data(self, page):
-        """Formated page data for a table.
+        """Formatted page data for a table.
 
         Returned data is a list of list of cell values zipped with column definitions.
         [[(column, value), (column, value), ...], ...]
