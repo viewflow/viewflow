@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Viewflow\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-07 10:45+0000\n"
+"POT-Creation-Date: 2024-02-20 07:49+0000\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -19,43 +19,43 @@ msgstr ""
 msgid "Administration"
 msgstr "Administration"
 
-#: contrib/auth.py:318
+#: contrib/auth.py:350
 msgid "Fantastic!"
-msgstr "Fantastique!"
+msgstr "Fantastique !"
 
-#: contrib/auth.py:319
+#: contrib/auth.py:351
 msgid "That looks awesome!"
-msgstr "Ça a l'air génial!"
+msgstr "Ça a l'air génial !"
 
-#: contrib/auth.py:320
+#: contrib/auth.py:352
 msgid "You are looking very well today!"
-msgstr "Vous avez l'air très bien aujourd'hui!"
+msgstr "Vous avez l'air très bien aujourd'hui !"
 
-#: contrib/auth.py:321
+#: contrib/auth.py:353
 msgid "I totally admire your spontaneity."
 msgstr "J'admire totalement votre spontanéité."
 
-#: contrib/auth.py:322
+#: contrib/auth.py:354
 msgid "I like your new haircut."
 msgstr "J'aime ta nouvelle coupe de cheveux."
 
-#: contrib/auth.py:323
+#: contrib/auth.py:355
 msgid "What a beautiful costume!"
-msgstr "Quel beau costume!"
+msgstr "Quel beau costume !"
 
-#: contrib/auth.py:324
+#: contrib/auth.py:356
 msgid "You look very good in that suit"
 msgstr "Tu es très bien dans ce costume."
 
-#: contrib/auth.py:325
+#: contrib/auth.py:357
 msgid "I love your style."
 msgstr "J'aime votre style."
 
-#: contrib/auth.py:326
+#: contrib/auth.py:358
 msgid "I love your hair today"
 msgstr "J'aime tes cheveux aujourd'hui"
 
-#: contrib/auth.py:327
+#: contrib/auth.py:359
 msgid "That color looks great on you!"
 msgstr "Cette couleur te va à merveille !"
 
@@ -63,41 +63,41 @@ msgstr "Cette couleur te va à merveille !"
 msgid "Format"
 msgstr ""
 
-#: forms/renderers.py:176 forms/renderers.py:222
+#: forms/renderers.py:183 forms/renderers.py:229
 msgid "YYYY"
 msgstr "AAAA"
 
-#: forms/renderers.py:177 forms/renderers.py:223 forms/renderers.py:226
-#: forms/renderers.py:287
+#: forms/renderers.py:184 forms/renderers.py:230 forms/renderers.py:233
+#: forms/renderers.py:299
 msgid "MM"
 msgstr ""
 
-#: forms/renderers.py:178 forms/renderers.py:224
+#: forms/renderers.py:185 forms/renderers.py:231
 msgid "DD"
 msgstr "JJ"
 
-#: forms/renderers.py:225 forms/renderers.py:286 forms/renderers.py:289
+#: forms/renderers.py:232 forms/renderers.py:298 forms/renderers.py:301
 msgid "HH"
 msgstr ""
 
-#: forms/renderers.py:227 forms/renderers.py:288
+#: forms/renderers.py:234 forms/renderers.py:300
 msgid "SS"
 msgstr ""
 
-#: forms/renderers.py:290
+#: forms/renderers.py:302
 msgid "AM/PM"
 msgstr ""
 
-#: fsm/admin.py:136 fsm/rest.py:132 fsm/viewset.py:87
+#: fsm/admin.py:167 fsm/rest.py:158 fsm/viewset.py:87
 msgid "Transition is not allowed"
 msgstr "La transition n'est pas autorisée"
 
-#: fsm/admin.py:175
+#: fsm/admin.py:212
 #, python-format
 msgid "%(label)s %(name)s"
 msgstr ""
 
-#: fsm/rest.py:126
+#: fsm/rest.py:152
 msgid "Invalid transition"
 msgstr "Transition invalide"
 
@@ -112,7 +112,7 @@ msgstr "Mauvaise demande"
 #: templates/registration/password_reset_done.html:12
 #: templates/registration/profile.html:18
 msgid "View site"
-msgstr "Voir site"
+msgstr "Voir le site"
 
 #: templates/403.html:4 templates/403.html:6
 msgid "Access Forbidden"
@@ -131,7 +131,7 @@ msgstr "%(user)s n'ont pas le droit d'accéder à cette page"
 #: templates/registration/login.html:10 templates/registration/login.html:19
 #: templates/registration/password_reset_complete.html:12
 msgid "Log in"
-msgstr "Connection"
+msgstr "Connexion"
 
 #: templates/403.html:29
 msgid "Log in as another user"
@@ -192,6 +192,14 @@ msgstr "Oui, je suis sûre."
 msgid "No, take me back"
 msgstr "Non, ramène-moi."
 
+#: templates/formtools/wizard/wizard_form.html:19
+msgid "first step"
+msgstr ""
+
+#: templates/formtools/wizard/wizard_form.html:20
+msgid "prev step"
+msgstr ""
+
 #: templates/registration/logged_out.html:4
 msgid "Logout"
 msgstr "Déconnexion"
@@ -203,11 +211,11 @@ msgstr "Déconnexion"
 
 #: templates/registration/logged_out.html:10
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr "Merci de passer un peu de temps sur le site Web aujourd'hui."
+msgstr "Merci d'avoir passé un peu de temps sur le site web aujourd'hui."
 
 #: templates/registration/logged_out.html:18
 msgid "Log in again"
-msgstr "Connectez-vous à nouveau"
+msgstr "Se connecter à nouveau"
 
 #: templates/registration/login.html:11
 msgid "Viewflow Demo suite"
@@ -235,7 +243,7 @@ msgstr "Votre mot de passe a été modifié."
 #: templates/viewflow/includes/object_detail_card.html:41
 #: templates/viewflow/views/form.html:35
 msgid "Change"
-msgstr "Changement"
+msgstr "Changer"
 
 #: templates/registration/password_reset_complete.html:10
 msgid "Your password has been set.  You may go ahead and log in now."
@@ -277,7 +285,7 @@ msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
-"Si vous ne recevez pas d'email, vérifiez que vous avez bien entré l'adresse "
+"Si vous ne recevez pas d'e-mail, vérifiez que vous avez bien entré l'adresse "
 "avec laquelle vous vous êtes inscrit, et vérifiez votre dossier spam."
 
 #: templates/registration/password_reset_form.html:9
@@ -321,18 +329,18 @@ msgstr "Connexion"
 #: templates/viewflow/contrib/import_export/export_action.html:14
 #: templates/viewflow/contrib/import_export/export_action.html:40
 msgid "Export"
-msgstr "Exportation"
+msgstr "Exporter"
 
 #: templates/viewflow/contrib/import_export/export_action.html:23
 #, python-format
 msgid ""
 "\n"
-"                    Export the %(name)s\n"
-"                    "
+"                        Export the %(name)s\n"
+"                      "
 msgid_plural ""
 "\n"
-"                    Export the %(objects_count)s %(plural_name)s\n"
-"                  "
+"                        Export the %(objects_count)s %(plural_name)s\n"
+"                      "
 msgstr[0] ""
 msgstr[1] ""
 
@@ -340,8 +348,8 @@ msgstr[1] ""
 #, python-format
 msgid ""
 "\n"
-"                    Export all %(plural_name)s\n"
-"                  "
+"                        Export all %(plural_name)s\n"
+"                      "
 msgstr ""
 
 #: templates/viewflow/contrib/import_export/export_action.html:39
@@ -351,7 +359,7 @@ msgstr ""
 #: templates/viewflow/workflow/tasks_assign.html:46
 #: templates/viewflow/workflow/tasks_unassign.html:46
 msgid "Back"
-msgstr "Dos"
+msgstr "Retour"
 
 #: templates/viewflow/includes/list_bulk_actions.html:12
 msgid "Pick an action"
@@ -377,14 +385,14 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                    Are you sure you want to delete the %(name)s and related "
-"items?\n"
-"                    "
+"                        Are you sure you want to delete the %(name)s and "
+"related items?\n"
+"                      "
 msgid_plural ""
 "\n"
-"                    Are you sure you want to delete the %(objects_count)s "
-"%(plural_name)s and related items?\n"
-"                  "
+"                        Are you sure you want to delete the "
+"%(objects_count)s %(plural_name)s and related items?\n"
+"                      "
 msgstr[0] ""
 msgstr[1] ""
 
@@ -392,9 +400,9 @@ msgstr[1] ""
 #, python-format
 msgid ""
 "\n"
-"                    Are you sure you want to delete all %(plural_name)s and "
-"related items?\n"
-"                  "
+"                        Are you sure you want to delete all %(plural_name)s "
+"and related items?\n"
+"                      "
 msgstr ""
 
 #: templates/viewflow/views/form.html:21
@@ -404,6 +412,10 @@ msgstr "Nouveau"
 #: templates/viewflow/views/form.html:35
 msgid "Add"
 msgstr "Ajouter"
+
+#: templates/viewflow/views/form.html:60
+msgid "Save"
+msgstr ""
 
 #: templates/viewflow/views/transition.html:36
 msgid "Confirm"
@@ -415,20 +427,24 @@ msgstr "Tableau de bord"
 
 #: templates/viewflow/workflow/flow_menu.html:11
 #: templates/viewflow/workflow/tasks_unassign.html:13
-#: templates/viewflow/workflow/workflow_menu.html:7 workflow/rest/filters.py:56
+#: templates/viewflow/workflow/workflow_menu.html:7
+#: workflow/flow/views/list.py:22 workflow/flow/views/list.py:159
+#: workflow/rest/filters.py:57
 msgid "Inbox"
 msgstr "Boîte"
 
 #: templates/viewflow/workflow/flow_menu.html:16
 #: templates/viewflow/workflow/tasks_assign.html:13
 #: templates/viewflow/workflow/workflow_menu.html:12
-#: workflow/rest/filters.py:57
+#: workflow/flow/views/list.py:60 workflow/flow/views/list.py:178
+#: workflow/rest/filters.py:58
 msgid "Queue"
-msgstr ""
+msgstr "File"
 
 #: templates/viewflow/workflow/flow_menu.html:21
 #: templates/viewflow/workflow/workflow_menu.html:17
-#: workflow/rest/filters.py:58
+#: workflow/flow/views/list.py:95 workflow/flow/views/list.py:190
+#: workflow/rest/filters.py:59
 msgid "Archive"
 msgstr "Archives"
 
@@ -437,7 +453,7 @@ msgid "No rights to execute"
 msgstr "Aucun droit d'exécution"
 
 #: templates/viewflow/workflow/process_dashboard.html:61
-#: templates/viewflow/workflow/process_dashboard.html:117
+#: templates/viewflow/workflow/process_dashboard.html:118
 #: templates/viewflow/workflow/tasks_assign.html:29
 #: templates/viewflow/workflow/tasks_unassign.html:29 workflow/models.py:29
 #: workflow/models.py:91
@@ -450,7 +466,7 @@ msgstr "Assigné"
 
 #: templates/viewflow/workflow/process_dashboard.html:74
 #: templates/viewflow/workflow/task.html:25
-#: templates/viewflow/workflow/task.html:48
+#: templates/viewflow/workflow/task.html:49
 msgid "Execute"
 msgstr "Exécuter"
 
@@ -462,7 +478,7 @@ msgid "Assign"
 msgstr "Affecter"
 
 #: templates/viewflow/workflow/process_dashboard.html:84
-#: templates/viewflow/workflow/process_dashboard.html:122 views/create.py:50
+#: templates/viewflow/workflow/process_dashboard.html:123 views/create.py:50
 #: views/update.py:60
 msgid "View"
 msgstr "Voir"
@@ -477,16 +493,16 @@ msgstr "Afficher tous"
 msgid "Finished"
 msgstr "Fini"
 
-#: templates/viewflow/workflow/process_dashboard.html:137
+#: templates/viewflow/workflow/process_dashboard.html:138
 #: templates/viewflow/workflow/process_list.html:8
 #: templates/viewflow/workflow/task_list.html:8 workflow/models.py:251
 msgid "Process list"
 msgstr "Liste des processus"
 
 #: templates/viewflow/workflow/process_detail.html:23
-#: workflow/flow/views/dashboard.py:105 workflow/flow/views/list.py:26
-#: workflow/flow/views/list.py:56 workflow/flow/views/list.py:86
-#: workflow/flow/views/list.py:117
+#: workflow/flow/views/dashboard.py:110 workflow/flow/views/list.py:31
+#: workflow/flow/views/list.py:66 workflow/flow/views/list.py:101
+#: workflow/flow/views/list.py:132
 msgid "#"
 msgstr ""
 
@@ -508,16 +524,16 @@ msgid "Status"
 msgstr "Statut"
 
 #: templates/viewflow/workflow/start.html:21
-#: templates/viewflow/workflow/start.html:44
+#: templates/viewflow/workflow/start.html:45
 #: templates/viewflow/workflow/workflow_tasks_list.html:8
 msgid "Start"
-msgstr "Début"
+msgstr "Commencer"
 
-#: templates/viewflow/workflow/start.html:38
+#: templates/viewflow/workflow/start.html:39
 msgid "Start and continue"
 msgstr "Commencer et continuer"
 
-#: templates/viewflow/workflow/task.html:42
+#: templates/viewflow/workflow/task.html:43
 msgid "Execute and continue"
 msgstr "Exécuter et continuer"
 
@@ -527,7 +543,7 @@ msgstr "Attribuer et poursuivre"
 
 #: templates/viewflow/workflow/task_detail.html:21
 msgid "Previous tasks"
-msgstr "Previous tasks"
+msgstr "Tâches précédentes"
 
 #: templates/viewflow/workflow/task_detail.html:26
 msgid "No previous tasks"
@@ -544,7 +560,7 @@ msgstr "Aucune tâche suivante"
 #: templates/viewflow/workflow/task_revive.html:6
 #: templates/viewflow/workflow/task_revive.html:17
 msgid "Revive"
-msgstr "Revive"
+msgstr "Réactiver"
 
 #: templates/viewflow/workflow/task_unassign.html:6
 #: templates/viewflow/workflow/task_unassign.html:17
@@ -558,20 +574,20 @@ msgid "Undo"
 msgstr "Annuler"
 
 #: templates/viewflow/workflow/tasks_assign.html:11
-#: workflow/flow/views/list.py:165
+#: workflow/flow/views/list.py:177
 msgid "Assign selected tasks"
 msgstr "Assigner les tâches sélectionnées"
 
 #: templates/viewflow/workflow/tasks_assign.html:26
 #: templates/viewflow/workflow/tasks_unassign.html:26
-#: workflow/flow/views/list.py:121 workflow/models.py:81 workflow/models.py:279
+#: workflow/flow/views/list.py:137 workflow/models.py:81 workflow/models.py:282
 msgid "Task"
 msgstr "Tâche"
 
 #: templates/viewflow/workflow/tasks_assign.html:27
 #: templates/viewflow/workflow/tasks_unassign.html:27
 msgid "Brief"
-msgstr "Brief"
+msgstr "Résumé"
 
 #: templates/viewflow/workflow/tasks_assign.html:28
 #: templates/viewflow/workflow/tasks_unassign.html:28
@@ -584,7 +600,7 @@ msgid "confirm"
 msgstr "confirmer"
 
 #: templates/viewflow/workflow/tasks_unassign.html:11
-#: workflow/flow/views/list.py:143
+#: workflow/flow/views/list.py:157
 msgid "Unassign selected tasks"
 msgstr "Désaffecter les tâches sélectionnées"
 
@@ -607,9 +623,9 @@ msgstr "L'objet {obj} a été supprimé avec succès."
 msgid "The {obj} was changed successfully. {link}"
 msgstr "L'objet {obj} a été modifié avec succès. {link}"
 
-#: workflow/apps.py:10
+#: workflow/apps.py:11
 msgid "Workflow"
-msgstr ""
+msgstr "Flux de travail"
 
 #: workflow/flow/views/actions.py:29
 #, python-brace-format
@@ -636,37 +652,37 @@ msgstr "La tâche {task} a été annulée."
 msgid "Task {task} has been revived."
 msgstr "La tâche {task} a été réactivée."
 
-#: workflow/flow/views/actions.py:152
+#: workflow/flow/views/actions.py:159
 #, python-brace-format
 msgid "Process #{self.object.pk} can not be canceled."
 msgstr "Le processus #{self.object.pk} ne peut pas être annulé."
 
-#: workflow/flow/views/actions.py:161
+#: workflow/flow/views/actions.py:168
 #, python-brace-format
 msgid "Process #{self.object.pk} has been canceled."
 msgstr "Le processus #{self.object.pk} a été annulé."
 
-#: workflow/flow/views/create.py:16
+#: workflow/flow/views/create.py:18
 #, python-brace-format
 msgid "Process {process} has been started."
 msgstr "Le processus {process} a été lancé."
 
 #: workflow/flow/views/detail.py:40
 msgid "You have no rights to view this task"
-msgstr "Le processus {process} a été lancé."
+msgstr "Vous n'avez pas le droit de voir cette {task}."
 
-#: workflow/flow/views/update.py:16 workflow/flow/views/update.py:36
+#: workflow/flow/views/update.py:17 workflow/flow/views/update.py:38
 #, python-brace-format
 msgid "Task {task} has been completed."
 msgstr "La tâche {task} a été complétée."
 
-#: workflow/flow/viewset.py:370
+#: workflow/flow/viewset.py:402
 msgid "Processes"
 msgstr "Processus"
 
 #: workflow/models.py:21
 msgid "Flow"
-msgstr "Débit"
+msgstr "Flux"
 
 #: workflow/models.py:82
 msgid "Type"
@@ -688,23 +704,23 @@ msgstr "ID de tâche externe"
 msgid "Permission"
 msgstr ""
 
-#: workflow/models.py:250 workflow/models.py:260
+#: workflow/models.py:250 workflow/models.py:263
 msgid "Process"
 msgstr "Processus"
 
-#: workflow/models.py:280
+#: workflow/models.py:283
 msgid "Tasks"
 msgstr "Tâches"
 
-#: workflow/rest/filters.py:31 workflow/rest/filters.py:59
+#: workflow/rest/filters.py:32 workflow/rest/filters.py:60
 msgid "Active"
 msgstr "Actif"
 
-#: workflow/rest/filters.py:32
+#: workflow/rest/filters.py:33
 msgid "Canceled"
 msgstr "Annulé"
 
-#: workflow/rest/filters.py:33
+#: workflow/rest/filters.py:34
 msgid "Completed"
 msgstr "Complété"
 
@@ -736,7 +752,7 @@ msgstr "Erreur"
 #: workflow/status.py:17
 msgctxt "STATUS"
 msgid "Revived"
-msgstr "Ressuscité"
+msgstr "Réactivé"
 
 #: workflow/status.py:18
 msgctxt "STATUS"

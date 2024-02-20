@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Viewflow\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-07 10:45+0000\n"
+"POT-Creation-Date: 2024-02-20 07:49+0000\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -17,45 +17,45 @@ msgstr ""
 
 #: contrib/admin/__init__.py:34
 msgid "Administration"
-msgstr "管理部門"
+msgstr "管理"
 
-#: contrib/auth.py:318
+#: contrib/auth.py:350
 msgid "Fantastic!"
 msgstr "ファンタスティック!"
 
-#: contrib/auth.py:319
+#: contrib/auth.py:351
 msgid "That looks awesome!"
 msgstr "すごそうですね。"
 
-#: contrib/auth.py:320
+#: contrib/auth.py:352
 msgid "You are looking very well today!"
 msgstr "今日はとてもお元気そうですね。"
 
-#: contrib/auth.py:321
+#: contrib/auth.py:353
 msgid "I totally admire your spontaneity."
 msgstr "その自発性にはまったく感心します。"
 
-#: contrib/auth.py:322
+#: contrib/auth.py:354
 msgid "I like your new haircut."
 msgstr "新しい髪型いいですね。"
 
-#: contrib/auth.py:323
+#: contrib/auth.py:355
 msgid "What a beautiful costume!"
 msgstr "なんて美しい衣装なんでしょう。"
 
-#: contrib/auth.py:324
+#: contrib/auth.py:356
 msgid "You look very good in that suit"
 msgstr "そのスーツはとてもよく似合っている"
 
-#: contrib/auth.py:325
+#: contrib/auth.py:357
 msgid "I love your style."
 msgstr "私はあなたのスタイルが大好きです。"
 
-#: contrib/auth.py:326
+#: contrib/auth.py:358
 msgid "I love your hair today"
 msgstr "今日の髪、素敵ですね"
 
-#: contrib/auth.py:327
+#: contrib/auth.py:359
 msgid "That color looks great on you!"
 msgstr "その色、すごく似合ってるよ!"
 
@@ -63,47 +63,47 @@ msgstr "その色、すごく似合ってるよ!"
 msgid "Format"
 msgstr "フォーマット"
 
-#: forms/renderers.py:176 forms/renderers.py:222
+#: forms/renderers.py:183 forms/renderers.py:229
 msgid "YYYY"
 msgstr ""
 
-#: forms/renderers.py:177 forms/renderers.py:223 forms/renderers.py:226
-#: forms/renderers.py:287
+#: forms/renderers.py:184 forms/renderers.py:230 forms/renderers.py:233
+#: forms/renderers.py:299
 msgid "MM"
 msgstr ""
 
-#: forms/renderers.py:178 forms/renderers.py:224
+#: forms/renderers.py:185 forms/renderers.py:231
 msgid "DD"
 msgstr ""
 
-#: forms/renderers.py:225 forms/renderers.py:286 forms/renderers.py:289
+#: forms/renderers.py:232 forms/renderers.py:298 forms/renderers.py:301
 msgid "HH"
 msgstr ""
 
-#: forms/renderers.py:227 forms/renderers.py:288
+#: forms/renderers.py:234 forms/renderers.py:300
 msgid "SS"
 msgstr ""
 
-#: forms/renderers.py:290
+#: forms/renderers.py:302
 msgid "AM/PM"
 msgstr ""
 
-#: fsm/admin.py:136 fsm/rest.py:132 fsm/viewset.py:87
+#: fsm/admin.py:167 fsm/rest.py:158 fsm/viewset.py:87
 msgid "Transition is not allowed"
 msgstr "トランジション不可"
 
-#: fsm/admin.py:175
+#: fsm/admin.py:212
 #, python-format
 msgid "%(label)s %(name)s"
 msgstr ""
 
-#: fsm/rest.py:126
+#: fsm/rest.py:152
 msgid "Invalid transition"
 msgstr "無効なトランジション"
 
 #: templates/400.html:4 templates/400.html:6
 msgid "Bad Request"
-msgstr "悪いお願い"
+msgstr "不正なリクエスト"
 
 #: templates/400.html:15 templates/404.html:15 templates/500.html:16
 #: templates/registration/password_change_done.html:11
@@ -192,6 +192,14 @@ msgstr "はい、そうです"
 msgid "No, take me back"
 msgstr "いや 俺を連れてってくれ"
 
+#: templates/formtools/wizard/wizard_form.html:19
+msgid "first step"
+msgstr ""
+
+#: templates/formtools/wizard/wizard_form.html:20
+msgid "prev step"
+msgstr ""
+
 #: templates/registration/logged_out.html:4
 msgid "Logout"
 msgstr "ログアウト"
@@ -199,7 +207,7 @@ msgstr "ログアウト"
 #: templates/registration/logged_out.html:6
 #: templates/viewflow/base_page.html:61
 msgid "Log out"
-msgstr "Log out"
+msgstr "ログアウト"
 
 #: templates/registration/logged_out.html:10
 msgid "Thanks for spending some quality time with the Web site today."
@@ -324,21 +332,20 @@ msgstr "輸出"
 #, python-format
 msgid ""
 "\n"
-"                    Export the %(name)s\n"
-"                    "
+"                        Export the %(name)s\n"
+"                      "
 msgid_plural ""
 "\n"
-"                    Export the %(objects_count)s %(plural_name)s\n"
-"                  "
+"                        Export the %(objects_count)s %(plural_name)s\n"
+"                      "
 msgstr[0] ""
-msgstr[1] ""
 
 #: templates/viewflow/contrib/import_export/export_action.html:29
 #, python-format
 msgid ""
 "\n"
-"                    Export all %(plural_name)s\n"
-"                  "
+"                        Export all %(plural_name)s\n"
+"                      "
 msgstr ""
 
 #: templates/viewflow/contrib/import_export/export_action.html:39
@@ -374,24 +381,23 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                    Are you sure you want to delete the %(name)s and related "
-"items?\n"
-"                    "
+"                        Are you sure you want to delete the %(name)s and "
+"related items?\n"
+"                      "
 msgid_plural ""
 "\n"
-"                    Are you sure you want to delete the %(objects_count)s "
-"%(plural_name)s and related items?\n"
-"                  "
+"                        Are you sure you want to delete the "
+"%(objects_count)s %(plural_name)s and related items?\n"
+"                      "
 msgstr[0] ""
-msgstr[1] ""
 
 #: templates/viewflow/views/delete_action.html:31
 #, python-format
 msgid ""
 "\n"
-"                    Are you sure you want to delete all %(plural_name)s and "
-"related items?\n"
-"                  "
+"                        Are you sure you want to delete all %(plural_name)s "
+"and related items?\n"
+"                      "
 msgstr ""
 
 #: templates/viewflow/views/form.html:21
@@ -401,6 +407,10 @@ msgstr "新規"
 #: templates/viewflow/views/form.html:35
 msgid "Add"
 msgstr "追加"
+
+#: templates/viewflow/views/form.html:60
+msgid "Save"
+msgstr ""
 
 #: templates/viewflow/views/transition.html:36
 msgid "Confirm"
@@ -412,20 +422,24 @@ msgstr "ダッシュボード"
 
 #: templates/viewflow/workflow/flow_menu.html:11
 #: templates/viewflow/workflow/tasks_unassign.html:13
-#: templates/viewflow/workflow/workflow_menu.html:7 workflow/rest/filters.py:56
+#: templates/viewflow/workflow/workflow_menu.html:7
+#: workflow/flow/views/list.py:22 workflow/flow/views/list.py:159
+#: workflow/rest/filters.py:57
 msgid "Inbox"
 msgstr "受信箱"
 
 #: templates/viewflow/workflow/flow_menu.html:16
 #: templates/viewflow/workflow/tasks_assign.html:13
 #: templates/viewflow/workflow/workflow_menu.html:12
-#: workflow/rest/filters.py:57
+#: workflow/flow/views/list.py:60 workflow/flow/views/list.py:178
+#: workflow/rest/filters.py:58
 msgid "Queue"
 msgstr "キュー"
 
 #: templates/viewflow/workflow/flow_menu.html:21
 #: templates/viewflow/workflow/workflow_menu.html:17
-#: workflow/rest/filters.py:58
+#: workflow/flow/views/list.py:95 workflow/flow/views/list.py:190
+#: workflow/rest/filters.py:59
 msgid "Archive"
 msgstr "アーカイブ"
 
@@ -434,7 +448,7 @@ msgid "No rights to execute"
 msgstr "実行権なし"
 
 #: templates/viewflow/workflow/process_dashboard.html:61
-#: templates/viewflow/workflow/process_dashboard.html:117
+#: templates/viewflow/workflow/process_dashboard.html:118
 #: templates/viewflow/workflow/tasks_assign.html:29
 #: templates/viewflow/workflow/tasks_unassign.html:29 workflow/models.py:29
 #: workflow/models.py:91
@@ -447,19 +461,19 @@ msgstr "担当"
 
 #: templates/viewflow/workflow/process_dashboard.html:74
 #: templates/viewflow/workflow/task.html:25
-#: templates/viewflow/workflow/task.html:48
+#: templates/viewflow/workflow/task.html:49
 msgid "Execute"
-msgstr "実行する"
+msgstr "実行"
 
 #: templates/viewflow/workflow/process_dashboard.html:79
 #: templates/viewflow/workflow/task_assign.html:6
 #: templates/viewflow/workflow/task_assign.html:23
 #: templates/viewflow/workflow/tasks_assign.html:14
 msgid "Assign"
-msgstr "アサイン"
+msgstr "割り当てる"
 
 #: templates/viewflow/workflow/process_dashboard.html:84
-#: templates/viewflow/workflow/process_dashboard.html:122 views/create.py:50
+#: templates/viewflow/workflow/process_dashboard.html:123 views/create.py:50
 #: views/update.py:60
 msgid "View"
 msgstr "表示"
@@ -474,16 +488,16 @@ msgstr "すべて表示"
 msgid "Finished"
 msgstr "完成品"
 
-#: templates/viewflow/workflow/process_dashboard.html:137
+#: templates/viewflow/workflow/process_dashboard.html:138
 #: templates/viewflow/workflow/process_list.html:8
 #: templates/viewflow/workflow/task_list.html:8 workflow/models.py:251
 msgid "Process list"
 msgstr "プロセス一覧"
 
 #: templates/viewflow/workflow/process_detail.html:23
-#: workflow/flow/views/dashboard.py:105 workflow/flow/views/list.py:26
-#: workflow/flow/views/list.py:56 workflow/flow/views/list.py:86
-#: workflow/flow/views/list.py:117
+#: workflow/flow/views/dashboard.py:110 workflow/flow/views/list.py:31
+#: workflow/flow/views/list.py:66 workflow/flow/views/list.py:101
+#: workflow/flow/views/list.py:132
 msgid "#"
 msgstr ""
 
@@ -505,16 +519,16 @@ msgid "Status"
 msgstr "ステータス"
 
 #: templates/viewflow/workflow/start.html:21
-#: templates/viewflow/workflow/start.html:44
+#: templates/viewflow/workflow/start.html:45
 #: templates/viewflow/workflow/workflow_tasks_list.html:8
 msgid "Start"
 msgstr "スタート"
 
-#: templates/viewflow/workflow/start.html:38
+#: templates/viewflow/workflow/start.html:39
 msgid "Start and continue"
 msgstr "開始と継続"
 
-#: templates/viewflow/workflow/task.html:42
+#: templates/viewflow/workflow/task.html:43
 msgid "Execute and continue"
 msgstr "実行と継続"
 
@@ -555,13 +569,13 @@ msgid "Undo"
 msgstr "アンドゥ"
 
 #: templates/viewflow/workflow/tasks_assign.html:11
-#: workflow/flow/views/list.py:165
+#: workflow/flow/views/list.py:177
 msgid "Assign selected tasks"
 msgstr "選択したタスクの割り当て"
 
 #: templates/viewflow/workflow/tasks_assign.html:26
 #: templates/viewflow/workflow/tasks_unassign.html:26
-#: workflow/flow/views/list.py:121 workflow/models.py:81 workflow/models.py:279
+#: workflow/flow/views/list.py:137 workflow/models.py:81 workflow/models.py:282
 msgid "Task"
 msgstr "タスク"
 
@@ -581,7 +595,7 @@ msgid "confirm"
 msgstr "むすぶ"
 
 #: templates/viewflow/workflow/tasks_unassign.html:11
-#: workflow/flow/views/list.py:143
+#: workflow/flow/views/list.py:157
 msgid "Unassign selected tasks"
 msgstr "選択したタスクの割り当てを解除する"
 
@@ -604,7 +618,7 @@ msgstr "{obj}は正常に削除されました。"
 msgid "The {obj} was changed successfully. {link}"
 msgstr "{obj}は正常に変更されました。{link}"
 
-#: workflow/apps.py:10
+#: workflow/apps.py:11
 msgid "Workflow"
 msgstr "ワークフロー"
 
@@ -633,17 +647,17 @@ msgstr "タスク{task}は取り消されました。"
 msgid "Task {task} has been revived."
 msgstr "タスク{task} が復活しました。"
 
-#: workflow/flow/views/actions.py:152
+#: workflow/flow/views/actions.py:159
 #, python-brace-format
 msgid "Process #{self.object.pk} can not be canceled."
 msgstr "プロセス#{self.object.pk}をキャンセルすることはできません。"
 
-#: workflow/flow/views/actions.py:161
+#: workflow/flow/views/actions.py:168
 #, python-brace-format
 msgid "Process #{self.object.pk} has been canceled."
 msgstr "プロセス#{self.object.pk}はキャンセルされました。"
 
-#: workflow/flow/views/create.py:16
+#: workflow/flow/views/create.py:18
 #, python-brace-format
 msgid "Process {process} has been started."
 msgstr "プロセス{process}が開始されました。"
@@ -652,12 +666,12 @@ msgstr "プロセス{process}が開始されました。"
 msgid "You have no rights to view this task"
 msgstr "このタスクを表示する権利がありません"
 
-#: workflow/flow/views/update.py:16 workflow/flow/views/update.py:36
+#: workflow/flow/views/update.py:17 workflow/flow/views/update.py:38
 #, python-brace-format
 msgid "Task {task} has been completed."
 msgstr "タスク{task}が完了しました。"
 
-#: workflow/flow/viewset.py:370
+#: workflow/flow/viewset.py:402
 msgid "Processes"
 msgstr "プロセス"
 
@@ -685,23 +699,23 @@ msgstr "外部タスクID"
 msgid "Permission"
 msgstr "許可"
 
-#: workflow/models.py:250 workflow/models.py:260
+#: workflow/models.py:250 workflow/models.py:263
 msgid "Process"
 msgstr "プロセス"
 
-#: workflow/models.py:280
+#: workflow/models.py:283
 msgid "Tasks"
 msgstr "タスク"
 
-#: workflow/rest/filters.py:31 workflow/rest/filters.py:59
+#: workflow/rest/filters.py:32 workflow/rest/filters.py:60
 msgid "Active"
 msgstr "アクティブ"
 
-#: workflow/rest/filters.py:32
+#: workflow/rest/filters.py:33
 msgid "Canceled"
 msgstr "キャンセル"
 
-#: workflow/rest/filters.py:33
+#: workflow/rest/filters.py:34
 msgid "Completed"
 msgstr "完成品"
 

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-01-07 10:45+0000\n"
+"POT-Creation-Date: 2024-02-20 08:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -20,93 +20,93 @@ msgstr ""
 
 #: contrib/admin/__init__.py:34
 msgid "Administration"
-msgstr ""
+msgstr "Басқару"
 
-#: contrib/auth.py:318
+#: contrib/auth.py:350
 msgid "Fantastic!"
-msgstr ""
+msgstr "Керемет!"
 
-#: contrib/auth.py:319
+#: contrib/auth.py:351
 msgid "That looks awesome!"
-msgstr ""
+msgstr "Бұл тамаша көрінеді!"
 
-#: contrib/auth.py:320
+#: contrib/auth.py:352
 msgid "You are looking very well today!"
-msgstr ""
+msgstr "Бүгін сіз өте жақсы көрінесіз!"
 
-#: contrib/auth.py:321
+#: contrib/auth.py:353
 msgid "I totally admire your spontaneity."
-msgstr ""
+msgstr "Мен сіздің бейімділігіңізге толықтай таң қаламын."
 
-#: contrib/auth.py:322
+#: contrib/auth.py:354
 msgid "I like your new haircut."
-msgstr ""
+msgstr "Маған сіздің жаңа шаш қиысыңыз ұнайды."
 
-#: contrib/auth.py:323
+#: contrib/auth.py:355
 msgid "What a beautiful costume!"
-msgstr ""
+msgstr "Қандай әдемі костюм!"
 
-#: contrib/auth.py:324
+#: contrib/auth.py:356
 msgid "You look very good in that suit"
-msgstr ""
+msgstr "Сол костюмде сіз өте жақсы көрінесіз"
 
-#: contrib/auth.py:325
+#: contrib/auth.py:357
 msgid "I love your style."
-msgstr ""
+msgstr "Мен сіздің стиліңізді ұнатамын."
 
-#: contrib/auth.py:326
+#: contrib/auth.py:358
 msgid "I love your hair today"
-msgstr ""
+msgstr "Маған бүгінгі шашыңыз ұнайды"
 
-#: contrib/auth.py:327
+#: contrib/auth.py:359
 msgid "That color looks great on you!"
-msgstr ""
+msgstr "Бұл түс сізге өте жарасымды!"
 
 #: contrib/import_export/views.py:11
 msgid "Format"
-msgstr ""
+msgstr "Формат"
 
-#: forms/renderers.py:176 forms/renderers.py:222
+#: forms/renderers.py:183 forms/renderers.py:229
 msgid "YYYY"
 msgstr ""
 
-#: forms/renderers.py:177 forms/renderers.py:223 forms/renderers.py:226
-#: forms/renderers.py:287
+#: forms/renderers.py:184 forms/renderers.py:230 forms/renderers.py:233
+#: forms/renderers.py:299
 msgid "MM"
 msgstr ""
 
-#: forms/renderers.py:178 forms/renderers.py:224
+#: forms/renderers.py:185 forms/renderers.py:231
 msgid "DD"
 msgstr ""
 
-#: forms/renderers.py:225 forms/renderers.py:286 forms/renderers.py:289
+#: forms/renderers.py:232 forms/renderers.py:298 forms/renderers.py:301
 msgid "HH"
 msgstr ""
 
-#: forms/renderers.py:227 forms/renderers.py:288
+#: forms/renderers.py:234 forms/renderers.py:300
 msgid "SS"
 msgstr ""
 
-#: forms/renderers.py:290
+#: forms/renderers.py:302
 msgid "AM/PM"
 msgstr ""
 
-#: fsm/admin.py:136 fsm/rest.py:132 fsm/viewset.py:87
+#: fsm/admin.py:167 fsm/rest.py:158 fsm/viewset.py:87
 msgid "Transition is not allowed"
-msgstr ""
+msgstr "Өтуге рұқсат етілмейді"
 
-#: fsm/admin.py:175
+#: fsm/admin.py:212
 #, python-format
 msgid "%(label)s %(name)s"
 msgstr ""
 
-#: fsm/rest.py:126
+#: fsm/rest.py:152
 msgid "Invalid transition"
-msgstr ""
+msgstr "Жарамсыз өту"
 
 #: templates/400.html:4 templates/400.html:6
 msgid "Bad Request"
-msgstr ""
+msgstr "Бұрыс сұрау"
 
 #: templates/400.html:15 templates/404.html:15 templates/500.html:16
 #: templates/registration/password_change_done.html:11
@@ -115,108 +115,118 @@ msgstr ""
 #: templates/registration/password_reset_done.html:12
 #: templates/registration/profile.html:18
 msgid "View site"
-msgstr ""
+msgstr "Сайтты көру"
 
 #: templates/403.html:4 templates/403.html:6
 msgid "Access Forbidden"
-msgstr ""
+msgstr "Кіруге тыйым салынған"
 
 #: templates/403.html:11
 msgid "You are not logged in"
-msgstr ""
+msgstr "Сіз жүйеге кірмегенсіз"
 
 #: templates/403.html:16
 #, python-format
 msgid "%(user)s have no rights to access this page"
-msgstr ""
+msgstr "%(user)s бұл бетке кіруге құқылы емес"
 
 #: templates/403.html:27 templates/registration/login.html:8
 #: templates/registration/login.html:10 templates/registration/login.html:19
 #: templates/registration/password_reset_complete.html:12
 msgid "Log in"
-msgstr ""
+msgstr "Кіру"
 
 #: templates/403.html:29
 msgid "Log in as another user"
-msgstr ""
+msgstr "Басқа пайдаланушы ретінде кіру"
 
 #: templates/404.html:4 templates/404.html:6
 msgid "Page not found"
-msgstr ""
+msgstr "Бет табылмады"
 
 #: templates/404.html:10
 msgid "We're sorry, but the requested page could not be found."
-msgstr ""
+msgstr "Кешіріңіз, бірақ сұралған бет табылмады."
 
 #: templates/500.html:4 templates/500.html:6
 msgid "Server error"
-msgstr ""
+msgstr "Сервер қатесі"
 
 #: templates/500.html:11
 msgid ""
 "There's been an error. It's been reported to the site administrators via "
 "email and should be fixed shortly. Thanks for your patience."
 msgstr ""
+"Қате пайда болды. Бұл электрондық пошта арқылы сайт әкімшілеріне хабарланды "
+"және жақын арада түзетілуі тиіс. Шыдамдылығыңыз үшін рақмет."
 
 #: templates/admin/fsm_change_list.html:10
 #, python-format
 msgid "Recover deleted %(name)s"
-msgstr ""
+msgstr "Жойылған %(name)s қалпына келтіру"
 
 #: templates/admin/fsm_change_list.html:20
 msgid "Graph"
-msgstr ""
+msgstr "График"
 
 #: templates/admin/fsm_change_list.html:31
 #: templates/viewflow/includes/list_filter.html:4
 #: templates/viewflow/includes/list_filter.html:10
 msgid "Filter"
-msgstr ""
+msgstr "Сүзгі"
 
 #: templates/admin/fsm_transition_form.html:18
 msgid "Home"
-msgstr ""
+msgstr "Басты бет"
 
 #: templates/admin/fsm_transition_form.html:32
 msgid "Please correct the error below."
-msgstr ""
+msgstr "Төмендегі қатені түзетіңіз."
 
 #: templates/admin/fsm_transition_form.html:32
 msgid "Please correct the errors below."
-msgstr ""
+msgstr "Төмендегі қателерді түзетіңіз."
 
 #: templates/admin/fsm_transition_form.html:54
 msgid "Yes, I’m sure"
-msgstr ""
+msgstr "Иә, мен сенімдімін"
 
 #: templates/admin/fsm_transition_form.html:55
 msgid "No, take me back"
+msgstr "Жоқ, мені қайтарыңыз"
+
+#: templates/formtools/wizard/wizard_form.html:19
+msgid "first step"
+msgstr ""
+
+#: templates/formtools/wizard/wizard_form.html:20
+msgid "prev step"
 msgstr ""
 
 #: templates/registration/logged_out.html:4
 msgid "Logout"
-msgstr ""
+msgstr "Шығу"
 
 #: templates/registration/logged_out.html:6
 #: templates/viewflow/base_page.html:61
 msgid "Log out"
-msgstr ""
+msgstr "Шығу"
 
 #: templates/registration/logged_out.html:10
 msgid "Thanks for spending some quality time with the Web site today."
-msgstr ""
+msgstr "Бүгін веб-сайтпен сапалы уақыт өткізгеніңіз үшін рақмет."
 
 #: templates/registration/logged_out.html:18
 msgid "Log in again"
-msgstr ""
+msgstr "Қайтадан кіру"
 
 #: templates/registration/login.html:11
 msgid "Viewflow Demo suite"
-msgstr ""
+msgstr "Viewflow демо жиынтығы"
 
 #: templates/registration/login.html:25
 msgid "Reset password"
-msgstr ""
+msgstr "Құпия сөзді қалпына келтіру"
 
 #: templates/registration/password_change_done.html:5
 #: templates/registration/password_change_done.html:17
@@ -225,56 +235,66 @@ msgstr ""
 #: templates/registration/profile.html:4 templates/registration/profile.html:11
 #: templates/registration/profile.html:25 templates/viewflow/base_page.html:54
 msgid "Profile"
-msgstr ""
+msgstr "Профиль"
 
 #: templates/registration/password_change_done.html:30
 msgid "Your password was changed."
-msgstr ""
+msgstr "Құпия сөзіңіз өзгертілді."
 
 #: templates/registration/password_change_form.html:41
 #: templates/registration/profile.html:74
 #: templates/viewflow/includes/object_detail_card.html:41
 #: templates/viewflow/views/form.html:35
 msgid "Change"
-msgstr ""
+msgstr "Өзгерту"
 
 #: templates/registration/password_reset_complete.html:10
 msgid "Your password has been set.  You may go ahead and log in now."
-msgstr ""
+msgstr "Құпия сөзіңіз орнатылды. Енді сіз кіре аласыз."
 
 #: templates/registration/password_reset_confirm.html:12
 msgid ""
 "Please enter your new password twice so we can verify you typed it in "
 "correctly."
 msgstr ""
+"Жаңа құпия сөзіңізді дұрыс енгізгеніңізді тексеру үшін екі рет енгізіңіз."
 
 #: templates/registration/password_reset_confirm.html:19
 msgid "Change my password"
-msgstr ""
+msgstr "Құпия сөзімді өзгерту"
 
 #: templates/registration/password_reset_confirm.html:26
 msgid ""
 "The password reset link was invalid, possibly because it has already been "
 "used.  Please request a new password reset."
 msgstr ""
+"Құпия сөзді қалпына келтіру сілтемесі жарамсыз болды, мүмкін ол алдын ала "
+"пайдаланылған. Жаңа құпия сөзді қалпына келтіруді сұраңыз."
 
 #: templates/registration/password_reset_done.html:9
 msgid ""
 "We’ve emailed you instructions for setting your password, if an account "
 "exists with the email you entered. You should receive them shortly."
 msgstr ""
+"Егер сіз енгізген электрондық пошта мекенжайымен тіркелген шот болса, біз "
+"сізге құпия сөзіңізді орнату бойынша нұсқауларды жібердік. Оларды жақын "
+"арада алуыңыз керек."
 
 #: templates/registration/password_reset_done.html:10
 msgid ""
 "If you don’t receive an email, please make sure you’ve entered the address "
 "you registered with, and check your spam folder."
 msgstr ""
+"Егер электрондық пошта алмасаңыз, тіркелген мекенжайыңызды дұрыс "
+"енгізгеніңізді және спам қалтасын тексергеніңізді қамтамасыз етіңіз."
 
 #: templates/registration/password_reset_form.html:9
 msgid ""
 "Forgotten your password? Enter your email address below, and we’ll email "
 "instructions for setting a new one."
 msgstr ""
+"Құпия сөзіңізді ұмыттыңыз ба? Төменде сіздің электрондық пошта "
+"мекенжайыңызды енгізіңіз, біз жаңасын орнату бойынша нұсқауларды жібереміз."
 
 #: templates/registration/password_reset_form.html:16
 #: templates/viewflow/workflow/process_cancel.html:16
@@ -283,43 +303,43 @@ msgstr ""
 #: templates/viewflow/workflow/task_cancel.html:6
 #: templates/viewflow/workflow/task_cancel.html:17
 msgid "Cancel"
-msgstr ""
+msgstr "Бас тарту"
 
 #: templates/registration/password_reset_form.html:17
 msgid "Reset"
-msgstr ""
+msgstr "Қалпына келтіру"
 
 #: templates/registration/profile.html:55
 msgid "Change password"
-msgstr ""
+msgstr "Құпия сөзді өзгерту"
 
 #: templates/registration/profile.html:59
 msgid "Edit"
-msgstr ""
+msgstr "Өңдеу"
 
 #: templates/registration/profile.html:82
 msgid "Submit"
-msgstr ""
+msgstr "Жіберу"
 
 #: templates/viewflow/base_page.html:91
 msgid "Login"
-msgstr ""
+msgstr "Кіру"
 
 #: templates/viewflow/contrib/import_export/export_action.html:14
 #: templates/viewflow/contrib/import_export/export_action.html:40
 msgid "Export"
-msgstr ""
+msgstr "Экспорттау"
 
 #: templates/viewflow/contrib/import_export/export_action.html:23
 #, python-format
 msgid ""
 "\n"
-"                    Export the %(name)s\n"
-"                    "
+"                        Export the %(name)s\n"
+"                      "
 msgid_plural ""
 "\n"
-"                    Export the %(objects_count)s %(plural_name)s\n"
-"                  "
+"                        Export the %(objects_count)s %(plural_name)s\n"
+"                      "
 msgstr[0] ""
 msgstr[1] ""
 
@@ -327,8 +347,8 @@ msgstr[1] ""
 #, python-format
 msgid ""
 "\n"
-"                    Export all %(plural_name)s\n"
-"                  "
+"                        Export all %(plural_name)s\n"
+"                      "
 msgstr ""
 
 #: templates/viewflow/contrib/import_export/export_action.html:39
@@ -338,21 +358,21 @@ msgstr ""
 #: templates/viewflow/workflow/tasks_assign.html:46
 #: templates/viewflow/workflow/tasks_unassign.html:46
 msgid "Back"
-msgstr ""
+msgstr "Артқа"
 
 #: templates/viewflow/includes/list_bulk_actions.html:12
 msgid "Pick an action"
-msgstr ""
+msgstr "Әрекет таңдаңыз"
 
 #: templates/viewflow/includes/site_menu.html:8
 msgid "Applications"
-msgstr ""
+msgstr "Қолданбалар"
 
 #: templates/viewflow/views/confirm_delete.html:23
 #: templates/viewflow/views/delete_action.html:15
 #: templates/viewflow/views/delete_action.html:46
 msgid "Delete"
-msgstr ""
+msgstr "Жою"
 
 #: templates/viewflow/views/confirm_delete.html:32
 #, python-format
@@ -364,14 +384,14 @@ msgstr ""
 #, python-format
 msgid ""
 "\n"
-"                    Are you sure you want to delete the %(name)s and related "
-"items?\n"
-"                    "
+"                        Are you sure you want to delete the %(name)s and "
+"related items?\n"
+"                      "
 msgid_plural ""
 "\n"
-"                    Are you sure you want to delete the %(objects_count)s "
-"%(plural_name)s and related items?\n"
-"                  "
+"                        Are you sure you want to delete the "
+"%(objects_count)s %(plural_name)s and related items?\n"
+"                      "
 msgstr[0] ""
 msgstr[1] ""
 
@@ -379,358 +399,366 @@ msgstr[1] ""
 #, python-format
 msgid ""
 "\n"
-"                    Are you sure you want to delete all %(plural_name)s and "
-"related items?\n"
-"                  "
+"                        Are you sure you want to delete all %(plural_name)s "
+"and related items?\n"
+"                      "
 msgstr ""
 
 #: templates/viewflow/views/form.html:21
 msgid "New"
-msgstr ""
+msgstr "Жаңа"
 
 #: templates/viewflow/views/form.html:35
 msgid "Add"
+msgstr "Қосу"
+
+#: templates/viewflow/views/form.html:60
+msgid "Save"
 msgstr ""
 
 #: templates/viewflow/views/transition.html:36
 msgid "Confirm"
-msgstr ""
+msgstr "Растау"
 
 #: templates/viewflow/workflow/flow_menu.html:7
 msgid "Dashboard"
-msgstr ""
+msgstr "Басқару тақтасы"
 
 #: templates/viewflow/workflow/flow_menu.html:11
 #: templates/viewflow/workflow/tasks_unassign.html:13
-#: templates/viewflow/workflow/workflow_menu.html:7 workflow/rest/filters.py:56
+#: templates/viewflow/workflow/workflow_menu.html:7
+#: workflow/flow/views/list.py:22 workflow/flow/views/list.py:159
+#: workflow/rest/filters.py:57
 msgid "Inbox"
-msgstr ""
+msgstr "Кіріс жәшігі"
 
 #: templates/viewflow/workflow/flow_menu.html:16
 #: templates/viewflow/workflow/tasks_assign.html:13
 #: templates/viewflow/workflow/workflow_menu.html:12
-#: workflow/rest/filters.py:57
+#: workflow/flow/views/list.py:60 workflow/flow/views/list.py:178
+#: workflow/rest/filters.py:58
 msgid "Queue"
-msgstr ""
+msgstr "Кезек"
 
 #: templates/viewflow/workflow/flow_menu.html:21
 #: templates/viewflow/workflow/workflow_menu.html:17
-#: workflow/rest/filters.py:58
+#: workflow/flow/views/list.py:95 workflow/flow/views/list.py:190
+#: workflow/rest/filters.py:59
 msgid "Archive"
-msgstr ""
+msgstr "Мұрағат"
 
 #: templates/viewflow/workflow/process_dashboard.html:32
 msgid "No rights to execute"
-msgstr ""
+msgstr "Орындау құқықтары жоқ"
 
 #: templates/viewflow/workflow/process_dashboard.html:61
-#: templates/viewflow/workflow/process_dashboard.html:117
+#: templates/viewflow/workflow/process_dashboard.html:118
 #: templates/viewflow/workflow/tasks_assign.html:29
 #: templates/viewflow/workflow/tasks_unassign.html:29 workflow/models.py:29
 #: workflow/models.py:91
 msgid "Created"
-msgstr ""
+msgstr "Құрылды"
 
 #: templates/viewflow/workflow/process_dashboard.html:66 workflow/models.py:92
 msgid "Assigned"
-msgstr ""
+msgstr "Тағайындалды"
 
 #: templates/viewflow/workflow/process_dashboard.html:74
 #: templates/viewflow/workflow/task.html:25
-#: templates/viewflow/workflow/task.html:48
+#: templates/viewflow/workflow/task.html:49
 msgid "Execute"
-msgstr ""
+msgstr "Орындау"
 
 #: templates/viewflow/workflow/process_dashboard.html:79
 #: templates/viewflow/workflow/task_assign.html:6
 #: templates/viewflow/workflow/task_assign.html:23
 #: templates/viewflow/workflow/tasks_assign.html:14
 msgid "Assign"
-msgstr ""
+msgstr "Тағайындау"
 
 #: templates/viewflow/workflow/process_dashboard.html:84
-#: templates/viewflow/workflow/process_dashboard.html:122 views/create.py:50
+#: templates/viewflow/workflow/process_dashboard.html:123 views/create.py:50
 #: views/update.py:60
 msgid "View"
-msgstr ""
+msgstr "Қарау"
 
 #: templates/viewflow/workflow/process_dashboard.html:94
 msgid "Show all"
-msgstr ""
+msgstr "Барлығын көрсету"
 
 #: templates/viewflow/workflow/process_dashboard.html:102
 #: templates/viewflow/workflow/process_detail.html:27 workflow/models.py:30
 #: workflow/models.py:94
 msgid "Finished"
-msgstr ""
+msgstr "Аяқталды"
 
-#: templates/viewflow/workflow/process_dashboard.html:137
+#: templates/viewflow/workflow/process_dashboard.html:138
 #: templates/viewflow/workflow/process_list.html:8
 #: templates/viewflow/workflow/task_list.html:8 workflow/models.py:251
 msgid "Process list"
-msgstr ""
+msgstr "Процестер тізімі"
 
 #: templates/viewflow/workflow/process_detail.html:23
-#: workflow/flow/views/dashboard.py:105 workflow/flow/views/list.py:26
-#: workflow/flow/views/list.py:56 workflow/flow/views/list.py:86
-#: workflow/flow/views/list.py:117
+#: workflow/flow/views/dashboard.py:110 workflow/flow/views/list.py:31
+#: workflow/flow/views/list.py:66 workflow/flow/views/list.py:101
+#: workflow/flow/views/list.py:132
 msgid "#"
 msgstr ""
 
 #: templates/viewflow/workflow/process_detail.html:24
 msgid "Description"
-msgstr ""
+msgstr "Сипаттама"
 
 #: templates/viewflow/workflow/process_detail.html:25 workflow/models.py:120
 msgid "Owner"
-msgstr ""
+msgstr "Иесі"
 
 #: templates/viewflow/workflow/process_detail.html:26 workflow/models.py:93
 msgid "Started"
-msgstr ""
+msgstr "Басталды"
 
 #: templates/viewflow/workflow/process_detail.html:28 workflow/models.py:23
 #: workflow/models.py:84
 msgid "Status"
-msgstr ""
+msgstr "Статус"
 
 #: templates/viewflow/workflow/start.html:21
-#: templates/viewflow/workflow/start.html:44
+#: templates/viewflow/workflow/start.html:45
 #: templates/viewflow/workflow/workflow_tasks_list.html:8
 msgid "Start"
-msgstr ""
+msgstr "Бастау"
 
-#: templates/viewflow/workflow/start.html:38
+#: templates/viewflow/workflow/start.html:39
 msgid "Start and continue"
-msgstr ""
+msgstr "Бастау және жалғастыру"
 
-#: templates/viewflow/workflow/task.html:42
+#: templates/viewflow/workflow/task.html:43
 msgid "Execute and continue"
-msgstr ""
+msgstr "Орындау және жалғастыру"
 
 #: templates/viewflow/workflow/task_assign.html:17
 msgid "Assign and continue"
-msgstr ""
+msgstr "Тағайындау және жалғастыру"
 
 #: templates/viewflow/workflow/task_detail.html:21
 msgid "Previous tasks"
-msgstr ""
+msgstr "Алдыңғы тапсырмалар"
 
 #: templates/viewflow/workflow/task_detail.html:26
 msgid "No previous tasks"
-msgstr ""
+msgstr "Алдыңғы тапсырмалар жоқ"
 
 #: templates/viewflow/workflow/task_detail.html:31
 msgid "Next tasks"
-msgstr ""
+msgstr "Келесі тапсырмалар"
 
 #: templates/viewflow/workflow/task_detail.html:36
 msgid "No next tasks"
-msgstr ""
+msgstr "Келесі тапсырмалар жоқ"
 
 #: templates/viewflow/workflow/task_revive.html:6
 #: templates/viewflow/workflow/task_revive.html:17
 msgid "Revive"
-msgstr ""
+msgstr "Қайта жандандыру"
 
 #: templates/viewflow/workflow/task_unassign.html:6
 #: templates/viewflow/workflow/task_unassign.html:17
 #: templates/viewflow/workflow/tasks_unassign.html:14
 msgid "Unassign"
-msgstr ""
+msgstr "Тағайындауды алып тастау"
 
 #: templates/viewflow/workflow/task_undo.html:6
 #: templates/viewflow/workflow/task_undo.html:17
 msgid "Undo"
-msgstr ""
+msgstr "Болдырмау"
 
 #: templates/viewflow/workflow/tasks_assign.html:11
-#: workflow/flow/views/list.py:165
+#: workflow/flow/views/list.py:177
 msgid "Assign selected tasks"
-msgstr ""
+msgstr "Таңдалған тапсырмаларды тағайындау"
 
 #: templates/viewflow/workflow/tasks_assign.html:26
 #: templates/viewflow/workflow/tasks_unassign.html:26
-#: workflow/flow/views/list.py:121 workflow/models.py:81 workflow/models.py:279
+#: workflow/flow/views/list.py:137 workflow/models.py:81 workflow/models.py:282
 msgid "Task"
-msgstr ""
+msgstr "Тапсырма"
 
 #: templates/viewflow/workflow/tasks_assign.html:27
 #: templates/viewflow/workflow/tasks_unassign.html:27
 msgid "Brief"
-msgstr ""
+msgstr "Қысқаша"
 
 #: templates/viewflow/workflow/tasks_assign.html:28
 #: templates/viewflow/workflow/tasks_unassign.html:28
 msgid "Process brief"
-msgstr ""
+msgstr "Процесс туралы қысқаша"
 
 #: templates/viewflow/workflow/tasks_assign.html:47
 #: templates/viewflow/workflow/tasks_unassign.html:47
 msgid "confirm"
-msgstr ""
+msgstr "растау"
 
 #: templates/viewflow/workflow/tasks_unassign.html:11
-#: workflow/flow/views/list.py:143
+#: workflow/flow/views/list.py:157
 msgid "Unassign selected tasks"
-msgstr ""
+msgstr "Таңдалған тапсырмалардың тағайындауын алып тастау"
 
 #: templates/viewflow/workflow/workflow_tasks_list.html:20
 msgid "New process"
-msgstr ""
+msgstr "Жаңа процесс"
 
 #: views/create.py:53
 #, python-brace-format
 msgid "The {obj} was added successfully. {link}"
-msgstr ""
+msgstr "{obj} сәтті қосылды. {link}"
 
 #: views/delete.py:83
 #, python-brace-format
 msgid "The {obj} was deleted successfully."
-msgstr ""
+msgstr "{obj} сәтті жойылды."
 
 #: views/update.py:63
 #, python-brace-format
 msgid "The {obj} was changed successfully. {link}"
-msgstr ""
+msgstr "{obj} сәтті өзгертілді. {link}"
 
-#: workflow/apps.py:10
+#: workflow/apps.py:11
 msgid "Workflow"
-msgstr ""
+msgstr "Жұмыс процесі"
 
 #: workflow/flow/views/actions.py:29
 #, python-brace-format
 msgid "Task {task} has been assigned."
-msgstr ""
+msgstr "Тапсырма {task} тағайындалды."
 
 #: workflow/flow/views/actions.py:51
 #, python-brace-format
 msgid "Task {task} has been unassigned."
-msgstr ""
+msgstr "Тапсырма {task} тағайындаудан алынды."
 
 #: workflow/flow/views/actions.py:73
 #, python-brace-format
 msgid "Task {task} has been canceled."
-msgstr ""
+msgstr "Тапсырма {task} болдырмады."
 
 #: workflow/flow/views/actions.py:95
 #, python-brace-format
 msgid "Task {task} has been undone."
-msgstr ""
+msgstr "Тапсырма {task} қайтарылды."
 
 #: workflow/flow/views/actions.py:117
 #, python-brace-format
 msgid "Task {task} has been revived."
-msgstr ""
+msgstr "Тапсырма {task} қайта жандандырылды."
 
-#: workflow/flow/views/actions.py:152
+#: workflow/flow/views/actions.py:159
 #, python-brace-format
 msgid "Process #{self.object.pk} can not be canceled."
-msgstr ""
+msgstr "Процесс #{self.object.pk} болдырмау мүмкін емес."
 
-#: workflow/flow/views/actions.py:161
+#: workflow/flow/views/actions.py:168
 #, python-brace-format
 msgid "Process #{self.object.pk} has been canceled."
-msgstr ""
+msgstr "Процесс #{self.object.pk} болдырмады."
 
-#: workflow/flow/views/create.py:16
+#: workflow/flow/views/create.py:18
 #, python-brace-format
 msgid "Process {process} has been started."
-msgstr ""
+msgstr "Процесс {process} басталды."
 
 #: workflow/flow/views/detail.py:40
 msgid "You have no rights to view this task"
-msgstr ""
+msgstr "Бұл тапсырманы көру құқығыңыз жоқ"
 
-#: workflow/flow/views/update.py:16 workflow/flow/views/update.py:36
+#: workflow/flow/views/update.py:17 workflow/flow/views/update.py:38
 #, python-brace-format
 msgid "Task {task} has been completed."
-msgstr ""
+msgstr "Тапсырма {task} аяқталды."
 
-#: workflow/flow/viewset.py:370
+#: workflow/flow/viewset.py:402
 msgid "Processes"
-msgstr ""
+msgstr "Процестер"
 
 #: workflow/models.py:21
 msgid "Flow"
-msgstr ""
+msgstr "Ағым"
 
 #: workflow/models.py:82
 msgid "Type"
-msgstr ""
+msgstr "Түрі"
 
 #: workflow/models.py:97 workflow/models.py:110
 msgid "Previous"
-msgstr ""
+msgstr "Алдыңғы"
 
 #: workflow/models.py:99
 msgid "Token"
-msgstr ""
+msgstr "Токен"
 
 #: workflow/models.py:106
 msgid "External Task ID"
-msgstr ""
+msgstr "Сыртқы Тапсырма ИД"
 
 #: workflow/models.py:127
 msgid "Permission"
-msgstr ""
+msgstr "Рұқсат"
 
-#: workflow/models.py:250 workflow/models.py:260
+#: workflow/models.py:250 workflow/models.py:263
 msgid "Process"
-msgstr ""
+msgstr "Процесс"
 
-#: workflow/models.py:280
+#: workflow/models.py:283
 msgid "Tasks"
-msgstr ""
+msgstr "Тапсырмалар"
 
-#: workflow/rest/filters.py:31 workflow/rest/filters.py:59
+#: workflow/rest/filters.py:32 workflow/rest/filters.py:60
 msgid "Active"
-msgstr ""
-
-#: workflow/rest/filters.py:32
-msgid "Canceled"
-msgstr ""
+msgstr "Белсенді"
 
 #: workflow/rest/filters.py:33
+msgid "Canceled"
+msgstr "Болдырмады"
+
+#: workflow/rest/filters.py:34
 msgid "Completed"
-msgstr ""
+msgstr "Аяқталды"
 
 #: workflow/status.py:6 workflow/status.py:13
 msgctxt "STATUS"
 msgid "Canceled"
-msgstr ""
+msgstr "Болдырмады"
 
 #: workflow/status.py:7 workflow/status.py:14
 msgctxt "STATUS"
 msgid "Done"
-msgstr ""
+msgstr "Аяқталды"
 
 #: workflow/status.py:8 workflow/status.py:16
 msgctxt "STATUS"
 msgid "New"
-msgstr ""
+msgstr "Жаңа"
 
 #: workflow/status.py:12
 msgctxt "STATUS"
 msgid "Assigned"
-msgstr ""
+msgstr "Тағайындалды"
 
 #: workflow/status.py:15
 msgctxt "STATUS"
 msgid "Error"
-msgstr ""
+msgstr "Қате"
 
 #: workflow/status.py:17
 msgctxt "STATUS"
 msgid "Revived"
-msgstr ""
+msgstr "Қайта жандандырылды"
 
 #: workflow/status.py:18
 msgctxt "STATUS"
 msgid "Scheduled"
-msgstr ""
+msgstr "Жоспарланды"
 
 #: workflow/status.py:19
 msgctxt "STATUS"
 msgid "Started"
-msgstr ""
+msgstr "Басталды"
