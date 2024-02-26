@@ -330,7 +330,8 @@ class DetailViewMixin(metaclass=ViewsetMeta):
 
     def get_detail_page_actions(self, request, obj, *actions):
         if hasattr(self, "has_delete_permission") and self.has_delete_permission(
-            request.user
+            request.user,
+            obj=obj,
         ):
             actions = (
                 Action(
