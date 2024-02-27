@@ -50,6 +50,9 @@ import {VLinearProgress} from './vf-progress';
 import {VSnackbar} from './vf-snackbar';
 import {VTurbo} from './vf-turbo';
 
+import {VDash} from '../contrib/plotly';
+
+
 window.addEventListener('DOMContentLoaded', () => {
   window.customElements.define('vf-card-menu', VCardMenu);
   window.customElements.define('vf-dialog', VDialog);
@@ -128,4 +131,5 @@ export {
   VLinearProgress,
   VSnackbar,
   VTurbo,
+  VDash,
 };
