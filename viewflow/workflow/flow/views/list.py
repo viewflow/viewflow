@@ -1,4 +1,3 @@
-from django.urls import reverse_lazy
 from django.utils.safestring import mark_safe
 from django.utils.timesince import timesince
 from django.utils.translation import gettext_lazy as _
@@ -19,9 +18,9 @@ class FlowInboxListView(
 
     flow_class = None
     template_filename = "process_tasks_list.html"
-    title = _('Inbox')
+    title = _("Inbox")
 
-    columns = ("task_id", "flow_task", "brief", "created")
+    columns = ("task_id", "task_title", "brief", "created")
     filterset_class = filters.FlowUserTaskListFilter
 
     def task_id(self, task):
@@ -29,6 +28,11 @@ class FlowInboxListView(
         return mark_safe(f'<a href="{task_url}">#{task.process_id}/{task.pk}</a>')
 
     task_id.short_description = _("#")
+
+    def task_title(self, obj):
+        return obj.title
+
+    task_title.short_description = _("Task")
 
     @property
     def model(self):
@@ -53,17 +57,22 @@ class FlowQueueListView(
 ):
     """List of current user available tasks of a flow"""
 
-    columns = ("task_id", "flow_task", "brief", "created")
+    columns = ("task_id", "task_title", "brief", "created")
     filterset_class = filters.FlowUserTaskListFilter
     flow_class = None
     template_filename = "process_tasks_list.html"
-    title = _('Queue')
+    title = _("Queue")
 
     def task_id(self, task):
         task_url = task.flow_task.reverse("index", args=[task.process_id, task.pk])
         return mark_safe(f'<a href="{task_url}">#{task.process_id}/{task.pk}</a>')
 
     task_id.short_description = _("#")
+
+    def task_title(self, obj):
+        return obj.title
+
+    task_title.short_description = _("Task")
 
     @property
     def model(self):
@@ -92,7 +101,7 @@ class FlowArchiveListView(
     filterset_class = filters.FlowArchiveListFilter
     flow_class = None
     template_filename = "process_tasks_list.html"
-    title = _('Archive')
+    title = _("Archive")
 
     def task_id(self, task):
         task_url = task.flow_task.reverse("index", args=[task.process_id, task.pk])
@@ -132,7 +141,7 @@ class WorkflowTaskListView(mixins.StoreRequestPathMixin, ListModelView):
     task_id.short_description = _("#")
 
     def flow_task(self, task):
-        return _(str(task.flow_task))
+        return task.title
 
     flow_task.short_description = _("Task")
 
@@ -156,7 +165,7 @@ class WorkflowInboxListView(WorkflowTaskListView):
     bulk_actions = (
         Action(name=_("Unassign selected tasks"), viewname="tasks_unassign"),
     )
-    title = _('Inbox')
+    title = _("Inbox")
 
     filterset_class = filters.FlowUserTaskListFilter
 
@@ -175,7 +184,7 @@ class WorkflowQueueListView(WorkflowTaskListView):
     columns = ("task_id", "process_brief", "flow_task", "brief", "created")
     filterset_class = filters.FlowUserTaskListFilter
     bulk_actions = (Action(name=_("Assign selected tasks"), viewname="tasks_assign"),)
-    title = _('Queue')
+    title = _("Queue")
 
     @viewprop
     def queryset(self):
@@ -187,7 +196,7 @@ class WorkflowArchiveListView(WorkflowTaskListView):
 
     columns = ("task_id", "flow_task", "brief", "process_brief", "created", "finished")
     filterset_class = filters.FlowArchiveListFilter
-    title = _('Archive')
+    title = _("Archive")
 
     @viewprop
     def queryset(self):

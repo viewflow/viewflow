@@ -8,7 +8,7 @@
         <div class="mdc-card vf-card">
           <section class="vf-card__header">
             <h1 class="vf-card__title">
-              {{ task.flow_task.task_description|default:task.flow_task.task_title }}
+              {{ task.title }}
             </h1>
             <h2 class="vf-card__breadcrumbs">
               {% block breadcrumbs_items %}

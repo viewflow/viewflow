@@ -172,6 +172,13 @@ class AbstractTask(models.Model):
                 self.process, self.flow_task.flow_class.process_class
             )
 
+    @property
+    def title(self):
+        if self.flow_task.task_title:
+            return self.flow_task.task_title
+        return _(str(self.flow_task))
+
+    @property
     def brief(self):
         """Quick textual task representation for the end user."""
         if not self.flow_task:

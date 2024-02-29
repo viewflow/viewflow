@@ -20,7 +20,7 @@
                     <a href="{% reverse viewset 'index' %}">{{ process.flow_class.process_title }}</a>
                     <a href="{% reverse viewset 'process_detail' process.pk %}">#{{ process.pk }}</a>
                     <a href="{% reverse request.activation.flow_task 'detail' process.pk task.pk %}">
-                      {{ task.flow_task.task_title }} #{{ task.pk}}
+                      {{ task.title }} #{{ task.pk}}
                     </a>
                     <a>{% trans 'Execute' %}</a>
                   {% endblock %}
