@@ -1,3 +1,4 @@
+import warnings
 from functools import lru_cache
 
 from django.db import models
@@ -11,7 +12,15 @@ from viewflow.workflow.token import Token
 @lru_cache(maxsize=None)
 def import_flow_by_ref(flow_strref):
     """Return flow class by flow string reference."""
-    app_label, flow_path = flow_strref.split("/")
+    try:
+        app_label, flow_path = flow_strref.split("/")
+    except ValueError:
+        warnings.warn(
+            f"Input string must be in the format 'app_label/flow_path'. Got {flow_strref}",
+            UserWarning,
+        )
+        return None
+
     # TODO Raise if imported class is not Flow
     return import_string("{}.{}".format(get_app_package(app_label), flow_path))
 
