@@ -1,0 +1,49 @@
+vf-field-radio-select {
+  position: relative;  // for floating label
+
+  .vf-field__row {
+    padding-bottom: 11px;
+  }
+
+  .mdc-form-field {
+    width: 100%;
+    padding-top: 5px;
+  }
+
+  .mdc-floating-label {
+    color: rgba(0, 0, 0, 0.6);
+    -webkit-transform: translateY(-50%) scale(0.75);
+    transform: translateY(-40%) scale(0.75);
+    margin-left: 12px;
+  }
+
+  .vf-radio-select__control {
+    margin-top: 8px;
+  }
+
+  .vf-radio--inline .mdc-form-field {
+    width: initial;
+
+    & > label {
+      padding-right: 8px;
+    }
+  }
+
+  .mdc-text-field-helper-text {
+    color: rgba(0, 0, 0, 0.6);
+    margin-top: -5px;
+    padding-left: 12px;
+    padding-bottom: 11px;
+  }
+
+  .mdc-radio--disabled ~ label {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .vf-radio--invalid {
+    .mdc-text-field-helper-text {
+      color: #b00020;
+      color: var(--mdc-theme-error, #b00020);
+    }
+  }
+}

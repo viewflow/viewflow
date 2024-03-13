@@ -37,6 +37,7 @@ import {VDateField, VInlineCalendarField, VTimeField} from './vf-field-datetime'
 import {VFileInputField} from './vf-field-file';
 import {VInputField} from './vf-field-input';
 import {VPasswordField} from './vf-field-password';
+import {VRadioSelectField} from './vf-field-radio-select';
 import {VSelectField, VSelectMultipleField} from './vf-field-select';
 import {VTextareaField} from './vf-field-textarea';
 import {VFormElement} from './vf-form';
@@ -111,6 +112,7 @@ export {
   VFormset,
   VInputField,
   VPasswordField,
+  VRadioSelectField,
   VSelectField,
   VTextareaField,
   VFormElement,
