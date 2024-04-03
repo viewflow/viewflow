@@ -9,11 +9,11 @@ VIEWFLOW = {
 }
 """
 
-# Copyright (c) 2017-2020, Mikhail Podgurskiy
+# Copyright (c) 2017-2024, Mikhail Podgurskiy
 # All Rights Reserved.
 
 # This work is dual-licensed under AGPL defined in file 'LICENSE' with
-# LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
+# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 
 
@@ -27,20 +27,20 @@ from viewflow.forms import renderers
 
 
 DEFAULTS = {
-    'AUTOREGISTER': 'viewflow' in django_settings.INSTALLED_APPS,
-    'WIDGET_RENDERERS': renderers.WIDGET_RENDERERS,
+    "AUTOREGISTER": "viewflow" in django_settings.INSTALLED_APPS,
+    "WIDGET_RENDERERS": renderers.WIDGET_RENDERERS,
 }
 
 
 class Settings(object):
     def __init__(self, custom=None):
         if custom is None:
-            custom = getattr(django_settings, 'VIEWFLOW', {})
+            custom = getattr(django_settings, "VIEWFLOW", {})
         self.settings = deepcopy(DEFAULTS)
 
-        for key, value in custom.get('WIDGET_RENDERERS', {}):
+        for key, value in custom.get("WIDGET_RENDERERS", {}).items():
             widget_class, renderer_class = import_string(key), import_string(value)
-            self.settings['WIDGET_RENDERERS'][widget_class] = renderer_class()
+            self.settings["WIDGET_RENDERERS"][widget_class] = renderer_class
 
     def __getattr__(self, attr):
         if attr not in self.settings:
@@ -53,8 +53,8 @@ settings = Settings()
 
 def reload_settings(*args, **kwargs):
     global settings
-    setting, value = kwargs['setting'], kwargs['value']
-    if setting == 'VIEWFLOW':
+    setting, value = kwargs["setting"], kwargs["value"]
+    if setting == "VIEWFLOW":
         settings = Settings(value)
 
 
