@@ -4,7 +4,7 @@ README = open("README.md", "r", encoding="utf-8").read()
 
 setuptools.setup(
     name="django-viewflow",
-    version="2.0.0b8",
+    version="2.0.0",
     author_email="kmmbvnr@gmail.com",
     author="Mikhail Podgurskiy",
     description="Reusable library to build business applications fast",
@@ -14,10 +14,10 @@ setuptools.setup(
     # long_description_content_type="text/markdown",
     # long_description=README,
     packages=setuptools.find_packages(exclude=["tests*"]),
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     zip_safe=False,
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
         "Natural Language :: English",
         "Operating System :: OS Independent",
@@ -29,11 +29,14 @@ setuptools.setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
+        "Programming Language :: Python :: 3.12",
+        "Programming Language :: Python :: 3.13",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     ],
     install_requires=[
-        "Django>=3.2",
+        "Django>=4.2",
         "django-filter>=2.3.0",
     ],
 )

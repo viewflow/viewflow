@@ -31,11 +31,11 @@ Viewflow works with Python 3.8 or greater and Django 4.0+
 
 Viewflow:
 
-    pip install django-viewflow --pre
+    pip install django-viewflow
 
-Viewflow-PRO
+Viewflow-PRO:
 
-    pip install django-viewflow-pro  --extra-index-url https://pypi.viewflow.io/<licence_id>/simple/ --pre
+    pip install django-viewflow-pro  --extra-index-url https://pypi.viewflow.io/<licence_id>/simple/
 
 Add 'viewflow' and, in case you need workflow capabilities 'viewflow.workflow' to the INSTALLED_APPS settings.py
 
@@ -183,16 +183,15 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
-### 2.0.0.b8 2023-09-29
+### 2.0.0 2024-04-09
 
-- Fixed default values for jsonstore fields in forms.
-- Pre-built workflow views now accept the layout option for forms.
-- Improved success redirects for workflow action views.
-- Enabled the 'Undo' action for celery.Job.
-- Extended celery.Job activation to allow its use within the start and end tasks of celery.chord.
-- Stored error traces and local variables in task.data JSON for failed celery.Job tasks.
-- Enhanced handling of obsolete nodes.
-- Fixed the JS calendar date shift issue for time zones with negative time offsets.
+- Added support for Django 5.0+
+- Updated to Material Components Web 1.4.0
+- Improved help text styles
+- Fixed default app_name configuration for Viewsets
+- List View initial filter values support
+- Enhanced localization support
+- Corrected object permission checks for delete actions
 
 
 [build]: https://img.shields.io/github/actions/workflow/status/viewflow/viewflow/django.yml?branch=main

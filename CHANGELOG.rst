@@ -2,6 +2,17 @@
 Changelog
 =========
 
+2.0.0 2024-04-09
+----------------
+
+- Added support for Django 5.0+
+- Updated to Material Components Web 1.4.0
+- Improved help text styles
+- Fixed default app_name configuration for Viewsets
+- List View initial filter values support
+- Enhanced localization support
+- Corrected object permission checks for delete actions
+
 2.0.0.b8 2023-09-29
 -------------------
 
