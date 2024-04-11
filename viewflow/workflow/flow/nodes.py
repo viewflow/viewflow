@@ -222,6 +222,36 @@ class If(
 
 
 class Function(mixins.NodeDetailMixin, mixins.NodeUndoMixin, nodes.Function):
+    """
+    Represents a callback function executed synchronously as part of a workflow
+    node.
+
+    A `Function` node is used within a flow to execute a callable (e.g., a
+    method) that operates on the process instance. The execution is synchronous,
+    meaning the workflow will wait for the callable to complete before
+    proceeding to the next node.
+
+
+    Usage:
+
+    In the following example, a `Function` node is used within a `MyFlow` class
+    to execute a logging function immediately after a task been activated.
+
+    .. code-block:: python
+
+        class MyFlow(flow.Flow):
+            ...
+
+            log_immediately = (
+                flow.Function(this.log) .Next(this.end)
+            )
+
+            def log(self, activation):
+                print(f"Process is in action {activation.process.pk}")
+
+
+    """
+
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
     undo_view_class = views.UndoTaskView
