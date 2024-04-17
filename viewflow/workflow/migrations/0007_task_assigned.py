@@ -6,13 +6,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('viewflow', '0006_i18n'),
+        ("viewflow", "0006_i18n"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='task',
-            name='assigned',
-            field=models.DateTimeField(blank=True, null=True, verbose_name='Assigned'),
+            model_name="task",
+            name="assigned",
+            field=models.DateTimeField(blank=True, null=True, verbose_name="Assigned"),
         ),
     ]

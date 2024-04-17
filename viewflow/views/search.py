@@ -13,7 +13,7 @@ def lookup_spawns_duplicates(opts, lookup_path):
     lookup_fields = lookup_path.split(LOOKUP_SEP)
     # Go through the fields (following all relations) and look for an m2m.
     for field_name in lookup_fields:
-        if field_name == 'pk':
+        if field_name == "pk":
             field_name = opts.pk.name
         try:
             field = opts.get_field(field_name)
@@ -21,7 +21,7 @@ def lookup_spawns_duplicates(opts, lookup_path):
             # Ignore query lookups.
             continue
         else:
-            if hasattr(field, 'path_infos'):
+            if hasattr(field, "path_infos"):
                 # This field is a relation; update opts to follow the relation.
                 path_info = field.path_infos
                 opts = path_info[-1].to_opts
@@ -87,8 +87,7 @@ def get_search_results(queryset, search_fields, search_term):
         queryset = queryset.filter(or_queries)
 
     may_have_duplicates = any(
-        lookup_spawns_duplicates(opts, search_spec)
-        for search_spec in orm_lookups
+        lookup_spawns_duplicates(opts, search_spec) for search_spec in orm_lookups
     )
 
     if may_have_duplicates:
@@ -101,13 +100,14 @@ class SearchableViewMixin(object):
     """
     The mixin for LitView to enable search capabilities
     """
+
     search_fields = None
 
     def search_enabled(self):
         return self.search_fields is not None
 
     def get_search_term(self):
-        return self.request.GET.get('_search')
+        return self.request.GET.get("_search")
 
     def get_queryset(self):
         queryset = super().get_queryset()

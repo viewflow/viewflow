@@ -22,8 +22,10 @@ from viewflow.utils import viewprop, has_object_perm
 from .base import FormLayoutMixin
 
 
-@method_decorator(login_required, name='dispatch')
-class CreateModelView(FormLayoutMixin, FormDependentSelectMixin, FormAjaxCompleteMixin, generic.CreateView):
+@method_decorator(login_required, name="dispatch")
+class CreateModelView(
+    FormLayoutMixin, FormDependentSelectMixin, FormAjaxCompleteMixin, generic.CreateView
+):
     viewset = None
     layout = None
     form_widgets = None

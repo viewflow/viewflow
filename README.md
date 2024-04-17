@@ -183,6 +183,12 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
+
+### 2.0.1 2024-04-17
+
+- Fix for AjaxModelSelect in m2m relations
+
+
 ### 2.0.0 2024-04-09
 
 - Added support for Django 5.0+

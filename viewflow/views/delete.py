@@ -20,7 +20,7 @@ from django.views import generic
 from viewflow.utils import has_object_perm, viewprop
 
 
-@method_decorator(login_required, name='dispatch')
+@method_decorator(login_required, name="dispatch")
 class DeleteModelView(generic.DeleteView):
     viewset = None
 
@@ -28,19 +28,18 @@ class DeleteModelView(generic.DeleteView):
         if self.viewset is not None:
             return self.viewset.has_delete_permission(request.user, obj=obj)
         else:
-            return has_object_perm(request.user, 'delete', self.model, obj=obj)
+            return has_object_perm(request.user, "delete", self.model, obj=obj)
 
     def get_deleted_objects(self):
         collector = Collector(using=router.db_for_write(self.object))
         collector.collect([self.object])
         return (
-            (model_class, objects)
-            for model_class, objects in collector.data.items()
+            (model_class, objects) for model_class, objects in collector.data.items()
         )
 
     @viewprop
     def queryset(self):
-        if self.viewset is not None and hasattr(self.viewset, 'get_queryset'):
+        if self.viewset is not None and hasattr(self.viewset, "get_queryset"):
             return self.viewset.get_queryset(self.request)
         return None
 
@@ -69,8 +68,10 @@ class DeleteModelView(generic.DeleteView):
         if self.template_name is None:
             opts = self.model._meta
             return [
-                '{}/{}{}.html'.format(opts.app_label, opts.model_name, self.template_name_suffix),
-                'viewflow/views/confirm_delete.html',
+                "{}/{}{}.html".format(
+                    opts.app_label, opts.model_name, self.template_name_suffix
+                ),
+                "viewflow/views/confirm_delete.html",
             ]
         return [self.template_name]
 
@@ -84,10 +85,12 @@ class DeleteModelView(generic.DeleteView):
             obj=str(self.object),
         )
         self.object.delete()
-        messages.add_message(self.request, messages.SUCCESS, message, fail_silently=True)
+        messages.add_message(
+            self.request, messages.SUCCESS, message, fail_silently=True
+        )
         return HttpResponseRedirect(success_url)
 
     def get_success_url(self):
-        if self.viewset and hasattr(self.viewset, 'get_success_url'):
+        if self.viewset and hasattr(self.viewset, "get_success_url"):
             return self.viewset.get_success_url(self.request)
-        return '../'
+        return "../"

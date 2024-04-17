@@ -6,9 +6,8 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('viewflow', '0008_jsonfield_and_artifact'),
-        ('viewflow', '0008_merge'),
+        ("viewflow", "0008_jsonfield_and_artifact"),
+        ("viewflow", "0008_merge"),
     ]
 
-    operations = [
-    ]
+    operations = []

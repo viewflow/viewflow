@@ -19,7 +19,6 @@ from django.utils.timezone import is_aware
 
 
 class CompositeKey(models.AutoField):
-
     class Key(dict):
         """Dictionary with json-compatible string conversion."""
 

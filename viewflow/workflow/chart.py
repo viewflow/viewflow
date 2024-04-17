@@ -15,16 +15,16 @@ EDGE_START_GAP_SIZE = 2
 EDGE_END_GAP_SIZE = 7
 
 DEFAULT_SHAPE = {
-    'width': 150,
-    'height': 100,
-    'svg': """
+    "width": 150,
+    "height": 100,
+    "svg": """
         <rect class="task" width="150" height="100" rx="5" ry="5"/>
-    """
+    """,
 }
 
 
 class Edge(object):
-    __slots__ = ['src', 'dst', 'segments']
+    __slots__ = ["src", "dst", "segments"]
 
     def __init__(self, src, dst, segments=None):
         self.src = src
@@ -33,7 +33,7 @@ class Edge(object):
 
 
 class Shape(object):
-    __slots__ = ['x', 'y', 'width', 'height', 'svg', 'text']
+    __slots__ = ["x", "y", "width", "height", "svg", "text"]
 
     def __init__(self, x=-1, y=-1, width=-1, height=-1):
         self.x = x
@@ -43,13 +43,24 @@ class Shape(object):
         self.text = []
 
     def label(self):
-        return ' '.join(segment[0] for segment in self.text)
+        return " ".join(segment[0] for segment in self.text)
 
 
 class Cell(object):
-    __slots__ = ['col', 'row', 'x', 'y', 'width', 'height', 'node', 'shape', 'status']
+    __slots__ = ["col", "row", "x", "y", "width", "height", "node", "shape", "status"]
 
-    def __init__(self, node, col=-1, row=-1, x=-1, y=-1, width=-1, height=-1, shape=None, status=None):
+    def __init__(
+        self,
+        node,
+        col=-1,
+        row=-1,
+        x=-1,
+        y=-1,
+        width=-1,
+        height=-1,
+        shape=None,
+        status=None,
+    ):
         self.node = node
         self.col = col
         self.row = row
@@ -72,14 +83,10 @@ class Grid(object):
         self.width = -1
         self.height = -1
 
-        self.grid = {
-            node: Cell(node)
-            for node in nodes
-        }
+        self.grid = {node: Cell(node) for node in nodes}
         self.edges = [
-            Edge(edge.src, edge.dst)
-            for node in nodes
-            for edge in node._incoming()]
+            Edge(edge.src, edge.dst) for node in nodes for edge in node._incoming()
+        ]
 
     def __getitem__(self, node):
         return self.grid[node]
@@ -123,9 +130,9 @@ class Grid(object):
         children = [child for child in children if self[child].row == -1]
         parent_cell = self[parent]
         half = len(children) / 2
-        above = children[0: int(math.floor(half))]
-        middle = children[int(math.floor(half)):int(math.ceil(half))]
-        below = children[int(math.ceil(half)):]
+        above = children[0 : int(math.floor(half))]
+        middle = children[int(math.floor(half)) : int(math.ceil(half))]
+        below = children[int(math.ceil(half)) :]
         for child in above:
             self.insert_row_above(parent_cell.row)
             self[child].row = parent_cell.row - 1
@@ -165,14 +172,8 @@ def topsort(flow_class):
     result, incoming_to_reverse = [], {}
 
     nodes = list(flow_class.instance.nodes())
-    incoming_edges = {
-        node: {edge.src for edge in node._incoming()}
-        for node in nodes
-    }
-    initial_incoming = {
-        node: set(incoming_edges[node])
-        for node in nodes
-    }
+    incoming_edges = {node: {edge.src for edge in node._incoming()} for node in nodes}
+    initial_incoming = {node: set(incoming_edges[node]) for node in nodes}
 
     while nodes:
         start_nodes, circle_broken = [], False
@@ -207,6 +208,7 @@ def topsort(flow_class):
 
 def find_prev_split(nodes, incoming_edges, outgoing_edges, join):
     """Find the split for join"""
+
     def is_split_node(source):
         return len(outgoing_edges[source]) > 1
 
@@ -236,7 +238,7 @@ def find_prev_split(nodes, incoming_edges, outgoing_edges, join):
 
     common_splits = sorted(
         set.intersection(*[set(splits) for splits in incoming_splits]),
-        key=lambda split: incoming_splits[0].index(split)
+        key=lambda split: incoming_splits[0].index(split),
     )
 
     if not common_splits:
@@ -250,7 +252,9 @@ def layout(nodes, incoming_edges, outgoing_edges):
 
     for node in nodes:
         incomings, outgoings = incoming_edges[node], outgoing_edges[node]
-        placed_incomings = [incoming for incoming in incomings if grid[incoming].col != -1]
+        placed_incomings = [
+            incoming for incoming in incomings if grid[incoming].col != -1
+        ]
 
         if len(placed_incomings) == 0:
             grid.place_start_node(node)
@@ -267,7 +271,11 @@ def layout(nodes, incoming_edges, outgoing_edges):
                         # join connected directly to split
                         outgoings = copy(outgoings)
                         outgoings.remove(child)
-                        outgoings = outgoings[0:int(len(outgoings) / 2)] + [child] + outgoings[int(len(outgoings) / 2):]
+                        outgoings = (
+                            outgoings[0 : int(len(outgoings) / 2)]
+                            + [child]
+                            + outgoings[int(len(outgoings) / 2) :]
+                        )
                         break
             grid.distribute_children(node, outgoings)
 
@@ -276,23 +284,27 @@ def layout(nodes, incoming_edges, outgoing_edges):
     return grid
 
 
-def calc_layout_data(flow_class, edge_start_gap_size=EDGE_START_GAP_SIZE, edge_end_gap_size=EDGE_END_GAP_SIZE):
+def calc_layout_data(
+    flow_class,
+    edge_start_gap_size=EDGE_START_GAP_SIZE,
+    edge_end_gap_size=EDGE_END_GAP_SIZE,
+):
     # Topological nodes sort, and edge cycle breaking
     nodes, _ = topsort(flow_class)
 
     # Topologically sorted incoming edges
     incoming_edges = {
         node: sorted(
-            [edge.src for edge in node._incoming()],
-            key=lambda node: nodes.index(node))
+            [edge.src for edge in node._incoming()], key=lambda node: nodes.index(node)
+        )
         for node in nodes
     }
 
     # Topologically sorted outgoing edges
     outgoing_edges = {
         node: sorted(
-            [edge.dst for edge in node._outgoing()],
-            key=lambda node: nodes.index(node))
+            [edge.dst for edge in node._outgoing()], key=lambda node: nodes.index(node)
+        )
         for node in nodes
     }
 
@@ -302,11 +314,19 @@ def calc_layout_data(flow_class, edge_start_gap_size=EDGE_START_GAP_SIZE, edge_e
     # hack fix
     for cell1 in grid.cells:
         for cell2 in grid.cells:
-            if cell1.node != cell2.node and cell1.row == cell2.row and cell1.col == cell2.col:
+            if (
+                cell1.node != cell2.node
+                and cell1.row == cell2.row
+                and cell1.col == cell2.col
+            ):
                 cell1.row += 1
 
     init_shapes(grid)
-    calc_edges(grid, edge_start_gap_size=edge_start_gap_size, edge_end_gap_size=edge_end_gap_size)
+    calc_edges(
+        grid,
+        edge_start_gap_size=edge_start_gap_size,
+        edge_end_gap_size=edge_end_gap_size,
+    )
     calc_text(grid)
 
     return grid
@@ -315,10 +335,10 @@ def calc_layout_data(flow_class, edge_start_gap_size=EDGE_START_GAP_SIZE, edge_e
 def init_shapes(grid):
     # init shapes
     for cell in grid.cells:
-        shape = getattr(cell.node, 'shape', DEFAULT_SHAPE)
-        cell.shape.width = shape['width']
-        cell.shape.height = shape['height']
-        cell.shape.svg = shape['svg']
+        shape = getattr(cell.node, "shape", DEFAULT_SHAPE)
+        cell.shape.width = shape["width"]
+        cell.shape.height = shape["height"]
+        cell.shape.svg = shape["svg"]
 
     # calc rows and col sizes
     row_sizes = [0] * max(cell.row + 1 for cell in grid.cells)
@@ -329,8 +349,8 @@ def init_shapes(grid):
 
     # set shapes positions
     for cell in grid.cells:
-        cell.x = sum(col_sizes[:cell.col]) + GAP_SIZE * cell.col
-        cell.y = sum(row_sizes[:cell.row]) + GAP_SIZE * cell.row
+        cell.x = sum(col_sizes[: cell.col]) + GAP_SIZE * cell.col
+        cell.y = sum(row_sizes[: cell.row]) + GAP_SIZE * cell.row
 
         cell.width = col_sizes[cell.col]
         if cell.shape.width < col_sizes[cell.col]:
@@ -350,7 +370,9 @@ def init_shapes(grid):
     return grid
 
 
-def calc_edges(grid, edge_start_gap_size=EDGE_START_GAP_SIZE, edge_end_gap_size=EDGE_END_GAP_SIZE):
+def calc_edges(
+    grid, edge_start_gap_size=EDGE_START_GAP_SIZE, edge_end_gap_size=EDGE_END_GAP_SIZE
+):
     for edge in grid.edges:
         src_cell = grid[edge.src]
         dst_cell = grid[edge.dst]
@@ -359,19 +381,19 @@ def calc_edges(grid, edge_start_gap_size=EDGE_START_GAP_SIZE, edge_end_gap_size=
             edge.segments = [
                 [
                     src_cell.shape.x + src_cell.shape.width + edge_start_gap_size,
-                    src_cell.shape.y + int(src_cell.shape.height / 2)
+                    src_cell.shape.y + int(src_cell.shape.height / 2),
                 ],
                 [
                     dst_cell.shape.x - edge_end_gap_size,
-                    dst_cell.shape.y + int(dst_cell.shape.height / 2)
-                ]
+                    dst_cell.shape.y + int(dst_cell.shape.height / 2),
+                ],
             ]
         elif src_cell.row < dst_cell.row and src_cell.col < dst_cell.col:  # ↘
             if len(list(edge.src._outgoing())) > 1:
                 edge.segments = [
                     [
                         src_cell.shape.x + int(src_cell.shape.width / 2),
-                        src_cell.shape.y + src_cell.shape.height + edge_start_gap_size
+                        src_cell.shape.y + src_cell.shape.height + edge_start_gap_size,
                     ],
                     [
                         src_cell.shape.x + int(src_cell.shape.width / 2),
@@ -380,145 +402,145 @@ def calc_edges(grid, edge_start_gap_size=EDGE_START_GAP_SIZE, edge_end_gap_size=
                     [
                         dst_cell.shape.x - edge_end_gap_size,
                         dst_cell.shape.y + int(dst_cell.shape.height / 2),
-                    ]
+                    ],
                 ]
             else:
                 edge.segments = [
                     [
                         src_cell.shape.x + src_cell.shape.width + edge_start_gap_size,
-                        src_cell.shape.y + int(src_cell.shape.height / 2)
+                        src_cell.shape.y + int(src_cell.shape.height / 2),
                     ],
                     [
                         dst_cell.shape.x + int(dst_cell.shape.width / 2),
-                        src_cell.shape.y + int(src_cell.shape.height / 2)
+                        src_cell.shape.y + int(src_cell.shape.height / 2),
                     ],
                     [
                         dst_cell.shape.x + int(dst_cell.shape.width / 2),
-                        dst_cell.shape.y - edge_end_gap_size
-                    ]
+                        dst_cell.shape.y - edge_end_gap_size,
+                    ],
                 ]
         elif src_cell.row < dst_cell.row and src_cell.col == dst_cell.col:  # ↓
             edge.segments = [
                 [
                     src_cell.shape.x + int(src_cell.shape.width / 2),
-                    src_cell.shape.y + src_cell.shape.height + edge_start_gap_size
+                    src_cell.shape.y + src_cell.shape.height + edge_start_gap_size,
                 ],
                 [
                     dst_cell.shape.x + int(dst_cell.shape.width / 2),
-                    dst_cell.shape.y - edge_end_gap_size
-                ]
+                    dst_cell.shape.y - edge_end_gap_size,
+                ],
             ]
         elif src_cell.row < dst_cell.row and src_cell.col > dst_cell.col:  # ↙
             edge.segments = [
                 [
                     src_cell.shape.x + int(src_cell.shape.width / 2),
-                    src_cell.shape.y + src_cell.shape.height + edge_start_gap_size
+                    src_cell.shape.y + src_cell.shape.height + edge_start_gap_size,
                 ],
                 [
                     src_cell.shape.x + int(src_cell.shape.width / 2),
-                    src_cell.y + src_cell.height + GAP_SIZE // 2
+                    src_cell.y + src_cell.height + GAP_SIZE // 2,
                 ],
                 [
                     dst_cell.shape.x + int(3 * dst_cell.shape.width / 4),
-                    src_cell.y + src_cell.height + GAP_SIZE // 2
+                    src_cell.y + src_cell.height + GAP_SIZE // 2,
                 ],
                 [
                     dst_cell.shape.x + int(3 * dst_cell.shape.width / 4),
-                    dst_cell.shape.y - edge_end_gap_size
-                ]
+                    dst_cell.shape.y - edge_end_gap_size,
+                ],
             ]
         elif src_cell.row == dst_cell.row and src_cell.col > dst_cell.col:  # ←
             edge.segments = [
                 [
                     src_cell.shape.x + int(src_cell.shape.width / 2),
-                    src_cell.shape.y + src_cell.shape.height + edge_start_gap_size
+                    src_cell.shape.y + src_cell.shape.height + edge_start_gap_size,
                 ],
                 [
                     src_cell.shape.x + int(src_cell.shape.width / 2),
-                    src_cell.y + src_cell.height + int(4 * GAP_SIZE // 5)
+                    src_cell.y + src_cell.height + int(4 * GAP_SIZE // 5),
                 ],
                 [
                     dst_cell.shape.x + int(3 * dst_cell.shape.width / 4),
-                    src_cell.y + src_cell.height + int(4 * GAP_SIZE // 5)
+                    src_cell.y + src_cell.height + int(4 * GAP_SIZE // 5),
                 ],
                 [
                     dst_cell.shape.x + int(3 * dst_cell.shape.width / 4),
-                    dst_cell.shape.y + dst_cell.shape.height + edge_end_gap_size
-                ]
+                    dst_cell.shape.y + dst_cell.shape.height + edge_end_gap_size,
+                ],
             ]
         elif src_cell.row > dst_cell.row and src_cell.col > dst_cell.col:  # ↖
             edge.segments = [
                 [
                     src_cell.shape.x + int(src_cell.shape.width / 2),
-                    src_cell.shape.y - edge_start_gap_size
+                    src_cell.shape.y - edge_start_gap_size,
                 ],
                 [
                     src_cell.shape.x + int(src_cell.shape.width / 2),
-                    src_cell.y - GAP_SIZE // 2
+                    src_cell.y - GAP_SIZE // 2,
                 ],
                 [
                     dst_cell.shape.x + int(3 * dst_cell.shape.width / 4),
-                    src_cell.y - GAP_SIZE // 2
+                    src_cell.y - GAP_SIZE // 2,
                 ],
                 [
                     dst_cell.shape.x + int(3 * dst_cell.shape.width / 4),
-                    dst_cell.shape.y + dst_cell.shape.height + edge_end_gap_size
-                ]
+                    dst_cell.shape.y + dst_cell.shape.height + edge_end_gap_size,
+                ],
             ]
         elif src_cell.row > dst_cell.row and src_cell.col == dst_cell.col:  # ↑
             edge.segments = [
                 [
                     src_cell.shape.x + int(src_cell.shape.width / 2),
-                    src_cell.shape.y - edge_start_gap_size
+                    src_cell.shape.y - edge_start_gap_size,
                 ],
                 [
                     dst_cell.shape.x + int(dst_cell.shape.width / 2),
-                    dst_cell.shape.y + dst_cell.shape.height + edge_end_gap_size
-                ]
+                    dst_cell.shape.y + dst_cell.shape.height + edge_end_gap_size,
+                ],
             ]
         elif src_cell.row > dst_cell.row and src_cell.col < dst_cell.col:  # ↗
             if len(list(edge.src._outgoing())) > 1:
                 edge.segments = [
                     [
                         src_cell.shape.x + int(src_cell.shape.width / 2),
-                        src_cell.shape.y - edge_start_gap_size
+                        src_cell.shape.y - edge_start_gap_size,
                     ],
                     [
                         src_cell.shape.x + int(src_cell.shape.width / 2),
-                        dst_cell.shape.y + int(dst_cell.shape.height / 2)
+                        dst_cell.shape.y + int(dst_cell.shape.height / 2),
                     ],
                     [
                         dst_cell.shape.x - edge_end_gap_size,
-                        dst_cell.shape.y + int(dst_cell.shape.height / 2)
-                    ]
+                        dst_cell.shape.y + int(dst_cell.shape.height / 2),
+                    ],
                 ]
             else:
                 edge.segments = [
                     [
                         src_cell.shape.x + src_cell.shape.width + edge_start_gap_size,
-                        src_cell.shape.y + int(src_cell.shape.height / 2)
+                        src_cell.shape.y + int(src_cell.shape.height / 2),
                     ],
                     [
                         dst_cell.shape.x + int(dst_cell.shape.width / 2),
-                        src_cell.shape.y + int(src_cell.shape.height / 2)
+                        src_cell.shape.y + int(src_cell.shape.height / 2),
                     ],
                     [
                         dst_cell.shape.x + int(dst_cell.shape.width / 2),
-                        dst_cell.shape.y + dst_cell.shape.height + edge_end_gap_size
-                    ]
+                        dst_cell.shape.y + dst_cell.shape.height + edge_end_gap_size,
+                    ],
                 ]
 
 
 def calc_text(grid):
     for cell in grid.cells:
-        shape = getattr(cell.node, 'shape', DEFAULT_SHAPE)
-        text_align = shape.get('text-align')
-        font_size = shape.get('font-size', 12)
-        if text_align == 'middle':
+        shape = getattr(cell.node, "shape", DEFAULT_SHAPE)
+        text_align = shape.get("text-align")
+        font_size = shape.get("font-size", 12)
+        if text_align == "middle":
             if cell.node.task_title:
                 title = force_str(cell.node.task_title)
             else:
-                title = ' '.join(cell.node.name.capitalize().split('_'))
+                title = " ".join(cell.node.name.capitalize().split("_"))
             segments = wrap(title, 20)
             block_height = max(len(segments) - 1, 0) * font_size * 1.2
 
@@ -528,23 +550,21 @@ def calc_text(grid):
             for n, segment in enumerate(segments):
                 cell.shape.text.append(
                     (
-                        segment, 'align-middle', font_size,
+                        segment,
+                        "align-middle",
+                        font_size,
                         x_start,
-                        y_start + (n * font_size * 1.2)
+                        y_start + (n * font_size * 1.2),
                     )
                 )
 
 
 def calc_cell_status(flow_class, grid, process_pk):
     tasks = flow_class.task_class._default_manager.filter(
-        process_id=process_pk,
-        process__flow_class=flow_class
-    ).order_by(
-        'flow_task', 'created'
-    )
+        process_id=process_pk, process__flow_class=flow_class
+    ).order_by("flow_task", "created")
     tasks_group = dict(
-        (k, list(v))
-        for k, v in groupby(tasks, lambda task: task.flow_task)
+        (k, list(v)) for k, v in groupby(tasks, lambda task: task.flow_task)
     )
     for flow_task in grid.nodes:
         for task in tasks_group.get(flow_task, []):
@@ -555,16 +575,10 @@ def calc_cell_status(flow_class, grid, process_pk):
 
 
 def grid_to_svg(grid):
-    svg_template = get_template('viewflow/workflow/graph.svg')
-    return svg_template.render({
-        'grid': grid,
-        'cells': grid.cells,
-        'edges': grid.edges})
+    svg_template = get_template("viewflow/workflow/graph.svg")
+    return svg_template.render({"grid": grid, "cells": grid.cells, "edges": grid.edges})
 
 
 def grid_to_bpmn(grid):
-    svg_template = get_template('viewflow/workflow/graph.bpmn')
-    return svg_template.render({
-        'grid': grid,
-        'cells': grid.cells,
-        'edges': grid.edges})
+    svg_template = get_template("viewflow/workflow/graph.bpmn")
+    return svg_template.render({"grid": grid, "cells": grid.cells, "edges": grid.edges})

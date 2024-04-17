@@ -7,9 +7,8 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('viewflow', '0005_rename_flowcls'),
-        ('viewflow', '0005_merge'),
+        ("viewflow", "0005_rename_flowcls"),
+        ("viewflow", "0005_merge"),
     ]
 
-    operations = [
-    ]
+    operations = []

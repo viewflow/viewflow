@@ -28,17 +28,17 @@ class Token(object):
 
     def is_split_token(self):
         """True, if it is a token of parallel task."""
-        return '/' in self.token
+        return "/" in self.token
 
     def get_base_split_token(self):
         """Return token before last split happens."""
-        return Token(self.token.rsplit('/', 1)[0])
+        return Token(self.token.rsplit("/", 1)[0])
 
     def get_common_split_prefix(self, join_token, task_pk):
         """Common prefix for tokens."""
         if self == join_token:
-            return '{}/{}_'.format(self.token, task_pk)
-        return '{}_'.format(self.token.rsplit('_', 1)[0])
+            return "{}/{}_".format(self.token, task_pk)
+        return "{}_".format(self.token.rsplit("_", 1)[0])
 
     def __repr__(self):
         return self.token

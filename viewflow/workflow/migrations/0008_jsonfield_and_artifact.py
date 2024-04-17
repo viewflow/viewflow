@@ -7,39 +7,51 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
-        ('viewflow', '0007_task_assigned'),
+        ("contenttypes", "0002_remove_content_type_name"),
+        ("viewflow", "0007_task_assigned"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='process',
-            name='artifact_content_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='contenttypes.ContentType'),
+            model_name="process",
+            name="artifact_content_type",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="contenttypes.ContentType",
+            ),
         ),
         migrations.AddField(
-            model_name='process',
-            name='artifact_object_id',
+            model_name="process",
+            name="artifact_object_id",
             field=models.PositiveIntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='process',
-            name='data',
+            model_name="process",
+            name="data",
             field=models.JSONField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='task',
-            name='artifact_content_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='contenttypes.ContentType'),
+            model_name="task",
+            name="artifact_content_type",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="contenttypes.ContentType",
+            ),
         ),
         migrations.AddField(
-            model_name='task',
-            name='artifact_object_id',
+            model_name="task",
+            name="artifact_object_id",
             field=models.PositiveIntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='task',
-            name='data',
+            model_name="task",
+            name="data",
             field=models.JSONField(blank=True, null=True),
         ),
     ]

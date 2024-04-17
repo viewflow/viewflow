@@ -7,13 +7,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('viewflow', '0004_extend_fields_length'),
+        ("viewflow", "0004_extend_fields_length"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='process',
-            old_name='flow_cls',
-            new_name='flow_class',
+            model_name="process",
+            old_name="flow_cls",
+            new_name="flow_class",
         ),
     ]

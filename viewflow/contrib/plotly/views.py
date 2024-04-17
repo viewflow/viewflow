@@ -15,27 +15,29 @@ def _extract_urls(data):
     >>> )
     /viewflow/js/contrib/dash/deps/polyfill@7.12.1.min.js
     """
-    for url in re.findall('src=\"(.*)\"', data):
-        _, url = url.split('/_dash-component-suites/')
-        start, end = url.rsplit('.v')
-        extention = end.split('.', 1)[1]
+    for url in re.findall('src="(.*)"', data):
+        _, url = url.split("/_dash-component-suites/")
+        start, end = url.rsplit(".v")
+        extention = end.split(".", 1)[1]
         yield f"viewflow/js/contrib/{start}.{extention}"
 
 
 class DashboardView(TemplateView):
-    template_name = 'viewflow/contrib/plotly.html'
+    template_name = "viewflow/contrib/plotly.html"
     viewset = None
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(
-            dash_scripts_urls=_extract_urls(self.viewset.dash_app._generate_scripts_html()),
-            dash_config_html=self.viewset.dash_app._generate_config_html()
+            dash_scripts_urls=_extract_urls(
+                self.viewset.dash_app._generate_scripts_html()
+            ),
+            dash_config_html=self.viewset.dash_app._generate_config_html(),
         )
 
 
 def layout_endpoint(request, viewset):
     dash_response = viewset.dash_app.serve_layout()
-    return HttpResponse(dash_response.data, content_type='application/json')
+    return HttpResponse(dash_response.data, content_type="application/json")
 
 
 def dependencies_endpoint(request, viewset):
@@ -57,14 +59,17 @@ def update_component_endpoint(request, viewset):
         callback_data = viewset.dash_app.callback_map[output]
 
     except (json.JSONDecodeError, KeyError) as e:
-        return JsonResponse({'code': 400, 'message': f'Request body error: {e}'}, status=400)
+        return JsonResponse(
+            {"code": 400, "message": f"Request body error: {e}"}, status=400
+        )
     else:
         callback_args = [
             [item.get("value") for item in items]
-            if isinstance(items, list) else items.get("value")
+            if isinstance(items, list)
+            else items.get("value")
             for items in inputs + state
         ]
 
         callback_func = callback_data["callback"]
         result = callback_func(*callback_args, outputs_list=outputs_list)
-        return HttpResponse(result, content_type='application/json')
+        return HttpResponse(result, content_type="application/json")

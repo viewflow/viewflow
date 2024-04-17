@@ -107,7 +107,9 @@ class NodeCancelMixin(metaclass=ViewsetMeta):
         if self.cancel_view:
             return path(
                 f"<int:process_pk>/{self.name}/<int:task_pk>/cancel/",
-                utils.wrap_task_view(self, self.cancel_view, permission=self.can_cancel),
+                utils.wrap_task_view(
+                    self, self.cancel_view, permission=self.can_cancel
+                ),
                 name="cancel",
             )
 
@@ -131,11 +133,11 @@ class NodeReviveMixin(metaclass=ViewsetMeta):
         if self.revive_view:
             return path(
                 f"<int:process_pk>/{self.name}/<int:task_pk>/revive/",
-                utils.wrap_task_view(self, self.revive_view, permission=self.can_revive),
+                utils.wrap_task_view(
+                    self, self.revive_view, permission=self.can_revive
+                ),
                 name="revive",
             )
 
     def can_revive(self, user, task):
         return self.flow_class.instance.has_manage_permission(user)
-
-

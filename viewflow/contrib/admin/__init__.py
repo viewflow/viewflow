@@ -27,9 +27,10 @@ class Admin(Application):
         ]
 
     """
-    app_name = 'admin'
-    namespace = 'admin'
-    prefix = 'admin'
+
+    app_name = "admin"
+    namespace = "admin"
+    prefix = "admin"
 
     title = _("Administration")
     icon = Icon("build")

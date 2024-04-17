@@ -29,7 +29,7 @@ class Context(object):
     def __getattr__(self, name):
         stack = []
 
-        if hasattr(_context_stack, 'data'):
+        if hasattr(_context_stack, "data"):
             stack = _context_stack.data
 
         for scope in reversed(stack):
@@ -42,7 +42,7 @@ class Context(object):
         raise AttributeError(name)
 
     def __enter__(self):
-        if not hasattr(_context_stack, 'data'):
+        if not hasattr(_context_stack, "data"):
             _context_stack.data = []
         _context_stack.data.append(self.current_context_data)
 

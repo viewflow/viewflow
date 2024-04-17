@@ -7,9 +7,16 @@ from .token import Token
 from .utils import act
 
 __all__ = (
-    'STATUS', 'PROCESS', 'Activation', 'Flow', 'Node',
-    'context', 'Token', 'act',
-    'FlowRuntimeError', 'FlowLockFailed'
+    "STATUS",
+    "PROCESS",
+    "Activation",
+    "Flow",
+    "Node",
+    "context",
+    "Token",
+    "act",
+    "FlowRuntimeError",
+    "FlowLockFailed",
 )
 
-default_app_config = 'viewflow.workflow.apps.WorkflowConfig'
+default_app_config = "viewflow.workflow.apps.WorkflowConfig"
