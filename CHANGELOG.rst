@@ -2,6 +2,12 @@
 Changelog
 =========
 
+2.0.2 2024-04-19
+----------------
+
+- Fix logout link
+- Change admin user autocomplete field to readonly
+
 2.0.1 2024-04-17
 ----------------
 

@@ -56,10 +56,13 @@
                         {% endif %}
                         {% url 'logout' as logout_url %}
                         {% if logout_url %}
-                          <a class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" href="{{ logout_url }}" {% if viewset.turbo_disabled %} data-turbo="false"{% endif %}>
-                            <span class="mdc-list-item__start"><i class="material-icons">exit_to_app</i></span>
-                            <span class="mdc-list-item__content">{% trans 'Log out' %}</span>
-                          </a>
+                          <form method="post" action="{{ logout_url }}">
+                            {% csrf_token %}
+                            <button type="submit" style="width:100%;border:none;background-color:inherit" class="mdc-list-item mdc-list-item--with-one-line mdc-list-item--with-leading-icon vf-page__menu-list-item" {% if viewset.turbo_disabled %} data-turbo="false"{% endif %}>
+                              <span class="mdc-list-item__start"><i class="material-icons">exit_to_app</i></span>
+                              <span class="mdc-list-item__content" style="text-align:left">{% trans 'Log out' %}</span>
+                            </button>
+                          </form>
                         {% endif %}
                       {% endblock %}
                     </vf-page-menu-navigation>
