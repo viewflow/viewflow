@@ -34,8 +34,10 @@
       <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-10">
         <div class="mdc-card vf-page-profile__detail">
           <section class="vf-page-profile__detail-header">
-            <h1 class="mdc-typography--headline6">John Doe</h1>
-            <h2 class="mdc-typography--subtitle2">admin@admin.com</h2>
+            {% block form-header-title %}
+            <h1 class="mdc-typography--headline6">{{view.request.user.get_username.title }}</h1>
+            {% endblock %}
+            {% block form-header-subtitle %}{% endblock %}
           </section>
           <section>
             <table class="vf-list__table">
