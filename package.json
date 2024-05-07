@@ -41,7 +41,7 @@
     "simple-icons-font": "^11.3.0",
     "smartcrop": "^2.0.5",
     "swagger-ui-dist": "^4.19.1",
-    "trix": "^2.0.10",
+    "trix": "^2.1.1",
     "vis-network": "^9.1.9"
   },
   "eslintConfig": {
