@@ -21,7 +21,7 @@
     <h4 class="mdc-typography mdc-typography--headline5" style="margin-bottom:10px">{% trans "Previous tasks" %}</h4>
     <div>
       {% for prev_task in task.previous.all %}
-        <a class="mdc-typography mdc-typography--subtitle1" href="{% reverse prev_task.flow_task 'index' process.pk prev_task.pk %}">{{ prev_task.flow_task.task_description|default:prev_task.flow_task }}</a>{% if not forloop.last %}, {% endif %}
+        <a class="mdc-typography mdc-typography--subtitle1" href="{% reverse prev_task.flow_task 'index' process.pk prev_task.pk %}">{{ prev_task.flow_task.task_description|default:prev_task.flow_task.task_title }}</a>{% if not forloop.last %}, {% endif %}
       {% empty %}
         <span class="mdc-typography mdc-typography--subtitle1" style="color:grey">{% trans "No previous tasks" %}</span>
       {% endfor %}
@@ -31,7 +31,7 @@
     <h4 class="mdc-typography mdc-typography--headline5"  style="margin-bottom:10px">{% trans "Next tasks" %}</h4>
     <div>
       {% for next_task in task.leading.all %}
-        <a class="mdc-typography mdc-typography--subtitle1" href="{% reverse next_task.flow_task 'index' process.pk next_task.pk %}">{{ prev_task.next_task.task_description|default:next_task.flow_task }}</a>{% if not forloop.last %}, {% endif %}
+        <a class="mdc-typography mdc-typography--subtitle1" href="{% reverse next_task.flow_task 'index' process.pk next_task.pk %}">{{ next_task.task_description|default:next_task.flow_task.task_title }}</a>{% if not forloop.last %}, {% endif %}
       {% empty %}
         <span class="mdc-typography mdc-typography--subtitle1" style="color:grey">{% trans "No next tasks" %}</span>
       {% endfor %}
