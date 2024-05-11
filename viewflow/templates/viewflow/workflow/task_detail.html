@@ -4,7 +4,7 @@
 {% block breadcrumbs_items %}
   <a href="{% reverse viewset 'index' %}">{{ process.flow_class.process_title }}</a>
   <a href="{% reverse viewset 'process_detail' process.pk %}">#{{ process.pk }}</a>
-  <a>{{ task.flow_task }} #{{ task.pk}}</a>
+  <a>{{ task.flow_task.task_title }} #{{ task.pk}}</a>
 {% endblock %}
 
 {% block task_content %}
