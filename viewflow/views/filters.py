@@ -38,7 +38,10 @@ class FilterableViewMixin(object):
                 data = data.copy()
                 for key, value in self.filterset_initial.items():
                     if key not in data:
-                        data[key] = value
+                        if isinstance(value, (list, tuple, set)):
+                            data.setlist(key, value)
+                        else:
+                            data[key] = value
 
         return {
             **kwargs,

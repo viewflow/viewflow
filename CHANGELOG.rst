@@ -2,6 +2,12 @@
 Changelog
 =========
 
+2.0.3 2024-05-11
+----------------
+
+- Fix task titles on the task details pages
+
+
 2.0.2 2024-04-19
 ----------------
 
