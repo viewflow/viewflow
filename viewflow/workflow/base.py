@@ -130,7 +130,7 @@ class Node(Viewset):
         Subclasses can perform additional initialization here.
         """
 
-    def _create(self, prev_activation, token):
+    def _create(self, prev_activation, token, data=None):
         """
         Create a new task instance.
 
@@ -141,7 +141,7 @@ class Node(Viewset):
         :returns: The new activation instance.
         :rtype: Activation
         """
-        return self.activation_class.create(self, prev_activation, token)
+        return self.activation_class.create(self, prev_activation, token, data=data)
 
     def Annotation(
         self, title=None, description=None, summary_template=None, result_template=None

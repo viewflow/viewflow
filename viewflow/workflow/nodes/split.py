@@ -22,12 +22,14 @@ class SplitActivation(Activation):
     @Activation.status.super()
     def activate(self):
         """Calculate nodes list to activate."""
-        for node, cond in self.flow_task._branches:
-            if cond:
-                if cond(self):
-                    self.next_tasks.append(node)
+        for node, cond, data_source in self.flow_task._branches:
+            if cond and not cond(self):
+                continue
+            if data_source:
+                for data in data_source(self):
+                    self.next_tasks.append((node, data))
             else:
-                self.next_tasks.append(node)
+                self.next_tasks.append((node, None))
 
         if not self.next_tasks:
             raise FlowRuntimeError(
@@ -44,17 +46,47 @@ class SplitActivation(Activation):
         token_source = Token.split_token_source(self.task.token, self.task.pk)
 
         next_tasks = [
-            task for task in self.next_tasks if not isinstance(task, Join)
-        ] + [task for task in self.next_tasks if isinstance(task, Join)]
+            (task, data) for task, data in self.next_tasks if not isinstance(task, Join)
+        ] + [(task, None) for task in self.next_tasks if isinstance(task, Join)]
 
-        for n, next_task in enumerate(next_tasks, 1):
-            yield next_task._create(prev_activation=self, token=next(token_source))
+        for n, (next_task, data) in enumerate(next_tasks, 1):
+            yield next_task._create(
+                prev_activation=self, token=next(token_source), data=data
+            )
 
 
 class Split(
     Node,
 ):
-    """Parallel split gateway."""
+    """
+    Represents a parallel split gateway in a workflow, allowing branching into multiple parallel paths.
+
+    Methods:
+        - `Next(node, case=None, data_source=None)`: Defines the subsequent node in the workflow.
+          - `node`: The next node to execute.
+          - `case` (optional): A callable that takes an activation and returns `True` if the node should be activated.
+          - `data_source` (optional): A callable that takes an activation and returns a list of data items, creating an instance of the node for each item, with `task.data` set to the item.
+        - `Always(node)`: A shortcut to define a subsequent node that is always executed.
+
+    Example:
+        ```python
+        flow.Split()
+            .Next(
+                this.approve,
+                case=act.process.approved,
+                data_source=lambda activation: [{"sample": "test task 1"}, {"sample": "test task 2"}],
+            )
+            .Always(this.required)
+        ```
+
+    In this example:
+        - The `approve` node is executed multiple times based on the `data_source` list.
+        - The `required` node is always executed unconditionally in parallel.
+
+    Notes:
+        - If `case` is not provided, the node is always activated.
+        - If `data_source` is not provided, the node is created only once.
+    """
 
     activation_class = SplitActivation
 
@@ -76,7 +108,7 @@ class Split(
         self._activate_next = []
 
     def _outgoing(self):
-        for next_node, cond in self._activate_next:
+        for next_node, cond, _ in self._activate_next:
             edge_class = "cond_true" if cond else "default"
             yield Edge(src=self, dst=next_node, edge_class=edge_class)
 
@@ -84,20 +116,25 @@ class Split(
         super()._resolve(instance)
 
         self._activate_next = [
-            (this.resolve(instance, node), cond) for node, cond in self._activate_next
+            (
+                this.resolve(instance, node),
+                this.resolve(instance, cond),
+                this.resolve(instance, data_source),
+            )
+            for node, cond, data_source in self._activate_next
         ]
 
     @property
     def _branches(self):
         return self._activate_next
 
-    def Next(self, node, case=None):
+    def Next(self, node, case=None, data_source=None):
         """Node to activate if condition is true.
 
         :param cond: Callable[activation] -> bool
 
         """
-        self._activate_next.append((node, case))
+        self._activate_next.append((node, case, data_source))
         return self
 
     def Always(self, node):

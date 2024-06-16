@@ -14,12 +14,12 @@ class Test(TestCase):  # noqa: D101
         process = TestWorkflow.start.run(approved=True)
         approve_task = process.task_set.filter(flow_task=TestWorkflow.approve).first()
         self.assertEqual(approve_task.status, STATUS.NEW)
+        self.assertEqual(approve_task.data, {"sample": "test task 1"})
 
         required_task = process.task_set.filter(flow_task=TestWorkflow.required).first()
 
         self.assertEqual(
-            list(approve_task.previous.all()),
-            list(required_task.previous.all())
+            list(approve_task.previous.all()), list(required_task.previous.all())
         )
 
     def test_split__not_approved(self):
@@ -46,7 +46,11 @@ class TestWorkflow(flow.Flow):  # noqa: D101
 
     split = (
         flow.Split()
-        .Next(this.approve, case=act.process.approved)
+        .Next(
+            this.approve,
+            case=act.process.approved,
+            data_source=lambda activation: [{"sample": "test task 1"}],
+        )
         .Next(this.required)
     )
 
@@ -61,6 +65,4 @@ class TestWorkflow(flow.Flow):  # noqa: D101
         pass
 
 
-urlpatterns = [
-    path('', FlowViewset(TestWorkflow).urls)
-]
+urlpatterns = [path("", FlowViewset(TestWorkflow).urls)]

@@ -315,6 +315,11 @@ class Split(
     mixins.NodeReviveMixin,
     nodes.Split,
 ):
+    """
+    Parallel split gateway.
+
+    """
+
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
     undo_view_class = views.UndoTaskView

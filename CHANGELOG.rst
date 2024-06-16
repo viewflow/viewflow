@@ -2,6 +2,13 @@
 Changelog
 =========
 
+2.1.0 2024-06-16
+----------------
+
+- Allow to assign additional custom data to viewflow.fsm transitions
+- Added `data_source` parameter to `Split.Next()` method, allowing dynamic creation of multiple node instances based on a list of data items.
+
+
 2.0.3 2024-05-11
 ----------------
 

@@ -6,15 +6,16 @@ from django.test import tag
 from selenium import webdriver
 
 
-@tag('selenium')
+@tag("selenium")
 class LiveTestCase(StaticLiveServerTestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
-        cls.assertTrue(shutil.which('geckodriver'), "`geckodriver` not found")
-
-        cls.browser = webdriver.Firefox()
+        geckodriver_path = shutil.which("geckodriver")
+        cls.assertTrue(geckodriver_path, "`geckodriver` not found")
+        driver_service = webdriver.FirefoxService(executable_path=geckodriver_path)
+        cls.browser = webdriver.Firefox(service=driver_service)
         cls.browser.implicitly_wait(10)
 
     @classmethod
@@ -28,15 +29,15 @@ class LiveTestCase(StaticLiveServerTestCase):
         if logged_in:
             auth_cookie = {
                 **self.client.cookies[settings.SESSION_COOKIE_NAME],
-                'name': settings.SESSION_COOKIE_NAME,
-                'value': self.client.session.session_key,
-                'secure': settings.SESSION_COOKIE_SECURE or False,
+                "name": settings.SESSION_COOKIE_NAME,
+                "value": self.client.session.session_key,
+                "secure": settings.SESSION_COOKIE_SECURE or False,
             }
             self.browser.add_cookie(auth_cookie)
 
         return logged_in
 
     def assertNoJsErrors(self):
-        errors = self.browser.execute_script('return window.errors')
-        self.browser.execute_script('window.errors=[]')
+        errors = self.browser.execute_script("return window.errors")
+        self.browser.execute_script("window.errors=[]")
         self.assertFalse(errors)

@@ -183,31 +183,10 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
-### 2.0.3 2024-05-11
+### 2.1.0 2024-06-16
 
-- Fix task titles on the task details pages
-
-
-### 2.0.2 2024-04-19
-
-- Fix logout link
-- Change admin user autocomplete field to readonly
-
-
-### 2.0.1 2024-04-17
-
-- Fix for AjaxModelSelect in m2m relations
-
-
-### 2.0.0 2024-04-09
-
-- Added support for Django 5.0+
-- Updated to Material Components Web 1.4.0
-- Improved help text styles
-- Fixed default app_name configuration for Viewsets
-- List View initial filter values support
-- Enhanced localization support
-- Corrected object permission checks for delete actions
+- Allow to assign additional custom data to viewflow.fsm transitions
+- Added `data_source` parameter to `Split.Next()` method, allowing dynamic creation of multiple node instances based on a list of data items.
 
 
 [build]: https://img.shields.io/github/actions/workflow/status/viewflow/viewflow/django.yml?branch=main

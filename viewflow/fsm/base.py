@@ -40,6 +40,7 @@ class Transition:
         label: Optional[str] = None,
         conditions: Optional[List[Condition]] = None,
         permission: Optional[Permission] = None,
+        custom: Optional[Dict] = None,
     ):  # noqa D102
         self.func = func
         self.source = source
@@ -47,6 +48,7 @@ class Transition:
         self._label = label
         self.permission = permission
         self.conditions = conditions if conditions else []
+        self.custom = custom if custom is not None else {}
 
     def __repr__(self) -> str:
         return f"<Transition({self.label} {self.source} -> {self.target}) object at {id(self)}>"
@@ -409,6 +411,7 @@ class State:
         label: Optional[str] = None,
         conditions: Optional[List[Condition]] = None,
         permission: Optional[Permission] = None,
+        custom: Optional[Dict] = None,
     ) -> Any:
         """Decorator to mark a method as a state transition."""
 
@@ -430,6 +433,7 @@ class State:
                     label=label,
                     conditions=conditions,
                     permission=permission,
+                    custom=custom,
                 )
                 descriptor.add_transition(transition)
 
