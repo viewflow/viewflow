@@ -15,7 +15,7 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def create(cls, flow_task, prev_activation, token):
+    def create(cls, flow_task, prev_activation, token, data=None):
         """
         Join and, if all incoming paths are completed, continue execution.
 
@@ -43,7 +43,10 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
                 token = token.get_base_split_token()
 
             task = flow_class.task_class.objects.create(
-                process=prev_activation.process, flow_task=flow_task, token=token
+                process=prev_activation.process,
+                flow_task=flow_task,
+                token=token,
+                data=data if data is not None else {},
             )
 
         task.previous.add(prev_activation.task)

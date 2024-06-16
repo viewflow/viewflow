@@ -14,7 +14,7 @@ from . import mixins
 
 class AbstractJobActivation(mixins.NextNodeActivationMixin, Activation):
     @classmethod
-    def create(cls, flow_task, prev_activation, token):
+    def create(cls, flow_task, prev_activation, token, data=None):
         """Instantiate and persist new flow task."""
         flow_class = flow_task.flow_class
         task = flow_class.task_class(
@@ -22,6 +22,7 @@ class AbstractJobActivation(mixins.NextNodeActivationMixin, Activation):
             flow_task=flow_task,
             token=token,
             external_task_id=str(uuid.uuid4()),
+            data=data if data is not None else {},
         )
         task.save()
         task.previous.add(prev_activation.task)

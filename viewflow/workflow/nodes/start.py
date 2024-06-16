@@ -13,12 +13,15 @@ class StartActivation(mixins.NextNodeActivationMixin, Activation):
     """Task activation that creates new process instance."""
 
     @classmethod
-    def create(cls, flow_task, prev_activation, token):
+    def create(cls, flow_task, prev_activation, token, data=None):
         flow_class = flow_task.flow_class
 
         process = flow_class.process_class(flow_class=flow_class)
         task = flow_class.task_class(
-            flow_task=flow_task, process=process, started=now()
+            flow_task=flow_task,
+            process=process,
+            started=now(),
+            data=data if data is not None else {},
         )
 
         return cls(task)

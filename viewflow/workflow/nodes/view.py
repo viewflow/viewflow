@@ -13,11 +13,14 @@ class ViewActivation(mixins.NextNodeActivationMixin, Activation):
     """View node activation."""
 
     @classmethod
-    def create(cls, flow_task, prev_activation, token):
+    def create(cls, flow_task, prev_activation, token, data=None):
         """Instantiate and persist new flow task."""
         flow_class = flow_task.flow_class
         task = flow_class.task_class(
-            process=prev_activation.process, flow_task=flow_task, token=token
+            process=prev_activation.process,
+            flow_task=flow_task,
+            token=token,
+            data=data if data is not None else {},
         )
 
         activation = cls(task)
