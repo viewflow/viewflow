@@ -143,6 +143,8 @@ Make and run migrations to create the necessary database tables, then start your
 server and access the workflow through the pre-built frontend. You should be
 able to create and track pizza orders with the workflow.
 
+Go to the https://docs.viewflow.io/workflow/writing.html for the next steps
+
 ## Documentation
 
 Viewflow's documentation for the latest version is available at

@@ -316,8 +316,37 @@ class Split(
     nodes.Split,
 ):
     """
-    Parallel split gateway.
+    Represents a parallel split gateway in a workflow, allowing branching into multiple parallel paths.
 
+    Methods:
+        - `Next(node, case=None, data_source=None)`: Defines the subsequent node in the workflow.
+
+          * `node`: The next node to execute.
+          * `case` (optional): A callable that takes an activation and returns `True` if the node should be activated.
+          * `data_source` (optional): A callable that takes an activation and returns a list of data items, creating an instance of the node for each item, with `task.data` set to the item.
+
+        - `Always(node)`: A shortcut to define a subsequent node that is always executed.
+
+    Example:
+
+    .. code-block:: python
+
+        flow.Split()
+            .Next(
+                this.approve,
+                case=act.process.approved,
+                data_source=lambda activation: [{"sample": "test task 1"}, {"sample": "test task 2"}],
+            )
+            .Always(this.required)
+
+
+    In this example:
+        - The `approve` node is executed multiple times based on the `data_source` list.
+        - The `required` node is always executed unconditionally in parallel.
+
+    Notes:
+        - If `case` is not provided, the node is always activated.
+        - If `data_source` is not provided, the node is created only once.
     """
 
     index_view_class = views.IndexTaskView
@@ -330,6 +359,30 @@ class SplitFirst(
     mixins.NodeDetailMixin,
     nodes.SplitFirst,
 ):
+    """
+    Parallel split, as soon as the first task is completed, the remaining tasks
+    are cancelled.
+
+    The `SplitFirst` class is useful in workflows where you want to initiate
+    multiple parallel tasks but only require the first task to complete,
+    cancelling the rest once the first task finishes.
+
+    Example:
+
+    .. code-block:: python
+
+        class MyFlow(flow.Flow):
+            split_first = SplitFirst().Next(this.task_a).Next(this.task_b)
+
+            task_a = flow.View(views.UserView).Next(this.join)
+
+            task_b = celery.Timer(delay=timedelata(minutes=10)).Next(this.join)
+
+            join = flow.Join()
+
+
+    """
+
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
 
