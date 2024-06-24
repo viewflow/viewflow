@@ -141,7 +141,7 @@ class CreateViewMixin(metaclass=ViewsetMeta):
     def get_list_page_actions(self, request, *actions):
         if self.has_add_permission(request.user):
             add_action = Action(
-                name="Add new",
+                name=_("Add new"),
                 url=self.reverse("add"),
                 icon=Icon("add_circle", class_="material-icons mdc-list-item__graphic"),
             )
