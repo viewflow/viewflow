@@ -185,6 +185,20 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
+### 2.1.2 2024-06-24
+
+- Allow cancelling Celery tasks from the ERROR state.
+- Hotfix: Fix broken Join when no other nodes are created by Split.
+- Allow using this references to flow static methods as Celery tasks.
+- Allow cancelling Celery jobs from the ERROR status.
+- Add missing permission check before adding a new item to the list.
+- Allow Admin() viewset to be used as a sub-item in an Application viewset.
+
+### 2.1.1 2024-06-06
+
+- Hotfix broken task creation
+
+
 ### 2.1.0 2024-06-16
 
 - Allow to assign additional custom data to viewflow.fsm transitions

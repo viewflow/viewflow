@@ -2,11 +2,15 @@
 Changelog
 =========
 
-2.1.2
----------------
+2.1.2 2024-06-24
+----------------
 
-- Allow cancel celery tasks from ERROR state
-- Hotfix broken Join in case if no other nodes created by Split
+- Allow cancelling Celery tasks from the ERROR state.
+- Hotfix: Fix broken Join when no other nodes are created by Split.
+- Allow using this references to flow static methods as Celery tasks.
+- Allow cancelling Celery jobs from the ERROR status.
+- Add missing permission check before adding a new item to the list.
+- Allow Admin() viewset to be used as a sub-item in an Application viewset.
 
 2.1.1 2024-06-06
 ----------------

@@ -6,6 +6,7 @@
 # which is part of this source code package.
 
 from django.urls import path
+from django.utils.translation import gettext_lazy as _
 
 from viewflow.urls import AppMenuMixin, Viewset, ViewsetMeta
 from viewflow.utils import DEFAULT, Icon, first_not_default, has_object_perm, viewprop
@@ -138,12 +139,14 @@ class CreateViewMixin(metaclass=ViewsetMeta):
         return self.filter_kwargs(self.create_view_class, **view_kwargs)
 
     def get_list_page_actions(self, request, *actions):
-        add_action = Action(
-            name="Add new",
-            url=self.reverse("add"),
-            icon=Icon("add_circle", class_="material-icons mdc-list-item__graphic"),
-        )
-        return super().get_list_page_actions(request, *(add_action, *actions))
+        if self.has_add_permission(request.user):
+            add_action = Action(
+                name="Add new",
+                url=self.reverse("add"),
+                icon=Icon("add_circle", class_="material-icons mdc-list-item__graphic"),
+            )
+            actions = (add_action, *actions)
+        return super().get_list_page_actions(request, *actions)
 
     @viewprop
     def create_view_kwargs(self):
