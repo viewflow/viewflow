@@ -9,20 +9,22 @@ from django.contrib import admin
 from django.utils.translation import gettext_lazy as _
 
 from viewflow import Icon
-from viewflow.urls import Application
+from viewflow.urls import Application, AppMenuMixin
 
 
-class Admin(Application):
+class Admin(AppMenuMixin, Application):
     """
     Django administration Viewset adapter::
 
-        from material.contrib.admin import Admin
+        from django.contrib import admin
+        from viewflow.contrib.admin import Admin
 
-        site = Site(apps=[
+        site = Site(viewsets=[
             Admin()
         ])
 
         urls = [
+            path("admin/", admin.site.urls),
             path('', site.urls)
         ]
 

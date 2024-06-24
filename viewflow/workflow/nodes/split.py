@@ -47,7 +47,7 @@ class SplitActivation(Activation):
 
         next_tasks = [
             (task, data) for task, data in self.next_tasks if not isinstance(task, Join)
-        ] + [(task, None) for task in self.next_tasks if isinstance(task, Join)]
+        ] + [(task, data) for task, data in self.next_tasks if isinstance(task, Join)]
 
         for n, (next_task, data) in enumerate(next_tasks, 1):
             yield next_task._create(

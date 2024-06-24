@@ -132,23 +132,29 @@ def get_user_avatar_url(user):
 
 class AuthViewset(Viewset):
     """
-    Class-based url configuration for the `django.contrib.auth`.
+    Class-based URL configuration for `django.contrib.auth`.
 
-    urlpatterns = [
-        path('accounts/', AuthViewset(
-            allow_password_change=False,
-            login_view=views.LoginView.as_view(
-                authentication_form=MyAuthForm
-            ),
-        ).urls),
-    ]
+    This viewset provides URL patterns for user authentication, including login,
+    logout, and password management views.
+
+    .. code-block:: python
+
+        urlpatterns = [
+            path('accounts/', AuthViewset(
+                allow_password_change=False,
+                login_view=views.LoginView.as_view(
+                    authentication_form=MyAuthForm
+                ),
+            ).urls),
+        ]
     """
 
     def __init__(self, *, allow_password_change=True, with_profile_view=True, **kwargs):
         """
-        Initialize the viewset.
+        Initialize the viewset with options for password change and profile view.
 
-        :param allow_password_change=True: enable password change/reset views
+        :param allow_password_change: Enable or disable password change/reset views. Defaults to True.
+        :param with_profile_view: Enable or disable profile view. Defaults to True.
         """
         super().__init__(**kwargs)
         self.allow_password_change = allow_password_change
@@ -160,16 +166,32 @@ class AuthViewset(Viewset):
     login_view_class = views.LoginView
 
     def get_login_view_kwargs(self, **kwargs):
+        """
+        Get keyword arguments for the login view.
+
+        :param kwargs: Additional keyword arguments for the login view.
+        :return: Dictionary of keyword arguments.
+        """
         result = {"form_class": AuthenticationForm}
         result.update(kwargs)
         return result
 
     @viewprop
     def login_view(self):
+        """
+        Property to get the configured login view.
+
+        :return: Configured login view instance.
+        """
         return self.login_view_class.as_view(**self.get_login_view_kwargs())
 
     @property
     def login_path(self):
+        """
+        Property to get the URL pattern for the login view.
+
+        :return: URL pattern for the login view.
+        """
         return path("login/", self.login_view, name="login")
 
     """
@@ -178,14 +200,30 @@ class AuthViewset(Viewset):
     logout_view_class = views.LogoutView
 
     def get_logout_view_kwargs(self, **kwargs):
+        """
+        Get keyword arguments for the logout view.
+
+        :param kwargs: Additional keyword arguments for the logout view.
+        :return: Dictionary of keyword arguments.
+        """
         return kwargs
 
     @viewprop
     def logout_view(self):
+        """
+        Property to get the configured logout view.
+
+        :return: Configured logout view class.
+        """
         return self.logout_view_class.as_view(**self.get_logout_view_kwargs())
 
     @property
     def logout_path(self):
+        """
+        Property to get the URL pattern for the logout view.
+
+        :return: URL pattern for the logout view.
+        """
         return path("logout/", self.logout_view, name="logout")
 
     """
@@ -194,14 +232,30 @@ class AuthViewset(Viewset):
     pass_change_view_class = views.PasswordChangeView
 
     def get_pass_change_view_kwargs(self, **kwargs):
+        """
+        Get keyword arguments for the password change view.
+
+        :param kwargs: Additional keyword arguments for the password change view.
+        :return: Dictionary of keyword arguments.
+        """
         return kwargs
 
     @viewprop
     def pass_change_view(self):
+        """
+        Property to get the configured password change view.
+
+        :return: Configured password change view class.
+        """
         return self.pass_change_view_class.as_view(**self.get_pass_change_view_kwargs())
 
     @property
     def pass_change_path(self):
+        """
+        Property to get the URL pattern for the password change view.
+
+        :return: URL pattern for the password change view.
+        """
         if self.allow_password_change:
             return path(
                 "password_change/", self.pass_change_view, name="password_change"
@@ -213,16 +267,32 @@ class AuthViewset(Viewset):
     pass_change_done_view_class = views.PasswordChangeDoneView
 
     def get_pass_change_done_view_kwargs(self, **kwargs):
+        """
+        Get keyword arguments for the password change done view.
+
+        :param kwargs: Additional keyword arguments for the password change done view.
+        :return: Dictionary of keyword arguments.
+        """
         return kwargs
 
     @viewprop
     def pass_change_done_view(self):
+        """
+        Property to get the configured password change done view.
+
+        :return: Configured password change done view class.
+        """
         return self.pass_change_done_view_class.as_view(
             **self.get_pass_change_done_view_kwargs()
         )
 
     @property
     def pass_change_done_path(self):
+        """
+        Property to get the URL pattern for the password change done view.
+
+        :return: URL pattern for the password change done view.
+        """
         if self.allow_password_change:
             return path(
                 "password_change/done/",
@@ -236,14 +306,30 @@ class AuthViewset(Viewset):
     pass_reset_view_class = views.PasswordResetView
 
     def get_pass_reset_view_kwargs(self, **kwargs):
+        """
+        Get keyword arguments for the password reset request view.
+
+        :param kwargs: Additional keyword arguments for the password reset request view.
+        :return: Dictionary of keyword arguments.
+        """
         return kwargs
 
     @viewprop
     def pass_reset_view(self):
+        """
+        Property to get the configured password reset request view.
+
+        :return: Configured password reset request view class.
+        """
         return self.pass_reset_view_class.as_view(**self.get_pass_reset_view_kwargs())
 
     @property
     def pass_reset_path(self):
+        """
+        Property to get the URL pattern for the password reset request view.
+
+        :return: URL pattern for the password reset request view.
+        """
         if self.allow_password_change:
             return path("password_reset/", self.pass_reset_view, name="password_reset")
 
@@ -253,16 +339,32 @@ class AuthViewset(Viewset):
     pass_reset_done_view_class = views.PasswordResetDoneView
 
     def get_pass_reset_done_view_kwargs(self, **kwargs):
+        """
+        Get keyword arguments for the password reset request done view.
+
+        :param kwargs: Additional keyword arguments for the password reset request done view.
+        :return: Dictionary of keyword arguments.
+        """
         return kwargs
 
     @viewprop
     def pass_reset_done_view(self):
+        """
+        Property to get the configured password reset request done view.
+
+        :return: Configured password reset request done view class.
+        """
         return self.pass_reset_done_view_class.as_view(
             **self.get_pass_reset_done_view_kwargs()
         )
 
     @property
     def pass_reset_done_path(self):
+        """
+        Property to get the URL pattern for the password reset request done view.
+
+        :return: URL pattern for the password reset request done view.
+        """
         if self.allow_password_change:
             return path(
                 "password_reset/done/",
@@ -276,16 +378,32 @@ class AuthViewset(Viewset):
     pass_reset_confirm_view_class = views.PasswordResetConfirmView
 
     def get_pass_reset_confirm_view_kwargs(self, **kwargs):
+        """
+        Get keyword arguments for the password reset confirm view.
+
+        :param kwargs: Additional keyword arguments for the password reset confirm view.
+        :return: Dictionary of keyword arguments.
+        """
         return kwargs
 
     @viewprop
     def pass_reset_confirm_view(self):
+        """
+        Property to get the configured password reset confirm view.
+
+        :return: Configured password reset confirm view class.
+        """
         return self.pass_reset_confirm_view_class.as_view(
             **self.get_pass_reset_confirm_view_kwargs()
         )
 
     @property
     def pass_reset_confirm_path(self):
+        """
+        Property to get the URL pattern for the password reset confirm view.
+
+        :return: URL pattern for the password reset confirm view.
+        """
         if self.allow_password_change:
             return path(
                 "reset/<uidb64>/<token>/",
@@ -299,16 +417,32 @@ class AuthViewset(Viewset):
     pass_reset_complete_view_class = views.PasswordResetCompleteView
 
     def get_pass_reset_complete_view_kwargs(self, **kwargs):
+        """
+        Get keyword arguments for the password reset complete view.
+
+        :param kwargs: Additional keyword arguments for the password reset complete view.
+        :return: Dictionary of keyword arguments.
+        """
         return kwargs
 
     @viewprop
     def pass_reset_complete_view(self):
+        """
+        Property to get the configured password reset complete view.
+
+        :return: Configured password reset complete view class.
+        """
         return self.pass_reset_complete_view_class.as_view(
             **self.get_pass_reset_complete_view_kwargs()
         )
 
     @property
     def pass_reset_complete_path(self):
+        """
+        Property to get the URL pattern for the password reset complete view.
+
+        :return: URL pattern for the password reset complete view.
+        """
         if self.allow_password_change:
             return path(
                 "reset/done/",
@@ -322,14 +456,30 @@ class AuthViewset(Viewset):
     profile_view_class = ProfileView
 
     def get_profile_view_kwargs(self, **kwargs):
+        """
+        Get keyword arguments for the profile view.
+
+        :param kwargs: Additional keyword arguments for the profile view.
+        :return: Dictionary of keyword arguments.
+        """
         return kwargs
 
     @viewprop
     def profile_view(self):
+        """
+        Property to get the configured profile view.
+
+        :return: Configured profile view class.
+        """
         return self.profile_view_class.as_view(**self.get_profile_view_kwargs())
 
     @property
     def profile_path(self):
+        """
+        Property to get the URL pattern for the profile view.
+
+        :return: URL pattern for the profile view.
+        """
         if self.with_profile_view:
             return path("profile/", self.profile_view, name="profile")
 

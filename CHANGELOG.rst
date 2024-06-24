@@ -2,6 +2,17 @@
 Changelog
 =========
 
+2.1.2
+---------------
+
+- Allow cancel celery tasks from ERROR state
+- Hotfix broken Join in case if no other nodes created by Split
+
+2.1.1 2024-06-06
+----------------
+
+- Hotfix broken task creation
+
 2.1.0 2024-06-16
 ----------------
 
