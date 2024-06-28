@@ -1,6 +1,7 @@
 import copy
 from collections import defaultdict
 from textwrap import dedent
+from typing import Any, Dict, Iterator, List, Optional, Tuple
 
 from django.apps import apps
 from django.db import transaction
@@ -10,34 +11,46 @@ from django.utils.timezone import now
 
 from viewflow.utils import LazySingletonDescriptor, camel_case_to_title, strip_suffixes
 from viewflow.urls import Viewset, ViewsetMeta
-
+from .activation import Activation
 from .exceptions import FlowRuntimeError
 from .status import STATUS, PROCESS
 from . import lock
 
 
-class Edge(object):
-    """Edge of the Flow graph."""
+class Edge:
+    """Represents an edge in the Flow graph.
+
+    An edge connects two nodes (source and destination) in the flow graph and
+    can have different types (e.g., `next`, `cond_true`, `cond_false`, `default`).
+
+    Attributes:
+        _src: The source node of the edge.
+        _dst: The destination node of the edge.
+        _edge_class: The class/type of the edge.
+    """
 
     __slots__ = ("_src", "_dst", "_edge_class", "_label")
 
-    def __init__(self, src, dst, edge_class):  # noqa D102
+    def __init__(self, src: str, dst: str, edge_class: str) -> None:
+        """
+        Initializes an Edge instance.
+        """
         self._src = src
         self._dst = dst
         self._edge_class = edge_class
 
     @property
-    def src(self):
+    def src(self) -> str:
         """Edge source node."""
         return self._src
 
     @property
-    def dst(self):
+    def dst(self) -> str:
         """Edge destination node."""
         return self._dst
 
     @property
-    def edge_class(self):
+    def edge_class(self) -> str:
         """Type of the edge.
 
         Viewflow uses `next`, 'cond_true', `cond_false` and `default`
@@ -47,11 +60,11 @@ class Edge(object):
         """
         return self._edge_class
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         if isinstance(other, self.__class__):
             return self.src == other.src and self.dst == other.dst
 
-    def __str__(self):
+    def __str__(self) -> str:
         return "[{}] {} ---> {}".format(self._edge_class, self._src, self._dst)
 
 
@@ -63,16 +76,20 @@ class Node(Viewset):
     :keyword activation_class: Activation implementation specific for this node
     """
 
-    activation_class = None
-    flow_class = None
-    task_type = None
+    activation_class: Optional[type] = None
+    flow_class: Optional[type] = None
+    task_type: Optional[str] = None
 
-    task_title = ""
-    task_description = ""
-    task_summary_template = ""
-    task_result_template = ""
+    task_title: str = ""
+    task_description: str = ""
+    task_summary_template: str = ""
+    task_result_template: str = ""
 
-    def __init__(self, activation_class=None, **kwargs):  # noqa D102
+    def __init__(
+        self,
+        activation_class: Optional[type] = None,
+        **kwargs: Any,
+    ):  # noqa D102
         self._incoming_edges = []
 
         if activation_class:
@@ -81,19 +98,25 @@ class Node(Viewset):
         super(Node, self).__init__(**kwargs)
 
     @property
-    def name(self):
+    def name(self) -> str:
+        """
+        Get the name of the node."
+        """
         return self.app_name
 
     @name.setter
-    def name(self, value):
+    def name(self, value: str) -> None:
         self.app_name = value
         if not self.task_title:
             self.task_title = value.replace("_", " ").title()
 
-    def _get_resolver_extra(self):
+    def _get_resolver_extra(self) -> Dict[str, Any]:
+        """
+        Get additional variable for view context
+        """
         return {"node": self}
 
-    def _outgoing(self):
+    def _outgoing(self) -> Iterator[Edge]:
         """
         Get an iterator over the outgoing edges of this node.
 
@@ -102,7 +125,7 @@ class Node(Viewset):
         """
         raise NotImplementedError
 
-    def _incoming(self):
+    def _incoming(self) -> Iterator[Edge]:
         """
         Get an iterator over the incoming edges of this node.
 
@@ -111,26 +134,31 @@ class Node(Viewset):
         """
         return iter(self._incoming_edges)
 
-    def __str__(self):
+    def __str__(self) -> str:
         if self.name:
             return self.name.title().replace("_", " ")
         return super(Node, self).__str__()
 
-    def _resolve(self, instance):
+    def _resolve(self, instance: "Flow") -> None:
         """Node class should resolve other nodes this-references here.
 
         Called as soon as node instances infatuated, but before
         incoming/outgoing links set.
         """
 
-    def _ready(self):
+    def _ready(self) -> None:
         """
         Called when the flow class setup is finished.
 
         Subclasses can perform additional initialization here.
         """
 
-    def _create(self, prev_activation, token, data=None):
+    def _create(
+        self,
+        prev_activation: "Activation",
+        token: str,
+        data: Optional[Dict[str, Any]] = None,
+    ) -> "Activation":
         """
         Create a new task instance.
 
@@ -144,8 +172,12 @@ class Node(Viewset):
         return self.activation_class.create(self, prev_activation, token, data=data)
 
     def Annotation(
-        self, title=None, description=None, summary_template=None, result_template=None
-    ):
+        self,
+        title: Optional[str] = None,
+        description: Optional[str] = None,
+        summary_template: Optional[str] = None,
+        result_template: Optional[str] = None,
+    ) -> "Node":
         """
         Sets annotation for the node.
 
@@ -165,7 +197,7 @@ class Node(Viewset):
             self.task_result_template = result_template
         return self
 
-    def _get_transition_url(self, activation, transition):
+    def _get_transition_url(self, activation: Activation, transition: Any) -> str:
         url_name = transition.slug
         if url_name == "start":
             url_name = "execute"
@@ -174,7 +206,9 @@ class Node(Viewset):
             url_name, args=[activation.process.pk, activation.task.pk]
         )
 
-    def get_available_actions(self, activation, user):
+    def get_available_actions(
+        self, activation: Activation, user: Any
+    ) -> Iterator[Tuple[str, str]]:
         """
         Returns a list of available actions for the given user on the current node.
 
@@ -197,7 +231,7 @@ class Node(Viewset):
 
 
 class FlowMetaClass(ViewsetMeta):
-    def __str__(self):
+    def __str__(self) -> str:
         from .fields import get_flow_ref
 
         return get_flow_ref(self)
@@ -214,18 +248,20 @@ class Flow(Viewset, metaclass=FlowMetaClass):
     :type activation_class: class
     """
 
-    instance = None
+    instance: Optional["Flow"] = None
 
-    process_class = None
-    task_class = None
-    lock_impl = lock.no_lock
+    process_class: Optional[type] = None
+    task_class: Optional[type] = None
+    lock_impl: Any = lock.no_lock
 
-    process_title = ""
-    process_description = ""
-    process_summary_template = ""
-    process_result_template = ""
+    propagate_task_data: bool = False
 
-    def __init_subclass__(cls, **kwargs):
+    process_title: str = ""
+    process_description: str = ""
+    process_summary_template: str = ""
+    process_result_template: str = ""
+
+    def __init_subclass__(cls, **kwargs: Any) -> None:
         """
         Create a new node instance.
 
@@ -298,24 +334,36 @@ class Flow(Viewset, metaclass=FlowMetaClass):
         for _, node in cls._nodes_by_name.items():
             node._ready()
 
-    def __str__(self):
+    def __str__(self) -> str:
         return str(self.process_title)
 
-    def _get_resolver_extra(self):
+    def _get_resolver_extra(self) -> Dict[str, Any]:
+        """
+        Get additional context for views
+        """
         return {"flow": self}
 
     @classmethod
-    def lock(cls, process_pk):
+    def lock(cls, process_pk: int) -> Any:
+        """
+        Acquire a lock for the specified process.
+        """
         return cls.lock_impl(cls, process_pk)
 
     @property
-    def app_label(self):
+    def app_label(self) -> str:
+        """
+        Get the application label for the flow.
+        """
         module = "{}.{}".format(self.__module__, self.__class__.__name__)
         app_config = apps.get_containing_app_config(module)
         return app_config.label
 
     @property
-    def flow_label(self):
+    def flow_label(self) -> str:
+        """
+        Get the flow label for the flow.
+        """
         module = "{}.{}".format(self.__module__, self.__class__.__name__)
         app_config = apps.get_containing_app_config(module)
 
@@ -327,10 +375,13 @@ class Flow(Viewset, metaclass=FlowMetaClass):
 
         return subpath.lower().replace(".", "/")
 
-    def nodes(self):
+    def nodes(self) -> Iterator[Node]:
         return self._nodes_by_name.values()
 
-    def node(self, name, no_obsolete=False):
+    def node(self, name: str, no_obsolete: bool = False) -> Optional[Node]:
+        """
+        Get a node by name.
+        """
         node = self._nodes_by_name.get(name, None)
         if node is None and not no_obsolete:
             from .nodes import Obsolete
@@ -339,19 +390,19 @@ class Flow(Viewset, metaclass=FlowMetaClass):
             node = obsolete_factory.create_node(name, flow_class=self.__class__)
         return node
 
-    def has_view_permission(self, user, obj=None):
+    def has_view_permission(self, user: Any, obj: Optional[Any] = None) -> bool:
         opts = self.process_class._meta
         return user.is_authenticated and user.has_perm(
             f"{opts.app_label}.view_{ opts.model_name}"
         )
 
-    def has_manage_permission(self, user, obj=None):
+    def has_manage_permission(self, user: Any, obj: Optional[Any] = None) -> bool:
         opts = self.process_class._meta
         return user.is_authenticated and user.has_perm(
             f"{opts.app_label}.manage_{ opts.model_name}"
         )
 
-    def _get_urls(self):
+    def _get_urls(self) -> List:
         urlpatterns = super()._get_urls()
 
         for node in self.nodes():
@@ -363,7 +414,7 @@ class Flow(Viewset, metaclass=FlowMetaClass):
 
         return urlpatterns
 
-    def _this_owner(self, flow_task):
+    def _this_owner(self, flow_task: type) -> Any:
         """Return user that was assigned to the task."""
 
         def get_task_owner(activation):
@@ -382,7 +433,7 @@ class Flow(Viewset, metaclass=FlowMetaClass):
         return get_task_owner
 
     @classmethod
-    def get_start_nodes(cls, user=None):
+    def get_start_nodes(cls, user: Optional[Any] = None) -> List[Node]:
         """
         List of flow start nodes.
 
@@ -397,12 +448,16 @@ class Flow(Viewset, metaclass=FlowMetaClass):
             if user is None or node.can_execute(user)
         ]
 
-    def get_available_process_actions(self, process, user=None):
+    def get_available_process_actions(
+        self,
+        process: Any,
+        user: Optional[Any] = None,
+    ) -> List[Dict[str, str]]:
         """List of {name, url} process actions available for the current user"""
         # TODO process cancel
         return []
 
-    def cancel(self, process):
+    def cancel(self, process: Any) -> None:
         with transaction.atomic(), self.lock(process.pk):
             active_tasks = process.task_set.exclude(
                 status__in=[STATUS.DONE, STATUS.CANCELED]

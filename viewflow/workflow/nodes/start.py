@@ -184,6 +184,10 @@ class StartHandle(mixins.NextNodeMixin, Node):
     def _create_wrapper_function(self, origin_func):
         def func(**kwargs):
             activation = self.activation_class.create(self, None, None)
+
+            # link subprocess to a parent process
+            activation.process.parent_task = kwargs.pop("_parent_task", None)
+
             result = (
                 origin_func(activation, **kwargs) if origin_func else activation.process
             )

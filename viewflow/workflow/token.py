@@ -1,9 +1,10 @@
 from itertools import count
+from typing import Iterator, Any
 from django.utils.deconstruct import deconstructible
 
 
 @deconstructible
-class Token(object):
+class Token:
     """
     Helper for tree-like flow token management.
 
@@ -18,32 +19,32 @@ class Token(object):
       becomes 'start/3_4'
     """
 
-    def __init__(self, token):
+    def __init__(self, token: str) -> None:
         """
         Instantiate a new token.
 
         :param token: str
         """
-        self.token = token
+        self.token: str = token
 
-    def is_split_token(self):
+    def is_split_token(self) -> bool:
         """True, if it is a token of parallel task."""
         return "/" in self.token
 
-    def get_base_split_token(self):
+    def get_base_split_token(self) -> "Token":
         """Return token before last split happens."""
         return Token(self.token.rsplit("/", 1)[0])
 
-    def get_common_split_prefix(self, join_token, task_pk):
+    def get_common_split_prefix(self, join_token: "Token", task_pk: int) -> str:
         """Common prefix for tokens."""
         if self == join_token:
             return "{}/{}_".format(self.token, task_pk)
         return "{}_".format(self.token.rsplit("_", 1)[0])
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return self.token
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if isinstance(other, Token):
             other_token = other.token
         elif isinstance(other, str):
@@ -53,11 +54,11 @@ class Token(object):
 
         return self.token == other_token
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.token)
 
     @classmethod
-    def split_token_source(cls, prev_token, task_pk):
+    def split_token_source(cls, prev_token: str, task_pk: int) -> Iterator["Token"]:
         """Span a set of uniq tokens with common prefix."""
         for n in count(1):
             yield Token("{}/{}_{}".format(prev_token, task_pk, n))

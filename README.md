@@ -185,6 +185,10 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
+### 2.1.3 2024-06-26
+
+- Allow to use `flow.StartHandle` as start for subprocess
+
 ### 2.1.2 2024-06-24
 
 - Allow cancelling Celery tasks from the ERROR state.

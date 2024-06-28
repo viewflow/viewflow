@@ -8,6 +8,7 @@ import copy
 import types
 import warnings
 from collections import namedtuple, OrderedDict
+from typing import Optional, Dict, Any, List, Union
 
 from django.views.generic import RedirectView
 from django.urls import URLPattern, URLResolver, include, path, reverse
@@ -29,17 +30,17 @@ class _UrlName(str):
     hierarchy.
     """
 
-    def __init__(self, value):
+    def __init__(self, value) -> None:
         str.__init__(value)
         self.extra = {}
 
 
 class _URLResolver(URLResolver):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs) -> None:
         self.extra = kwargs.pop("extra", {})
         super(_URLResolver, self).__init__(*args, **kwargs)
 
-    def resolve(self, *args, **kwargs):
+    def resolve(self, *args, **kwargs) -> str:
         result = super(_URLResolver, self).resolve(*args, **kwargs)
         if not isinstance(result.url_name, _UrlName):
             result.url_name = _UrlName(result.url_name)
@@ -54,7 +55,7 @@ class _URLResolver(URLResolver):
 Route = namedtuple("Route", ["prefix", "viewset"])
 
 
-def route(prefix, viewset):
+def route(prefix, viewset: "BaseViewset") -> Route:
     """A viewset url"""
     if not isinstance(viewset, BaseViewset):
         raise ValueError(
@@ -65,26 +66,48 @@ def route(prefix, viewset):
     return Route(prefix, viewset)
 
 
-class BaseViewset(object):
+class BaseViewset:
     """
-    Class-based django routing configuration
+    Base class for defining a class-based Django routing configuration.
+
+    Attributes:
+        app_name (Optional[str]): The name of the application associated with this viewset.
+        namespace (Optional[str]): The namespace for the URLs of this viewset.
+        parent_namespace (Optional[str]): The namespace of the parent viewset.
+        extra_kwargs (Optional[Dict[str, Any]]): Additional keyword arguments for URL configuration.
     """
 
-    app_name = None
-    namespace = None
-    parent_namespace = None
-    extra_kwargs = None
+    app_name: Optional[str] = None
+    namespace: Optional[str] = None
+    parent_namespace: Optional[str] = None
+    extra_kwargs: Optional[Dict[str, Any]] = None
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
-        self._parent = None
+        self._parent: Optional[BaseViewset] = None
 
     @property
-    def parent(self):
+    def parent(self) -> Optional["BaseViewset"]:
+        """
+        Get the parent viewset.
+
+        Returns:
+            Optional[BaseViewset]: The parent viewset, if any.
+        """
         return self._parent
 
     @parent.setter
-    def parent(self, value):
+    def parent(self, value: "BaseViewset") -> None:
+        """
+        Set the parent viewset. This can only be set once.
+
+        Args:
+            value (BaseViewset): The viewset to set as the parent.
+
+        Raises:
+            Warning: If the parent is being set more than once or if the viewset
+                     already has an explicit parent namespace.
+        """
         if self._parent is not None:
             warnings.warn(
                 f"Viewset {self.__class__.__name__} parent could be set only once",
@@ -98,11 +121,28 @@ class BaseViewset(object):
         self._parent = value
 
     @property
-    def urls(self):
+    def urls(self) -> List[Any]:
         raise NotImplementedError("Subclass should override this")
 
-    def reverse(self, viewname, args=None, kwargs=None, current_app=None):
-        """Get view url."""
+    def reverse(
+        self,
+        viewname: str,
+        args: Optional[list[Any]] = None,
+        kwargs: Optional[dict[str, Any]] = None,
+        current_app: Optional[str] = None,
+    ) -> str:
+        """
+        Get the URL for a given viewname, including the namespace.
+
+        Args:
+            viewname (str): The name of the view.
+            args (Optional[list[Any]], optional): Positional arguments for the view.
+            kwargs (Optional[dict[str, Any]], optional): Keyword arguments for the view.
+            current_app (Optional[str], optional): The current application namespace.
+
+        Returns:
+            str: The URL for the view with the appropriate namespace
+        """
         view_namespace = ""
 
         current_viewset = self
@@ -121,7 +161,17 @@ class BaseViewset(object):
 
         return reverse(viewname, args=args, kwargs=kwargs, current_app=current_app)
 
-    def has_view_permission(self, user, obj=None):
+    def has_view_permission(self, user: Any, obj: Optional[Any] = None):
+        """
+        Determine if the user has permission to view the viewset.
+
+        Args:
+            user (User): The user to check permissions for.
+            obj (Optional[Any], optional): The object being viewed.
+
+        Returns:
+            bool: True if the user has view permission, False otherwise.
+        """
         return True
 
 

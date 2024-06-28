@@ -2,6 +2,12 @@
 Changelog
 =========
 
+2.1.3 2024-06-26
+----------------
+
+- Allow to use `flow.StartHandle` as start for subprocess
+- Subprocess got get_subprocess_kwargs callable to provide additional parameters to flow.StartHandle
+
 2.1.2 2024-06-24
 ----------------
 

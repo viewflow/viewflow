@@ -1,5 +1,5 @@
 from contextlib import contextmanager
-from typing import List
+from typing import Any, List, Optional, Set
 
 from django.db import connection, transaction
 from django.utils.timezone import now
@@ -10,70 +10,115 @@ from .signals import task_finished, task_failed
 from .status import STATUS, PROCESS
 
 
-def parent_tasks_completed(activation):
-    """Canceled task could be recreated iff all parent task was not cancelled."""
+def parent_tasks_completed(activation: "Activation") -> bool:
+    """
+    Check if all parent tasks are completed.
+
+    Canceled task could be recreated iff all parent task was not cancelled.
+
+    Args:
+        activation (Activation): The current activation instance.
+
+    Returns:
+        bool: True if all parent tasks are completed, False otherwise.
+    """
     previous = activation.task.previous.values("status")
     completed = (STATUS.DONE, STATUS.REVIVED)
     return all(lambda task: task.status in completed, previous)
 
 
-def leading_tasks_canceled(activation):
-    """Task could be undone iff no outgoing uncancelled tasks are exists."""
+def leading_tasks_canceled(activation: "Activation") -> bool:
+    """
+    Check if all leading tasks are canceled.
+
+    Task could be undone iff no outgoing uncancelled tasks are exists.
+
+    Args:
+        activation (Activation): The current activation instance.
+
+    Returns:
+        bool: True if all leading tasks are canceled, False otherwise.
+    """
     non_canceled_count = activation.task.leading.exclude(status=STATUS.CANCELED).count()
     return non_canceled_count == 0
 
 
-def process_not_cancelled(activation):
+def process_not_cancelled(activation: "Activation") -> bool:
+    """
+    Check if the process is not canceled.
+
+    Args:
+        activation (Activation): The current activation instance.
+
+    Returns:
+        bool: True if the process is not canceled, False otherwise.
+    """
     return activation.process.status != PROCESS.CANCELED
 
 
-def has_manage_permission(activation, user):
+def has_manage_permission(activation: "Activation", user: Any) -> bool:
+    """
+    Check if the user has manage permission.
+
+    Args:
+        activation (Activation): The current activation instance.
+        user (Any): The user instance.
+
+    Returns:
+        bool: True if the user has manage permission, False otherwise.
+    """
     return activation.flow_class.instance.has_manage_permission(user)
 
 
-class Activation(object):
+class Activation:
     """
     Base class for flow task activations.
 
-    Activation is responsible for flow task state management and persistance.
-    Each activation status changes are restricted by a simple finite state
-    automata.
+    Activation is responsible for flow task state management and persistence.
+    Each activation status change is restricted by a simple finite state automaton.
     """
 
     status: fsm.State = fsm.State(STATUS, default=STATUS.NEW)
 
-    def __init__(self, task):
-        """Instantiate an activation."""
+    def __init__(self, task: Any) -> None:
+        """
+        Instantiate an activation.
+
+        Args:
+            task (Any): The task instance associated with the activation.
+        """
         self.task = task
         self.process = task.process.coerced
 
-    def __eq__(self, other):
+    def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Activation):
             return False
         return self.task == other.task
 
-    def __hash__(self):
+    def __hash__(self) -> int:
         return hash(self.task)
 
     @status.setter()
-    def _set_status(self, value):
+    def _set_status(self, value: Any) -> None:
         """Set the status to the underline task."""
         self.task.status = value
 
     @status.getter()
-    def _get_status(self):
+    def _get_status(self) -> Any:
         """Get the status of the activated task."""
         return self.task.status
 
     @property
-    def flow_task(self):
+    def flow_task(self) -> Any:
+        """Get the flow task associated with the activation."""
         return self.task.flow_task
 
     @property
-    def flow_class(self):
+    def flow_class(self) -> Any:
+        """Get the flow class associated with the activation."""
         return self.flow_task.flow_class
 
-    def exception_guard(self):
+    def exception_guard(self) -> contextmanager:
         """
         Perform activation action inside a transaction.
 
@@ -100,8 +145,25 @@ class Activation(object):
         return guard()
 
     @classmethod
-    def create(cls, flow_task, prev_activation, token, data=None):
-        """Instantiate and persist new flow task."""
+    def create(
+        cls,
+        flow_task: Any,
+        prev_activation: "Activation",
+        token: Any,
+        data: Optional[Any] = None,
+    ) -> "Activation":
+        """
+        Instantiate and persist a new flow task.
+
+        Args:
+            flow_task (Any): The flow task instance.
+            prev_activation (Activation): The previous activation instance.
+            token (Any): The token for the new task.
+            data (Optional[Any]): Additional data for the new task.
+
+        Returns:
+            Activation: The newly created activation instance.
+        """
         flow_class = flow_task.flow_class
         task = flow_class.task_class(
             process=prev_activation.process,
@@ -114,25 +176,29 @@ class Activation(object):
         return cls(task)
 
     @status.transition(source=STATUS.NEW)
-    def activate(self):
+    def activate(self) -> None:
+        """Activate the task."""
         raise NotImplementedError(
             f"{self.__class__.__name__} class should override act() method"
         )
 
     @status.transition(source=STATUS.DONE)
-    def create_next(self):
+    def create_next(self) -> None:
+        """Create the next task in the flow."""
         raise NotImplementedError(
             f"{self.__class__.__name__} class should override create_next() method"
         )
 
     @status.transition(source=STATUS.NEW, target=STATUS.DONE)
-    def complete(self):
+    def complete(self) -> None:
+        """Complete the current task."""
         assert connection.in_atomic_block
         self.task.finished = now()
         self.task.save()
         task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
 
-    def _activate_next(self, activations: set):
+    def _activate_next(self, activations: Set["Activation"]) -> None:
+        """Activate the next set of tasks."""
         while activations:
             for current_activation in activations:
                 if current_activation.activate.can_proceed():
@@ -149,7 +215,8 @@ class Activation(object):
             }
 
     @status.transition(source=STATUS.DONE)
-    def activate_next(self):
+    def activate_next(self) -> None:
+        """Activate the next task in the flow."""
         assert connection.in_atomic_block
         activations = set(self.create_next())
         self._activate_next(activations)
@@ -160,7 +227,8 @@ class Activation(object):
         conditions=[leading_tasks_canceled],
         permission=has_manage_permission,
     )
-    def undo(self):
+    def undo(self) -> None:
+        """Undo the current task."""
         self.task.finished = now()
         self.task.save()
 
@@ -169,7 +237,7 @@ class Activation(object):
         target=STATUS.REVIVED,
         permission=has_manage_permission,
     )
-    def revive(self):
+    def revive(self) -> Any:
         """
         Recreate and activate cancelled task
         """
@@ -188,7 +256,9 @@ class Activation(object):
         return task
 
     def get_outgoing_transitions(self) -> List[fsm.Transition]:
+        """Get the outgoing transitions for the current status."""
         return self.__class__.status.get_outgoing_transitions(self.status)
 
     def get_available_transitions(self, user) -> List[fsm.Transition]:
+        """Get the available transitions for the current status and user."""
         return self.__class__.status.get_available_transitions(self, self.status, user)

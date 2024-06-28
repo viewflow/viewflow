@@ -1,3 +1,4 @@
+from typing import Callable, Dict, Any, Optional
 from django.utils.timezone import now
 
 from viewflow import this
@@ -6,11 +7,11 @@ from ..activation import Activation
 from ..base import Node
 from ..signals import task_started, flow_finished
 from ..status import STATUS
-from .start import StartActivation
+from .start import StartActivation, StartHandle
 from . import mixins
 
 
-def subprocess_finished(activation):
+def subprocess_finished(activation: Activation) -> bool:
     return all(
         process.status == STATUS.DONE
         for process in Process._default_manager.filter(
@@ -42,12 +43,12 @@ class StartSubprocess(mixins.NextNodeMixin, Node):
         super().__init__(**kwargs)
         self._func = func
 
-    def run(self, parent_task, **kwargs):
+    def run(self, _parent_task, **kwargs):
         func = this.resolve(self.flow_class.instance, self._func)
 
         def wrapper(**kwargs):
-            activation = self.activation_class.create(self, None, parent_task.token)
-            activation.process.parent_task = parent_task
+            activation = self.activation_class.create(self, None, _parent_task.token)
+            activation.process.parent_task = _parent_task
             if func:
                 func(activation, **kwargs)
             activation.execute()
@@ -62,9 +63,15 @@ class SubprocessActivation(mixins.NextNodeActivationMixin, Activation):
         with self.exception_guard():
             self.task.started = now()
             self.task.save()
-            self.flow_task.start_subprocess_task.run(self.task)
             task_started.send(
                 sender=self.flow_class, process=self.process, task=self.task
+            )
+
+            subprocess_kwargs = {}
+            if self.flow_task.get_subprocess_kwargs:
+                subprocess_kwargs = self.flow_task.get_subprocess_kwargs(self)
+            self.flow_task.start_subprocess_task.run(
+                _parent_task=self.task, **subprocess_kwargs
             )
 
     @Activation.status.transition(
@@ -86,6 +93,10 @@ class SubprocessActivation(mixins.NextNodeActivationMixin, Activation):
 
 
 class Subprocess(mixins.NextNodeMixin, Node):
+    """
+    The ``Subprocess`` node in a flow.
+    """
+
     task_type = "SUBPROCESS"
     activation_class = SubprocessActivation
 
@@ -98,8 +109,14 @@ class Subprocess(mixins.NextNodeMixin, Node):
         """,
     }
 
-    def __init__(self, start_subprocess_task, **kwargs):
+    def __init__(
+        self,
+        start_subprocess_task: StartHandle,
+        get_subprocess_kwargs: Optional[Callable[[Activation], Dict[str, Any]]] = None,
+        **kwargs
+    ):
         self.start_subprocess_task = start_subprocess_task
+        self.get_subprocess_kwargs = get_subprocess_kwargs
         super().__init__(**kwargs)
 
     def _ready(self):
@@ -123,7 +140,9 @@ class NSubprocessActivation(SubprocessActivation):
             self.task.save()
 
             for item in self.flow_task.subitem_source(self.process):
-                self.flow_task.start_subprocess_task.run(self.task, item=item)
+                self.flow_task.start_subprocess_task.run(
+                    _parent_task=self.task, item=item
+                )
 
             task_started.send(
                 sender=self.flow_class, process=self.process, task=self.task
@@ -131,6 +150,34 @@ class NSubprocessActivation(SubprocessActivation):
 
 
 class NSubprocess(Subprocess):
+    """
+    The ``NSubprocess`` node in a flow.
+
+       This node is used to start multiple instances of a subprocess flow within a
+       parent flow. Each instance processes a different item, and all subprocesses
+       must be completed before the parent flow can proceed.
+
+
+       .. code-block:: python
+
+           class ExampleSubFlow(flow.Flow):
+               start = flow.StartHandle(this.start_func).Next(this.task) task =
+               flow.Handle(this.task_func).Next(this.end)
+               end = flow.End()
+
+               def start_func(self, activation, item=0):
+                   # instantialed with one of 1, 2, 3, 4 as item
+                   activation.process.data = item
+
+               def task_func(self, activation):
+                   activation.process.data += 100
+
+           class MainFlowWithNSubprocess(flow.Flow):
+               start = flow.StartFunction().Next(this.nsubprocess) nsubprocess =
+               flow.NSubprocess(ExampleSubFlow.start, lambda p: [1, 2, 3, 4]).Next(this.end)
+               end = flow.End()
+    """
+
     task_type = "SUBPROCESS"
     activation_class = NSubprocessActivation
 
