@@ -2,6 +2,17 @@
 Changelog
 =========
 
+2.2.0 2024-06-28
+----------------
+
+- Introduced a new parameter for .Next(..., task_data_source=) that allows the
+  instantiation of new tasks with additional initialized .data, enabling data to
+  be passed from task to task.
+- Added process.seed and task.seed generic foreign keys to the default workflow
+  models. Along with process.artifact and task.artifact, these additions enable
+  tracking of business process results from start to finish.
+- Renamed Split.Next(data_source=) to task_data_source=.
+
 2.1.3 2024-06-26
 ----------------
 

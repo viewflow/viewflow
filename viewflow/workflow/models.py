@@ -240,6 +240,18 @@ class Process(AbstractProcess):
         to="Task",
     )
 
+    # process seed reference
+    seed = GenericForeignKey("seed_content_type", "seed_object_id")
+
+    seed_content_type = models.ForeignKey(
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="+",
+        to=ContentType,
+    )
+    seed_object_id = models.PositiveIntegerField(null=True, blank=True)
+
     # process artifact reference
     artifact = GenericForeignKey("artifact_content_type", "artifact_object_id")
 
@@ -271,6 +283,18 @@ class Task(AbstractTask):
     )
 
     data = models.JSONField(default=dict, blank=True)
+
+    # task seed reference
+    seed = GenericForeignKey("seed_content_type", "seed_object_id")
+
+    seed_content_type = models.ForeignKey(
+        blank=True,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="+",
+        to=ContentType,
+    )
+    seed_object_id = models.PositiveIntegerField(null=True, blank=True)
 
     # task artifact reference
     artifact = GenericForeignKey("artifact_content_type", "artifact_object_id")

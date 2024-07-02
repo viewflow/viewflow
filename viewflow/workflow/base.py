@@ -254,8 +254,6 @@ class Flow(Viewset, metaclass=FlowMetaClass):
     task_class: Optional[type] = None
     lock_impl: Any = lock.no_lock
 
-    propagate_task_data: bool = False
-
     process_title: str = ""
     process_description: str = ""
     process_summary_template: str = ""

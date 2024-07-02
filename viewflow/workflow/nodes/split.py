@@ -25,9 +25,6 @@ class SplitActivation(Activation):
         for node, cond, data_source in self.flow_task._branches:
             if cond and not cond(self):
                 continue
-            if data_source:
-                for data in data_source(self):
-                    self.next_tasks.append((node, data))
             else:
                 self.next_tasks.append((node, None))
 
@@ -128,13 +125,13 @@ class Split(
     def _branches(self):
         return self._activate_next
 
-    def Next(self, node, case=None, data_source=None):
+    def Next(self, node, case=None):
         """Node to activate if condition is true.
 
         :param cond: Callable[activation] -> bool
 
         """
-        self._activate_next.append((node, case, data_source))
+        self._activate_next.append((node, case, None))
         return self
 
     def Always(self, node):

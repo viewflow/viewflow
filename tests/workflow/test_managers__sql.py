@@ -10,6 +10,8 @@ from viewflow.workflow.models import Process, Task
 
 
 class Test(TestCase):  # noqa: D101
+    maxDiff = None
+
     def test_process_queryset_filter_by_flow_class_succeed(self):
         queryset = managers.ProcessQuerySet(model=Process).filter(flow_class=ChildFlow)
 
@@ -17,7 +19,8 @@ class Test(TestCase):  # noqa: D101
             str(queryset.query).strip(),
             'SELECT "viewflow_process"."id", "viewflow_process"."flow_class", "viewflow_process"."status",'
             ' "viewflow_process"."created", "viewflow_process"."finished", "viewflow_process"."data",'
-            ' "viewflow_process"."parent_task_id", "viewflow_process"."artifact_content_type_id",'
+            ' "viewflow_process"."parent_task_id", "viewflow_process"."seed_content_type_id",'
+            ' "viewflow_process"."seed_object_id", "viewflow_process"."artifact_content_type_id",'
             ' "viewflow_process"."artifact_object_id" FROM "viewflow_process"'
             ' WHERE "viewflow_process"."flow_class" = tests/workflow.test_managers__sql.ChildFlow'
             ' ORDER BY "viewflow_process"."created" DESC',
@@ -35,6 +38,8 @@ class Test(TestCase):  # noqa: D101
             '       "viewflow_process"."finished",\n'
             '       "viewflow_process"."data",\n'
             '       "viewflow_process"."parent_task_id",\n'
+            '       "viewflow_process"."seed_content_type_id",\n'
+            '       "viewflow_process"."seed_object_id",\n'
             '       "viewflow_process"."artifact_content_type_id",\n'
             '       "viewflow_process"."artifact_object_id",\n'
             '       "tests_childprocess"."process_ptr_id",\n'
@@ -96,7 +101,8 @@ class Test(TestCase):  # noqa: D101
             ' "viewflow_task"."external_task_id", "viewflow_task"."owner_id",'
             ' "viewflow_task"."owner_permission", "viewflow_task"."owner_permission_content_type_id",'
             ' "viewflow_task"."owner_permission_obj_pk", "viewflow_task"."process_id",'
-            ' "viewflow_task"."data", "viewflow_task"."artifact_content_type_id",'
+            ' "viewflow_task"."data", "viewflow_task"."seed_content_type_id",'
+            ' "viewflow_task"."seed_object_id", "viewflow_task"."artifact_content_type_id",'
             ' "viewflow_task"."artifact_object_id"'
             ' FROM "viewflow_task"'
             ' WHERE "viewflow_task"."flow_task" = tests/workflow.test_managers__sql.ChildFlow.start'

@@ -9,7 +9,6 @@ from .join import Join, JoinActivation
 from .obsolete import Obsolete, ObsoleteActivation
 from .split import Split, SplitActivation, SplitFirst
 from .start import Start, StartHandle, StartActivation
-from .subprocess import StartSubprocess, Subprocess, NSubprocess
 from .switch import Switch, SwitchActivation
 from .view import ViewActivation, View
 
@@ -26,7 +25,6 @@ __all__ = (
     "IfActivation",
     "Join",
     "JoinActivation",
-    "NSubprocess",
     "Obsolete",
     "ObsoleteActivation",
     "Split",
@@ -35,8 +33,6 @@ __all__ = (
     "Start",
     "StartActivation",
     "StartHandle",
-    "StartSubprocess",
-    "Subprocess",
     "Switch",
     "SwitchActivation",
     "View",

@@ -387,94 +387,98 @@ class SplitFirst(
     detail_view_class = views.DetailTaskView
 
 
-class StartSubprocess(
-    mixins.NodeDetailMixin,
-    mixins.NodeCancelMixin,
-    mixins.NodeUndoMixin,
-    nodes.StartSubprocess,
-):
-    index_view_class = views.IndexTaskView
-    detail_view_class = views.DetailTaskView
-    cancel_view_class = views.CancelTaskView
-    undo_view_class = views.UndoTaskView
+try:
+
+    class StartSubprocess(
+        mixins.NodeDetailMixin,
+        mixins.NodeCancelMixin,
+        mixins.NodeUndoMixin,
+        nodes.StartSubprocess,
+    ):
+        index_view_class = views.IndexTaskView
+        detail_view_class = views.DetailTaskView
+        cancel_view_class = views.CancelTaskView
+        undo_view_class = views.UndoTaskView
+
+    class Subprocess(
+        mixins.NodeDetailMixin,
+        mixins.NodeCancelMixin,
+        mixins.NodeUndoMixin,
+        nodes.Subprocess,
+    ):
+        """
+        The ``Subprocess`` node in a flow **(PRO-only)**
+
+        This node is used to start a subprocess flow within a parent flow. The
+        subprocess must be completed before the parent flow can proceed.
+
+        .. code-block:: python
+
+            class ExampleSubFlow(flow.Flow):
+                start = flow.StartHandle(this.start_func).Next(this.task)
+                task = flow.Handle(this.task_func).Next(this.end)
+                end = flow.End()
+
+                def start_func(self, activation):
+                    # get access to parent process and data
+                    activation.process.parent_task.process.data
+
+                def task_func(self, activation):
+                    pass
+
+            class MainFlowWithSubprocess(flow.Flow):
+                start = flow.StartHandle().Next(this.subprocess)
+                subprocess = flow.Subprocess(ExampleSubFlow.start).Next(this.end)
+                end = flow.End()
+        """
+
+        index_view_class = views.IndexTaskView
+        detail_view_class = views.DetailTaskView
+        cancel_view_class = views.CancelTaskView
+        undo_view_class = views.UndoTaskView
+
+    class NSubprocess(
+        mixins.NodeDetailMixin,
+        mixins.NodeCancelMixin,
+        mixins.NodeUndoMixin,
+        nodes.NSubprocess,
+    ):
+        """
+        The ``NSubprocess`` node in a flow **(PRO-only)**
+
+        This node is used to start multiple instances of a subprocess flow within a
+        parent flow. Each instance processes a different item, and all subprocesses
+        must be completed before the parent flow can proceed.
 
 
-class Subprocess(
-    mixins.NodeDetailMixin,
-    mixins.NodeCancelMixin,
-    mixins.NodeUndoMixin,
-    nodes.Subprocess,
-):
-    """
-    The ``Subprocess`` node in a flow.
+        .. code-block:: python
 
-    This node is used to start a subprocess flow within a parent flow. The
-    subprocess must be completed before the parent flow can proceed.
+            class ExampleSubFlow(flow.Flow):
+                start = flow.StartHandle(this.start_func).Next(this.task) task =
+                flow.Handle(this.task_func).Next(this.end)
+                end = flow.End()
 
-    .. code-block:: python
+                def start_func(self, activation, item=0):
+                    # instantialed with one of 1, 2, 3, 4 as item
+                    activation.process.data = item
 
-        class ExampleSubFlow(flow.Flow):
-            start = flow.StartHandle(this.start_func).Next(this.task)
-            task = flow.Handle(this.task_func).Next(this.end)
-            end = flow.End()
+                def task_func(self, activation):
+                    activation.process.data += 100
 
-            def start_func(self, activation):
-                # get access to parent process and data
-                activation.process.parent_task.process.data
+            class MainFlowWithNSubprocess(flow.Flow):
+                start = flow.StartFunction().Next(this.nsubprocess) nsubprocess =
+                flow.NSubprocess(ExampleSubFlow.start, lambda p: [1, 2, 3, 4]).Next(this.end)
+                end = flow.End()
+        """
 
-            def task_func(self, activation):
-                pass
+        index_view_class = views.IndexTaskView
+        detail_view_class = views.DetailTaskView
+        cancel_view_class = views.CancelTaskView
+        undo_view_class = views.UndoTaskView
 
-        class MainFlowWithSubprocess(flow.Flow):
-            start = flow.StartHandle().Next(this.subprocess)
-            subprocess = flow.Subprocess(ExampleSubFlow.start).Next(this.end)
-            end = flow.End()
-    """
-
-    index_view_class = views.IndexTaskView
-    detail_view_class = views.DetailTaskView
-    cancel_view_class = views.CancelTaskView
-    undo_view_class = views.UndoTaskView
-
-
-class NSubprocess(
-    mixins.NodeDetailMixin,
-    mixins.NodeCancelMixin,
-    mixins.NodeUndoMixin,
-    nodes.NSubprocess,
-):
-    """
-    The ``NSubprocess`` node in a flow.
-
-    This node is used to start multiple instances of a subprocess flow within a
-    parent flow. Each instance processes a different item, and all subprocesses
-    must be completed before the parent flow can proceed.
-
-
-    .. code-block:: python
-
-        class ExampleSubFlow(flow.Flow):
-            start = flow.StartHandle(this.start_func).Next(this.task) task =
-            flow.Handle(this.task_func).Next(this.end)
-            end = flow.End()
-
-            def start_func(self, activation, item=0):
-                # instantialed with one of 1, 2, 3, 4 as item
-                activation.process.data = item
-
-            def task_func(self, activation):
-                activation.process.data += 100
-
-        class MainFlowWithNSubprocess(flow.Flow):
-            start = flow.StartFunction().Next(this.nsubprocess) nsubprocess =
-            flow.NSubprocess(ExampleSubFlow.start, lambda p: [1, 2, 3, 4]).Next(this.end)
-            end = flow.End()
-    """
-
-    index_view_class = views.IndexTaskView
-    detail_view_class = views.DetailTaskView
-    cancel_view_class = views.CancelTaskView
-    undo_view_class = views.UndoTaskView
+except AttributeError:
+    """Pro-only functionality"""
+    pass
 
 
 class Switch(
