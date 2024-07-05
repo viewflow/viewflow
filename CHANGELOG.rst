@@ -2,10 +2,29 @@
 Changelog
 =========
 
+2.2.2 2024-07-05
+----------------
+
+- Introduced new parameters for .If().Then(.., task_data=, task_seed) and
+  .Else(...)
+- Include {{ form.media }} into default workflow/task.html template
+
+
+2.2.1 2024-07-03
+----------------
+
+- Introduced a new parameter for .Next(..., task_seed=) that allows the
+  instantiation of new tasks with additional initialized .seed generic foreign key
+- Introduced a new parameter for .Split(..., task_seed_source=) same as task_data_source,
+  prodices outgoing tasks with initializaed .seed value
+- Introduced a new parameter for flow.Subprocess(process_data=, process_seed=,
+  task_data=, task_seed=) allows to provide data nad seed for newly created
+  process and/or start task
+
 2.2.0 2024-06-28
 ----------------
 
-- Introduced a new parameter for .Next(..., task_data_source=) that allows the
+- Introduced a new parameter for .Next(..., task_data=) that allows the
   instantiation of new tasks with additional initialized .data, enabling data to
   be passed from task to task.
 - Added process.seed and task.seed generic foreign keys to the default workflow

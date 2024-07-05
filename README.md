@@ -185,28 +185,32 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
-### 2.1.3 2024-06-26
+### 2.2.2 2024-07-05
 
-- Allow to use `flow.StartHandle` as start for subprocess
-
-### 2.1.2 2024-06-24
-
-- Allow cancelling Celery tasks from the ERROR state.
-- Hotfix: Fix broken Join when no other nodes are created by Split.
-- Allow using this references to flow static methods as Celery tasks.
-- Allow cancelling Celery jobs from the ERROR status.
-- Add missing permission check before adding a new item to the list.
-- Allow Admin() viewset to be used as a sub-item in an Application viewset.
-
-### 2.1.1 2024-06-06
-
-- Hotfix broken task creation
+- Introduced new parameters for .If().Then(.., task_data=, task_seed) and
+  .Else(...)
+- Include {{ form.media }} into default workflow/task.html template
 
 
-### 2.1.0 2024-06-16
+### 2.2.1 2024-07-03
 
-- Allow to assign additional custom data to viewflow.fsm transitions
-- Added `data_source` parameter to `Split.Next()` method, allowing dynamic creation of multiple node instances based on a list of data items.
+- Introduced a new parameter for .Next(..., task_seed=) that allows the
+  instantiation of new tasks with additional initialized .seed generic foreign key
+- Introduced a new parameter for .Split(..., task_seed_source=) same as task_data_source,
+  prodices outgoing tasks with initializaed .seed value
+- Introduced a new parameter for flow.Subprocess(process_data=, process_seed=,
+  task_data=, task_seed=) allows to provide data nad seed for newly created
+  process and/or start task
+
+### 2.2.0 2024-06-28
+
+- Introduced a new parameter for .Next(..., task_data=) that allows the
+  instantiation of new tasks with additional initialized .data, enabling data to
+  be passed from task to task.
+- Added process.seed and task.seed generic foreign keys to the default workflow
+  models. Along with process.artifact and task.artifact, these additions enable
+  tracking of business process results from start to finish.
+- Renamed Split.Next(data_source=) to task_data_source=.
 
 
 [build]: https://img.shields.io/github/actions/workflow/status/viewflow/viewflow/django.yml?branch=main

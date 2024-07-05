@@ -1,6 +1,10 @@
 {% extends request.resolver_match.app.base_template_name|default:'viewflow/workflow/base_page.html' %}
 {% load i18n viewflow workflow %}
 
+{% block extrahead %}
+  {{ block.super }}
+  {{ form.media }}
+{% endblock %}
 
 {% block content %}{% with process=request.activation.process task=request.activation.task %}
   <div class="mdc-layout-grid vf-page__grid">
