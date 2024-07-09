@@ -158,6 +158,7 @@ class Node(Viewset):
         prev_activation: "Activation",
         token: str,
         data: Optional[Dict[str, Any]] = None,
+        seed: Optional[Any] = None,
     ) -> "Activation":
         """
         Create a new task instance.
@@ -169,7 +170,9 @@ class Node(Viewset):
         :returns: The new activation instance.
         :rtype: Activation
         """
-        return self.activation_class.create(self, prev_activation, token, data=data)
+        return self.activation_class.create(
+            self, prev_activation, token, data=data, seed=seed
+        )
 
     def Annotation(
         self,

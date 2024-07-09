@@ -16,13 +16,25 @@ class IfActivation(Activation):
 
     @Activation.status.super()
     def create_next(self):
-        next_node = (
-            self.flow_task._on_true
+        next_node, next_data_source, next_seed_sourse = (
+            (
+                self.flow_task._on_true,
+                self.flow_task._on_true_data,
+                self.flow_task._on_true_seed,
+            )
             if self._condition_result
-            else self.flow_task._on_false
+            else (
+                self.flow_task._on_false,
+                self.flow_task._on_false_data,
+                self.flow_task._on_false_seed,
+            )
         )
         if next_node:
-            yield next_node._create(self, self.task.token)
+            next_data = next_data_source(self) if next_data_source else None
+            next_seed = next_seed_sourse(self) if next_seed_sourse else None
+            yield next_node._create(
+                self, self.task.token, data=next_data, seed=next_seed
+            )
 
 
 class If(Node):
@@ -47,7 +59,11 @@ class If(Node):
         super().__init__(**kwargs)
         self._condition = cond
         self._on_true = None
+        self._on_true_data = None
+        self._on_true_seed = None
         self._on_false = None
+        self._on_false_data = None
+        self._on_false_seed = None
 
     def _outgoing(self):
         yield Edge(src=self, dst=self._on_true, edge_class="cond_true")
@@ -55,19 +71,29 @@ class If(Node):
 
     def _resolve(self, instance):
         super()._resolve(instance)
+
         self._on_true = this.resolve(instance, self._on_true)
+        self._on_true_data = this.resolve(instance, self._on_true_data)
+        self._on_true_seed = this.resolve(instance, self._on_true_seed)
+
         self._on_false = this.resolve(instance, self._on_false)
+        self._on_false_data = this.resolve(instance, self._on_false_data)
+        self._on_false_seed = this.resolve(instance, self._on_false_seed)
 
     @property
     def condition(self):
         return this.resolve(self.flow_class.instance, self._condition)
 
-    def Then(self, node):
+    def Then(self, node, task_data=None, task_seed=None):
         """Node activated if condition is True."""
         self._on_true = node
+        self._on_true_data = task_data
+        self._on_true_seed = task_seed
         return self
 
-    def Else(self, node):
+    def Else(self, node, task_data=None, task_seed=None):
         """Node activated if condition is False."""
         self._on_false = node
+        self._on_false_data = task_data
+        self._on_false_seed = task_seed
         return self

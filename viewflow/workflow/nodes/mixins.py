@@ -1,3 +1,4 @@
+from typing import Any, Callable, Dict, Optional
 from viewflow import this
 
 from ..activation import Activation
@@ -11,7 +12,14 @@ class NextNodeActivationMixin(object):
     @Activation.status.transition(source=STATUS.DONE)
     def create_next(self):
         if self.flow_task._next:
-            yield self.flow_task._next._create(self, self.task.token)
+            data, seed = {}, None
+            if self.flow_task._task_data:
+                data = self.flow_task._task_data(self)
+            if self.flow_task._task_seed:
+                seed = self.flow_task._task_seed(self)
+            yield self.flow_task._next._create(
+                self, self.task.token, data=data, seed=seed
+            )
 
 
 class NextNodeMixin(object):
@@ -19,15 +27,26 @@ class NextNodeMixin(object):
 
     def __init__(self, *args, **kwargs):  # noqa D102
         self._next = None
+        self._task_data = None
+        self._task_seed = None
         super().__init__(*args, **kwargs)
 
-    def Next(self, node):
+    def Next(
+        self,
+        node,
+        task_data: Optional[Callable[[Activation], Dict[str, Any]]] = None,
+        task_seed: Optional[Callable[[Activation], Any]] = None,
+    ):
         """Next node to activate."""
         self._next = node
+        self._task_data = task_data
+        self._task_seed = task_seed
         return self
 
     def _resolve(self, cls):
         self._next = this.resolve(cls, self._next)
+        self._task_data = this.resolve(cls, self._task_data)
+        self._task_seed = this.resolve(cls, self._task_seed)
 
     def _outgoing(self):
         if self._next:

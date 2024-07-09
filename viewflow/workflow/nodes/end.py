@@ -2,7 +2,7 @@ from django.db import transaction
 from django.utils.timezone import now
 
 from ..base import Node
-from ..activation import Activation, process_not_cancelled
+from ..activation import Activation, process_not_cancelled, has_manage_permission
 from ..status import STATUS, PROCESS
 from ..signals import task_started, task_finished, flow_finished
 
@@ -11,7 +11,10 @@ class EndActivation(Activation):
     """Activation that finishes the flow process."""
 
     @Activation.status.transition(
-        source=STATUS.DONE, target=STATUS.CANCELED, conditions=[process_not_cancelled]
+        source=STATUS.DONE,
+        target=STATUS.CANCELED,
+        conditions=[process_not_cancelled],
+        permission=has_manage_permission,
     )
     def undo(self):
         self.process.finished = None

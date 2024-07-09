@@ -166,6 +166,10 @@ class BaseFlowViewsMixin(metaclass=ViewsetMeta):
                 return next_user_task.flow_task.reverse(
                     "index", args=[next_user_task.process_id, next_user_task.pk]
                 )
+            else:
+                return self.reverse(
+                    "process_detail", args=[request.activation.process.pk]
+                )
 
         if "back" in request.GET:
             back_url = request.GET["back"]

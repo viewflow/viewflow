@@ -79,6 +79,7 @@ class Activation:
     """
 
     status: fsm.State = fsm.State(STATUS, default=STATUS.NEW)
+    type: str = "node"
 
     def __init__(self, task: Any) -> None:
         """
@@ -151,6 +152,7 @@ class Activation:
         prev_activation: "Activation",
         token: Any,
         data: Optional[Any] = None,
+        seed: Optional[Any] = None,
     ) -> "Activation":
         """
         Instantiate and persist a new flow task.
@@ -170,6 +172,7 @@ class Activation:
             flow_task=flow_task,
             token=token,
             data=data if data is not None else {},
+            seed=seed,
         )
         task.save()
         task.previous.add(prev_activation.task)
@@ -200,19 +203,40 @@ class Activation:
     def _activate_next(self, activations: Set["Activation"]) -> None:
         """Activate the next set of tasks."""
         while activations:
-            for current_activation in activations:
+            join_activations = {act for act in activations if act.type == "join"}
+            task_activations = activations - join_activations
+
+            if task_activations:
+                for current_activation in task_activations:
+                    if current_activation.activate.can_proceed():
+                        current_activation.activate()
+
+                    if current_activation.complete.can_proceed():
+                        current_activation.complete()
+
+                activations = {
+                    next_activation
+                    for current_activation in activations
+                    if current_activation.create_next.can_proceed()
+                    for next_activation in current_activation.create_next()
+                }
+                activations.update(join_activations)
+            elif join_activations:
+                # process first join activation
+                current_activation = join_activations.pop()
                 if current_activation.activate.can_proceed():
                     current_activation.activate()
 
                 if current_activation.complete.can_proceed():
                     current_activation.complete()
 
-            activations = {
-                next_activation
-                for current_activation in activations
-                if current_activation.create_next.can_proceed()
-                for next_activation in current_activation.create_next()
-            }
+                activations = set()
+                if current_activation.create_next.can_proceed():
+                    activations = {
+                        next_activation
+                        for next_activation in current_activation.create_next()
+                    }
+                activations.update(join_activations)
 
     @status.transition(source=STATUS.DONE)
     def activate_next(self) -> None:

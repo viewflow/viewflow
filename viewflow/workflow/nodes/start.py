@@ -13,7 +13,7 @@ class StartActivation(mixins.NextNodeActivationMixin, Activation):
     """Task activation that creates new process instance."""
 
     @classmethod
-    def create(cls, flow_task, prev_activation, token, data=None):
+    def create(cls, flow_task, prev_activation, token, data=None, seed=None):
         flow_class = flow_task.flow_class
 
         process = flow_class.process_class(flow_class=flow_class)
@@ -22,6 +22,7 @@ class StartActivation(mixins.NextNodeActivationMixin, Activation):
             process=process,
             started=now(),
             data=data if data is not None else {},
+            seed=seed,
         )
 
         return cls(task)
@@ -187,6 +188,10 @@ class StartHandle(mixins.NextNodeMixin, Node):
 
             # link subprocess to a parent process
             activation.process.parent_task = kwargs.pop("_parent_task", None)
+            activation.process.data = kwargs.pop("_process_data", {})
+            activation.process.seed = kwargs.pop("_process_seed", None)
+            activation.task.data = kwargs.pop("_task_data", {})
+            activation.task.seed = kwargs.pop("_task_seed", None)
 
             result = (
                 origin_func(activation, **kwargs) if origin_func else activation.process

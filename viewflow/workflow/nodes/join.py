@@ -10,12 +10,14 @@ from . import mixins
 class JoinActivation(mixins.NextNodeActivationMixin, Activation):
     """Activation for parallel Join node."""
 
+    type: str = "join"
+
     def __init__(self, *args, **kwargs):  # noqa D102
         self.next_task = None
         super().__init__(*args, **kwargs)
 
     @classmethod
-    def create(cls, flow_task, prev_activation, token, data=None):
+    def create(cls, flow_task, prev_activation, token, data=None, seed=None):
         """
         Join and, if all incoming paths are completed, continue execution.
 
@@ -47,7 +49,11 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
                 flow_task=flow_task,
                 token=token,
                 data=data if data is not None else {},
+                seed=seed,
             )
+        else:
+            # todo resolve task_data and seed
+            pass
 
         task.previous.add(prev_activation.task)
         activation = cls(task)
