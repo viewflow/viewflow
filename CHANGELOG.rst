@@ -2,6 +2,16 @@
 Changelog
 =========
 
+2.2.3 2024-07-09
+-----------------
+
+- Fixed issue with Split/Join operations when an immediate split to join
+  connection occurs.
+- Improved redirect functionality for "Execute and Continue." Now redirects to
+  the process details if the process has finished.
+- Enabled the Undo action for End() nodes.
+
+
 2.2.2 2024-07-05
 ----------------
 
