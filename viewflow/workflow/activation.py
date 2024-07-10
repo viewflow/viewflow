@@ -267,7 +267,12 @@ class Activation:
         """
         flow_class = self.flow_class
         task = flow_class.task_class(
-            process=self.process, flow_task=self.flow_task, token=self.task.token
+            process=self.process,
+            flow_task=self.flow_task,
+            token=self.task.token,
+            seed=self.task.seed,
+            artifact=self.task.artifact,
+            data=self.task.data,
         )
         task.save()
 
