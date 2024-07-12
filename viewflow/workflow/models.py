@@ -236,7 +236,7 @@ class Process(AbstractProcess):
         blank=True,
         null=True,
         on_delete=models.CASCADE,
-        related_name="+",
+        related_name="subprocesses",
         to="Task",
     )
 

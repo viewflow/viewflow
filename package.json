@@ -31,6 +31,7 @@
   },
   "dependencies": {
     "@hotwired/turbo": "^7.3.0",
+    "@iconfu/svg-inject": "^1.2.3",
     "@material/textfield": "^14.0.0",
     "@material/web": "^1.2.0",
     "@open-wc/lit-helpers": "^0.6.0",

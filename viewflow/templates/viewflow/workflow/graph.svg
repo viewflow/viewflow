@@ -81,7 +81,7 @@
     
         circle.event,
         path.event {
-            fill: none;
+            fill: transparent;
             stroke: #000;
         }
 
@@ -90,12 +90,12 @@
         }
 
         path.event-marker {
-            fill: none;
+            fill: transparent;
             stroke: #000;
         }
 
         path.gateway {
-            fill: none;
+            fill: transparent;
             stroke: #000;
             stroke-width: 1.1;
         }
@@ -108,7 +108,7 @@
         }
 
         rect.task {
-            fill: none;
+            fill: transparent;
             stroke: #000;
             stroke-width: 1.1;
         }
@@ -120,7 +120,7 @@
         }
 
         path.task-marker {
-            fill: none;
+            fill: transparent;
             stroke: #000;
             stroke-width: 1.1;
         }
@@ -128,14 +128,14 @@
     </style>
     {% for cell in cells %}
     <g id="{{ cell.node.name }}" transform="translate({{ cell.shape.x }}, {{ cell.shape.y }})"{% if cell.status %} class="{{ cell.status|lower }}"{% endif %}>
-        {% if cell.status %}<title>{{ cell.status }}</title>{% endif %}
+        {% if cell.title %}<title>{{ cell.title }}</title>{% endif %}
         {{ cell.shape.svg|safe }}
         {% for text, class, font_size, x, y in cell.shape.text %}
         <text class="{{ class }}" font-size="{{ font_size }}px" x="{{ x }}" y="{{ y }}">{% if forloop.first %}{{ text|title }}{% else %}{{ text }}{% endif %}</text>
         {% endfor %}
     </g>
     {% endfor %}{% for edge in edges %}
-    <path fill="none" stroke="#000000" stroke-width="2" id="{{ edge.src.name}}__{{ edge.dst.name }}" marker-end="url(#end-marker)"
+    <path fill="transparent" stroke="#000000" stroke-width="2" id="{{ edge.src.name}}__{{ edge.dst.name }}" marker-end="url(#end-marker)"
           d="{% for x,y in edge.segments %}{% if forloop.first %}M{% else %} L{% endif %}{{ x }}, {{ y }}{% endfor %}"/>
 
     {% endfor %}

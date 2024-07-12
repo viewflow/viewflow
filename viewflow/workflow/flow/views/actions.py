@@ -58,7 +58,6 @@ class UnassignTaskView(
 
 class CancelTaskView(
     mixins.SuccessMessageMixin,
-    mixins.TaskSuccessUrlMixin,
     mixins.TaskViewTemplateNames,
     generic.FormView,
 ):
@@ -77,10 +76,16 @@ class CancelTaskView(
         self.request.activation.cancel()
         return super().form_valid(*args, **kwargs)
 
+    def get_success_url(self):
+        """Continue on task or redirect back to task list."""
+        activation = self.request.activation
+        return activation.flow_task.reverse(
+            "detail", args=[activation.process.pk, activation.task.pk]
+        )
+
 
 class UndoTaskView(
     mixins.SuccessMessageMixin,
-    mixins.TaskSuccessUrlMixin,
     mixins.TaskViewTemplateNames,
     generic.FormView,
 ):
@@ -99,10 +104,16 @@ class UndoTaskView(
         self.request.activation.undo()
         return super().form_valid(*args, **kwargs)
 
+    def get_success_url(self):
+        """Continue on task or redirect back to task list."""
+        activation = self.request.activation
+        return activation.flow_task.reverse(
+            "detail", args=[activation.process.pk, activation.task.pk]
+        )
+
 
 class ReviveTaskView(
     mixins.SuccessMessageMixin,
-    mixins.TaskSuccessUrlMixin,
     mixins.TaskViewTemplateNames,
     generic.FormView,
 ):

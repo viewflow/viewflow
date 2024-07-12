@@ -24,6 +24,10 @@ class UpdateProcessView(
     def form_valid(self, form):
         """If the form is valid, save the associated model and finish the task."""
         self.object = form.save()
+        if "seed" in form.cleaned_data:
+            self.object.seed = form.cleaned_data["seed"]
+        if "artifact" in form.cleaned_data:
+            self.object.artifact = form.cleaned_data["artifact"]
         self.request.activation.execute()
         return HttpResponseRedirect(self.get_success_url())
 

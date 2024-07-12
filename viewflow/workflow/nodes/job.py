@@ -55,9 +55,13 @@ class AbstractJobActivation(mixins.NextNodeActivationMixin, Activation):
         tb = exception.__traceback__
         while tb.tb_next:
             tb = tb.tb_next
-        serialized_locals = json.dumps(
-            tb.tb_frame.f_locals, default=lambda obj: str(obj)
-        )
+
+        try:
+            serialized_locals = json.dumps(
+                tb.tb_frame.f_locals, default=lambda obj: str(obj)
+            )
+        except Exception as ex:
+            serialized_locals = json.dumps({"_serialization_exception": str(ex)})
 
         self.task.data["_exception"] = {
             "title": str(exception),

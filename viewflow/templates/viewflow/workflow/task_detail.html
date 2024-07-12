@@ -37,6 +37,16 @@
       {% endfor %}
     </div>
   </div>
+  {% with subprocesses=task.subprocesses.all %}{% if subprocesses %}
+  <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+    <h4 class="mdc-typography mdc-typography--headline5"  style="margin-bottom:10px">{% trans "Subprocess" %}</h4>
+    <div>
+      {% for subprocess in subprocesses %}
+        <a class="mdc-typography mdc-typography--subtitle1" href="{% reverse subprocess.flow_class 'process_detail' subprocess.pk %}">{{ subprocess }}</a>{% if not forloop.last %}, {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}{% endwith %}
 {% endblock %}
 
 {% block task_actions %}

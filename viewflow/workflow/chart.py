@@ -47,7 +47,18 @@ class Shape(object):
 
 
 class Cell(object):
-    __slots__ = ["col", "row", "x", "y", "width", "height", "node", "shape", "status"]
+    __slots__ = [
+        "col",
+        "row",
+        "x",
+        "y",
+        "width",
+        "height",
+        "node",
+        "shape",
+        "title",
+        "status",
+    ]
 
     def __init__(
         self,
@@ -59,6 +70,7 @@ class Cell(object):
         width=-1,
         height=-1,
         shape=None,
+        title=None,
         status=None,
     ):
         self.node = node
@@ -69,6 +81,7 @@ class Cell(object):
         self.width = width
         self.height = height
         self.shape = shape if shape is not None else Shape()
+        self.title = title
         self.status = status
 
     def incoming(self):
@@ -536,11 +549,13 @@ def calc_text(grid):
         shape = getattr(cell.node, "shape", DEFAULT_SHAPE)
         text_align = shape.get("text-align")
         font_size = shape.get("font-size", 12)
+
+        if cell.node.task_title:
+            title = force_str(cell.node.task_title)
+        else:
+            title = " ".join(cell.node.name.capitalize().split("_"))
+
         if text_align == "middle":
-            if cell.node.task_title:
-                title = force_str(cell.node.task_title)
-            else:
-                title = " ".join(cell.node.name.capitalize().split("_"))
             segments = wrap(title, 20)
             block_height = max(len(segments) - 1, 0) * font_size * 1.2
 
@@ -557,6 +572,8 @@ def calc_text(grid):
                         y_start + (n * font_size * 1.2),
                     )
                 )
+        else:
+            cell.title = title
 
 
 def calc_cell_status(flow_class, grid, process_pk):

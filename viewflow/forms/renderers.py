@@ -510,9 +510,10 @@ class FormLayout:
     def append_non_field_errors(self, form: forms.Form, root: ElementTree.Element):
         errors = form.non_field_errors()
         errors.extend(
-            form.error_class(bound_field.errors)
+            error
             for bound_field in form.hidden_fields()
             if bound_field.errors
+            for error in bound_field.errors
         )
 
         if errors:

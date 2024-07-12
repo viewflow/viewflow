@@ -1,4 +1,4 @@
-{% load viewflow %}
+{% load viewflow i18n %}
 <div class="mdc-card vf-card">
   <section class="vf-card__header">
     <h1 class="vf-card__title">{{ process }}</h1>
@@ -20,13 +20,33 @@
           </td>
         </tr>
         {% for field, field_name, value in process_data %}
-          {% if field.name != 'data' and field.name != 'flow_class' and field.name != 'artifact_object_id' and field.name != 'artifact_content_type'%}
+          {% if field.name != 'parent_task' and field.name != 'data' and field.name != 'flow_class' and field.name != 'artifact_object_id' and field.name != 'artifact_content_type' and field.name != 'seed_object_id' and field.name != 'seed_content_type'%}
             <tr>
               <th class="vf-list__table-header vf-list__table-header-text">{{ field_name }}</th>
               <td>{{ value }}</td>
             </tr>
           {% endif %}
         {% endfor %}
+        {% if process.parent_task %}
+        <tr>
+          <th class="vf-list__table-header vf-list__table-header-text">{% translate 'Parent Task' %}</th>
+          <td>
+            <a href="{% reverse process.parent_task.flow_task 'index' process.parent_task.process_id process.parent_task.pk %}">{{ process.parent_task.flow_task }}</a>
+          </td>
+        </tr>
+        {% endif %}
+        {% if process.seed %}
+        <tr>
+          <th class="vf-list__table-header vf-list__table-header-text">{% translate 'Seed' %}</th>
+          <td>{{ process.seed }}</td>
+        </tr>
+        {% endif %}
+        {% if process.artifact %}
+        <tr>
+          <th class="vf-list__table-header vf-list__table-header-text">{% translate 'Artifact' %}</th>
+          <td>{{ process.artifact }}</td>
+        </tr>
+        {% endif %}
       </tbody>
     </table>
   </section>

@@ -185,6 +185,26 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
+### 2.2.4 2024-07-12
+
+- Clone data, seed, and artifacts from canceled tasks to revived tasks.
+- Enhance error handling for celery.Job.
+- Improve the process cancellation template.
+- Redirect to the task detail page after canceling or undoing actions, instead
+  of redirecting to the process detail page.
+- Added links to parent subprocess and parent task on the subprocess process and
+  task details pages.
+- Updated the Process.parent_task field to use related_name='subprocess',
+  allowing access to subprocesses via task.subprocess
+- Enhanced CreateProcessView and UpdateProcessView to set process_seed and
+  artifact_generic_foreign_key fields based on form.cleaned_data, as Django
+  model forms do not handle this automatically.
+- Added tasks with an ERROR status to the process dashboard for better visibility and tracking.
+- Added tooltip hover titles to nodes without text labels in the SVG workflow graph.
+- Marked StartHandler nodes as BPMN Start Message events on the SVG graph.
+- Fixed rendering of hidden field errors in forms.
+
+
 ### 2.2.3 2024-07-09
 
 - Fixed issue with Split/Join operations when an immediate split to join

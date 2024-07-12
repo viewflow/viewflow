@@ -51,6 +51,8 @@ def include_task_data(context, task):
     try:
         if task.artifact_object_id:
             context["artifact_data"] = get_object_data(task.artifact)
+        if task.seed_object_id:
+            context["seed_data"] = get_object_data(task.seed)
         context["data"] = task.data
         context["task"] = task
         return template.render(

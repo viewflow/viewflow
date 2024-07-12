@@ -170,6 +170,8 @@ class StartHandle(mixins.NextNodeMixin, Node):
         "height": 50,
         "svg": """
             <circle class="event" cx="25" cy="25" r="25"/>
+            <rect xmlns="http://www.w3.org/2000/svg" x="7.5" y="15" width="35" height="20" fill="transparent" stroke="rgb(0, 0, 0)"/>
+            <path xmlns="http://www.w3.org/2000/svg" d="M 7.5 15 L 25 25 L 42.5 15" fill="none" stroke="rgb(0, 0, 0)" stroke-miterlimit="10"/>
         """,
     }
 

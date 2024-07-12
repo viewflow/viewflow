@@ -1,5 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
+from django.db.models import Q
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -7,7 +8,7 @@ from django.views import generic
 
 from viewflow.views import ListModelView
 from viewflow.utils import viewprop, has_object_perm
-from viewflow.workflow import chart
+from viewflow.workflow import chart, STATUS
 from viewflow.workflow.fields import get_task_ref
 from . import mixins, filters
 
@@ -56,7 +57,8 @@ class DashboardView(
                     "tasks": self.flow_class.task_class._default_manager.filter_available(
                         [self.flow_class], self.request.user
                     ).filter(
-                        finished__isnull=True, flow_task=node
+                        Q(finished__isnull=True) | Q(status=STATUS.ERROR),
+                        flow_task=node,
                     )[
                         : self.MAX_ROWS
                     ],
