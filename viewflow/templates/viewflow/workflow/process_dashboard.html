@@ -11,9 +11,9 @@
           <div class="column">
             <span class="column-title">{{ view.flow_class }}</span>
             <div class="column-content">
-              <div class="mdc-card" style="padding:20px;margin-top:10px;margin-botton:5px">
+              <div class="mdc-card" style="padding:20px;margin-top:10px;margin-bottom:5px">
                 {% if view.flow_class.process_description %}
-                  <h6 class="mdc-typography--subtitle2" style="margin:0;font-weight: normal">{{ view.flow_class.process_description }}</h6>
+                  <h6 class="mdc-typography--subtitle2" style="margin:0;font-weight: normal;padding-bottom: 8px;">{{ view.flow_class.process_description }}</h6>
                 {% endif %}
                 <vf-modal-trigger class="vf-modal-trigger--closed">
                   <span class="vf-modal-trigger__helper"></span>

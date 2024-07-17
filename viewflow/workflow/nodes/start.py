@@ -91,6 +91,9 @@ class StartViewActivation(StartActivation):
 
         super().undo.original()
 
+    def get_success_url(self, request):
+        return request.resolver_match.flow_viewset.get_success_url(request)
+
 
 class Start(
     mixins.NextNodeMixin,

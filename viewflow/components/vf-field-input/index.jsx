@@ -24,7 +24,8 @@ export const defaultProps = {
   'trailingIcon': undefined,
   'type': 'text',
   'value': '',
-  'readonly': undefined
+  'readonly': undefined,
+  'pattern': undefined,
 };
 
 const HelpText = (props) => {
@@ -102,6 +103,7 @@ const Input = (props) => {
         tabindex={ props.tabIndex }
         value={ props.value }
         readonly= {props.readonly }
+        pattern= {props.pattern}
         aria-labelledby={ props.id + '_label' }
         oninput={props.onInput}
         onChange={props.onChange}

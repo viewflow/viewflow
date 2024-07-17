@@ -112,7 +112,6 @@ class ViewActivation(mixins.NextNodeActivationMixin, Activation):
     )
     def execute(self):
         self.complete()
-        task_finished.send(sender=self.flow_class, process=self.process, task=self.task)
         self.activate_next()
 
     @Activation.status.transition(
@@ -131,6 +130,9 @@ class ViewActivation(mixins.NextNodeActivationMixin, Activation):
             self.flow_task._undo_func(self)
 
         super().undo.original()
+
+    def get_success_url(self, request):
+        return request.resolver_match.flow_viewset.get_success_url(request)
 
 
 class View(

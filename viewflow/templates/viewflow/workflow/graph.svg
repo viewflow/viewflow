@@ -136,7 +136,6 @@
     </g>
     {% endfor %}{% for edge in edges %}
     <path fill="transparent" stroke="#000000" stroke-width="2" id="{{ edge.src.name}}__{{ edge.dst.name }}" marker-end="url(#end-marker)"
-          d="{% for x,y in edge.segments %}{% if forloop.first %}M{% else %} L{% endif %}{{ x }}, {{ y }}{% endfor %}"/>
-
+          d="{% for x,y in edge.segments %}{% if forloop.first %}M{% else %} L{% endif %}{{ x }}, {{ y }}{% endfor %}" style="pointer-events: none"/>
     {% endfor %}
 </svg>{% endlocalize %}

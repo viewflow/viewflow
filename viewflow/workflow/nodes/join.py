@@ -155,8 +155,11 @@ class Join(
 
     bpmn_element = "parallelGateway"
 
-    def __init__(self, continue_on_condition=None, **kwargs):  # noqa D102
+    def __init__(
+        self, continue_on_condition=None, cancel_active=True, **kwargs
+    ):  # noqa D102
         super().__init__(**kwargs)
+        self._cancel_active: bool = cancel_active
         self._continue_on_condition = continue_on_condition
 
     def _resolve(self, cls):

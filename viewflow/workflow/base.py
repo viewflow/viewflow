@@ -134,6 +134,9 @@ class Node(Viewset):
         """
         return iter(self._incoming_edges)
 
+    def bpmn_content(self):
+        return ""
+
     def __str__(self) -> str:
         if self.name:
             return self.name.title().replace("_", " ")

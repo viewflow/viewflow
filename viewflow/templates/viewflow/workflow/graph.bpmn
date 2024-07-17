@@ -12,6 +12,7 @@
         <bpmn:{{ cell.node.bpmn_element }} id="id_node_{{ cell.node.name }}" {% if cell.shape.label %}name="{{ cell.shape.label }}{% if cell.status %} ({{ cell.status }}){% endif %}"{% endif %}>{% for edge in cell.incoming %}
             <bpmn:incoming>id_edge_{{ edge.src.name}}__{{ edge.dst.name }}</bpmn:incoming>{% endfor %}{% for edge in cell.outgoing %}
             <bpmn:outgoing>id_edge_{{ edge.src.name}}__{{ edge.dst.name }}</bpmn:outgoing>{% endfor %}
+            {{ cell.node.bpmn_content|safe }}
         </bpmn:{{ cell.node.bpmn_element }}>
         {% endif %}
         {% endfor %}

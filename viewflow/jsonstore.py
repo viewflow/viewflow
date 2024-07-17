@@ -33,7 +33,10 @@ class JSONFieldDescriptor(object):
                 if hasattr(self.field, "from_json"):
                     value = self.field.from_json(value)
             elif self.field.default and self.field.default != fields.NOT_PROVIDED:
-                value = self.field.default
+                if callable(self.field.default):
+                    value = self.field.default()
+                else:
+                    value = self.field.default
             else:
                 value = None
             return value

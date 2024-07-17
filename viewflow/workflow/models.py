@@ -1,4 +1,5 @@
 from contextlib import contextmanager
+from typing import Any, List
 
 from django.conf import settings
 from django.contrib.contenttypes.fields import GenericForeignKey
@@ -313,3 +314,6 @@ class Task(AbstractTask):
         verbose_name = _("Task")
         verbose_name_plural = _("Tasks")
         ordering = ["-created"]
+
+    def reverse(self, view_name: str, *args: List[Any]) -> str:
+        return self.flow_task.reverse(view_name, args=[self.process_id, self.pk, *args])

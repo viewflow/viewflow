@@ -15,6 +15,8 @@ from viewflow.workflow.models import Task
     "DATABASE_URL" in os.environ, "Celery test requires specific database config"
 )
 class CeleryTestCase(TransactionTestCase):
+    SETTINGS = "cookbook.workflow101.config"
+
     def setUp(self):
         """Start celery worker connection the the test database"""
         env = os.environ.copy()
@@ -26,7 +28,7 @@ class CeleryTestCase(TransactionTestCase):
         cmd = [
             "celery",
             "--app",
-            "cookbook.workflow101.config",
+            self.SETTINGS,
             "worker",
             "--loglevel",
             "DEBUG",
@@ -34,7 +36,6 @@ class CeleryTestCase(TransactionTestCase):
             "-c",
             "1",
         ]
-
         self.process = subprocess.Popen(
             cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env
         )

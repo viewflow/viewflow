@@ -2,6 +2,18 @@
 Changelog
 =========
 
+2.2.5 2024-07-17
+-----------------
+
+- The 'pattern' widget attribute is now passed to the underlying form input.
+- Fixed issue with flow image reload.
+- Fixed dashboard max height on pages with long sidebars.
+- Added .get_success_url(request) shortcut method to StartViewActivation and
+  ViewActivation for convenient use in function-based views.
+- Fixed duplicated task_finished signal on flow.View completion.
+- Enabled callable defaults on jsonstore fields.
+- Improved SVG and BPMN export shapes for SplitFirst and Timer Tasks.
+
 2.2.4 2024-07-12
 -----------------
 

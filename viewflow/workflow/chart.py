@@ -372,11 +372,19 @@ def init_shapes(grid):
             # is it ever happens?
             cell.shape.x = cell.x
 
+        # avoid svg top cut
+        if cell.shape.x == 0:
+            cell.shape.x = 1
+
         cell.height = row_sizes[cell.row]
         if cell.shape.height < row_sizes[cell.row]:
             cell.shape.y = cell.y + int((row_sizes[cell.row] - cell.shape.height) / 2)
         else:
             cell.shape.y = cell.y
+
+        # avoid svg left cut
+        if cell.shape.y == 0:
+            cell.shape.y = 1
 
     grid.width = sum(col_sizes) + GAP_SIZE * len(col_sizes)
     grid.height = sum(row_sizes) + GAP_SIZE * len(row_sizes)
