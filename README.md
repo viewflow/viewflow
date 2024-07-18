@@ -9,6 +9,8 @@ Viewflow is a low-code, reusable component library for creating comprehensive bu
 
 With Viewflow, you can create full-featured business applications in just a few lines of code using its reusable component library. It's shipped as a single package with batteries included, and each part of Viewflow can be used independently of the others, but they all work well together.
 
+GPT assisted with Viewflow documentation: [![Viewflow Pair Programming Buddy]][gpt]
+
 
 Viewflow comes in two flavors:
 - **Viewflow Core:** A lightweight, open-source library with only non-opinionated core classes that allows you to build your custom solution on top.
@@ -264,3 +266,4 @@ modifications of Viewflow. You can find the commercial license terms in
 [py-versions]: https://img.shields.io/pypi/pyversions/django-viewflow.svg
 [requirements-svg]: https://requires.io/github/viewflow/viewflow/requirements.svg?branch=v2
 [requirements]: https://requires.io/github/viewflow/viewflow/requirements/?branch=v2
+[gpt]: https://chatgpt.com/g/g-8UHAnOpE3-viewflow-pair-programming
