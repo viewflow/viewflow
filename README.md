@@ -9,7 +9,7 @@ Viewflow is a low-code, reusable component library for creating comprehensive bu
 
 With Viewflow, you can create full-featured business applications in just a few lines of code using its reusable component library. It's shipped as a single package with batteries included, and each part of Viewflow can be used independently of the others, but they all work well together.
 
-GPT assisted with Viewflow documentation: [![Viewflow Pair Programming Buddy]][gpt]
+GPT assisted with Viewflow documentation: [Viewflow Pair Programming Buddy][gpt]
 
 
 Viewflow comes in two flavors:
