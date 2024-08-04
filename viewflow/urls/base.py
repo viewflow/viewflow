@@ -127,8 +127,8 @@ class BaseViewset:
     def reverse(
         self,
         viewname: str,
-        args: Optional[list[Any]] = None,
-        kwargs: Optional[dict[str, Any]] = None,
+        args: Optional[List[Any]] = None,
+        kwargs: Optional[Dict[str, Any]] = None,
         current_app: Optional[str] = None,
     ) -> str:
         """
@@ -136,8 +136,8 @@ class BaseViewset:
 
         Args:
             viewname (str): The name of the view.
-            args (Optional[list[Any]], optional): Positional arguments for the view.
-            kwargs (Optional[dict[str, Any]], optional): Keyword arguments for the view.
+            args (Optional[List[Any]], optional): Positional arguments for the view.
+            kwargs (Optional[Dict[str, Any]], optional): Keyword arguments for the view.
             current_app (Optional[str], optional): The current application namespace.
 
         Returns:

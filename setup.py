@@ -13,6 +13,8 @@ setuptools.setup(
     license="AGPL",
     # long_description_content_type="text/markdown",
     # long_description=README,
+    long_description_content_type="text/markdown",
+    long_description=README,
     packages=setuptools.find_packages(exclude=["tests*"]),
     python_requires=">=3.8",
     zip_safe=False,

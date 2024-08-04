@@ -2,6 +2,13 @@
 Changelog
 =========
 
+2.2.7 GIT VERSION
+-----------------
+
+- Fix compatibility with Python 3.8
+
+
+
 2.2.6 2024-08-04
 ----------------
 
