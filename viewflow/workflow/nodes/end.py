@@ -27,7 +27,7 @@ class EndActivation(Activation):
         """
         Finalize the flow. If there is no active task, process marked as finished.
         """
-        with transaction.atomic(savepoint=True):
+        with transaction.atomic(savepoint=True), self.exception_guard():
             self.task.started = now()
             task_started.send(
                 sender=self.flow_class, process=self.process, task=self.task

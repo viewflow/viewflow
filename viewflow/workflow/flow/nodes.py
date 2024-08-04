@@ -221,7 +221,12 @@ class If(
     revive_view_class = views.ReviveTaskView
 
 
-class Function(mixins.NodeDetailMixin, mixins.NodeUndoMixin, nodes.Function):
+class Function(
+    mixins.NodeDetailMixin,
+    mixins.NodeUndoMixin,
+    mixins.NodeReviveMixin,
+    nodes.Function,
+):
     """
     Represents a callback function executed synchronously as part of a workflow
     node.
@@ -255,6 +260,7 @@ class Function(mixins.NodeDetailMixin, mixins.NodeUndoMixin, nodes.Function):
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
     undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
 
 
 class Handle(
@@ -357,6 +363,7 @@ class Split(
 
 class SplitFirst(
     mixins.NodeDetailMixin,
+    mixins.NodeReviveMixin,
     nodes.SplitFirst,
 ):
     """
@@ -385,6 +392,8 @@ class SplitFirst(
 
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
 
 
 try:

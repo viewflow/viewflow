@@ -49,9 +49,9 @@ def include_task_data(context, task):
     template = select_template(template_names)
     context.push()
     try:
-        if task.artifact_object_id:
+        if task.artifact_object_id and task.artifact is not None:
             context["artifact_data"] = get_object_data(task.artifact)
-        if task.seed_object_id:
+        if task.seed_object_id and task.seed is not None:
             context["seed_data"] = get_object_data(task.seed)
         context["data"] = task.data
         context["task"] = task

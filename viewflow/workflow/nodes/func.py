@@ -1,7 +1,8 @@
+from django.db import transaction
 from django.utils.timezone import now
 
 from viewflow import this
-from ..activation import Activation
+from ..activation import Activation, has_manage_permission
 from ..base import Node
 from ..status import STATUS
 from ..signals import task_started
@@ -18,17 +19,21 @@ class FunctionActivation(mixins.NextNodeActivationMixin, Activation):
     @Activation.status.super()
     def activate(self):
         """Perform the callback within current exception propagation strategy."""
-        with self.exception_guard():
+        with transaction.atomic(savepoint=True), self.exception_guard():
             self.task.started = now()
             task_started.send(
                 sender=self.flow_class, process=self.process, task=self.task
             )
             self.flow_task._func(self)
 
-    @Activation.status.transition(source=STATUS.ERROR, target=STATUS.DONE)
-    def retry(self):
-        """Retry the next node calculation and activation."""
-        self.activate.original()
+    @Activation.status.transition(
+        source=[STATUS.ERROR],
+        target=STATUS.CANCELED,
+        permission=has_manage_permission,
+    )
+    def cancel(self):
+        self.task.finished = now()
+        self.task.save()
 
 
 class Function(mixins.NextNodeMixin, mixins.NodePermissionMixin, Node):

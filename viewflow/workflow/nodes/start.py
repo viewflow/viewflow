@@ -21,10 +21,9 @@ class StartActivation(mixins.NextNodeActivationMixin, Activation):
             flow_task=flow_task,
             process=process,
             started=now(),
-            data=data if data is not None else {},
-            seed=seed,
         )
-
+        task.data = data if data is not None else {}
+        task.seed = seed
         return cls(task)
 
     @Activation.status.transition(source=STATUS.NEW)

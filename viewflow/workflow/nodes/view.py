@@ -20,9 +20,9 @@ class ViewActivation(mixins.NextNodeActivationMixin, Activation):
             process=prev_activation.process,
             flow_task=flow_task,
             token=token,
-            data=data if data is not None else {},
-            seed=seed,
         )
+        task.data = data if data is not None else {}
+        task.seed = seed
 
         activation = cls(task)
 

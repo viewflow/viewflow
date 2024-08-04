@@ -45,4 +45,8 @@ def get_next_process_task(manager, process, user):
             status__in=[STATUS.NEW, STATUS.SCHEDULED, STATUS.STARTED],
         ).first()
 
+    # a task in a ERROR state
+    if task is None:
+        task = manager.filter(process=process, status=STATUS.ERROR).first()
+
     return task

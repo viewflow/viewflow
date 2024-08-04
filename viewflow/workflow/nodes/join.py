@@ -44,13 +44,14 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
             if token.is_split_token():
                 token = token.get_base_split_token()
 
-            task = flow_class.task_class.objects.create(
+            task = flow_class.task_class(
                 process=prev_activation.process,
                 flow_task=flow_task,
                 token=token,
-                data=data if data is not None else {},
-                seed=seed,
             )
+            task.data = data if data is not None else {}
+            task.seed = seed
+            task.save()
         else:
             # todo resolve task_data and seed
             pass
@@ -63,7 +64,6 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
     @Activation.status.transition(source=STATUS.NEW, target=STATUS.STARTED)
     @Activation.status.transition(source=STATUS.STARTED)
     def activate(self):
-        """Do nothing on a sync call"""
         if self.task.started is None:
             self.task.started = now()
             self.task.save()

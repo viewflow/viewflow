@@ -1,4 +1,6 @@
-from contextlib import contextmanager
+import json
+import traceback
+from contextlib import ContextDecorator
 from typing import Any, List, Optional, Set
 
 from django.db import connection, transaction
@@ -119,31 +121,54 @@ class Activation:
         """Get the flow class associated with the activation."""
         return self.flow_task.flow_class
 
-    def exception_guard(self) -> contextmanager:
+    def exception_guard(self) -> ContextDecorator:
         """
         Perform activation action inside a transaction.
 
         Handle and propagate exception depending on activation context state.
         """
 
-        @contextmanager
-        def guard():
-            try:
-                with transaction.atomic(savepoint=True):
-                    yield
-            except Exception as exc:  # noqa: TODO
-                if not context.propagate_exception:
-                    # TODO self.task.comments = "{}\n{}".format(exc, traceback.format_exc())
-                    self.task.finished = now()
-                    self.set_status(STATUS.ERROR)
-                    self.task.save()
-                    task_failed.send(
-                        sender=self.flow_class, process=self.process, task=self.task
-                    )
-                else:
-                    raise
+        class ExceptionGuard(ContextDecorator):
+            def __enter__(self):
+                return self
 
-        return guard()
+            def __exit__(self_eg, exc_type, exc_val, exc_tb):
+                if exc_type is not None:
+                    if not context.propagate_exception:
+                        # Keep error state
+                        tb = exc_val.__traceback__
+                        while tb.tb_next:
+                            tb = tb.tb_next
+
+                        try:
+                            serialized_locals = json.dumps(
+                                tb.tb_frame.f_locals, default=lambda obj: str(obj)
+                            )
+                        except Exception as ex:
+                            serialized_locals = json.dumps(
+                                {"_serialization_exception": str(ex)}
+                            )
+
+                        self.task.data["_exception"] = {
+                            "title": str(exc_val),
+                            "traceback": traceback.format_exc(),
+                            "locals": json.loads(serialized_locals),
+                        }
+
+                        # Set status
+                        self.task.finished = now()
+                        self._set_status(STATUS.ERROR)
+                        self.task.save()
+                        task_failed.send(
+                            sender=self.flow_class, process=self.process, task=self.task
+                        )
+                        # self.transaction.__exit__(exc_type, exc_val, exc_tb)
+                        return True  # Suppress the exception
+                    else:
+                        # self.transaction.__exit__(exc_type, exc_val, exc_tb)
+                        return False  # Propagate the exception
+
+        return ExceptionGuard()
 
     @classmethod
     def create(
@@ -171,9 +196,9 @@ class Activation:
             process=prev_activation.process,
             flow_task=flow_task,
             token=token,
-            data=data if data is not None else {},
-            seed=seed,
         )
+        task.data = data if data is not None else {}
+        task.seed = seed
         task.save()
         task.previous.add(prev_activation.task)
         return cls(task)
@@ -270,10 +295,10 @@ class Activation:
             process=self.process,
             flow_task=self.flow_task,
             token=self.task.token,
-            seed=self.task.seed,
-            artifact=self.task.artifact,
-            data=self.task.data,
         )
+        task.seed = self.task.seed
+        task.data = self.task.data
+        task.artifact = self.task.artifact
         task.save()
 
         for prev_task in self.task.previous.all():

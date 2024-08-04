@@ -1,3 +1,4 @@
+from django.db import transaction
 from viewflow import this
 
 from ..base import Node, Edge
@@ -12,7 +13,8 @@ class IfActivation(Activation):
 
     @Activation.status.super()
     def activate(self):
-        self._condition_result = self.flow_task.condition(self)
+        with transaction.atomic(savepoint=True), self.exception_guard():
+            self._condition_result = self.flow_task._condition(self)
 
     @Activation.status.super()
     def create_next(self):
@@ -72,6 +74,7 @@ class If(Node):
     def _resolve(self, instance):
         super()._resolve(instance)
 
+        self._condition = this.resolve(self.flow_class.instance, self._condition)
         self._on_true = this.resolve(instance, self._on_true)
         self._on_true_data = this.resolve(instance, self._on_true_data)
         self._on_true_seed = this.resolve(instance, self._on_true_seed)
@@ -79,10 +82,6 @@ class If(Node):
         self._on_false = this.resolve(instance, self._on_false)
         self._on_false_data = this.resolve(instance, self._on_false_data)
         self._on_false_seed = this.resolve(instance, self._on_false_seed)
-
-    @property
-    def condition(self):
-        return this.resolve(self.flow_class.instance, self._condition)
 
     def Then(self, node, task_data=None, task_seed=None):
         """Node activated if condition is True."""

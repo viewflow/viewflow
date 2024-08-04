@@ -228,7 +228,11 @@ def get_object_data(obj: models.Model) -> Iterator[Tuple[models.Field, str, Any]
         if value is not None:
             yield (field, field.verbose_name.capitalize(), value)
 
-    if hasattr(obj, "artifact_object_id") and obj.artifact_object_id:
+    if (
+        hasattr(obj, "artifact_object_id")
+        and obj.artifact_object_id
+        and obj.artifact is not None
+    ):
         yield from get_object_data(obj.artifact)
 
 

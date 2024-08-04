@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from ..activation import Activation
 from ..base import Node
+from ..context import Context
 from ..fields import get_flow_ref
 from ..signals import task_failed
 from ..status import STATUS
@@ -22,9 +23,9 @@ class AbstractJobActivation(mixins.NextNodeActivationMixin, Activation):
             flow_task=flow_task,
             token=token,
             external_task_id=str(uuid.uuid4()),
-            data=data if data is not None else {},
-            seed=seed,
         )
+        task.data = data if data is not None else {}
+        task.seed = seed
         task.save()
         task.previous.add(prev_activation.task)
         return cls(task)
@@ -45,7 +46,8 @@ class AbstractJobActivation(mixins.NextNodeActivationMixin, Activation):
     @Activation.status.transition(source=STATUS.STARTED)
     def execute(self):
         self.complete()
-        self.activate_next()
+        with Context(propagate_exception=False):
+            self.activate_next()
 
     @Activation.status.transition(source=STATUS.STARTED, target=STATUS.ERROR)
     def error(self, exception):

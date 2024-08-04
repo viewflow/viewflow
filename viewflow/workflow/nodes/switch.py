@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils.timezone import now
 
 from viewflow import this
@@ -16,18 +17,19 @@ class SwitchActivation(Activation):
 
     @Activation.status.super()
     def activate(self):
-        for node, cond in self.flow_task._branches:
-            if cond:
-                if cond(self):
+        with transaction.atomic(savepoint=True), self.exception_guard():
+            for node, cond in self.flow_task._branches:
+                if cond:
+                    if cond(self):
+                        self.next_task = node
+                        break
+                else:
                     self.next_task = node
-                    break
-            else:
-                self.next_task = node
 
-        if not self.next_task:
-            raise FlowRuntimeError(
-                "No next task available for {}".format(self.flow_task.name)
-            )
+            if not self.next_task:
+                raise FlowRuntimeError(
+                    "No next task available for {}".format(self.flow_task.name)
+                )
 
     @Activation.status.super()
     def create_next(self):
