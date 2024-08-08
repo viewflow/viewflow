@@ -6,7 +6,11 @@ Changelog
 -----------------
 
 - Fix compatibility with Python 3.8
-
+- Extend documentation with data management explanation - https://docs.viewflow.io/workflow/data_flow.html
+- Extend documentation with permission management - https://docs.viewflow.io/workflow/permissions.html
+- Add experimental JSONEditorWiget
+- Fix revived task state save
+- Allow to cancel If tasks
 
 
 2.2.6 2024-08-04

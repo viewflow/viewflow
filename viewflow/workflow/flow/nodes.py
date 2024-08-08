@@ -195,7 +195,11 @@ class View(
 
 
 class If(
-    mixins.NodeDetailMixin, mixins.NodeUndoMixin, mixins.NodeReviveMixin, nodes.If
+    mixins.NodeDetailMixin,
+    mixins.NodeUndoMixin,
+    mixins.NodeReviveMixin,
+    mixins.NodeCancelMixin,
+    nodes.If,
 ):
     """
     The  If-gate
@@ -218,6 +222,7 @@ class If(
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
     undo_view_class = views.UndoTaskView
+    cancel_view_class = views.CancelTaskView
     revive_view_class = views.ReviveTaskView
 
 
@@ -225,6 +230,7 @@ class Function(
     mixins.NodeDetailMixin,
     mixins.NodeUndoMixin,
     mixins.NodeReviveMixin,
+    mixins.NodeCancelMixin,
     nodes.Function,
 ):
     """
@@ -259,6 +265,7 @@ class Function(
 
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
     undo_view_class = views.UndoTaskView
     revive_view_class = views.ReviveTaskView
 

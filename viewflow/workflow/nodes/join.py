@@ -104,7 +104,9 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
         """
         join_prefixes = set(
             prev.token.get_common_split_prefix(self.task.token, prev.pk)
-            for prev in self.task.previous.exclude(status=STATUS.CANCELED).all()
+            for prev in self.task.previous.exclude(
+                status__in=[STATUS.CANCELED, STATUS.REVIVED]
+            ).all()
         )
 
         if len(join_prefixes) > 1:
@@ -116,7 +118,7 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
 
         active_tasks = self.flow_class.task_class._default_manager.filter(
             process=self.process, token__startswith=join_token_prefix
-        ).exclude(status__in=[STATUS.DONE, STATUS.CANCELED])
+        ).exclude(status__in=[STATUS.DONE, STATUS.CANCELED, STATUS.REVIVED])
 
         if self.flow_task._continue_on_condition:
             continue_result = self.flow_task._continue_on_condition(self, active_tasks)

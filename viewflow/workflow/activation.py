@@ -41,7 +41,11 @@ def leading_tasks_canceled(activation: "Activation") -> bool:
     Returns:
         bool: True if all leading tasks are canceled, False otherwise.
     """
-    non_canceled_count = activation.task.leading.exclude(status=STATUS.CANCELED).count()
+    non_canceled_count = (
+        activation.task.leading.exclude(status=STATUS.CANCELED)
+        .exclude(status=STATUS.REVIVED)
+        .count()
+    )
     return non_canceled_count == 0
 
 
@@ -304,6 +308,7 @@ class Activation:
         for prev_task in self.task.previous.all():
             task.previous.add(prev_task)
         task.previous.add(self.task)
+        self.task.save(update_fields=["status"])
 
         activations = set([type(self)(task)])
         self._activate_next(activations)

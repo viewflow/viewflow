@@ -155,7 +155,7 @@ class CancelProcessView(mixins.ProcessViewTemplateNames, generic.DetailView):
         return [
             task.flow_task.activation_class(task)
             for task in self.object.task_set.exclude(
-                status__in=[STATUS.DONE, STATUS.CANCELED]
+                status__in=[STATUS.DONE, STATUS.CANCELED, STATUS.REVIVED]
             )
         ]
 

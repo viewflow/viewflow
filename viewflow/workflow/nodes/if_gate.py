@@ -1,8 +1,10 @@
 from django.db import transaction
+from django.utils.timezone import now
 from viewflow import this
 
 from ..base import Node, Edge
-from ..activation import Activation
+from ..activation import Activation, has_manage_permission
+from ..status import STATUS
 from . import mixins
 
 
@@ -37,6 +39,15 @@ class IfActivation(Activation):
             yield next_node._create(
                 self, self.task.token, data=next_data, seed=next_seed
             )
+
+    @Activation.status.transition(
+        source=[STATUS.ERROR],
+        target=STATUS.CANCELED,
+        permission=has_manage_permission,
+    )
+    def cancel(self):
+        self.task.finished = now()
+        self.task.save()
 
 
 class If(Node):
