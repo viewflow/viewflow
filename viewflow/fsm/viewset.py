@@ -5,6 +5,7 @@
 # 'COMM_LICENSE', which is part of this source code package.
 
 from django.core.exceptions import PermissionDenied, SuspiciousOperation
+from django.db import transaction
 from django.forms import modelform_factory
 from django.http import HttpResponseRedirect
 from django.urls import path
@@ -62,6 +63,7 @@ class ModelTransitionView(UpdateModelView):
         else:
             return super().get_form_class()
 
+    @transaction.atomic
     def form_valid(self, form):
         self.object = form.save()
         self.transition()
