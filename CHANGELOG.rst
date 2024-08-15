@@ -11,8 +11,8 @@ Changelog
 - Add experimental JSONEditorWiget
 - Fix revived task state save
 - Allow to cancel If tasks
-- Defautl fsm state change view from FlowViewsMixin, now transaction.atomic
-
+- Default fsm state change view from FlowViewsMixin, now transaction.atomic
+- Allow to use DependentModelSelect in formsets
 
 2.2.6 2024-08-04
 ----------------
