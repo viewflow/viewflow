@@ -187,6 +187,35 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
+### 2.2.7 2024-08-16
+
+- Added compatibility fix for Python 3.8.
+- Extend documentation with data management explanation - https://docs.viewflow.io/workflow/data_flow.html
+- Expanded documentation to cover permission management - https://docs.viewflow.io/workflow/permissions.html
+- Introduced an experimental JSONEditorWidget.
+- Fixed issue with saving the state of revived tasks.
+- Enabled the option to cancel If tasks.
+- Updated default FSM state change in FlowViewsMixin to now use transaction.atomic.
+- Added support for using DependentModelSelect in formsets.
+- Enabled AjaxModelSelect to function as a dependency for DependentModelSelect
+- Corrected typo in the deletion success message.
+- Test under django 5.1
+
+### 2.2.6 2024-08-04
+
+- Resolved the flow.If condition's this reference during class construction.
+- Improved error handling when a Celery task finishes.
+- Fixed an issue where errors occurring in a task after a successful celery.Job
+  task incorrectly prevented the job task from being marked as completed, with
+  the errored task correctly put into an error state.
+- Redirect to the next process task now will take into account tasks in the ERROR state
+- Add ability to revive flow.Function and flow.SplitFirst
+- Fixed an error that occurred when a deleted process.artifact was referenced in
+  the process field data listing within templates.
+- Allow to cancel Subprocess tasks
+- Allow to cancel Function tasks
+- Allow custom task models inherited from AbstactTask have no .seed and .data fields
+
 ### 2.2.5 2024-07-17
 
 - The 'pattern' widget attribute is now passed to the underlying form input.
