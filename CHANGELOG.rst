@@ -2,17 +2,20 @@
 Changelog
 =========
 
-2.2.7 GIT VERSION
------------------
+2.2.7 2024-08-16
+----------------
 
-- Fix compatibility with Python 3.8
+- Added compatibility fix for Python 3.8.
 - Extend documentation with data management explanation - https://docs.viewflow.io/workflow/data_flow.html
-- Extend documentation with permission management - https://docs.viewflow.io/workflow/permissions.html
-- Add experimental JSONEditorWiget
-- Fix revived task state save
-- Allow to cancel If tasks
-- Default fsm state change view from FlowViewsMixin, now transaction.atomic
-- Allow to use DependentModelSelect in formsets
+- Expanded documentation to cover permission management - https://docs.viewflow.io/workflow/permissions.html
+- Introduced an experimental JSONEditorWidget.
+- Fixed issue with saving the state of revived tasks.
+- Enabled the option to cancel If tasks.
+- Updated default FSM state change in FlowViewsMixin to now use transaction.atomic.
+- Added support for using DependentModelSelect in formsets.
+- Enabled AjaxModelSelect to function as a dependency for DependentModelSelect
+- Corrected typo in the deletion success message.
+
 
 2.2.6 2024-08-04
 ----------------

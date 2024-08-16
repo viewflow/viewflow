@@ -113,7 +113,7 @@ class DeleteBulkActionView(BaseBulkActionView):
         return HttpResponseRedirect(self.get_success_url())
 
     def message_user(self):
-        message = "The objects was deleted successfully"
+        message = "The objects were deleted successfully"
         messages.add_message(
             self.request, messages.SUCCESS, message, fail_silently=True
         )
