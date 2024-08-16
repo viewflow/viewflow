@@ -15,7 +15,7 @@ Changelog
 - Added support for using DependentModelSelect in formsets.
 - Enabled AjaxModelSelect to function as a dependency for DependentModelSelect
 - Corrected typo in the deletion success message.
-
+- Test under django 5.1
 
 2.2.6 2024-08-04
 ----------------
