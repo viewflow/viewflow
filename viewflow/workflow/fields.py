@@ -94,6 +94,8 @@ class FlowReferenceField(models.CharField):
             return import_flow_by_ref(value)
         except LookupError:
             return None
+        except ImportError:
+            return None
 
     def get_prep_value(self, value):  # noqa D1o2
         if value and not isinstance(value, str):
@@ -118,7 +120,11 @@ class TaskReferenceField(models.CharField):
     def from_db_value(self, value, expression, connection):
         if value is None:
             return value
-        return import_task_by_ref(value)
+
+        try:
+            return import_task_by_ref(value)
+        except ImportError:
+            return None
 
     def get_prep_value(self, value):  # noqa D102
         if value and not isinstance(value, str):

@@ -17,7 +17,7 @@ class AppMenuMixin:
     """A route that can be listed in an Application menu."""
 
     title = None
-    icon = Icon("view_carousel")
+    icon: Icon | str = Icon("view_carousel")
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -47,7 +47,7 @@ class AppMenuMixin:
 
 class Application(IndexViewMixin, Viewset):
     title = ""
-    icon = Icon("view_module")
+    icon: Icon | str = Icon("view_module")
     menu_template_name = "viewflow/includes/app_menu.html"
     base_template_name = "viewflow/base_page.html"
     permission = None

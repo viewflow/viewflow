@@ -8,6 +8,7 @@
 import copy
 import json
 from datetime import date, datetime
+from decimal import Decimal
 from functools import partialmethod
 
 from django.core.exceptions import FieldError
@@ -190,7 +191,13 @@ class DateTimeField(JSONFieldMixin, fields.DateTimeField):
 
 
 class DecimalField(JSONFieldMixin, fields.DecimalField):
-    pass
+    def to_json(self, value):
+        if value is not None:
+            return str(value)
+
+    def from_json(self, value):
+        if value is not None:
+            return Decimal(value)
 
 
 class EmailField(JSONFieldMixin, fields.EmailField):

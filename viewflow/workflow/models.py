@@ -43,6 +43,9 @@ class AbstractProcess(models.Model):
     @property
     def brief(self):
         """Quick textual process state representation for end user."""
+        if self.flow_class is None:
+            return None
+
         template_content = ""
 
         if self.finished:
@@ -175,6 +178,9 @@ class AbstractTask(models.Model):
 
     @property
     def title(self):
+        if self.flow_task is None:
+            return None
+
         if self.flow_task.task_title:
             return self.flow_task.task_title
         return _(str(self.flow_task))

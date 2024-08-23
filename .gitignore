@@ -20,6 +20,7 @@
 /MANIFEST
 /crm.sqlite3
 db*.sqlite3
+dj*.sqlite3
 db*.sqlite3-journal
 node_modules/
 /docs/_build/**

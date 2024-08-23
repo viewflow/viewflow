@@ -230,6 +230,7 @@ def get_object_data(obj: models.Model) -> Iterator[Tuple[models.Field, str, Any]
 
     if (
         hasattr(obj, "artifact_object_id")
+        and hasattr(obj, "artifact")
         and obj.artifact_object_id
         and obj.artifact is not None
     ):

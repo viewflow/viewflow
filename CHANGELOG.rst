@@ -2,6 +2,15 @@
 Changelog
 =========
 
+2.2.8 GIT VERSION
+-----------------
+
+- No exception raiased by Process/Task models in case if flow class deleted, but
+  still referenced in DB
+- Fix jsonstore.DecimalField serialization
+- Add missing 'index' view for celery.Task node
+- Allow to revive flow.Subprocess and flow.NSubprocess nodes from error state
+
 2.2.7 2024-08-16
 ----------------
 
@@ -412,7 +421,7 @@ This is the cumulative release with many backward incompatibility changes.
 
 * Activation now passed as a request attribute. You need to remove
   explicit activation parameter from view function signature, and use
-  request.activation instead. 
+  request.activation instead.
 
 * Built-in class based views are renamed, to be more consistent. Check
   the documentation to find a new view name.
@@ -429,7 +438,7 @@ This is the cumulative release with many backward incompatibility changes.
   and signal handlers reusable over different flows.
 
 * Flow namespace are no longer hard-coded. Flow views now can be
-  attached to any namespace in a URL config. 
+  attached to any namespace in a URL config.
 
 * flow_start_func, flow_start_signal decorators need to be used for
   the start nodes handlers. Decorators would establish a proper

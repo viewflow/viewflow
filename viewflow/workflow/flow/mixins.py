@@ -1,3 +1,5 @@
+from typing import Type, Optional
+from django.views import View
 from django.urls import path
 from viewflow import viewprop
 from viewflow.urls import ViewsetMeta
@@ -7,7 +9,7 @@ from . import utils
 class NodeDetailMixin(metaclass=ViewsetMeta):
     """Task detail view."""
 
-    index_view_class = None
+    index_view_class: Optional[Type[View]] = None
 
     @viewprop
     def index_view(self):
@@ -24,7 +26,7 @@ class NodeDetailMixin(metaclass=ViewsetMeta):
                 name="index",
             )
 
-    detail_view_class = None
+    detail_view_class: Optional[Type[View]] = None
 
     @viewprop
     def detail_view(self):
@@ -49,7 +51,7 @@ class NodeDetailMixin(metaclass=ViewsetMeta):
 class NodeExecuteMixin(metaclass=ViewsetMeta):
     """Re-execute a gate manually."""
 
-    execute_view_class = None
+    execute_view_class: Optional[Type[View]] = None
 
     @viewprop
     def execute_view(self):
@@ -70,7 +72,7 @@ class NodeExecuteMixin(metaclass=ViewsetMeta):
 class NodeUndoMixin(metaclass=ViewsetMeta):
     """Allow to undo a completed task."""
 
-    undo_view_class = None
+    undo_view_class: Optional[Type[View]] = None
 
     @viewprop
     def undo_view(self):
@@ -94,7 +96,7 @@ class NodeUndoMixin(metaclass=ViewsetMeta):
 class NodeCancelMixin(metaclass=ViewsetMeta):
     """Cancel a task action."""
 
-    cancel_view_class = None
+    cancel_view_class: Optional[Type[View]] = None
 
     @viewprop
     def cancel_view(self):
@@ -120,7 +122,7 @@ class NodeCancelMixin(metaclass=ViewsetMeta):
 class NodeReviveMixin(metaclass=ViewsetMeta):
     """Review a canceled task"""
 
-    revive_view_class = None
+    revive_view_class: Optional[Type[View]] = None
 
     @viewprop
     def revive_view(self):

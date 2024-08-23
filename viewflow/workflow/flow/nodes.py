@@ -420,6 +420,7 @@ try:
         mixins.NodeDetailMixin,
         mixins.NodeCancelMixin,
         mixins.NodeUndoMixin,
+        mixins.NodeReviveMixin,
         nodes.Subprocess,
     ):
         """
@@ -452,11 +453,13 @@ try:
         detail_view_class = views.DetailTaskView
         cancel_view_class = views.CancelTaskView
         undo_view_class = views.UndoTaskView
+        revive_view_class = views.ReviveTaskView
 
     class NSubprocess(
         mixins.NodeDetailMixin,
         mixins.NodeCancelMixin,
         mixins.NodeUndoMixin,
+        mixins.NodeReviveMixin,
         nodes.NSubprocess,
     ):
         """
@@ -491,6 +494,7 @@ try:
         detail_view_class = views.DetailTaskView
         cancel_view_class = views.CancelTaskView
         undo_view_class = views.UndoTaskView
+        revive_view_class = views.ReviveTaskView
 
 except AttributeError:
     """Pro-only functionality"""
@@ -504,6 +508,22 @@ class Switch(
     mixins.NodeReviveMixin,
     nodes.Switch,
 ):
+    """
+    Gateway that selects one of the outgoing node.
+
+    Activates first node with matched condition.
+
+    Example::
+
+        select_responsible_person = (
+            flow.Switch()
+            .Case(this.dean_approval, lambda act: a.process.need_dean)
+            .Case(this.head_approval, lambda act: a.process.need_head)
+            .Default(this.supervisor_approval)
+        )
+
+    """
+
     index_view_class = views.IndexTaskView
     detail_view_class = views.DetailTaskView
     cancel_view_class = views.CancelTaskView

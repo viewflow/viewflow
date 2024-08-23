@@ -5,6 +5,7 @@
 # LICENSE_EXCEPTION and the Commercial licence defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 
+from typing import Any, List, Union
 from django import forms
 from viewflow.utils import viewprop
 from viewflow.forms import Span
@@ -29,7 +30,7 @@ class FormLayoutMixin(object):
     Mixin for FormView to infer View.fields definition from form Layout.
     """
 
-    form_class = None
+    form_class: Any = None
 
     @viewprop
     def layout(self):
@@ -37,7 +38,7 @@ class FormLayoutMixin(object):
             return self.form_class.layout
 
     @viewprop
-    def fields(self):
+    def fields(self) -> Any:
         if self.form_class is None:
             if self.layout is not None:
                 return _collect_elements(self.layout)

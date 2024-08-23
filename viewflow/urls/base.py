@@ -8,10 +8,9 @@ import copy
 import types
 import warnings
 from collections import namedtuple, OrderedDict
-from typing import Optional, Dict, Any, List, Union
-
+from typing import Optional, Dict, Any, List
 from django.views.generic import RedirectView
-from django.urls import URLPattern, URLResolver, include, path, reverse
+from django.urls import ResolverMatch, URLPattern, URLResolver, include, path, reverse
 from django.urls.resolvers import RoutePattern
 
 from viewflow.utils import (
@@ -40,7 +39,7 @@ class _URLResolver(URLResolver):
         self.extra = kwargs.pop("extra", {})
         super(_URLResolver, self).__init__(*args, **kwargs)
 
-    def resolve(self, *args, **kwargs) -> str:
+    def resolve(self, *args, **kwargs) -> ResolverMatch:
         result = super(_URLResolver, self).resolve(*args, **kwargs)
         if not isinstance(result.url_name, _UrlName):
             result.url_name = _UrlName(result.url_name)
