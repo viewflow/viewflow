@@ -12,7 +12,7 @@ from __future__ import annotations
 import inspect
 from typing import Any, Dict, Mapping, Iterable, List, Type, Optional
 from viewflow.this_object import ThisObject
-from viewflow.utils import MARKER
+from viewflow.utils import DEFAULT, MARKER
 from .typing import (
     UserModel,
     Condition,
@@ -39,7 +39,7 @@ class Transition:
         target: Optional[StateValue],
         label: Optional[str] = None,
         conditions: Optional[List[Condition]] = None,
-        permission: Optional[Permission] = None,
+        permission: Optional[Permission] = DEFAULT,
         custom: Optional[Dict] = None,
     ):  # noqa D102
         self.func = func
@@ -86,8 +86,10 @@ class Transition:
 
     def has_perm(self, instance: object, user: UserModel) -> bool:
         """Checks if the given user has permission to perform this transition."""
+        if self.permission is DEFAULT:
+            return False  # Protected by default
         if self.permission is None:
-            return False  # No permission required
+            return True  # Explicitly allowed to any
         elif callable(self.permission):
             return self.permission(instance, user)
         elif isinstance(self.permission, ThisObject):
@@ -410,7 +412,7 @@ class State:
         target: Optional[StateValue] = None,
         label: Optional[str] = None,
         conditions: Optional[List[Condition]] = None,
-        permission: Optional[Permission] = None,
+        permission: Optional[Permission] = DEFAULT,
         custom: Optional[Dict] = None,
     ) -> Any:
         """Decorator to mark a method as a state transition."""

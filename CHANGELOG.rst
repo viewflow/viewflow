@@ -10,6 +10,8 @@ Changelog
 - Fix jsonstore.DecimalField serialization
 - Add missing 'index' view for celery.Task node
 - Allow to revive flow.Subprocess and flow.NSubprocess nodes from error state
+- Fix invalid typing for fsm conditions
+- Allow explictily set permission=None for fsm @transtion decorator, to explicitly bypass permissions check
 
 2.2.7 2024-08-16
 ----------------
