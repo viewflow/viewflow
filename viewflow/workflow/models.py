@@ -257,7 +257,7 @@ class Process(AbstractProcess):
         related_name="+",
         to=ContentType,
     )
-    seed_object_id = models.PositiveIntegerField(null=True, blank=True)
+    seed_object_id = models.CharField(max_length=36, null=True, blank=True)
 
     # process artifact reference
     artifact = GenericForeignKey("artifact_content_type", "artifact_object_id")
@@ -269,7 +269,7 @@ class Process(AbstractProcess):
         related_name="+",
         to=ContentType,
     )
-    artifact_object_id = models.PositiveIntegerField(null=True, blank=True)
+    artifact_object_id = models.CharField(max_length=36, null=True, blank=True)
 
     class Meta:  # noqa D101
         ordering = ["-created"]
@@ -301,7 +301,7 @@ class Task(AbstractTask):
         related_name="+",
         to=ContentType,
     )
-    seed_object_id = models.PositiveIntegerField(null=True, blank=True)
+    seed_object_id = models.CharField(max_length=36, null=True, blank=True)
 
     # task artifact reference
     artifact = GenericForeignKey("artifact_content_type", "artifact_object_id")
@@ -314,7 +314,7 @@ class Task(AbstractTask):
         to=ContentType,
     )
 
-    artifact_object_id = models.PositiveIntegerField(null=True, blank=True)
+    artifact_object_id = models.CharField(max_length=36, null=True, blank=True)
 
     class Meta:  # noqa D101
         verbose_name = _("Task")
