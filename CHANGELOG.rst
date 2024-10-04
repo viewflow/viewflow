@@ -5,13 +5,14 @@ Changelog
 2.2.8 GIT VERSION
 -----------------
 
-- No exception raiased by Process/Task models in case if flow class deleted, but
-  still referenced in DB
-- Fix jsonstore.DecimalField serialization
-- Add missing 'index' view for celery.Task node
-- Allow to revive flow.Subprocess and flow.NSubprocess nodes from error state
-- Fix invalid typing for fsm conditions
-- Allow explictily set permission=None for fsm @transtion decorator, to explicitly bypass permissions check
+- Prevent exceptions from being raised by Process/Task models when a flow class
+  is deleted but still referenced in the database.
+- Fix serialization issue with jsonstore.DecimalField.
+- Add missing 'index' view for celery.Task node.
+- Enable recovery of flow.Subprocess and flow.NSubprocess nodes from error state.
+- Correct invalid typing for FSM conditions.
+- Allow setting permission=None in the FSM @transition decorator to explicitly bypass permission checks.
+- Add support for MultiValueField and django-money fields form rendering
 
 2.2.7 2024-08-16
 ----------------
