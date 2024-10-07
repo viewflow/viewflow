@@ -2,8 +2,14 @@
 Changelog
 =========
 
-2.2.8 GIT VERSION
+2.2.9 GIT VERSION
 -----------------
+
+- Improve flow_refs and task_refs validation
+
+
+2.2.8 2024-10-04
+----------------
 
 - Prevent exceptions from being raised by Process/Task models when a flow class
   is deleted but still referenced in the database.

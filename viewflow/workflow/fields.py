@@ -5,6 +5,7 @@ from django.db import models
 from django.utils.module_loading import import_string
 
 from viewflow.utils import get_app_package, get_containing_app_data
+from viewflow.workflow.base import Flow
 from viewflow.workflow.exceptions import FlowRuntimeError
 from viewflow.workflow.token import Token
 
@@ -21,8 +22,9 @@ def import_flow_by_ref(flow_strref):
         )
         return None
 
-    # TODO Raise if imported class is not Flow
-    return import_string("{}.{}".format(get_app_package(app_label), flow_path))
+    flow_class = import_string("{}.{}".format(get_app_package(app_label), flow_path))
+    assert issubclass(flow_class, Flow)
+    return flow_class
 
 
 @lru_cache(maxsize=None)
@@ -44,10 +46,18 @@ def get_flow_ref(flow_class):
 @lru_cache(maxsize=None)
 def import_task_by_ref(task_strref):
     """Return flow task by reference like `app_label/path.to.Flowclass.task_name`."""
-    app_label, flow_path = task_strref.split("/")
-    flow_path, task_name = flow_path.rsplit(".", 1)
+    try:
+        app_label, flow_path = task_strref.split("/")
+        flow_path, task_name = flow_path.rsplit(".", 1)
+    except ValueError:
+        warnings.warn(
+            f"Input string must be in the format 'app_label/flow_path.task_name'. Got {task_strref}",
+            UserWarning,
+        )
+        return None
+
     flow_class = import_string("{}.{}".format(get_app_package(app_label), flow_path))
-    # TODO Raise if imported class is not Node
+    assert issubclass(flow_class, Flow)
     return flow_class.instance.node(task_name)
 
 
