@@ -464,7 +464,7 @@ class Flow(Viewset, metaclass=FlowMetaClass):
     def cancel(self, process: Any) -> None:
         with transaction.atomic(), self.lock(process.pk):
             active_tasks = process.task_set.exclude(
-                status__in=[STATUS.DONE, STATUS.CANCELED]
+                status__in=[STATUS.DONE, STATUS.CANCELED, STATUS.REVIVED]
             )
 
             activations = [

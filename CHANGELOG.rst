@@ -6,7 +6,8 @@ Changelog
 -----------------
 
 - Improve flow_refs and task_refs validation
-
+- Fix canceling process with REVIVED tasks
+- Fix password reset confirmation template
 
 2.2.8 2024-10-04
 ----------------
