@@ -2,12 +2,14 @@
 Changelog
 =========
 
-2.2.9 GIT VERSION
------------------
+2.2.9 2025-01-08
+----------------
 
-- Improve flow_refs and task_refs validation
-- Fix canceling process with REVIVED tasks
-- Fix password reset confirmation template
+- Enhanced validation for flow_refs and task_refs to ensure accuracy and consistency.
+- Resolved an issue with canceling processes containing revived tasks.
+- Corrected the password reset confirmation email template for better functionality.
+- Fixed multipart form type detection for forms with file fields in formsets.
+
 
 2.2.8 2024-10-04
 ----------------
