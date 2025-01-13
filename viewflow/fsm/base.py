@@ -161,7 +161,7 @@ class TransitionBoundMethod:
                 )
 
             self.target_state = transition.target
-            if self.target_state:
+            if self.target_state is not None:
                 self.parent._state.set(self.parent._instance, self.target_state)
 
         def __exit__(
@@ -377,10 +377,7 @@ class State:
         """Get the state from the underline class instance."""
         if self._getter:
             value = self._getter(instance)
-            if self._default:
-                return value if value else self._default
-            else:
-                return value
+            return self._default if self._default and value is None else value
         return getattr(instance, self.propname, self._default)
 
     def set(self, instance: object, value: StateValue) -> None:
