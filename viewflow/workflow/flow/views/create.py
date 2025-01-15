@@ -1,6 +1,7 @@
 from django.http import HttpResponseRedirect
 from django.views import generic
 from django.utils.translation import gettext_lazy as _
+from viewflow.forms import FormAjaxCompleteMixin, FormDependentSelectMixin
 from viewflow.views import FormLayoutMixin
 
 from . import mixins
@@ -8,6 +9,8 @@ from . import mixins
 
 class CreateProcessView(
     FormLayoutMixin,
+    FormAjaxCompleteMixin,
+    FormDependentSelectMixin,
     mixins.SuccessMessageMixin,
     mixins.TaskSuccessUrlMixin,
     mixins.TaskViewTemplateNames,
@@ -35,6 +38,8 @@ class CreateProcessView(
 
 class CreateArtifactView(
     FormLayoutMixin,
+    FormAjaxCompleteMixin,
+    FormDependentSelectMixin,
     mixins.SuccessMessageMixin,
     mixins.TaskSuccessUrlMixin,
     mixins.TaskViewTemplateNames,
