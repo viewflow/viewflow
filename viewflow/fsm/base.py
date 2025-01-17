@@ -36,7 +36,7 @@ class Transition:
         self,
         func: TransitionFunction,
         source: StateValue,
-        target: Optional[StateValue],
+        target: Optional[StateValue] = DEFAULT,
         label: Optional[str] = None,
         conditions: Optional[List[Condition]] = None,
         permission: Optional[Permission] = DEFAULT,
@@ -161,7 +161,7 @@ class TransitionBoundMethod:
                 )
 
             self.target_state = transition.target
-            if self.target_state:
+            if self.target_state is not DEFAULT:
                 self.parent._state.set(self.parent._instance, self.target_state)
 
         def __exit__(
@@ -409,7 +409,7 @@ class State:
     def transition(
         self,
         source: StateValue,
-        target: Optional[StateValue] = None,
+        target: Optional[StateValue] = DEFAULT,
         label: Optional[str] = None,
         conditions: Optional[List[Condition]] = None,
         permission: Optional[Permission] = DEFAULT,

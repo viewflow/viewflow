@@ -187,11 +187,10 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
-## GIT Version
+## 2.3.0 GIT Version
 
 - Added FormAjaxCompleteMixin, FormDependentSelectMixin to default create and update workflow process views
 - Extended patterns demo with user resources allocation samples https://demo.viewflow.io/patterns/resource_allocation/
-
 
 ### 2.2.9 2025-01-08
 
