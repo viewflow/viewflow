@@ -56,6 +56,9 @@ class Transition:
     def __str__(self) -> str:
         return f"{self.label} Transition"
 
+    def __lt__(self, other) -> bool:
+        return self.label < other.label
+
     @property
     def label(self) -> str:
         """Return the human-readable label for the transition."""

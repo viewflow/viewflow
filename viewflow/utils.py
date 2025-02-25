@@ -33,6 +33,9 @@ class MARKER(object):
     def __repr__(self):
         return self.marker
 
+    def __lt__(self, other) -> bool:
+        return self.marker < str(other)
+
 
 DEFAULT = MARKER("DEFAULT")
 
