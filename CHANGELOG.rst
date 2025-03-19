@@ -2,6 +2,12 @@
 Changelog
 =========
 
+2.3.x GIT VERSION
+-----------------
+
+- Add viewset get_form_class/get_create_form_class/get_update_form_class to allow per-request form customization for CRUD Views
+
+
 2.2.9 2025-01-08
 ----------------
 

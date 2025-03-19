@@ -65,16 +65,30 @@ class CreateModelView(
         if self.viewset is not None and hasattr(self.viewset, "get_queryset"):
             return self.viewset.get_queryset(self.request)
         return None
+        
+    def get_form_widgets(self):
+        if self.form_widgets is not None:
+            return self.form_widgets
+        elif self.viewset and hasattr(self.viewset, "get_create_form_widgets"):
+            return self.viewset.get_create_form_widgets(self.request)
+        elif self.viewset and hasattr(self.viewset, "get_form_widgets"):
+            return self.viewset.get_form_widgets(self.request)
+        return None
 
     def get_form_class(self):
-        if self.form_class is None:
+        if self.form_class is not None:
+            return self.form_class
+        elif self.viewset and hasattr(self.viewset, "get_create_form_class"):
+            return self.viewset.get_create_form_class(self.request)
+        elif self.viewset and hasattr(self.viewset, "get_form_class"):
+            return self.viewset.get_form_class(self.request)
+        else:
             return modelform_factory(
                 self.model,
                 form=ModelForm,
                 fields=self.fields,
-                widgets=self.form_widgets,
+                widgets=self.get_form_widgets(),
             )
-        return self.form_class
 
     def get_template_names(self):
         """

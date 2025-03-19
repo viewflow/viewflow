@@ -5,19 +5,19 @@
 # 'COMM_LICENSE', which is part of this source code package.
 
 from enum import Enum
-from typing import List, Set, Tuple
+from typing import List, Set, Tuple, Union
 from django.db.models import Choices
 from .base import State, StateDescriptor, Transition
 from .typing import StateValue
 
 
-def get_state_name(state_value):
+def get_state_name(state_value: StateValue) -> str:
     if isinstance(state_value, Enum):
         return str(state_value.value)
     return str(state_value)
 
 
-def get_state_label(state_value):
+def get_state_label(state_value: StateValue) -> str:
     if isinstance(state_value, Choices):
         return state_value.label
     elif isinstance(state_value, Enum):
