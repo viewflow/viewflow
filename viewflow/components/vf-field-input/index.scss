@@ -15,7 +15,22 @@ vf-field-input {
 
 
   .vf-text-field__button {
-    background-color: red;
+    min-width: initial;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .vf-text-field__link {
+    text-decoration: none;
+    color: var(--mdc-theme-primary, #6200ee);
+    position: relative;
+    z-index: 2;
+    
+    &[disabled] {
+      color: rgba(0, 0, 0, 0.38);
+      cursor: default;
+      pointer-events: none;
+    }
   }
 
   // .mdc-text-field:not(.mdc-text-field--fullwidth):not(.mdc-text-field--textarea) {

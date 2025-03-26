@@ -22,6 +22,9 @@ export const defaultProps = {
   'required': false,
   'step': undefined,
   'trailingIcon': undefined,
+  'trailingButton': undefined,
+  'trailingLink': undefined,
+  'trailingLinkHref': undefined,
   'type': 'text',
   'value': '',
   'readonly': undefined,
@@ -69,7 +72,7 @@ const Input = (props) => {
         'mdc-text-field--outlined': true,
         'mdc-text-field--invalid': !! props.error,
         'mdc-text-field--with-leading-icon': !!props.leadingIcon,
-        'mdc-text-field--with-trailing-icon': !!props.trailingIcon,
+        'mdc-text-field--with-trailing-icon': !!props.trailingIcon || !!props.trailingButton || !!props.trailingLink,
       }) }
       ref={control}>
       <span class="mdc-notched-outline">
@@ -110,23 +113,44 @@ const Input = (props) => {
         onFocus={props.onFocus}
         onKeyUp={props.onKeyUp}
         onKeyDown={props.onKeyDown}/>
-      { props.trailingButton ?
-        <div class="mdc-touch-target-wrapper">
-          <button
-            class="mdc-button vf-text-field__button mdc-button--touch"
-            onClick={ props.onTrailingButtonClick }
-            disabled={ props.disabled }
-            type="button">
-            <div class="mdc-button__ripple"></div>
-            <span class="mdc-button__label material-icons">{ props.trailingButton }</span>
-            <div class="mdc-button__touch"></div>
-          </button>
-        </div> :
-        props.trailingIcon ?
-          <i class="material-icons mdc-text-field__icon mdc-text-field__icon--trailing" tabindex="-1" role="button">
-            { props.trailingIcon }
-          </i> : ''
-      }
+      {/* Render trailing buttons, links, and icons */}
+      { props.trailingButton || props.trailingLink || props.trailingIcon ? (
+        <>
+          { props.trailingButton && 
+            <div class="mdc-touch-target-wrapper">
+              <button
+                class="mdc-button vf-text-field__button mdc-button--touch"
+                onClick={ props.onTrailingButtonClick }
+                disabled={ props.disabled }
+                type="button">
+                <div class="mdc-button__ripple"></div>
+                <span class="mdc-button__label material-icons">{ props.trailingButton }</span>
+                <div class="mdc-button__touch"></div>
+              </button>
+            </div>
+          }
+          { props.trailingLink && 
+            <div class="mdc-touch-target-wrapper">
+              <a
+                class="mdc-button vf-text-field__button vf-text-field__link mdc-button--touch"
+                href={ props.trailingLinkHref || props.value }
+                target="_blank"
+                rel="noopener noreferrer"
+                disabled={ props.disabled }
+                download>
+                <div class="mdc-button__ripple"></div>
+                <span class="mdc-button__label material-icons">{ props.trailingLink }</span>
+                <div class="mdc-button__touch"></div>
+              </a>
+            </div>
+          }
+          { !props.trailingButton && !props.trailingLink && props.trailingIcon &&
+            <i class="material-icons mdc-text-field__icon mdc-text-field__icon--trailing" tabindex="-1" role="button">
+              { props.trailingIcon }
+            </i>
+          }
+        </>
+      ) : '' }
     </label>
   );
 };

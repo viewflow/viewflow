@@ -20,6 +20,7 @@ const defaultProps = {
   'required': false,
   'value': '',
   'multiple': undefined,
+  'trailingLinkHref': undefined,
 };
 
 const VFileInputField = customElement('vf-field-file', defaultProps, (props, {element}) => {
@@ -53,6 +54,8 @@ const VFileInputField = customElement('vf-field-file', defaultProps, (props, {el
         required={props.required}
         tabIndex="-1"
         trailingButton="file_upload"
+        trailingLink={props.value || props.trailingLinkHref ? "download" : undefined}
+        trailingLinkHref={props.trailingLinkHref || props.value}
         value={value()}
         onTrailingButtonClick={onTrailingButtonClick}
       />

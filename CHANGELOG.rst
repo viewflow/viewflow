@@ -6,6 +6,8 @@ Changelog
 -----------------
 
 - Add viewset get_form_class/get_create_form_class/get_update_form_class to allow per-request form customization for CRUD Views
+- Add support for a trailing link to vf-field-input component
+- Enhance vf-field-file to display a download link for existing files with automatic URL resolution
 
 
 2.2.9 2025-01-08

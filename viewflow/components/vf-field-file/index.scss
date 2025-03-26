@@ -16,20 +16,22 @@ vf-field-file {
   .vf-field__file-input {
     position: absolute;
     top: 0;
-    right: 0;
     left: 0;
     bottom: 0;
-    width: 100%;
+    /* Allow space for trailing buttons/links - adjust based on number of buttons */
+    width: calc(100% - 88px);
+    max-width: calc(100% - 48px);
     margin: 0;
     padding: 0;
     font-size: 20px;
     cursor: pointer;
     opacity: 0;
     filter: alpha(opacity=0);
+    /* Make sure this is below the trailing buttons/links in z-index */
+    z-index: 1;
   }
 
   .vf-text-field__button {
     min-width: initial;
   }
-
 }
