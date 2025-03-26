@@ -31,7 +31,7 @@ class Test(TestCase):
             ' label="Promocode" type="hidden"></div>'
             '<div class="vf-form__visiblefields mdc-layout-grid__inner">'
             '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
-            '<vf-field-input required="required" aria-invalid="true" id="id_username" name="username"'
+            '<vf-field-input required="required" aria-invalid="true" aria-describedby="id_username_error" id="id_username" name="username"'
             ' label="Username" error="This field is required." type="text"></vf-field-input></div></div></div>',
         )
 
@@ -48,7 +48,7 @@ class Test(TestCase):
             ' value="invalid" label="Promocode" error="Promocode must be empty" type="hidden"></div>'
             '<div class="vf-form__visiblefields mdc-layout-grid__inner">'
             '<div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">'
-            '<vf-field-input required="required" aria-invalid="true" id="id_username" name="username"'
+            '<vf-field-input required="required" aria-invalid="true" aria-describedby="id_username_error" id="id_username" name="username"'
             ' label="Username" error="This field is required." type="text"></vf-field-input></div></div></div>',
         )
 

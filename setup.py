@@ -4,7 +4,7 @@ README = open("README.md", "r", encoding="utf-8").read()
 
 setuptools.setup(
     name="django-viewflow",
-    version="2.2.9",
+    version="2.2.10",
     author_email="kmmbvnr@gmail.com",
     author="Mikhail Podgurskiy",
     description="Reusable library to build business applications fast",
@@ -16,7 +16,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     long_description=README,
     packages=setuptools.find_packages(exclude=["tests*"]),
-    python_requires=">=3.8",
+    python_requires=">=3.10",
     zip_safe=False,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
@@ -26,6 +26,7 @@ setuptools.setup(
         "Framework :: Django",
         "Framework :: Django :: 4.2",
         "Framework :: Django :: 5.0",
+        "Framework :: Django :: 5.1",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.8",
