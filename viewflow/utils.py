@@ -6,7 +6,7 @@
 # which is part of this source code package.
 
 import re
-from typing import Any, Callable, Iterator, List, Optional, Tuple, Type, TypeVar
+from typing import Any, Callable, Iterator, List, Optional, Tuple, Type, TypeVar, Generic
 
 from django.apps import apps
 from django.conf import settings
@@ -159,7 +159,7 @@ class viewprop:
         return "<view_property func={}>".format(self.fget)
 
 
-class LazySingletonDescriptor:
+class LazySingletonDescriptor(Generic[T]):
     """
     Descriptor class that creates a lazy singleton instance.
 
@@ -169,12 +169,12 @@ class LazySingletonDescriptor:
     """
 
     def __init__(self) -> None:  # noqa D102
-        self.instance: Optional[T] = None
+        self.instance: T | None = None
 
     def __get__(
         self,
-        instance: Optional[T] = None,
-        owner: Optional[Type[T]] = None,
+        instance: Any | None = None,
+        owner: type[T] | None = None,
     ) -> T:
         if self.instance is None:
             if owner is None:

@@ -2,12 +2,14 @@
 Changelog
 =========
 
-2.3.x GIT VERSION
+2.3.10 2025-03-27
 -----------------
 
 - Add viewset get_form_class/get_create_form_class/get_update_form_class to allow per-request form customization for CRUD Views
 - Add support for a trailing link to vf-field-input component
 - Enhance vf-field-file to display a download link for existing files with automatic URL resolution
+- Added FormAjaxCompleteMixin, FormDependentSelectMixin to default create and update workflow process views
+- Extended patterns demo with user resources allocation samples https://demo.viewflow.io/patterns/resource_allocation/
 
 
 2.2.9 2025-01-08
