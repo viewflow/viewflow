@@ -25,7 +25,7 @@ class Test(TestCase):
         view.setup(request)
 
         response = view.post(request)
-        self.assertEquals(response.status_code, 200)
+        self.assertEqual(response.status_code, 200)
         self.assertIn("/media/avatars/", auth.get_user_avatar_url(self.admin))
 
     @tag("integration")

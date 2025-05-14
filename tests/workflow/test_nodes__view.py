@@ -67,7 +67,7 @@ class Test(TestCase):  # noqa: D101
         self.assertEqual(response.status_code, 200)
 
         response = self.client.post(execute_url, {"_continue": 1})
-        self.assertEquals(response.status_code, 302)
+        self.assertEqual(response.status_code, 302)
 
         # check
         process.refresh_from_db()
