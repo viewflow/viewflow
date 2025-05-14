@@ -121,6 +121,21 @@ class Start(
         self._start_view = view
         self._undo_func = undo_func
 
+    def Available(self, owner=None, **owner_kwargs):
+        """
+        Make process start action available for the User.
+
+        Accepts user lookup kwargs or callable predicate :: User -> bool::
+
+            .Available(username='employee')
+            .Available(lambda user: user.is_super_user)
+        """
+        if owner:
+            self._owner = owner
+        else:
+            self._owner = owner_kwargs
+        return self
+
     def can_execute(self, user, task=None):
         """
         Check whether the user is authorized to start a flow.
