@@ -34,7 +34,7 @@ class FormLayoutMixin(object):
 
     @viewprop
     def layout(self):
-        if self.form_class is None and hasattr(self.form_class, "layout"):
+        if self.form_class is not None and hasattr(self.form_class, "layout"):
             return self.form_class.layout
 
     @viewprop
