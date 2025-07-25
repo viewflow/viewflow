@@ -1,5 +1,5 @@
 {% load viewflow i18n %}
-<div class="mdc-card vf-card">
+{% block content %}<div class="mdc-card vf-card">
   <section class="vf-card__header">
     <h1 class="vf-card__title">{{ process }}</h1>
   </section>
@@ -50,4 +50,4 @@
       </tbody>
     </table>
   </section>
-</div>
+</div>{% endblock %}

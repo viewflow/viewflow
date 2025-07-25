@@ -187,7 +187,11 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
-## 2.3.11 2025-05-14
+# 2.2.12 2025-07-25
+
+- Allow to extend and override process_data template
+
+## 2.2.11 2025-05-14
 
 - Return .Avaialble(..) for the start node
 

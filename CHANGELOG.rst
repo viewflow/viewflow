@@ -2,13 +2,19 @@
 Changelog
 =========
 
-2.3.11 2025-05-14
+2.2.12  2025-07-25
+------------------
+
+- Allow to extend and override process_data template
+
+
+2.2.11 2025-05-14
 -----------------
 
 - Return .Avaialble(..) for the start node
 
 
-2.3.10 2025-03-27
+2.2.10 2025-03-27
 -----------------
 
 - Add viewset get_form_class/get_create_form_class/get_update_form_class to allow per-request form customization for CRUD Views
