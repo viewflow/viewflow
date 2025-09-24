@@ -2,6 +2,11 @@
 Changelog
 =========
 
+2.2.13  2025-09-24
+------------------
+
+- Fix checkbox field error message styling to display in red color
+
 2.2.12  2025-07-25
 ------------------
 

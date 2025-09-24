@@ -72,7 +72,11 @@ const VCheckboxField = customElement('vf-field-checkbox', defaultProps, (props, 
         </div>
         { props.helpText || props.error ?
         <div class="mdc-text-field-helper-line">
-          <div class="mdc-text-field-helper-text mdc-text-field-helper-text--persistent">
+          <div class={cc({
+            'mdc-text-field-helper-text': true,
+            'mdc-text-field-helper-text--persistent': true,
+            'mdc-text-field-helper-text--validation-msg': !!props.error,
+          })}>
             { props.error || props.helpText }
           </div>
         </div> : '' }
