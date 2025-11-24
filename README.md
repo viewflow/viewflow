@@ -187,6 +187,12 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
+## 2.2.14 2025-11-24
+
+- Add Django 6.0 compatibility (requires Python 3.12+)
+- Improve error handling for permission creation in multiple database configurations
+- Fix BPMN export to include name attribute for gateway nodes (flow.If)
+
 ## 2.2.13 2025-09-24
 
 - Fix checkbox field error message styling to display in red color

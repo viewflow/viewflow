@@ -4,7 +4,7 @@ README = open("README.md", "r", encoding="utf-8").read()
 
 setuptools.setup(
     name="django-viewflow",
-    version="2.2.13",
+    version="2.2.14",
     author_email="kmmbvnr@gmail.com",
     author="Mikhail Podgurskiy",
     description="Reusable library to build business applications fast",
@@ -28,6 +28,7 @@ setuptools.setup(
         "Framework :: Django :: 5.0",
         "Framework :: Django :: 5.1",
         "Framework :: Django :: 5.2",
+        "Framework :: Django :: 6.0",
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3 :: Only",
         "Programming Language :: Python :: 3.10",
