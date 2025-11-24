@@ -11,7 +11,7 @@ import os
 import warnings
 
 from django.apps import apps
-from django.db import DEFAULT_DB_ALIAS, router
+from django.db import DEFAULT_DB_ALIAS, IntegrityError, router
 from django.db.models.signals import pre_migrate, post_migrate
 
 
@@ -61,7 +61,18 @@ def create_permissions(
         if (ct.pk, codename) not in all_perms
     ]
 
-    Permission.objects.using(using).bulk_create(perms)
+    try:
+        Permission.objects.using(using).bulk_create(perms)
+    except IntegrityError as e:
+        warnings.warn(
+            f"Unable to create permissions for Viewflow models: {e}\n\n"
+            "This is usually caused by having multiple databases configured. "
+            "Be sure to account for the Permission model in your database routers. "
+            "See Django's documentation on multiple databases for more information:\n"
+            "https://docs.djangoproject.com/en/stable/topics/db/multi-db/#allow_migrate"
+        )
+        raise
+
     if verbosity >= 2:
         for perm in perms:
             print("Adding permission '%s'" % perm)

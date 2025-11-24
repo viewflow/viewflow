@@ -9,7 +9,7 @@
     <bpmn:process isExecutable="true" id="id_process">
         {% for cell in cells %}
         {% if cell.node.bpmn_element %}
-        <bpmn:{{ cell.node.bpmn_element }} id="id_node_{{ cell.node.name }}" {% if cell.shape.label %}name="{{ cell.shape.label }}{% if cell.status %} ({{ cell.status }}){% endif %}"{% endif %}>{% for edge in cell.incoming %}
+        <bpmn:{{ cell.node.bpmn_element }} id="id_node_{{ cell.node.name }}" {% if cell.shape.label or cell.title %}name="{% if cell.shape.label %}{{ cell.shape.label }}{% else %}{{ cell.title }}{% endif %}{% if cell.status %} ({{ cell.status }}){% endif %}"{% endif %}>{% for edge in cell.incoming %}
             <bpmn:incoming>id_edge_{{ edge.src.name}}__{{ edge.dst.name }}</bpmn:incoming>{% endfor %}{% for edge in cell.outgoing %}
             <bpmn:outgoing>id_edge_{{ edge.src.name}}__{{ edge.dst.name }}</bpmn:outgoing>{% endfor %}
             {{ cell.node.bpmn_content|safe }}
@@ -26,9 +26,6 @@
             {% if cell.node.bpmn_element %}
             <bpmndi:BPMNShape id="id_shape_{{ cell.node.name }}" bpmnElement="id_node_{{ cell.node.name }}">
                 <dc:Bounds x="{{ cell.shape.x }}" y="{{ cell.shape.y }}" width="{{ cell.shape.width }}" height="{{ cell.shape.height }}" />
-                <bpmndi:BPMNLabel>
-                    <dc:Bounds x="296" y="196" width="26" height="12" />
-                </bpmndi:BPMNLabel>
             </bpmndi:BPMNShape>
             {% endif %}
             {% endfor %}

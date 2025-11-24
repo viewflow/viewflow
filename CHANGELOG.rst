@@ -2,6 +2,16 @@
 Changelog
 =========
 
+2.2.14  2025-11-24
+------------------
+
+- Add Django 6.0 compatibility (requires Python 3.12+)
+- Improve error handling for permission creation in multiple database configurations.
+  Added helpful error message when IntegrityError occurs during permission creation,
+  guiding users to properly configure database routers for the Permission model.
+- Fix BPMN export to include name attribute for gateway nodes (flow.If).
+  The flowexport command now properly exports gateway titles set via .Annotation(title="...").
+
 2.2.13  2025-09-24
 ------------------
 
