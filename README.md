@@ -187,6 +187,11 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
+## 2.2.15 2025-12-23
+
+- Fix form button name/value lost on resubmission after validation error with Turbo
+- Fix subprocess double execution when completing synchronously
+
 ## 2.2.14 2025-11-24
 
 - Add Django 6.0 compatibility (requires Python 3.12+)
