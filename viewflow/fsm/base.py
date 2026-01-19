@@ -240,6 +240,8 @@ class TransitionDescriptor:
     """Base transition definition descriptor."""
 
     do_not_call_in_templates = True
+    bound_method_class: Type[TransitionBoundMethod] = TransitionBoundMethod
+    method_class: Type[TransitionMethod] = TransitionMethod
 
     def __init__(self, state: StateValue, func: TransitionFunction):  # noqa D102
         self._state = state
@@ -250,10 +252,10 @@ class TransitionDescriptor:
         self, instance: object, owner: Optional[Type[object]] = None
     ) -> TransitionMethod | TransitionBoundMethod:
         if instance:
-            return TransitionBoundMethod(self._state, self._func, self, instance)
+            return self.bound_method_class(self._state, self._func, self, instance)
         else:
             assert owner is not None  # make mypy happy
-            return TransitionMethod(self._state, self._func, self, owner)
+            return self.method_class(self._state, self._func, self, owner)
 
     def add_transition(self, transition: Transition) -> None:
         self._transitions[transition.source] = transition
@@ -275,6 +277,8 @@ class TransitionDescriptor:
 
 class SuperTransitionDescriptor:
     do_not_call_in_templates = True
+    bound_method_class: Type[TransitionBoundMethod] = TransitionBoundMethod
+    method_class: Type[TransitionMethod] = TransitionMethod
 
     def __init__(self, state: State, func: TransitionFunction):  # noqa D102
         self._state = state
@@ -284,7 +288,7 @@ class SuperTransitionDescriptor:
         self, instance: object, owner: Optional[Type[object]] = None
     ) -> TransitionBoundMethod | TransitionMethod:
         if instance:
-            return TransitionBoundMethod(
+            return self.bound_method_class(
                 self._state,
                 self._func,
                 self.get_descriptor(instance.__class__),
@@ -292,7 +296,7 @@ class SuperTransitionDescriptor:
             )
         else:
             assert owner is not None  # make mypy happy
-            return TransitionMethod(
+            return self.method_class(
                 self._state, self._func, self.get_descriptor(owner), owner
             )
 
@@ -360,6 +364,7 @@ class State:
     """State slot field."""
 
     ANY = MARKER("ANY")
+    descriptor_class: Type[TransitionDescriptor] = TransitionDescriptor
 
     def __init__(self, states: Any, default: StateValue = None):
         self._default = default
@@ -424,7 +429,7 @@ class State:
             if isinstance(func, TransitionDescriptor):
                 descriptor = func
             else:
-                descriptor = TransitionDescriptor(self, func)
+                descriptor = self.descriptor_class(self, func)
 
             source_list = source
             if not isinstance(source, (list, tuple, set)):
