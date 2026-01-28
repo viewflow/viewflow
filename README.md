@@ -4,62 +4,62 @@
 
 [![build]][build] [![coverage]][coverage] [![pypi-version]][pypi] [![py-versions]][pypi]
 
+Viewflow is a low-code library for building business applications with Django.
+It gives you ready-made components for user management, workflows, and
+reporting. You write less code but keep full control. You can customize
+everything and connect it to your existing systems.
 
-Viewflow is a low-code, reusable component library for creating comprehensive business applications with ease. Built on top of Django, Viewflow simplifies development by providing pre-built components for user management, workflows, and reporting, while still offering flexibility to customize and integrate with existing systems.
-
-With Viewflow, you can create full-featured business applications in just a few lines of code using its reusable component library. It's shipped as a single package with batteries included, and each part of Viewflow can be used independently of the others, but they all work well together.
+Build full-featured business applications in a few lines of code. Viewflow ships
+as one package with everything included. Each part works on its own, but they
+all work well together.
 
 GPT assisted with Viewflow documentation: [Viewflow Pair Programming Buddy][gpt]
 
+Viewflow comes in two versions:
 
-Viewflow comes in two flavors:
-- **Viewflow Core:** A lightweight, open-source library with only non-opinionated core classes that allows you to build your custom solution on top.
-- **Viewflow PRO:** A comprehensive package that includes reference functionality implementation and integrated with third-party Django packages. This package has a commercial-friendly license that allows private forks and modifications of Viewflow.
+- **Viewflow Core:** Open-source library with base classes. Build your own solution on top.
+- **Viewflow PRO:** Full package with ready-to-use features and third-party integrations. Commercial license allows private forks and modifications.
 
 <img src="assets/ShipmentProcess.png" alt="drawing" width="600"/>
 
 ## Features
 
-- Modern, responsive user interface with an SPA-style look and feel
-- Reusable workflow library for quick implementation of BPMN workflows
-- Built-in customizable CRUD for managing complex forms and data
-- Integrated reporting dashboard
-- Small and concise API
-
+- Modern, responsive interface with SPA-style navigation
+- Reusable workflow library for BPMN processes
+- Built-in CRUD for complex forms and data
+- Reporting dashboard included
+- Small, easy-to-learn API
 
 ## Installation
 
-Viewflow works with Python 3.8 or greater and Django 4.0+
+Viewflow works with Python 3.8+ and Django 4.0+
 
 Viewflow:
 
     pip install django-viewflow
 
-Viewflow-PRO:
+Viewflow PRO:
 
     pip install django-viewflow-pro  --extra-index-url https://pypi.viewflow.io/<licence_id>/simple/
 
-Add 'viewflow' and, in case you need workflow capabilities 'viewflow.workflow' to the INSTALLED_APPS settings.py
+Add to INSTALLED_APPS in settings.py:
 
 ```python
     INSTALLED_APPS = [
         ....
         'viewflow',
-        'viewflow.workflow',
+        'viewflow.workflow',  # if you need workflows
     ]
 ```
 
-
 ## Quick start
 
-Here's an example of how to create a simple pizza ordering workflow using Viewflow:
+Here is a pizza ordering workflow example.
 
-1. Create a model to store process data
+### 1. Create a model for process data
 
-Before creating the workflow, you'll need to define a model to store the process
-data. Viewflow provides a Process model as the base model for your process
-instances. You can add your own fields to the model using jsonstore fields to
-avoid model inheritance and additional joins:
+Viewflow provides a Process base model. Use jsonstore fields to store data
+without extra database joins:
 
 ```python
 
@@ -77,13 +77,10 @@ avoid model inheritance and additional joins:
             proxy = True
 ```
 
-2. Create a new flow definition file flows.py
+### 2. Create flows.py with your workflow
 
-Next, create a new flow definition file *flows.py* and define your workflow. In
-this example, we'll create a PizzaFlow class that inherits from flow.Flow.
-We'll define three steps in the workflow: start, bake, and deliver. We'll
-use CreateProcessView and UpdateProcessView to create and update the process
-data from PizzaOrder:
+Define a flow class with steps. Use CreateProcessView and UpdateProcessView for
+the forms:
 
 ```python
 
@@ -112,10 +109,9 @@ data from PizzaOrder:
         end = flow.End()
 ```
 
-3. Add the flow to your URL configuration:
+### 3. Add URLs
 
-Finally, add the PizzaFlow to your URL configuration. You can use the Site and
-FlowAppViewset classes to register your workflow with the pre-built frontend.
+Register the workflow with the frontend:
 
 ```python
 
@@ -139,21 +135,18 @@ FlowAppViewset classes to register your workflow with the pre-built frontend.
 
 ```
 
-4. Make and run migrations and access the workflow through the pre-built frontend.
+### 4. Run migrations and start the server
 
-Make and run migrations to create the necessary database tables, then start your Django
-server and access the workflow through the pre-built frontend. You should be
-able to create and track pizza orders with the workflow.
+Run migrations, start Django, and open the browser. You can now create and track
+pizza orders through the workflow.
 
-Go to the https://docs.viewflow.io/workflow/writing.html for the next steps
+Next steps: https://docs.viewflow.io/workflow/writing.html
 
 ## Documentation
 
-Viewflow's documentation for the latest version is available at
-http://docs.viewflow.io/
+Latest version: http://docs.viewflow.io/
 
-Documentarian for Viewflow  1.xx  series available at http://v1-docs.viewflow.io
-
+Version 1.xx: http://v1-docs.viewflow.io
 
 ## Demo
 
@@ -161,10 +154,7 @@ http://demo.viewflow.io/
 
 ## Cookbook
 
-For sample applications and code snippets, check out the Viewflow PRO cookbook at
-
-https://github.com/viewflow/cookbook
-
+Code samples and examples: https://github.com/viewflow/cookbook
 
 ## License
 
@@ -187,7 +177,7 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
-## 2.2.15 2025-12-23
+## 2.2.15 2025-12-24
 
 - Fix form button name/value lost on resubmission after validation error with Turbo
 - Fix subprocess double execution when completing synchronously

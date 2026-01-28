@@ -2,6 +2,14 @@
 Changelog
 =========
 
+2.2.15  2025-12-24
+------------------
+
+- Fix form button name/value lost on resubmission after validation error with Turbo.
+  The vf-form component was disabling buttons during submit before Turbo captured
+  FormData, causing button values like _continue to be excluded.
+- Fix subprocess double execution when completing synchronously.
+
 2.2.14  2025-11-24
 ------------------
 
