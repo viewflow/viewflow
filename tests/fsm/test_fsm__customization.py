@@ -1,4 +1,4 @@
-"""Tests for customizable super transition descriptor classes."""
+"""Tests for FSM descriptor and bound method customization hooks."""
 
 from unittest import TestCase
 
@@ -13,19 +13,40 @@ from .test_fsm__basics import ReviewState
 
 
 class TrackingTransitionBoundMethod(TransitionBoundMethod):
-    """Base custom bound method used by the custom state class."""
+    """Custom bound method that records Wrapper context entry."""
+
+    wrapper_called = False
+
+    class Wrapper(TransitionBoundMethod.Wrapper):
+        """Wrapper that marks when transition execution enters the context."""
+
+        def __enter__(self):
+            """Set a flag and delegate to the base context manager."""
+            TrackingTransitionBoundMethod.wrapper_called = True
+            return super().__enter__()
 
 
 class TrackingTransitionDescriptor(TransitionDescriptor):
-    """Descriptor used by the custom state implementation."""
+    """Descriptor that injects TrackingTransitionBoundMethod for binding."""
 
     bound_method_class = TrackingTransitionBoundMethod
 
 
 class TrackingState(State):
-    """State that uses the custom regular transition descriptor."""
+    """State that uses TrackingTransitionDescriptor for @transition methods."""
 
     descriptor_class = TrackingTransitionDescriptor
+
+
+class PublicationWithCustomDescriptor:
+    """Flow-like object using a custom transition descriptor class."""
+
+    state = TrackingState(ReviewState, default=ReviewState.NEW)
+
+    @state.transition(source=ReviewState.NEW, target=ReviewState.PUBLISHED)
+    def publish(self):
+        """Transition to published state."""
+        pass
 
 
 class TrackingSuperBoundMethod(TransitionBoundMethod):
@@ -75,11 +96,21 @@ class GuestPublicationWithCustomSuperDescriptor(PublicationWithCustomSuperDescri
 
 
 class Test(TestCase):
-    """Regression tests for configurable super transition descriptors."""
+    """Regression tests for customization extension points."""
 
     def setUp(self):
         """Reset instrumentation flags before each test case."""
+        TrackingTransitionBoundMethod.wrapper_called = False
         TrackingSuperBoundMethod.wrapper_called = False
+
+    def test_custom_bound_method_wrapper_is_used(self):
+        """Custom bound method Wrapper is used for regular transition calls."""
+        publication = PublicationWithCustomDescriptor()
+
+        publication.publish()
+
+        self.assertTrue(TrackingTransitionBoundMethod.wrapper_called)
+        self.assertEqual(publication.state, ReviewState.PUBLISHED)
 
     def test_custom_super_descriptor_class_is_used(self):
         """State.super() uses configurable super_descriptor_class."""
