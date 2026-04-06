@@ -229,7 +229,7 @@ class TransitionBoundMethod:
                 return self._func.__name__.title()
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        with TransitionBoundMethod.Wrapper(self, kwargs=kwargs):
+        with self.Wrapper(self, kwargs=kwargs):
             return self._func(self._instance, *args, **kwargs)
 
     def get_transitions(self) -> Iterable[Transition]:
@@ -365,6 +365,7 @@ class State:
 
     ANY = MARKER("ANY")
     descriptor_class: Type[TransitionDescriptor] = TransitionDescriptor
+    super_descriptor_class: Type[SuperTransitionDescriptor] = SuperTransitionDescriptor
 
     def __init__(self, states: Any, default: StateValue = None):
         self._default = default
@@ -453,7 +454,7 @@ class State:
 
     def super(self) -> Any:
         def _wrapper(func: Any) -> Any:
-            return SuperTransitionDescriptor(self, func)
+            return self.super_descriptor_class(self, func)
 
         return _wrapper
 
