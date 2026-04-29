@@ -13,7 +13,16 @@ if TYPE_CHECKING:
 
 UserModel = Any
 StateValue = Any
-Condition = Union[ThisObject, Callable[[object], bool]]
-Permission = Union[ThisObject, Callable[[object, Any], bool]]
+# Note: Callable parameter is ``Any`` (rather than ``object``) so a typed
+# predicate that takes a specific flow class — e.g.
+# ``Callable[[Publication], bool]`` — type-checks under pyright/mypy at
+# the registration site. With ``[object]``, parameter contravariance
+# rejects narrower predicates (a function that only accepts
+# ``Publication`` is *not* substitutable where ``Callable[[object], bool]``
+# is expected). ``Any`` is gradually typed, so any concrete-param
+# predicate flows through cleanly. Runtime behavior is unchanged —
+# predicates are still invoked with the flow instance.
+Condition = Union[ThisObject, Callable[[Any], bool]]
+Permission = Union[ThisObject, Callable[[Any, Any], bool]]
 StateTransitions = Mapping["TransitionMethod", List["Transition"]]
 TransitionFunction = Callable[..., Any]
