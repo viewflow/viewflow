@@ -156,6 +156,11 @@ http://demo.viewflow.io/
 
 Code samples and examples: https://github.com/viewflow/cookbook
 
+## Stay updated
+
+[Subscribe to our newsletter][newsletter] for release notes, Django low-code
+tips, and notes on shipping business apps fast.
+
 ## License
 
 Viewflow is an Open Source project licensed under the terms of the AGPL license - [The GNU Affero General Public License v3.0](http://www.gnu.org/licenses/agpl-3.0.html) with the Additional Permissions
@@ -212,3 +217,4 @@ modifications of Viewflow. You can find the commercial license terms in
 [requirements-svg]: https://requires.io/github/viewflow/viewflow/requirements.svg?branch=v2
 [requirements]: https://requires.io/github/viewflow/viewflow/requirements/?branch=v2
 [gpt]: https://chatgpt.com/g/g-8UHAnOpE3-viewflow-pair-programming
+[newsletter]: https://robustarush.substack.com/?utm_source=github&utm_medium=readme&utm_campaign=viewflow_oss
