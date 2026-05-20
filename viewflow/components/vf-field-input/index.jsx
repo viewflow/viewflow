@@ -27,7 +27,7 @@ export const defaultProps = {
   'trailingLinkHref': undefined,
   'type': 'text',
   'value': '',
-  'readonly': undefined,
+  'readonly': false,
   'pattern': undefined,
 };
 
@@ -105,7 +105,7 @@ const Input = (props) => {
         type={ props.type }
         tabindex={ props.tabIndex }
         value={ props.value }
-        readonly= {props.readonly }
+        readonly={ !!props.readonly }
         pattern= {props.pattern}
         aria-labelledby={ props.id + '_label' }
         oninput={props.onInput}
