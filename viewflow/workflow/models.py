@@ -58,7 +58,7 @@ class AbstractProcess(models.Model):
             template_content = self.flow_class.process_description
 
         if not template_content:
-            template_content = "{{ flow_class.process_title }} - {{ process.status }}"
+            template_content = "{{ flow_class.process_title }} - {{ process.get_status_display }}"
 
         return Template(force_str(template_content)).render(
             Context({"process": self.coerced, "flow_class": self.flow_class})
@@ -206,7 +206,7 @@ class AbstractTask(models.Model):
             template_content = self.flow_task.task_title
 
         if not template_content:
-            template_content = "{{ flow_task }}/{{ task.status }}"
+            template_content = "{{ flow_task }}/{{ task.get_status_display }}"
 
         return Template(force_str(template_content)).render(
             Context(
