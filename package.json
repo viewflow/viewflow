@@ -42,7 +42,7 @@
     "simple-icons-font": "^11.15.0",
     "smartcrop": "^2.0.5",
     "swagger-ui-dist": "^4.19.1",
-    "trix": "^2.1.4",
+    "trix": "^2.1.18",
     "typescript": "^6.0.3",
     "vanilla-jsoneditor": "^0.23.8",
     "vis-network": "^9.1.13"
