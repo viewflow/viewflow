@@ -25,9 +25,9 @@
     "solid-element": "^1.8.0",
     "solid-js": "^1.8.14",
     "throttle-debounce": "^5.0.0",
-    "vite": "^5.0.12",
-    "vite-plugin-solid": "^2.9.1",
-    "vite-plugin-static-copy": "^1.0.1"
+    "vite": "^8.1.0",
+    "vite-plugin-solid": "^2.11.12",
+    "vite-plugin-static-copy": "^4.1.1"
   },
   "dependencies": {
     "@hotwired/turbo": "^7.3.0",
