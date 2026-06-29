@@ -9,7 +9,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "Node",
+    "moduleResolution": "bundler",
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
     "isolatedModules": true,
@@ -19,7 +19,7 @@
     "forceConsistentCasingInFileNames": true,
     "useDefineForClassFields": false,
     "skipLibCheck": true,
-    "target": "ES5",
+    "target": "ES2020",
   },
   "include": ["viewflow/js/**/*.ts"],
   "references": [{ "path": "./tsconfig.node.json" }]

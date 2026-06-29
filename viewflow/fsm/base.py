@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import inspect
-from typing import Any, Dict, Mapping, Iterable, List, Type, Optional
+from typing import Any, Dict, Mapping, Iterable, List, Type, Optional, TypeVar
 from viewflow.this_object import ThisObject
 from viewflow.utils import DEFAULT, MARKER
 from .typing import (
@@ -21,6 +21,10 @@ from .typing import (
     StateValue,
     TransitionFunction,
 )
+
+#: Bound from the predicates passed to ``State.transition`` so typed
+#: conditions/permissions keep their parameter type at the registration site.
+T = TypeVar("T")
 
 
 class TransitionNotAllowed(Exception):
@@ -414,8 +418,8 @@ class State:
         source: StateValue,
         target: Optional[StateValue] = DEFAULT,
         label: Optional[str] = None,
-        conditions: Optional[List[Condition]] = None,
-        permission: Optional[Permission] = DEFAULT,
+        conditions: Optional[List[Condition[T]]] = None,
+        permission: Optional[Permission[T]] = DEFAULT,
         custom: Optional[Dict] = None,
     ) -> Any:
         """Decorator to mark a method as a state transition."""
