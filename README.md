@@ -182,6 +182,12 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
+## Unreleased
+
+- Make `Condition`/`Permission` generic over the flow type, so typed predicates
+  like `Callable[[Publication], bool]` are accepted in `state.transition(...)`
+- Update frontend and tooling dependencies to their latest within-major versions
+
 ## 2.2.15 2025-12-24
 
 - Fix form button name/value lost on resubmission after validation error with Turbo
