@@ -2,6 +2,18 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+- Make ``Condition`` and ``Permission`` in ``viewflow.fsm.typing`` generic over
+  the flow type. Typed predicates such as ``Callable[[Publication], bool]`` are
+  now accepted at ``state.transition(conditions=...)`` without a cast, while all
+  conditions in one list are still checked to share a compatible instance type.
+- Update frontend and tooling dependencies to their latest within-major versions
+  (vite, the solid compiler, eslint, sass, material-icons, vis-network, trix and
+  others). ``@material/web`` and ``solid-element`` are intentionally held back —
+  newer releases break the web-component rendering.
+
 2.2.15  2025-12-24
 ------------------
 

@@ -13,7 +13,7 @@
     "@babel/preset-react": "^7.29.7",
     "@web/dev-server": "^0.4.6",
     "babel-core": "^4.7.16",
-    "babel-preset-solid": "^1.8.12",
+    "babel-preset-solid": "^1.9.12",
     "classcat": "^5.0.5",
     "eslint": "^8.57.1",
     "eslint-config-google": "^0.14.0",
@@ -23,10 +23,10 @@
     "sass": "^1.101.0",
     "shepherd.js": "^11.2.0",
     "solid-element": "^1.8.0",
-    "solid-js": "^1.8.14",
+    "solid-js": "^1.9.13",
     "throttle-debounce": "^5.0.2",
     "vite": "^5.4.21",
-    "vite-plugin-solid": "^2.9.1",
+    "vite-plugin-solid": "^2.11.12",
     "vite-plugin-static-copy": "^1.0.1"
   },
   "dependencies": {
