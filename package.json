@@ -45,7 +45,7 @@
     "trix": "^2.1.19",
     "typescript": "^6.0.3",
     "vanilla-jsoneditor": "^0.23.8",
-    "vis-network": "^9.1.13"
+    "vis-network": "^10.1.0"
   },
   "eslintConfig": {
     "extends": "google",
