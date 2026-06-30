@@ -61,7 +61,11 @@ const copyTargets = [
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [solidPlugin(), viteStaticCopy({targets: copyTargets})],
+  plugins: [solidPlugin(), viteStaticCopy({
+    // vite-plugin-static-copy v4 preserves the full source path under dest;
+    // stripBase flattens to the basename (the v1 behavior these targets expect).
+    targets: copyTargets.map((target) => ({rename: {stripBase: true}, ...target})),
+  })],
   css: {
     preprocessorOptions: {
       // @material 14 (MDC) still uses the deprecated Sass @import API and
