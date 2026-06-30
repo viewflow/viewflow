@@ -23,6 +23,8 @@ Unreleased
   ``typography.typography``); the generated CSS is unchanged.
 - Remove the unused legacy ``babel-core@4`` dev dependency (it pulled in a
   vulnerable lodash).
+- Upgrade ``vanilla-jsoneditor`` 0.23 -> 3 (now bundles svelte 5), clearing the
+  svelte advisories. The JSON field editor API is unchanged.
 
 2.2.15  2025-12-24
 ------------------

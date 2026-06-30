@@ -193,6 +193,8 @@ modifications of Viewflow. You can find the commercial license terms in
 - Upgrade the build to vite 7 and vite-plugin-static-copy 4; migrate the
   `@material` typography imports to the modern Sass `@use` API (generated CSS
   unchanged) and drop the unused `babel-core@4` dev dependency
+- Upgrade `vanilla-jsoneditor` 0.23 → 3 (bundles svelte 5); the JSON field
+  editor API is unchanged
 
 ## 2.2.15 2025-12-24
 
