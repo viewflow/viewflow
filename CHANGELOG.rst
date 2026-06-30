@@ -2,8 +2,8 @@
 Changelog
 =========
 
-Unreleased
-----------
+2.3.1  2026-06-30
+-----------------
 
 - Add Django 6.1 support.
 - Fix the bulk task assign/unassign actions not enforcing per-task
