@@ -5,6 +5,11 @@ Changelog
 Unreleased
 ----------
 
+- Fix ``viewflow.fsm`` chart generation crashing for ``Enum`` states and
+  ``State.ANY`` markers; chart sorting no longer relies on states or transitions
+  being orderable (#476).
+- Use the localized status label (``get_status_display``) instead of the raw
+  value in the default Task and Process briefs (#504).
 - Add a ``building-with-viewflow`` skill for AI coding assistants (``skill/``,
   beta), and ship machine-readable docs for LLMs — ``llms.txt``,
   ``llms-full.txt`` and ``AGENTS.md`` on docs.viewflow.io (#498).

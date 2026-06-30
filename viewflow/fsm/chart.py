@@ -72,14 +72,21 @@ def chart(flow_state: StateDescriptor, exclude_guards=True):
     vertices_definition = "\n".join(
         [
             '"%s" [label="%s"];' % (get_state_name(vertex), get_state_label(vertex))
-            for vertex in sorted(vertices)
+            for vertex in sorted(vertices, key=get_state_name)
         ]
     )
 
     edges_definition = "\n".join(
         [
             f'"{source}" -> "{target}" [label="{transition.label}"];'
-            for source, target, transition in sorted(edges)
+            for source, target, transition in sorted(
+                edges,
+                key=lambda edge: (
+                    get_state_name(edge[0]),
+                    get_state_name(edge[1]),
+                    edge[2].label,
+                ),
+            )
         ]
     )
 

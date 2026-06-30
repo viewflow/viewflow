@@ -184,6 +184,10 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Unreleased
 
+- Fix `viewflow.fsm` chart generation crashing for `Enum` states and `State.ANY`
+  markers (#476)
+- Use the localized status label (`get_status_display`) in the default Task and
+  Process briefs (#504)
 - Add a `building-with-viewflow` skill for AI coding assistants (`skill/`, beta),
   and ship `llms.txt`, `llms-full.txt` and `AGENTS.md` on docs.viewflow.io (#498)
 - Fix the `vf-field-input` `readonly` attribute not being treated as a boolean;
