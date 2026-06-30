@@ -182,7 +182,7 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
-## Unreleased
+## 2.3.0 2026-06-30
 
 - Fix `viewflow.fsm` chart generation crashing for `Enum` states and `State.ANY`
   markers (#476)

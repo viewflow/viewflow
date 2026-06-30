@@ -2,8 +2,8 @@
 Changelog
 =========
 
-Unreleased
-----------
+2.3.0  2026-06-30
+-----------------
 
 - Fix ``viewflow.fsm`` chart generation crashing for ``Enum`` states and
   ``State.ANY`` markers; chart sorting no longer relies on states or transitions
