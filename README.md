@@ -32,7 +32,7 @@ Viewflow comes in two versions:
 
 ## Installation
 
-Viewflow works with Python 3.8+ and Django 4.0+
+Viewflow works with Python 3.10+ and Django 4.2+
 
 Viewflow:
 
@@ -182,6 +182,16 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Changelog
 
+For older releases, see [CHANGELOG.rst](./CHANGELOG.rst).
+
+## 2.3.1 2026-06-30
+
+- Add Django 6.1 support
+- Fix the bulk task assign/unassign actions not enforcing the per-task
+  `can_assign`/`can_unassign` permission
+- Fix task views accepting a task pk from another flow; tasks are now scoped to
+  the flow in the URL
+
 ## 2.3.0 2026-06-30
 
 - Fix `viewflow.fsm` chart generation crashing for `Enum` states and `State.ANY`
@@ -205,29 +215,6 @@ modifications of Viewflow. You can find the commercial license terms in
   unchanged) and drop the unused `babel-core@4` dev dependency
 - Upgrade `vanilla-jsoneditor` 0.23 → 3 (bundles svelte 5); the JSON field
   editor API is unchanged
-
-## 2.2.15 2025-12-24
-
-- Fix form button name/value lost on resubmission after validation error with Turbo
-- Fix subprocess double execution when completing synchronously
-
-## 2.2.14 2025-11-24
-
-- Add Django 6.0 compatibility (requires Python 3.12+)
-- Improve error handling for permission creation in multiple database configurations
-- Fix BPMN export to include name attribute for gateway nodes (flow.If)
-
-## 2.2.13 2025-09-24
-
-- Fix checkbox field error message styling to display in red color
-
-## 2.2.12 2025-07-25
-
-- Allow to extend and override process_data template
-
-## 2.2.11 2025-05-14
-
-- Return .Avaialble(..) for the start node
 
 
 
