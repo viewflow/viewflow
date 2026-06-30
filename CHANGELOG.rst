@@ -5,6 +5,10 @@ Changelog
 Unreleased
 ----------
 
+- Fix process cancel being allowed with only view permission. Canceling a
+  process now requires the ``manage`` permission, like the task cancel/undo/revive
+  actions. ``Flow.has_view_permission`` and ``has_manage_permission`` now also
+  honor object-level (e.g. django-guardian) permissions when an object is passed.
 - Make ``Condition`` and ``Permission`` in ``viewflow.fsm.typing`` generic over
   the flow type. Typed predicates such as ``Callable[[Publication], bool]`` are
   now accepted at ``state.transition(conditions=...)`` without a cast, while all

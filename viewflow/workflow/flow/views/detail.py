@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.views import generic
 from django.utils.translation import gettext_lazy as _
 from . import mixins
@@ -57,12 +58,24 @@ class DetailTaskView(mixins.TaskViewTemplateNames, generic.TemplateView):
         return activation.flow_task.get_available_actions(activation, self.request.user)
 
 
-class DetailProcessView(generic.DetailView):  # todo permission
+class DetailProcessView(generic.DetailView):
     """Detail for process."""
 
     flow_class = None
     context_object_name = "process"
     pk_url_kwarg = "process_pk"
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.flow_class.instance.has_view_permission(
+            request.user, obj=self.get_object()
+        ):
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self, queryset=None):
+        if not hasattr(self, "_object_cache"):
+            self._object_cache = super().get_object(queryset)
+        return self._object_cache
 
     def get_template_names(self):
         """List of template names to be used for a process detail page.

@@ -1,5 +1,6 @@
 from django import forms
 from django.contrib import messages
+from django.core.exceptions import PermissionDenied
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.utils.functional import cached_property
@@ -149,6 +150,15 @@ class CancelProcessView(mixins.ProcessViewTemplateNames, generic.DetailView):
     def get_queryset(self):
         """Flow processes."""
         return self.flow_class.process_class._default_manager.all()
+
+    def dispatch(self, request, *args, **kwargs):
+        """Canceling a process is a manage action, not a view action."""
+        self.object = self.get_object()
+        if not self.flow_class.instance.has_manage_permission(
+            request.user, obj=self.object
+        ):
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
 
     @cached_property
     def active_activations(self):

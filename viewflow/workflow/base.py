@@ -9,7 +9,12 @@ from django.urls import include, path
 from django.urls.exceptions import NoReverseMatch
 from django.utils.timezone import now
 
-from viewflow.utils import LazySingletonDescriptor, camel_case_to_title, strip_suffixes
+from viewflow.utils import (
+    LazySingletonDescriptor,
+    camel_case_to_title,
+    has_object_perm,
+    strip_suffixes,
+)
 from viewflow.urls import Viewset, ViewsetMeta
 from .activation import Activation
 from .exceptions import FlowRuntimeError
@@ -395,15 +400,13 @@ class Flow(Viewset, metaclass=FlowMetaClass):
         return node
 
     def has_view_permission(self, user: Any, obj: Optional[Any] = None) -> bool:
-        opts = self.process_class._meta
-        return user.is_authenticated and user.has_perm(
-            f"{opts.app_label}.view_{ opts.model_name}"
+        return user.is_authenticated and has_object_perm(
+            user, "view", self.process_class, obj=obj
         )
 
     def has_manage_permission(self, user: Any, obj: Optional[Any] = None) -> bool:
-        opts = self.process_class._meta
-        return user.is_authenticated and user.has_perm(
-            f"{opts.app_label}.manage_{ opts.model_name}"
+        return user.is_authenticated and has_object_perm(
+            user, "manage", self.process_class, obj=obj
         )
 
     def _get_urls(self) -> List:

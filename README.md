@@ -184,6 +184,9 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Unreleased
 
+- Fix process cancel being allowed with only view permission; it now requires the
+  `manage` permission. `has_view_permission`/`has_manage_permission` also honor
+  object-level (e.g. django-guardian) permissions when an object is passed
 - Make `Condition`/`Permission` generic over the flow type, so typed predicates
   like `Callable[[Publication], bool]` are accepted in `state.transition(...)`
 - Update frontend and tooling dependencies to their latest within-major versions
