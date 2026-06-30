@@ -184,6 +184,8 @@ modifications of Viewflow. You can find the commercial license terms in
 
 ## Unreleased
 
+- Add a `building-with-viewflow` skill for AI coding assistants (`skill/`, beta),
+  and ship `llms.txt`, `llms-full.txt` and `AGENTS.md` on docs.viewflow.io (#498)
 - Fix the `vf-field-input` `readonly` attribute not being treated as a boolean;
   it now defaults to `false` and is coerced like `disabled`/`required` (#499),
   applied consistently across the field widgets, and added `readonly` support to

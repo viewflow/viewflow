@@ -5,6 +5,9 @@ Changelog
 Unreleased
 ----------
 
+- Add a ``building-with-viewflow`` skill for AI coding assistants (``skill/``,
+  beta), and ship machine-readable docs for LLMs — ``llms.txt``,
+  ``llms-full.txt`` and ``AGENTS.md`` on docs.viewflow.io (#498).
 - Fix the ``vf-field-input`` ``readonly`` attribute not being treated as a
   boolean: it now defaults to ``false`` and is coerced like ``disabled`` and
   ``required`` (#499). Applied the same boolean coercion consistently across the
