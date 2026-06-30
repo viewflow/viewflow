@@ -33,7 +33,7 @@
     "@iconfu/svg-inject": "^1.2.3",
     "@material/textfield": "^14.0.0",
     "@material/web": "^1.2.0",
-    "@open-wc/lit-helpers": "^0.6.0",
+    "@open-wc/lit-helpers": "^0.7.0",
     "material-components-web": "^14.0.0",
     "material-icons": "^1.13.14",
     "perfect-scrollbar": "^1.5.6",
