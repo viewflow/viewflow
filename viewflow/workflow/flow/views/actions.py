@@ -200,9 +200,19 @@ class BulkUnassignTasksActionView(BaseBulkActionView):
     template_name_suffix = "s_unassign"
 
     def form_valid(self, form):
+        user = self.request.user
         with transaction.atomic():
             for task in self.get_queryset():
                 with task.activation() as activation:
+                    # The queryset is the unscoped Task table filtered by the
+                    # submitted pks, and activation.unassign() does not enforce
+                    # its declared permission. Re-check per task against the
+                    # task's own flow node, exactly as the single-task view does.
+                    can_unassign = getattr(task.flow_task, "can_unassign", None)
+                    if not callable(can_unassign) or not can_unassign(
+                        user, activation.task
+                    ):
+                        raise PermissionDenied
                     activation.unassign()
         self.message_user()
         return HttpResponseRedirect(self.get_success_url())
@@ -220,10 +230,20 @@ class BulkAssignTasksActionView(BaseBulkActionView):
     template_name_suffix = "s_assign"
 
     def form_valid(self, form):
+        user = self.request.user
         with transaction.atomic():
             for task in self.get_queryset():
                 with task.activation() as activation:
-                    activation.assign(self.request.user)
+                    # The queryset is the unscoped Task table filtered by the
+                    # submitted pks, and activation.assign() does not enforce
+                    # its declared permission. Re-check per task against the
+                    # task's own flow node, exactly as the single-task view does.
+                    can_assign = getattr(task.flow_task, "can_assign", None)
+                    if not callable(can_assign) or not can_assign(
+                        user, activation.task
+                    ):
+                        raise PermissionDenied
+                    activation.assign(user)
         self.message_user()
         return HttpResponseRedirect(self.get_success_url())
 

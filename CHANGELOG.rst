@@ -2,6 +2,17 @@
 Changelog
 =========
 
+Unreleased
+----------
+
+- Add Django 6.1 support.
+- Fix the bulk task assign/unassign actions not enforcing per-task
+  ``can_assign``/``can_unassign`` permission.
+- Fix the REST ``View``-node ``GET`` endpoint serving task data without a
+  ``view`` permission check.
+- Fix task views accepting a task pk from another flow; the task is now scoped to
+  the flow in the URL.
+
 2.3.0  2026-06-30
 -----------------
 

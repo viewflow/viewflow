@@ -2,6 +2,7 @@ from functools import update_wrapper
 
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import transaction
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from viewflow.fsm import TransitionNotAllowed
 
@@ -18,6 +19,12 @@ def wrap_task_view(self, origin_view, permission=None):
 
         def call_with_activation():
             task = get_object_or_404(self.flow_class.task_class, pk=task_pk)
+            # The task_class is the shared Task table, so a task from any flow
+            # is reachable by pk. Confirm it belongs to this flow, otherwise the
+            # permission below would be evaluated against the URL's flow rather
+            # than the task's own flow (cross-flow access).
+            if task.process.flow_class != self.flow_class:
+                raise Http404("No task matches the given query.")
             request.activation = self.activation_class(task)
 
             if permission and not permission(request.user, task=task):
@@ -69,6 +76,8 @@ def wrap_view(flow_task, origin_view):
 
         def call_with_activation():
             task = get_object_or_404(flow_task.flow_class.task_class, pk=task_pk)
+            if task.process.flow_class != flow_task.flow_class:
+                raise Http404("No task matches the given query.")
             request.activation = flow_task.activation_class(task)
 
             if not flow_task.can_execute(request.user, task=task):
