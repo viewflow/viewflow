@@ -9,12 +9,12 @@ jobs:
     name: Viewflow CI
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v5
     - name: Set up Python
-      uses: actions/setup-python@v4
+      uses: actions/setup-python@v6
       with:
         python-version: "3.10"
-    - uses: actions/cache@v3
+    - uses: actions/cache@v6
       with:
         path: .venv
         key: ${{ hashFiles('tox.ini') }}
@@ -29,7 +29,7 @@ jobs:
         tox -- coverage run --source='viewflow' ./manage.py test --exclude-tag=selenium --exclude-tag=integration
         tox -- coverage lcov
     - name: Coveralls
-      uses: coverallsapp/github-action@master
+      uses: coverallsapp/github-action@v2
       with:
         github-token: ${{ secrets.GITHUB_TOKEN }}
         path-to-lcov: coverage.lcov
