@@ -190,6 +190,9 @@ modifications of Viewflow. You can find the commercial license terms in
 - Make `Condition`/`Permission` generic over the flow type, so typed predicates
   like `Callable[[Publication], bool]` are accepted in `state.transition(...)`
 - Update frontend and tooling dependencies to their latest within-major versions
+- Upgrade the build to vite 7 and vite-plugin-static-copy 4; migrate the
+  `@material` typography imports to the modern Sass `@use` API (generated CSS
+  unchanged) and drop the unused `babel-core@4` dev dependency
 
 ## 2.2.15 2025-12-24
 

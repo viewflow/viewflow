@@ -1,4 +1,4 @@
-@import '@material/typography/mixins.scss';
+@use '@material/typography';
 
 .vf-card__header {
   padding: 1rem;
@@ -7,13 +7,13 @@
 
 .vf-card__title {
   margin: 0;
-  @include mdc-typography("headline6");
+  @include typography.typography("headline6");
   font-weight: 400;
 }
 
 .vf-card__breadcrumbs {
   margin: 0;
-  @include mdc-typography("subtitle2");
+  @include typography.typography("subtitle2");
   margin-bottom: 10px;
 
   a {
@@ -70,7 +70,7 @@
 
 .vf-card__alert {
   margin-top: 0;
-  @include mdc-typography("headline6");
+  @include typography.typography("headline6");
   font-size: 1rem;
   padding: 8px;
   text-align: center;

@@ -1,4 +1,4 @@
-@import '@material/typography/mixins.scss';
+@use '@material/typography';
 
 .vf-dashboard__grid {
   height: 100%;
@@ -44,7 +44,7 @@
 
       .column-title {
         margin: 0;
-        @include mdc-typography("subtitle1");
+        @include typography.typography("subtitle1");
       }
 
       .column-content {

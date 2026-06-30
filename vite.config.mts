@@ -62,6 +62,17 @@ const copyTargets = [
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [solidPlugin(), viteStaticCopy({targets: copyTargets})],
+  css: {
+    preprocessorOptions: {
+      // @material 14 (MDC) still uses the deprecated Sass @import API and
+      // its import-only files (_*.import.scss); loadPaths lets Sass resolve
+      // them natively instead of through vite's importer.
+      scss: {
+        loadPaths: ['node_modules'],
+        silenceDeprecations: ['import', 'global-builtin', 'mixed-decls'],
+      },
+    },
+  },
   build: {
     sourcemap: true,
     emptyOutDir: false,
@@ -75,9 +86,12 @@ export default defineConfig({
     rollupOptions: {
       output: {
         assetFileNames: (assetInfo) => {
-          if (assetInfo.name == "style.css")
+          // vite 7 / rollup 4 names the lib CSS after the entry (viewflow.css)
+          // and exposes it via `names`; older versions used `style.css`/`name`.
+          const name = assetInfo.names?.[0] ?? assetInfo.name ?? "";
+          if (name.endsWith(".css"))
             return "css/viewflow.min.css";
-          return assetInfo.name;
+          return name;
         },
         entryFileNames: "js/viewflow.min.js",
       },

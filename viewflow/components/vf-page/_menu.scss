@@ -1,4 +1,4 @@
-@import '@material/typography/mixins.scss';
+@use '@material/typography';
 
 .vf-page__menu {
   border: none;
@@ -53,13 +53,13 @@
 
 .vf-page__menu-title {
   padding-top:5px;
-  @include mdc-typography("subtitle1");
+  @include typography.typography("subtitle1");
   white-space: nowrap;
   text-overflow: ellipsis;
 }
 
 .vf-page__menu-subtitle {
-  @include mdc-typography("subtitle2");
+  @include typography.typography("subtitle2");
 }
 
 .vf-page__menu-toggle {

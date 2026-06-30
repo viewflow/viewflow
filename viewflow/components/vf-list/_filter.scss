@@ -1,4 +1,4 @@
-@import '@material/typography/mixins.scss';
+@use '@material/typography';
 
 
 .vf-list__filter.mdc-drawer.mdc-drawer--open:not(.mdc-drawer--closing)+.mdc-drawer-app-content {
@@ -89,7 +89,7 @@
 }
 
 .vf-list__filter-title {
-  @include mdc-typography("headline6");
+  @include typography.typography("headline6");
   padding-left: 16px;
   margin-bottom: 0.5rem;
 }

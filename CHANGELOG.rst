@@ -14,9 +14,15 @@ Unreleased
   now accepted at ``state.transition(conditions=...)`` without a cast, while all
   conditions in one list are still checked to share a compatible instance type.
 - Update frontend and tooling dependencies to their latest within-major versions
-  (vite, the solid compiler, eslint, sass, material-icons, vis-network, trix and
+  (the solid compiler, eslint, sass, material-icons, vis-network, trix and
   others). ``@material/web`` and ``solid-element`` are intentionally held back —
   newer releases break the web-component rendering.
+- Upgrade the build to vite 7 (from 5) and vite-plugin-static-copy 4, clearing
+  the vite/esbuild dev-server advisories. The ``@material`` typography mixin
+  imports were migrated to the modern Sass ``@use`` API (``mdc-typography`` ->
+  ``typography.typography``); the generated CSS is unchanged.
+- Remove the unused legacy ``babel-core@4`` dev dependency (it pulled in a
+  vulnerable lodash).
 
 2.2.15  2025-12-24
 ------------------

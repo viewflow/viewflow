@@ -1,4 +1,4 @@
-@import '@material/typography/mixins.scss';
+@use '@material/typography';
 
 .vf-page-lockscreen {
   width: 100%;
@@ -26,11 +26,11 @@
 }
 
 .vf-page-lockscreen__sidebar-header-title {
-  @include mdc-typography("headline5");
+  @include typography.typography("headline5");
 }
 
 .vf-page-lockscreen__sidebar-header-subtitle {
-  @include mdc-typography("subtitle2");
+  @include typography.typography("subtitle2");
   font-weight: 300;
 }
 

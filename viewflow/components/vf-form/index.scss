@@ -1,4 +1,4 @@
-@import '@material/typography/mixins.scss';
+@use '@material/typography';
 
 .vf-form {
   padding: 0;
@@ -14,7 +14,7 @@
 }
 
 .vf-form__formset-header {
-  @include mdc-typography("subtitle2");
+  @include typography.typography("subtitle2");
 
   margin-top: 8px;
   margin-bottom: 8px;
