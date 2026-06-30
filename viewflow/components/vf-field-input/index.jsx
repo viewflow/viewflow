@@ -27,7 +27,7 @@ export const defaultProps = {
   'trailingLinkHref': undefined,
   'type': 'text',
   'value': '',
-  'readonly': undefined,
+  'readonly': false,
   'pattern': undefined,
 };
 
@@ -105,7 +105,7 @@ const Input = (props) => {
         type={ props.type }
         tabindex={ props.tabIndex }
         value={ props.value }
-        readonly= {props.readonly }
+        readonly={ !!props.readonly }
         pattern= {props.pattern}
         aria-labelledby={ props.id + '_label' }
         oninput={props.onInput}
@@ -121,7 +121,7 @@ const Input = (props) => {
               <button
                 class="mdc-button vf-text-field__button mdc-button--touch"
                 onClick={ props.onTrailingButtonClick }
-                disabled={ props.disabled }
+                disabled={ !!props.disabled }
                 type="button">
                 <div class="mdc-button__ripple"></div>
                 <span class="mdc-button__label material-icons">{ props.trailingButton }</span>
@@ -136,7 +136,7 @@ const Input = (props) => {
                 href={ props.trailingLinkHref || props.value }
                 target="_blank"
                 rel="noopener noreferrer"
-                disabled={ props.disabled }
+                disabled={ !!props.disabled }
                 download>
                 <div class="mdc-button__ripple"></div>
                 <span class="mdc-button__label material-icons">{ props.trailingLink }</span>

@@ -48,10 +48,10 @@ const VFileInputField = customElement('vf-field-file', defaultProps, (props, {el
   return (
     <div class="vf-field__row" style="position:relative">
       <Input
-        disabled={props.disabled}
+        disabled={ !!props.disabled }
         id={props.id + '_input'}
         label={props.label}
-        required={props.required}
+        required={ !!props.required }
         tabIndex="-1"
         trailingButton="file_upload"
         trailingLink={props.value || props.trailingLinkHref ? "download" : undefined}
@@ -69,7 +69,7 @@ const VFileInputField = customElement('vf-field-file', defaultProps, (props, {el
           value=""
           name={props.name}
           id={props.id}
-          required={props.required}
+          required={ !!props.required }
           tabindex="-1"
           onChange={onFileChange}/> :
       '' }
