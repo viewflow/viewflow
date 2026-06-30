@@ -186,7 +186,8 @@ modifications of Viewflow. You can find the commercial license terms in
 
 - Fix the `vf-field-input` `readonly` attribute not being treated as a boolean;
   it now defaults to `false` and is coerced like `disabled`/`required` (#499),
-  applied consistently across the field widgets
+  applied consistently across the field widgets, and added `readonly` support to
+  the password and textarea widgets
 - Fix process cancel being allowed with only view permission; it now requires the
   `manage` permission. `has_view_permission`/`has_manage_permission` also honor
   object-level (e.g. django-guardian) permissions when an object is passed

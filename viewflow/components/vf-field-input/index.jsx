@@ -8,7 +8,7 @@ import cc from 'classcat';
 import './index.scss';
 
 export const defaultProps = {
-  'autofocus': undefined,
+  'autofocus': false,
   'disabled': false,
   'error': undefined,
   'helpText': undefined,

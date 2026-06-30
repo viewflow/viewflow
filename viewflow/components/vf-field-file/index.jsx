@@ -6,7 +6,7 @@ import {Input, HelpText} from '../vf-field-input';
 import './index.scss';
 
 const defaultProps = {
-  'autofocus': undefined,
+  'autofocus': false,
   'disabled': false,
   'error': undefined,
   'helpText': undefined,
@@ -19,7 +19,7 @@ const defaultProps = {
   'placeholder': undefined,
   'required': false,
   'value': '',
-  'multiple': undefined,
+  'multiple': false,
   'trailingLinkHref': undefined,
 };
 
@@ -63,12 +63,12 @@ const VFileInputField = customElement('vf-field-file', defaultProps, (props, {el
       { !props.disabled ?
         <input
           class="vf-field__file-input"
-          multiple={props.multiple}
           type="file"
           {...props}
           value=""
           name={props.name}
           id={props.id}
+          multiple={ !!props.multiple }
           required={ !!props.required }
           tabindex="-1"
           onChange={onFileChange}/> :

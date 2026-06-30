@@ -14,6 +14,7 @@ const defaultProps = {
   'id': undefined,
   'label': undefined,
   'name': undefined,
+  'readonly': false,
   'required': false,
   'rows': undefined,
   'value': undefined,
@@ -62,6 +63,7 @@ const VTextareaField = customElement('vf-field-textarea', defaultProps, (props, 
             disabled={ !!props.disabled }
             id={ props.id + '_control' }
             name={ props.name }
+            readonly={ !!props.readonly }
             required={ !!props.required }
             rows={ props.rows }
             aria-label={ props.label }>{ props.value }</textarea>

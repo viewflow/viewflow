@@ -6,7 +6,7 @@ import {Input, HelpText} from '../vf-field-input';
 import './index.scss';
 
 const defaultProps = {
-  'autofocus': undefined,
+  'autofocus': false,
   'disabled': false,
   'error': undefined,
   'helpText': undefined,
@@ -17,6 +17,7 @@ const defaultProps = {
   'minlength': undefined,
   'name': undefined,
   'placeholder': undefined,
+  'readonly': false,
   'required': false,
   'type': 'password',
   'value': '',

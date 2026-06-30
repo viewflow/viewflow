@@ -9,7 +9,7 @@ const defaultProps = {
   'error': undefined,
   'helpText': undefined,
   'id': undefined,
-  'inline': undefined,
+  'inline': false,
   'label': undefined,
   'name': undefined,
   'optgroups': undefined,

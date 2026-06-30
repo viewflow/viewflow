@@ -9,7 +9,7 @@ import './index.scss';
 
 
 const defaultProps = {
-  'autofocus': undefined,
+  'autofocus': false,
   'disabled': false,
   'error': undefined,
   'helpText': undefined,

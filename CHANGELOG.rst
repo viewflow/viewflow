@@ -8,7 +8,8 @@ Unreleased
 - Fix the ``vf-field-input`` ``readonly`` attribute not being treated as a
   boolean: it now defaults to ``false`` and is coerced like ``disabled`` and
   ``required`` (#499). Applied the same boolean coercion consistently across the
-  field widgets (file, autocomplete, select-dependent).
+  field widgets (file ``multiple``/``disabled``, autocomplete, select-dependent),
+  and added ``readonly`` support to ``vf-field-password`` and ``vf-field-textarea``.
 - Fix process cancel being allowed with only view permission. Canceling a
   process now requires the ``manage`` permission, like the task cancel/undo/revive
   actions. ``Flow.has_view_permission`` and ``has_manage_permission`` now also
