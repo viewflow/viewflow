@@ -2,6 +2,242 @@
 Changelog
 =========
 
+2.3.2  2026-07-06
+-----------------
+
+- Fix cross-flow privilege escalation: a user with only flow A's ``manage``
+  permission could cancel flow B's process by posting flow B's process id to
+  flow A's cancel URL. ``CancelProcessView`` now scopes its queryset to the
+  view's own flow.
+- Fix the bulk-delete endpoint (``action/delete/``): it deleted rows without
+  checking login or the ``delete`` permission. Both checks now run before any
+  delete. The gap mattered most for a ``ModelViewset`` mounted outside a
+  ``Site``/``Application`` wrapper, where no other layer enforced auth.
+- Fix cross-flow information disclosure: a user with only flow A's ``view``
+  permission could read flow B's process detail, including its full task
+  list, by opening flow B's process id on flow A's URL.
+  ``DetailProcessView`` now scopes its queryset to the view's own flow.
+- Fix a 500 error on any list view without ``search_fields`` set: appending
+  ``?_search=`` crashed the view instead of being ignored.
+- Fix a crash on the admin change page of any FSM-backed model under
+  Django 5.2+ (incl. 6.1): the ``change_form_fsm_tools`` template tag called
+  ``InclusionAdminNode`` with the old signature after Django added a required
+  ``name`` first argument, raising ``TypeError`` while rendering.
+- Fix a transaction-ordering bug that committed partial writes alongside a
+  task's ``ERROR`` status. In async mode (e.g. after a JOB node), the
+  exception guard swallowed the error before the surrounding savepoint saw
+  it, so the savepoint rolled back nothing. Affects ``Function``, ``End``,
+  ``If``, ``Split``, and ``Switch`` nodes.
+- Wrap ``Subprocess`` and ``NSubprocess`` activation in a savepoint too, so a
+  failure while computing subprocess data or spawning children rolls back the
+  partial work instead of leaving it (and half-spawned children) committed
+  next to the ``ERROR`` status, where a ``retry`` would double-spawn them.
+- Guard ``Join`` completion the same way. An error while completing a join
+  (a partial-join cancel failing, a malformed multi-token join, or a
+  ``task_finished`` receiver raising) now follows the activation context: a
+  background trigger (e.g. a ``Job`` node) records ``STATUS.ERROR`` on the join
+  and rolls back the partial cancel, leaving the process recoverable instead of
+  crashing the worker, while a user/synchronous trigger propagates the error to
+  its caller. ``is_done`` is now a side-effect-free predicate; the branch
+  cancellation it used to perform runs inside the guarded ``complete()``.
+- Fix a celery ``Job`` node treating ``self.retry()`` as a task failure.
+  ``Retry`` (and ``Reject``) is a control-flow signal, not an error; it now
+  passes through instead of marking the task ``ERROR``. The redelivered retry
+  also used to hit ``TransitionNotAllowed`` because ``start()`` only accepted a
+  ``SCHEDULED`` task while a retry re-enters a ``STARTED`` one; ``start()`` now
+  accepts ``STARTED`` too, so the retried run restarts, runs, and completes
+  (the process lock still serialises concurrent deliveries).
+- Fix ``ImportViewsetMixin``'s "Import" button linking to a view with no
+  ``form_class``, which 500ed on every GET. It now renders a real upload
+  form and imports the submitted file via ``django-import-export``.
+- Fix a formset validation bypass: a form with an ``InlineFormSetField``
+  reported valid, and saved the parent, even when the formset's
+  ManagementForm was missing or tampered with. The real error lived in
+  ``non_form_errors()``, which the check never looked at.
+- Fix grouped ``<select>`` choices (options nested under an ``<optgroup>``)
+  being silently dropped except for the first option in each group.
+  Affects ``Select``, ``RadioSelect``, and ``DependentModelSelect``.
+- Fix an unbounded memory leak in form rendering: the widget-renderer cache
+  was keyed on the widget *instance*, and Django deep-copies widgets per
+  form, so every render pinned a new widget/field/form from garbage
+  collection forever with zero cache hits. Now cached by widget class.
+- Fix ``viewflow.fsm``'s default ``get_object_flow()`` (``FlowViewsMixin``,
+  ``FlowRESTMixin``, ``FlowAdminMixin``) always raising, even for a flow
+  class with a valid single-argument constructor. It called
+  ``get_flow_state()`` without the required ``request`` argument; the
+  resulting ``TypeError`` was swallowed and rebranded as a misleading
+  "no constructor with single argument" error.
+- Fix ``viewflow.fsm``'s REST ``transitions`` action, which hardcoded the
+  demo's URL name and namespace ("review-transition", "review:..."). Any
+  ``FlowRESTMixin`` viewset with a different basename or namespace hit
+  ``NoReverseMatch`` (500) on ``GET /{pk}/transition/``. Now built from
+  the viewset's own basename and the request's resolved namespace.
+- Fix ``jsonstore`` fields with a falsy ``default`` (``BooleanField(default=False)``,
+  ``IntegerField(default=0)``) returning ``None`` instead of the default when
+  the underlying JSON key is absent. The default was checked with a
+  truthiness test instead of an identity check against "not provided".
+- Fix ``vf-field-select-multiple`` silently dropping the last selected value when
+  deselecting a non-last item with 3+ items selected. A duplicated ``splice()``
+  call removed an extra entry from the selection array; the array logic is now
+  in a small, independently unit-tested module.
+- Fix ``vf-field-select-multiple`` sometimes failing to deselect an item on
+  click/keypress at all. The underlying MDC list ran its own native checkbox
+  toggle in addition to (not instead of) our custom selection handling, so a
+  single interaction toggled the same selection array through two independent
+  code paths.
+- Fix ``InlineCalendar`` always submitting an empty value: the hidden input
+  read a Solid signal *accessor* function instead of calling it, so the
+  picked date was silently dropped on every submit.
+- Fix the JSON editor field (``JSONEditorWiget``) corrupting its value on every
+  edit: the editor's internal ``Content`` wrapper (``{json: ...}`` or
+  ``{text: ...}``) was stored directly instead of the value inside it.
+- Fix the autocomplete field (single and multi-select) crashing on Enter when
+  no suggestion was selected, which stopped the form from being submitted
+  properly.
+- Fix ``ListModelView.get_object_url`` crashing with ``AttributeError`` when
+  used standalone (no ``viewset``) on a model with ``get_absolute_url``. It
+  called a misspelled method name.
+- Fix an unbounded memory leak in ``ListModelView``: an ``lru_cache`` keyed on
+  the view instance pinned every list view ever rendered. Now cached per
+  instance instead.
+- Fix ``Transition.can_proceed(check_conditions=False)`` returning ``False``
+  even when the transition exists. It now skips the condition check instead
+  of reporting the transition as unavailable.
+- Fix ``fsm.State`` with a custom getter replacing a falsy-but-valid state
+  (``0``, ``False``) with the field's default. Only a missing value (``None``
+  or ``""``) falls back to the default now.
+- Fix ``viewflow.fsm``'s state/transition descriptors treating a falsy flow
+  instance (one whose ``__len__`` returns ``0``) as a class-level access.
+  Reading state or calling a transition on such an instance now works
+  instead of raising ``TypeError``.
+- Fix the FSM REST ``transition`` action committing a field update even
+  when the transition itself failed. The update and the transition now run
+  in one transaction.
+- Fix the FSM REST ``transition`` action letting a user permitted to
+  perform one transition write any other writable field on the same
+  request. Add ``get_transition_fields()`` (default: none writable),
+  matching the admin and viewset layers.
+- Add a state chart view to ``FlowViewsMixin``: a ``chart/`` URL and a
+  "State chart" list-page action, showing the same diagram the admin
+  already renders. Replaces the dead, unrunnable ``FlowGraphView``.
+- Fix a transition with no explicit ``target`` (a state-machine
+  "self-transition") drawing a bogus ``"DEFAULT"`` node in the FSM chart.
+  ``target=None`` (a real but ambiguous case) is now rejected at
+  decoration time instead of silently mishandled.
+- Fix ``jsonstore`` fields discarding a falsy-but-valid assigned value
+  (``obj.n = 0``) on a ``blank=True`` field, silently falling back to
+  the field's default on the next read. Only a genuinely empty value
+  (``None`` or ``""``) is dropped now.
+- Fix ``jsonstore`` fields silently mis-sorting on ``order_by()``: it
+  sorted rows by the underlying JSON blob's raw text instead of the
+  extracted value (e.g. integer ``9`` sorted after ``10``).
+- Fix the ``VIEWFLOW`` setting silently ignoring every key except
+  ``WIDGET_RENDERERS`` (an explicit ``AUTOREGISTER`` was dropped). Also
+  fix ``AUTOREGISTER``'s default failing to recognize viewflow when
+  installed via its explicit AppConfig path
+  (``"viewflow.apps.ViewflowConfig"``), which silently skipped
+  registering ``SiteMiddleware``.
+- Fix ``SiteMiddleware`` crashing with ``TypeError`` on a
+  ``TemplateResponse`` built with no explicit context, as soon as the
+  app injects any context data.
+- Fix ``viewflow.contrib.plotly``'s Dash endpoints (layout, dependencies,
+  update-component) having no authentication check, letting an
+  unauthenticated client read a dashboard's data and invoke its
+  callbacks with arbitrary input.
+- Fix ``ExportView`` (``contrib.import_export``) having no permission
+  check, letting a user denied the list view export the whole table
+  anyway.
+- Fix avatar upload accepting any file as an image, with no size limit.
+- Fix ``RedisLock``: its TTL is now renewed while the lock is held, and
+  releasing an already-expired lock no longer raises.
+- Fix cancelling a subprocess task raising ``FlowLockFailed`` when the
+  child flow uses ``CacheLock``.
+- Fix a synchronously-failing first node leaving an orphaned, task-less
+  process row behind when the flow is started with ``start.run()``.
+- Fix ``FlowChartView`` having no permission check on a standalone
+  ``FlowViewset``, letting an anonymous user view the flow and
+  per-process charts.
+- Fix task actions releasing their lock before the transaction commits,
+  letting a concurrent request double-execute the action under
+  ``CacheLock``.
+- Fix an N+1 query on the flow inbox and queue list pages.
+- Fix a nested form's full HTML rendering into an unused ``value``
+  attribute on its wrapper element.
+- Fix a form ``Row``/``Column`` layout with an uneven ``AUTO`` split
+  silently leaving a gap instead of raising an error.
+- Fix the autocomplete/dependent-select AJAX endpoints crashing with a
+  500 on a malformed ``field`` name.
+- Fix the autocomplete endpoint crashing with a 500 when the requested
+  field doesn't use an Ajax-aware widget.
+- Fix a dependent select's pre-filled value failing to cascade to
+  chained child selects when editing an existing record.
+- Fix the autocomplete and dependent-select fields showing stale
+  results when a slower request resolves after a newer one.
+- Fix the autocomplete field clearing an already-selected value when a
+  modifier key like Shift or Ctrl was pressed afterward.
+- Fix a form validation error permanently disabling Turbo navigation
+  for the rest of the session.
+- Fix form buttons staying disabled forever after a failed submit or
+  a Back navigation.
+- Fix the calendar dropping day 1 for Monday-first locales when the
+  month starts on a Sunday.
+- Fix the calendar skipping a month when navigating from a day that
+  doesn't exist in the next month, like Jan 31.
+- Remove the time field's clock icon, which opened a dialog that
+  never worked. Type the time directly instead.
+- Fix the list filter drawer leaking its listeners on every page
+  navigation.
+- Fix the profile avatar upload silently failing instead of showing
+  an error when no image was selected.
+- Fix ``flowexport --format`` silently writing an empty file for an
+  unknown format instead of raising an error.
+- Fix permission setup creating content types in the wrong database
+  in multi-database setups.
+- Fix a crash in an internal, currently-unused helper
+  (``parent_tasks_completed``).
+- Fix a join or split raising the wrong error when it can't cancel a
+  branch that already started.
+- Fix a rare crash when every branch feeding a join was cancelled
+  right before the join completed.
+- Fix a crash in an unreachable fallback path of the task revive
+  view.
+- Fix the process cancel confirmation messages showing a literal
+  ``{self.object.pk}`` instead of the process number.
+- Fix a user with object-level (not model-wide) view permission on a
+  process being wrongly denied access to its task detail pages.
+- Speed up the flow dashboard's process and task lists, which ran a
+  database query per row.
+- Add a system check warning when a flow has Join nodes but no real
+  lock, which can create duplicate join tasks under concurrency.
+- Speed up the process admin's participants column, which ran two
+  database queries per row.
+- Fix a stray ``$`` corrupting the first custom CSS class on
+  rendered icons.
+- Fix a plain-object flow's state reverting to its default after
+  being pickled and unpickled in a different process.
+- Fix deleting a ``CompositeKey`` row skipping cascades and always
+  overriding a model's own ``delete()`` method.
+- Fix list views linking a column whose name happens to be a
+  substring of the intended link column.
+- Fix the "Administration" menu entry showing to every logged-in
+  user instead of just staff.
+- Fix the formset field leaking its "add" button listener on every
+  Turbo navigation.
+- Fix list tables leaking their column-sort click listener on every
+  Turbo navigation.
+- Fix the modal trigger leaking its button click listener on every
+  disconnect.
+- Fix the date field stacking a new listener every time its calendar
+  dialog was reopened.
+- Fix the autocomplete field's Escape key throwing an error instead
+  of clearing the highlighted suggestion.
+- Fix the total field leaking its internal ``expression``/``round``
+  attributes onto the rendered input.
+- Fix list pagination leaking Turbo listeners on a failed page visit.
+- Fix ``manage.py check``/``runserver`` crashing when a Join-node flow
+  is defined outside any ``INSTALLED_APPS`` entry (e.g. a diagram-only
+  flow at the project root).
+
 2.3.1  2026-06-30
 -----------------
 

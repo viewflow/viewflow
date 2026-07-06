@@ -108,7 +108,9 @@ class DetailProcessView(generic.DetailView):
     def get_queryset(self):
         """Return the `QuerySet` that will be used to look up the process."""
         if self.queryset is None:
-            return self.flow_class.process_class._default_manager.all()
+            return self.flow_class.process_class._default_manager.filter(
+                flow_class=self.flow_class
+            )
         return self.queryset.all()
 
 

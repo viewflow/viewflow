@@ -6,6 +6,9 @@ export class VFormElement extends HTMLElement {
     setTimeout(() => {
       this.form = this.querySelector('form');
       this.form.addEventListener('submit', this.onSubmit);
+      document.addEventListener('turbo:submit-end', this.onSubmitEnd);
+      document.addEventListener('turbo:fetch-request-error', this.onSubmitEnd);
+      document.addEventListener('turbo:before-cache', this.onSubmitEnd);
       // Match all buttons (default type is submit) not just explicit type=submit
       this.form.querySelectorAll('button:not([type=button]):not([type=reset])').forEach(
           (button) => {
@@ -18,6 +21,9 @@ export class VFormElement extends HTMLElement {
 
   disconnectedCallback() {
     this.form.removeEventListener('submit', this.onSubmit);
+    document.removeEventListener('turbo:submit-end', this.onSubmitEnd);
+    document.removeEventListener('turbo:fetch-request-error', this.onSubmitEnd);
+    document.removeEventListener('turbo:before-cache', this.onSubmitEnd);
     this.form.querySelectorAll('button:not([type=button]):not([type=reset])').forEach(
         (button) => {
           button.removeEventListener('click', this.onButtonClick);
@@ -43,6 +49,16 @@ export class VFormElement extends HTMLElement {
     }
     this.querySelectorAll('button').forEach(
         (button) => button.disabled=true,
+    );
+  }
+
+  onSubmitEnd = () => {
+    // A failed fetch (e.g. offline) never produces a response for Turbo
+    // to replace the DOM with, and a page cached on turbo:before-cache
+    // for back/forward restore must not freeze with disabled buttons --
+    // re-enable in both cases, and once the submission itself completes.
+    this.querySelectorAll('button').forEach(
+        (button) => button.disabled=false,
     );
   }
 

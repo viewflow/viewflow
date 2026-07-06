@@ -19,6 +19,7 @@ from django.core.cache import cache
 from django.core.cache.utils import make_template_fragment_key
 from django.core.files.storage import default_storage
 from django.db import models
+from django.template.defaultfilters import filesizeformat
 from django.urls import path
 from django.utils.decorators import method_decorator
 from django.views import generic
@@ -27,6 +28,9 @@ from django.utils.translation import gettext_lazy as _
 # from viewflow.forms.widgets import TextInput, PasswordInput
 from viewflow.urls import Viewset
 from viewflow.utils import viewprop
+
+
+MAX_AVATAR_SIZE = 5 * 1024 * 1024  # 5 MB
 
 
 class AuthenticationForm(auth_forms.AuthenticationForm):
@@ -68,16 +72,29 @@ class ProfileView(generic.DetailView):
 
     def post(self, request, *args, **kwargs):
         class AvatarForm(forms.Form):
-            avatar = forms.FileField(required=True)
+            avatar = forms.ImageField(required=True)
+
+            def clean_avatar(self):
+                avatar = self.cleaned_data["avatar"]
+                if avatar.size > MAX_AVATAR_SIZE:
+                    raise forms.ValidationError(
+                        _(
+                            "Avatar file is too large (%(size)s). "
+                            "Max size is %(max_size)s."
+                        )
+                        % {
+                            "size": filesizeformat(avatar.size),
+                            "max_size": filesizeformat(MAX_AVATAR_SIZE),
+                        }
+                    )
+                return avatar
 
         form = AvatarForm(request.POST, request.FILES)
         if form.is_valid():
             file_name = "avatars/{}.png".format(request.user.pk)
             if default_storage.exists(file_name):
                 default_storage.delete(file_name)
-            default_storage.save(
-                file_name, form.cleaned_data["avatar"], max_length=512 * 1024
-            )
+            default_storage.save(file_name, form.cleaned_data["avatar"])
             key = make_template_fragment_key(
                 "django-viewflow-avatar", [request.user.pk]
             )

@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils.timezone import now
 
 from viewflow import this
@@ -29,15 +30,16 @@ class StartActivation(mixins.NextNodeActivationMixin, Activation):
     @Activation.status.transition(source=STATUS.NEW)
     def execute(self):
         task_started.send(sender=self.flow_class, process=self.process, task=self.task)
-        self.process.save()
-        with self.flow_class.lock(self.process.pk):
-            self.complete()
-            flow_started.send(
-                sender=self.flow_class,
-                process=self.process,
-                task=self.task,
-            )
-            self.activate_next()
+        with transaction.atomic():
+            self.process.save()
+            with self.flow_class.lock(self.process.pk):
+                self.complete()
+                flow_started.send(
+                    sender=self.flow_class,
+                    process=self.process,
+                    task=self.task,
+                )
+                self.activate_next()
 
 
 class StartHandleActivation(StartActivation):

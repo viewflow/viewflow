@@ -59,7 +59,7 @@ class Command(BaseCommand):
                 chart.calc_cell_status(flow_class, grid, process_pk)
             result = chart.grid_to_bpmn(grid)
         else:
-            CommandError("Unknown output format {}".format(output_format))
+            raise CommandError("Unknown output format {}".format(output_format))
 
         filename = options.get("output")
         if filename:

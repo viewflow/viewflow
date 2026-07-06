@@ -37,7 +37,14 @@ const Calendar = (props) => {
 
     setState((state) => { return {...state, year: currentYear, month: currentMonth}});
     if (getState().selected) {
-      changeDay(getState().selected.getDate());
+      // Clamp to the new month's last valid day -- otherwise a day that
+      // doesn't exist in the new month (e.g. 31 navigating Jan -> Feb)
+      // rolls over into the *following* month via the Date constructor.
+      const day = Math.min(
+          getState().selected.getDate(),
+          VFDateUtils.daysInMonth(currentYear, currentMonth),
+      );
+      changeDay(day);
     }
   };
 
@@ -66,7 +73,10 @@ const Calendar = (props) => {
   };
 
   const monthDays = (props) => {
-    const startPos = new Date(getState().year, getState().month, 1).getDay() - VFDateUtils.firstDayOfWeek;
+    // Wrap into [0, 6]: getDay() can be smaller than firstDayOfWeek (e.g.
+    // Sunday=0 with a Monday-first locale), which would otherwise go
+    // negative and push day 1 out of the grid entirely.
+    const startPos = (new Date(getState().year, getState().month, 1).getDay() - VFDateUtils.firstDayOfWeek + 7) % 7;
     const daysInMonth = VFDateUtils.daysInMonth(getState().year, getState().month);
 
     return [0, 1, 2, 3, 4, 5].map((week) => {

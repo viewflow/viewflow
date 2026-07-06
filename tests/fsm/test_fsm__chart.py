@@ -34,6 +34,49 @@ class Test(TestCase):
         self.assertEqual(output.strip(), expected_output.strip())
 
 
+class NoTargetFlow:
+    # A "self-transition" that runs a side-effecting function without
+    # changing state -- target is left at its DEFAULT sentinel, not None.
+    state = fsm.State(states=["A", "B"])
+
+    @state.transition(source="A", target="B")
+    def advance(self):
+        pass
+
+    @state.transition(source="A")
+    def touch(self):
+        pass
+
+
+class TestNoTargetTransition(TestCase):
+    def test_no_target_transition_does_not_draw_a_default_vertex(self):
+        # BUG: chart() tested `transition.target is None`, but the runtime's
+        # actual "no target / unchanged" sentinel is the DEFAULT marker, not
+        # None. A transition left with no explicit target (the DEFAULT
+        # marker) was therefore drawn as a real "DEFAULT" vertex/edge.
+        output = fsm.chart(NoTargetFlow.state)
+
+        self.assertNotIn("DEFAULT", output)
+        self.assertIn('"A" [label="A"];', output)
+        self.assertIn('"B" [label="B"];', output)
+        self.assertIn('"A" -> "B" [label="Advance"];', output)
+
+    def test_explicit_none_target_is_rejected(self):
+        # The runtime treats an explicit `target=None` as "set state to
+        # None" (state.set(instance, None) runs, since None is not the
+        # DEFAULT sentinel), while chart() used to silently drop it as if
+        # it were "no target". That disagreement is exactly what produced
+        # the DEFAULT-vertex bug above. `target=None` is ambiguous with
+        # "no target" (the DEFAULT sentinel) is spelled by simply omitting
+        # `target`, so reject the explicit None outright.
+        state = fsm.State(states=["A", "B"])
+
+        with self.assertRaises(ValueError):
+
+            class _Flow:
+                state.transition(source="A", target=None)(lambda self: None)
+
+
 class Stage(Enum):
     NEW = "new"
     PUBLISHED = "published"

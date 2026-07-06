@@ -35,9 +35,8 @@ def create_permissions(
     ctypes = set()  # The codenames and ctypes that should exist.
 
     for klass in app_config.get_models():
-        # ctype = ContentType.objects.db_manager(using).get_for_model(klass)
         opts = klass._meta
-        ctype, _ = ContentType.objects.get_or_create(
+        ctype, _ = ContentType.objects.db_manager(using).get_or_create(
             app_label=opts.app_label, model=opts.object_name.lower()
         )
         ctypes.add(ctype)

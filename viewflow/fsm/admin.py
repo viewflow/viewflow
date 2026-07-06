@@ -48,11 +48,12 @@ class FlowAdminMixin(object):
         object. Override this function if your flow class does not have a
         constructor that accepts the model object as the only argument.
         """
+        owner = self.get_flow_state(request)._owner
         try:
-            return self.get_flow_state()._owner(obj)
+            return owner(obj)
         except TypeError:
             raise ValueError(
-                f"{self.flow_state._owner} does not have a constructor that accepts"
+                f"{owner} does not have a constructor that accepts"
                 " a single argument. Please redefine 'get_object_flow' on the model"
                 " admin."
             )

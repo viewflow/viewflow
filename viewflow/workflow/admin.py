@@ -1,4 +1,5 @@
 from django.contrib import admin, auth
+from django.db.models import Prefetch
 from .models import Process, Task
 
 
@@ -36,15 +37,27 @@ class ProcessAdmin(admin.ModelAdmin):
         """Disable manually process creation."""
         return False
 
+    def get_queryset(self, request):
+        """Prefetch each process's owned tasks once for the whole changelist,
+        instead of participants() querying per row."""
+        queryset = super().get_queryset(request)
+        return queryset.prefetch_related(
+            Prefetch(
+                "task_set",
+                queryset=Task._default_manager.exclude(
+                    owner__isnull=True
+                ).select_related("owner"),
+                to_attr="_participant_tasks",
+            )
+        )
+
     def participants(self, obj):
         """List of users performed tasks on the process."""
-        user_ids = obj.task_set.exclude(owner__isnull=True).values("owner")
-        USER_MODEL = auth.get_user_model()
-        username_field = USER_MODEL.USERNAME_FIELD
-        users = USER_MODEL._default_manager.filter(pk__in=user_ids).values_list(
-            username_field
-        )
-        return ", ".join(user[0] for user in users)
+        username_field = auth.get_user_model().USERNAME_FIELD
+        usernames = {
+            getattr(task.owner, username_field) for task in obj._participant_tasks
+        }
+        return ", ".join(sorted(usernames))
 
 
 @admin.register(Task)

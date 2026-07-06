@@ -30,8 +30,21 @@ class AbstractJobActivation(mixins.NextNodeActivationMixin, Activation):
         task.previous.add(prev_activation.task)
         return cls(task)
 
-    @Activation.status.transition(source=STATUS.SCHEDULED, target=STATUS.STARTED)
+    def prepare_revived_task(self, task):
+        # create() assigns every job task its own external_task_id; the
+        # revived copy needs a fresh one too, or activate() schedules the
+        # celery message under an id the task row doesn't know and
+        # cancel()'s broker revoke targets nothing.
+        task.external_task_id = str(uuid.uuid4())
+
+    @Activation.status.transition(
+        source=[STATUS.SCHEDULED, STATUS.STARTED], target=STATUS.STARTED
+    )
     def start(self):
+        # STARTED is an allowed source so a redelivered task -- a celery retry
+        # (self.retry()/autoretry) or an at-least-once redelivery -- can re-enter
+        # from STARTED instead of hitting TransitionNotAllowed. The process lock
+        # in ActivationManager serialises concurrent deliveries.
         self.task.started = timezone.now()
         self.task.save()
 

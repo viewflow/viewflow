@@ -2,8 +2,9 @@ from django.urls import path, reverse
 from django.test import TestCase, override_settings
 
 from viewflow import this
-from viewflow.workflow import flow, STATUS
+from viewflow.workflow import flow, PROCESS, STATUS
 from viewflow.workflow.flow import views
+from viewflow.workflow.models import Process
 
 
 @override_settings(ROOT_URLCONF=__name__)
@@ -69,3 +70,31 @@ class TestWorkflow(flow.Flow):  # noqa: D101
 urlpatterns = [
     path('', TestWorkflow.instance.urls)
 ]
+
+
+def _boom(activation):
+    raise ValueError("boom")
+
+
+class TestOrphanProcessFlow(flow.Flow):
+    start = flow.StartHandle().Next(this.fail_func)
+    fail_func = flow.Function(_boom).Next(this.end)
+    end = flow.End()
+
+
+class TestStartOrphanProcessOnFailure(TestCase):
+    def test_synchronously_failing_first_node_does_not_orphan_the_process(self):
+        # process.save() in StartActivation.execute() ran before the
+        # lock/atomic block, committing in autocommit while task creation
+        # (complete() + activate_next(), inside the lock's transaction)
+        # wasn't. start.run() is called with no enclosing transaction, so
+        # a synchronously-failing first node left the process row behind
+        # as PROCESS.NEW with zero tasks.
+        with self.assertRaises(ValueError):
+            TestOrphanProcessFlow.start.run()
+
+        self.assertEqual(
+            Process.objects.filter(flow_class=TestOrphanProcessFlow).count(),
+            0,
+            "the process row must not survive a rolled-back start",
+        )

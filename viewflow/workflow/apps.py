@@ -9,3 +9,6 @@ class WorkflowConfig(AppConfig):
     name = "viewflow.workflow"
     label = "viewflow"  # keep backward compatible with 1.x
     verbose_name = _("Workflow")
+
+    def ready(self):
+        from . import checks  # noqa: F401 -- registers system checks

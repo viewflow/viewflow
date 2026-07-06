@@ -42,7 +42,7 @@ class Admin(AppMenuMixin, Application):
         self.admin_site = admin_site or admin.site
         super().__init__(**kwargs)
 
-    def has_perm(self, user):
+    def has_view_permission(self, user, obj=None):
         return user.is_staff
 
     @property

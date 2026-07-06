@@ -1,9 +1,18 @@
 import html5lib
 from io import BytesIO
+from PIL import Image
 from django.contrib.auth.models import User
+from django.core.files.storage import default_storage
 from django.test import TestCase, RequestFactory, tag, override_settings
 from django.urls import path
 from viewflow.contrib import auth
+
+
+def _png_bytes(size=(10, 10)):
+    buf = BytesIO()
+    Image.new("RGB", size, color="red").save(buf, format="PNG")
+    buf.seek(0)
+    return buf
 
 
 @override_settings(ROOT_URLCONF=__name__)
@@ -15,7 +24,7 @@ class Test(TestCase):
 
     @tag("integration")
     def test_change_user_avatar(self):
-        img = BytesIO(b"my_binary_data")
+        img = _png_bytes()
         img.name = "avatar.png"
 
         request = RequestFactory().post("/", {"avatar": img})
@@ -23,10 +32,59 @@ class Test(TestCase):
 
         view = auth.ProfileView()
         view.setup(request)
+        try:
+            response = view.post(request)
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("/media/avatars/", auth.get_user_avatar_url(self.admin))
+        finally:
+            default_storage.delete("avatars/{}.png".format(self.admin.pk))
 
-        response = view.post(request)
-        self.assertEqual(response.status_code, 200)
-        self.assertIn("/media/avatars/", auth.get_user_avatar_url(self.admin))
+    @tag("integration")
+    def test_avatar_upload_rejects_non_image_content(self):
+        # AvatarForm used forms.FileField (not ImageField), so it never
+        # validated the upload is actually an image, and
+        # default_storage.save's max_length kwarg limits the *filename*
+        # length, not the file's byte size -- so arbitrary non-image
+        # content of any size could be stored as avatars/<pk>.png.
+        fake_avatar = BytesIO(b"not actually an image, just some bytes")
+        fake_avatar.name = "avatar.png"
+
+        request = RequestFactory().post("/", {"avatar": fake_avatar})
+        request.user = self.user
+
+        view = auth.ProfileView()
+        view.setup(request)
+        file_name = "avatars/{}.png".format(self.user.pk)
+        try:
+            response = view.post(request)
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(default_storage.exists(file_name))
+        finally:
+            if default_storage.exists(file_name):
+                default_storage.delete(file_name)
+
+    @tag("integration")
+    def test_avatar_upload_rejects_oversized_image(self):
+        # Regression guard for the size-limit half of the fix: even a
+        # genuinely valid image is rejected once it exceeds the cap.
+        oversized = BytesIO()
+        Image.new("RGB", (2000, 2000)).save(oversized, format="BMP")
+        oversized.seek(0)
+        oversized.name = "avatar.png"
+
+        request = RequestFactory().post("/", {"avatar": oversized})
+        request.user = self.user
+
+        view = auth.ProfileView()
+        view.setup(request)
+        file_name = "avatars/{}.png".format(self.user.pk)
+        try:
+            response = view.post(request)
+            self.assertEqual(response.status_code, 200)
+            self.assertFalse(default_storage.exists(file_name))
+        finally:
+            if default_storage.exists(file_name):
+                default_storage.delete(file_name)
 
     @tag("integration")
     def test_get_default_user_avatar_url(self):

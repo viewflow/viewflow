@@ -208,8 +208,8 @@ class TransitionBoundMethod:
         """Check is transition available."""
         current_state = self._state.get(self._instance)
         transition = self._descriptor.get_transition(current_state)
-        if transition and check_conditions:
-            return transition.conditions_met(self._instance)
+        if transition:
+            return transition.conditions_met(self._instance) if check_conditions else True
         return False
 
     def has_perm(self, user: UserModel) -> bool:
@@ -253,7 +253,7 @@ class TransitionDescriptor:
     def __get__(
         self, instance: object, owner: Optional[Type[object]] = None
     ) -> TransitionMethod | TransitionBoundMethod:
-        if instance:
+        if instance is not None:
             return TransitionBoundMethod(self._state, self._func, self, instance)
         else:
             assert owner is not None  # make mypy happy
@@ -287,7 +287,7 @@ class SuperTransitionDescriptor:
     def __get__(
         self, instance: object, owner: Optional[Type[object]] = None
     ) -> TransitionBoundMethod | TransitionMethod:
-        if instance:
+        if instance is not None:
             return TransitionBoundMethod(
                 self._state,
                 self._func,
@@ -370,9 +370,13 @@ class State:
         self._setter = None
         self._getter = None
         self._on_success = None
+        self._name: Optional[str] = None
+
+    def __set_name__(self, owner: Type[object], name: str) -> None:
+        self._name = name
 
     def __get__(self, instance: object, owner: Optional[Type[object]] = None) -> Any:
-        if instance:
+        if instance is not None:
             return self.get(instance)
         assert owner is not None  # make mypy happy
         return StateDescriptor(self, owner)
@@ -385,7 +389,7 @@ class State:
         if self._getter:
             value = self._getter(instance)
             if self._default:
-                return value if value else self._default
+                return self._default if value is None or value == "" else value
             else:
                 return value
         return getattr(instance, self.propname, self._default)
@@ -411,7 +415,7 @@ class State:
     @property
     def propname(self) -> str:
         """State storage attribute."""
-        return "__fsm{}".format(id(self))
+        return "__fsm_{}".format(self._name)
 
     def transition(
         self,
@@ -423,6 +427,11 @@ class State:
         custom: Optional[Dict] = None,
     ) -> Any:
         """Decorator to mark a method as a state transition."""
+        if target is None:
+            raise ValueError(
+                "target=None is ambiguous with 'no target'. Omit the target"
+                " argument entirely for a transition that doesn't change state."
+            )
 
         def _wrapper(func: Any) -> Any:
             if isinstance(func, TransitionDescriptor):

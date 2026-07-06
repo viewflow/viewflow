@@ -28,6 +28,12 @@ export class VListPagination extends HTMLElement {
     if (this._prevPageEl) {
       this._prevPageEl.removeEventListener('click', this.onClick);
     }
+    // onClick's document-level turbo:load/turbo:before-render listeners
+    // are otherwise only removed inside onTurboLoad -- a failed visit
+    // never fires turbo:load, leaking them past this element's own
+    // lifetime.
+    document.removeEventListener('turbo:load', this.onTurboLoad);
+    document.removeEventListener('turbo:before-render', this.onBeforeRender);
   }
 
   onClick = (event) => {
@@ -61,6 +67,9 @@ export class VListPagination extends HTMLElement {
   }
 
   onBeforeRender = (event) => {
-    event.detail.newBody.querySelector('vf-list').classList.add('vf-list--paginated');
+    const newList = event.detail.newBody.querySelector('vf-list');
+    if (newList) {
+      newList.classList.add('vf-list--paginated');
+    }
   }
 }

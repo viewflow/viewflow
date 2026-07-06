@@ -20,7 +20,8 @@ export class VPageProfileAvatar extends HTMLElement {
 
     const files = event.target.files;
     if (files.length === 0 || files[0].type.indexOf('image') === -1) {
-      this.showError('No images selected');
+      this._showError('No images selected');
+      return;
     }
 
     const reader = new FileReader();

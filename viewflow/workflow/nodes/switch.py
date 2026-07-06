@@ -17,7 +17,7 @@ class SwitchActivation(Activation):
 
     @Activation.status.super()
     def activate(self):
-        with transaction.atomic(savepoint=True), self.exception_guard():
+        with self.exception_guard(), transaction.atomic(savepoint=True):
             for node, cond in self.flow_task._branches:
                 if cond:
                     if cond(self):

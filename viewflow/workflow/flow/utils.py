@@ -34,7 +34,7 @@ def wrap_task_view(self, origin_view, permission=None):
 
         try:
             if request.method == "POST":
-                with transaction.atomic(), self.flow_class.lock(process_pk):
+                with self.flow_class.lock(process_pk), transaction.atomic():
                     return call_with_activation()
             else:
                 return call_with_activation()

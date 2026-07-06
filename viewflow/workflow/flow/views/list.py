@@ -41,7 +41,7 @@ class FlowInboxListView(
     @viewprop
     def queryset(self):
         """List of tasks assigned to the current user."""
-        queryset = self.model._default_manager.all()
+        queryset = self.model._default_manager.all().select_related("process")
 
         return queryset.filter(
             process__flow_class=self.flow_class,
@@ -81,7 +81,7 @@ class FlowQueueListView(
     @viewprop
     def queryset(self):
         """List of tasks available to the current user."""
-        queryset = self.model._default_manager.all()
+        queryset = self.model._default_manager.all().select_related("process")
 
         return (
             queryset.user_queue(self.request.user, flow_class=self.flow_class)

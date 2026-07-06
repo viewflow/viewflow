@@ -45,6 +45,13 @@ class DetailModelView(generic.DetailView):
             actions = self.page_actions + actions
         return actions
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if self.viewset is not None and hasattr(self.viewset, "get_flow_state"):
+            from viewflow.fsm.chart import chart
+            context["flow_chart"] = chart(self.viewset.get_flow_state(self.request))
+        return context
+
     def get_object_actions(self, *actions):
         if self.viewset:
             actions = (

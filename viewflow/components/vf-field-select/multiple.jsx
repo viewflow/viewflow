@@ -2,9 +2,10 @@
 
 import {onCleanup, createEffect} from 'solid-js';
 import {customElement} from 'solid-element';
-import {select, list} from 'material-components-web';
+import {select} from 'material-components-web';
 import cc from 'classcat';
 
+import {toggleSelection} from './toggle_selection.js';
 import './index.scss';
 
 
@@ -14,21 +15,7 @@ class MDCSelectFoundation extends select.MDCSelectFoundation {
   }
 
   toggleSelectedIndex(index, closeMenu = false, skipNotify = false) {
-    let currentSelection = this.adapter.getSelectedIndex();
-    if (currentSelection===undefined) {
-      currentSelection = [];
-    } else if (typeof currentSelection === 'number') {
-      currentSelection = [currentSelection];
-    }
-
-    if (currentSelection.includes(index)) {
-      currentSelection.splice(currentSelection.indexOf(index), 1);
-      currentSelection.splice(currentSelection.indexOf(index), 1);
-    } else {
-      currentSelection.push(index);
-    }
-
-    currentSelection.sort();
+    const currentSelection = toggleSelection(this.adapter.getSelectedIndex(), index);
     this.adapter.setSelectedIndex(currentSelection);
 
     const selectedItemsText = [];
@@ -69,12 +56,48 @@ class MDCSelect extends select.MDCSelect {
     super.menuSetup(menuFactory);
     this.menu.singleSelection = false;
     this.menu.list.initializeListType();
+    // MDCListFoundation.handleClick/handleKeydown call setSelectedIndexOnAction
+    // (toggling the checkbox and this.selectedIndex directly) *and*
+    // unconditionally call adapter.notifyAction(), which is what drives our
+    // own toggleSelectedIndex() below via handleItemAction/notifySelected.
+    // With isSelectableList() left at its default (true, since this is a
+    // checkbox list), a single click/keypress toggles the same shared
+    // selection array twice through two independent code paths, corrupting
+    // it. Our handleItemAction below is the sole intended authority for
+    // toggling, so disable the list's own native toggle while keeping
+    // notifyAction (and therefore our path) intact.
+    this.menu.list.foundation.isSelectableList = () => false;
     this.menu.foundation.handleItemAction = function(listItem) {
       const index = this.adapter.getElementIndex(listItem);
       if (index < 0) {
         return;
       }
       this.adapter.notifySelected({index: index});
+    };
+
+    // setSelectedIndex(-1) needs to be a no-op for *this* component's
+    // own list (avoids an error on an empty select multiple), but
+    // patching it on the shared MDCListFoundation.prototype applied
+    // app-wide and broke every other list-backed component that relies
+    // on -1 to legitimately clear a selection -- e.g. autocomplete's
+    // Escape-to-deselect. Override it on this list's own foundation
+    // instance instead, leaving the shared prototype untouched.
+    this.menu.list.foundation.setSelectedIndex = function(index, options = {}) {
+      if (!this.isIndexValid(index, false) || index == -1) {
+        return;
+      }
+
+      if (typeof index === 'number') {
+        index = [index];
+      }
+
+      if (this.isCheckboxList) {
+        this.setCheckboxAtIndex(index, options);
+      } else if (this.isRadioList) {
+        this.setRadioAtIndex(index, options);
+      } else {
+        this.setSingleSelectionAtIndex(index, options);
+      }
     };
   }
 
@@ -96,27 +119,6 @@ class MDCSelect extends select.MDCSelect {
     return new MDCSelectFoundation(adapter, this.getFoundationMap());
   }
 }
-
-list.MDCListFoundation.prototype.setSelectedIndex = function(index, options) {
-  if (options === void 0) {
-    options = {};
-  }
-  if (!this.isIndexValid(index, false) || index == -1) { // fix to avoid error on empty select multiple
-    return;
-  }
-
-  if (typeof index === 'number') {
-    index = [index];
-  }
-
-  if (this.isCheckboxList) {
-    this.setCheckboxAtIndex(index, options);
-  } else if (this.isRadioList) {
-    this.setRadioAtIndex(index, options);
-  } else {
-    this.setSingleSelectionAtIndex(index, options);
-  }
-};
 
 const defaultProps = {
   'disabled': false,

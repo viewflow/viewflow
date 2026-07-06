@@ -1,3 +1,4 @@
+from django.core.exceptions import PermissionDenied
 from django.views.decorators.http import last_modified
 from django.http import HttpResponse
 from django.utils import timezone
@@ -13,6 +14,11 @@ class FlowChartView(generic.View):
     """Flow and Process chart View."""
 
     flow_class = None
+
+    def dispatch(self, request, *args, **kwargs):
+        if not self.flow_class.instance.has_view_permission(request.user):
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
 
     @method_decorator(
         last_modified(

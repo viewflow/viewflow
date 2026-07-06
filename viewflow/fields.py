@@ -11,8 +11,8 @@ import json
 import uuid
 from typing import List
 from django.db import DEFAULT_DB_ALIAS, models, router
-from django.db.models import signals
-from django.db.models.sql.where import WhereNode, AND
+from django.db.models.deletion import Collector
+from django.db.models.sql.where import WhereNode, AND, OR
 from django.utils.duration import duration_iso_string
 from django.utils.functional import Promise
 from django.utils.timezone import is_aware
@@ -47,17 +47,17 @@ class CompositeKey(models.AutoField):
         def delete(inst, using=None, keep_parents=False):
             using = using or router.db_for_write(self.model, instance=inst)
 
-            signals.pre_delete.send(sender=cls, instance=inst, using=using)
-
-            query = cls._default_manager.filter(**self.__get__(inst))
-            query._raw_delete(using)
+            collector = Collector(using=using, origin=inst)
+            collector.collect([inst], keep_parents=keep_parents)
+            result = collector.delete()
 
             for column in self.columns:
                 setattr(inst, column, None)
 
-            signals.post_delete.send(sender=cls, instance=inst, using=using)
+            return result
 
-        cls.delete = delete
+        if cls.delete is models.Model.delete:
+            cls.delete = delete
 
     def get_prep_value(self, value):
         return self.to_python(value)
@@ -138,3 +138,37 @@ class Exact(models.Lookup):
         for lookup in lookups:
             value_constraint.add(lookup, AND)
         return value_constraint.as_sql(compiler, connection)
+
+
+@CompositeKey.register_lookup
+class In(models.Lookup):
+    """Supports ``pk__in=[...]``, notably the deletion `Collector`'s own
+    batch-delete query, which filters by ``<pk_attname>__in`` directly."""
+
+    lookup_name = "in"
+
+    def get_prep_lookup(self):
+        # The base Lookup.get_prep_lookup() would call
+        # output_field.get_prep_value() on the whole rhs list at once --
+        # CompositeKey.get_prep_value() expects a single key. Each key is
+        # prepared individually, per-field, in as_sql() instead.
+        return self.rhs
+
+    def as_sql(self, compiler, connection):
+        fields = [
+            self.lhs.field.model._meta.get_field(column)
+            for column in self.lhs.field.columns
+        ]
+        lookup_classes = [field.get_lookup("exact") for field in fields]
+
+        keys_constraint = WhereNode(connector=OR)
+        for key in self.rhs:
+            key_constraint = WhereNode()
+            for lookup_class, field, column in zip(
+                lookup_classes, fields, self.lhs.field.columns
+            ):
+                key_constraint.add(
+                    lookup_class(field.get_col(self.lhs.alias), key[column]), AND
+                )
+            keys_constraint.add(key_constraint, OR)
+        return keys_constraint.as_sql(compiler, connection)

@@ -4,49 +4,61 @@
 # This work is licensed under the Commercial license defined in file
 # 'COMM_LICENSE', which is part of this source code package.
 
-from django.db.models.query import QuerySet
-from rest_framework.views import APIView
-from rest_framework.response import Response
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.utils.decorators import method_decorator
+from django.views import generic
+
+from viewflow.views.detail import DetailModelView
+
+from .chart import chart
 
 
-class FlowGraphView(APIView):
-    flow_state_field = None
-    lookup_field = "pk"
-    lookup_url_kwarg = None
-    queryset = None
+@method_decorator(login_required, name="dispatch")
+class FSMChartView(generic.TemplateView):
+    """Render the state machine diagram for a `FlowViewsMixin` viewset."""
 
-    def get_queryset(self):
-        if self.queryset:
-            queryset = self.queryset
-            if isinstance(queryset, QuerySet):
-                # Ensure queryset is re-evaluated on each request.
-                queryset = queryset.all()
-            return queryset
+    template_name = "viewflow/views/fsm_chart.html"
+    viewset = None
+    flow_state = None
 
-    def get_object(self):
-        queryset = self.get_queryset()
-        if queryset is None:
-            return
+    def get_flow_state(self):
+        if self.viewset is not None:
+            return self.viewset.get_flow_state(self.request)
+        return self.flow_state
 
-        lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
-        if lookup_url_kwarg not in self.kwargs:
-            return
+    def has_view_permission(self, user):
+        if self.viewset is not None and hasattr(self.viewset, "has_view_permission"):
+            return self.viewset.has_view_permission(user)
+        return True
 
-        obj = queryset.filter(
-            **{self.lookup_field: self.kwargs[lookup_url_kwarg]}
-        ).first()
-        if not obj:
-            return
+    def get(self, request, *args, **kwargs):
+        if not self.has_view_permission(request.user):
+            raise PermissionDenied
+        return super().get(request, *args, **kwargs)
 
-        self.check_object_permissions(self.request, obj)
-        return obj
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["flow_chart"] = chart(self.get_flow_state())
+        return context
 
-    def get_flow_graph(self, obj=None):
-        raise NotImplementedError("Subclasses must implement `get_flow_graph` method.")
 
-    def get(self, request, format=None):
-        obj = self.get_object()
-        flow = self.get_flow(obj)
-        completed_states = self.get_completed_states(flow, obj)
-        graph = self.get_get_flow_graph(completed_states)
-        return Response(graph.to_json())
+class FSMDetailModelView(DetailModelView):
+    """Detail view that includes the FSM flow chart in the context."""
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        if hasattr(self.viewset, "get_flow_state"):
+            context["flow_chart"] = chart(self.viewset.get_flow_state(self.request))
+        return context
+
+    def get_template_names(self):
+        if self.template_name is None:
+            opts = self.model._meta
+            return [
+                "{}/{}{}.html".format(
+                    opts.app_label, opts.model_name, self.template_name_suffix
+                ),
+                "viewflow/fsm/detail.html",
+            ]
+        return [self.template_name]

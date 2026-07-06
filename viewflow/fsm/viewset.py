@@ -18,6 +18,7 @@ from viewflow.forms import ModelForm
 
 
 from .base import State, TransitionBoundMethod
+from .views import FSMChartView, FSMDetailModelView
 
 
 class ModelTransitionView(UpdateModelView):
@@ -94,6 +95,7 @@ class ModelTransitionView(UpdateModelView):
 class FlowViewsMixin(metaclass=ViewsetMeta):
     flow_state = None
     transition_view_class = ModelTransitionView
+    detail_view_class = FSMDetailModelView
 
     def get_flow_state(self, request) -> State:
         if self.flow_state is None:
@@ -101,17 +103,25 @@ class FlowViewsMixin(metaclass=ViewsetMeta):
         return self.flow_state
 
     def get_object_flow(self, request, obj):
+        owner = self.get_flow_state(request)._owner
         try:
-            return self.get_flow_state()._owner(obj)
+            return owner(obj)
         except TypeError:
             raise ValueError(
                 "%s has no constructor with single argument. Please "
                 "redefine .get_object_flow(self, request, obj) on the "
-                "viewset" % self.flow_state._owner
+                "viewset" % owner
             )
 
     def get_transition_fields(self, request, obj, slug):
         return []
+
+    def get_list_page_actions(self, request, *actions):
+        chart_action = Action(
+            name=_("State chart"),
+            url=self.reverse("chart"),
+        )
+        return super().get_list_page_actions(request, chart_action, *actions)
 
     def get_detail_page_object_actions(self, request, obj, *actions):
         state = self.get_flow_state(request)
@@ -155,8 +165,29 @@ class FlowViewsMixin(metaclass=ViewsetMeta):
     def transition_view(self):
         return self.transition_view_class.as_view(**self.get_transition_view_kwargs())
 
+    """
+    State chart view
+    """
+
+    chart_view_class = FSMChartView
+
+    def get_chart_view_kwargs(self, **kwargs):
+        view_kwargs = {**self.chart_view_kwargs, **kwargs}
+        return self.filter_kwargs(self.chart_view_class, **view_kwargs)
+
+    @viewprop
+    def chart_view_kwargs(self):
+        return {}
+
+    @viewprop
+    def chart_view(self):
+        return self.chart_view_class.as_view(**self.get_chart_view_kwargs())
+
     def _get_urls(self):
         urlpatterns = super()._get_urls()
+        urlpatterns.append(
+            path("chart/", self.chart_view, name="chart")
+        )
         urlpatterns.append(
             path(
                 "<path:pk>/transition/<slug:slug>/",

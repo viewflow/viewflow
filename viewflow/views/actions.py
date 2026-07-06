@@ -5,13 +5,18 @@
 # LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
 # which is part of this source code package.
 
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.db import router
 from django.db.models.deletion import Collector
-from django.contrib import messages
 from django.http import HttpResponseRedirect
+from django.utils.decorators import method_decorator
 from django.utils.functional import cached_property
 from django.views import generic
 from django.views.generic.list import MultipleObjectMixin
+
+from viewflow.utils import has_object_perm
 from .base import BulkActionForm
 from .list import FilterableViewMixin
 
@@ -86,9 +91,21 @@ class BaseBulkActionView(FilterableViewMixin, MultipleObjectMixin, generic.FormV
             return self.form_invalid(self.form)
 
 
+@method_decorator(login_required, name="dispatch")
 class DeleteBulkActionView(BaseBulkActionView):
     template_name = "viewflow/views/delete_action.html"
     template_name_suffix = "_delete_action"
+
+    def has_delete_permission(self, request):
+        if self.viewset is not None:
+            return self.viewset.has_delete_permission(request.user)
+        else:
+            return has_object_perm(request.user, "delete", self.model)
+
+    def post(self, request, *args, **kwargs):
+        if not self.has_delete_permission(request):
+            raise PermissionDenied
+        return super().post(request, *args, **kwargs)
 
     def get_deleted_objects(self, query):
         collector = Collector(using=router.db_for_write(self.model))

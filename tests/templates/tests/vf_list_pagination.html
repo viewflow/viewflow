@@ -1,0 +1,18 @@
+{% extends 'viewflow/base_page.html' %}
+
+{% block content %}
+<vf-list class="vf-list--paginated">
+  <table>
+    <thead>
+      <tr><th>Name</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Row</td></tr>
+    </tbody>
+  </table>
+</vf-list>
+<vf-list-pagination id="the-pagination" data-list-page-param="page" data-list-page-has-next="1">
+  <a class="vf-list__pagination-item--prev" data-page="1" href="?page=1">Prev</a>
+  <a class="vf-list__pagination-item--next" data-page="3" href="?page=3">Next</a>
+</vf-list-pagination>
+{% endblock %}

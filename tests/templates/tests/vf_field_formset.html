@@ -1,0 +1,17 @@
+{% extends 'viewflow/base_page.html' %}
+
+{% block content %}
+<form>
+  <vf-field-formset name="items" id="the-formset">
+    <input type="hidden" name="formset-items-TOTAL_FORMS" value="0">
+    <input type="hidden" name="formset-items-INITIAL_FORMS" value="0">
+    <input type="hidden" name="formset-items-MIN_NUM_FORMS" value="0">
+    <input type="hidden" name="formset-items-MAX_NUM_FORMS" value="10">
+    <div class="vf-form__formset-forms"></div>
+    <script type="form-template">
+      <div>__prefix__</div>
+    </script>
+    <button class="vf-from__formset-button" type="button">Add</button>
+  </vf-field-formset>
+</form>
+{% endblock %}

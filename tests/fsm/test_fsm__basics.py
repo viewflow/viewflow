@@ -31,6 +31,21 @@ class Publication(object):  # noqa:D100
     def hide(self):
         pass
 
+    @state.transition(
+        source=ReviewState.NEW,
+        target=ReviewState.APPROVED,
+        conditions=[lambda instance: False],
+    )
+    def approve(self):
+        pass
+
+
+class FalsyPublication(Publication):  # noqa:D100
+    # A container-like instance that is falsy (len(self) == 0) but not
+    # None. The descriptors must still treat it as a real instance.
+    def __len__(self):
+        return 0
+
 
 # REST
 # Admin
@@ -69,6 +84,7 @@ class Test(TestCase):  # noqa:D100
                 (ReviewState.NEW, ReviewState.PUBLISHED),
                 (ReviewState.PUBLISHED, ReviewState.HIDDEN),
                 (fsm.State.ANY, ReviewState.REMOVED),
+                (ReviewState.NEW, ReviewState.APPROVED),
             },
             transitions,
         )
@@ -92,3 +108,31 @@ class Test(TestCase):  # noqa:D100
         self.assertFalse(self.publication.publish.can_proceed())
         self.assertTrue(self.publication.remove.can_proceed())
         self.assertTrue(self.publication.hide.can_proceed())
+
+    def test_can_proceed_without_checking_conditions(self):
+        # INVERTED: can_proceed(check_conditions=False) returned False even
+        # when a matching transition existed -- it should skip the
+        # condition check, not treat "don't check conditions" as "no
+        # transition available".
+        self.assertFalse(self.publication.approve.can_proceed())
+        self.assertTrue(self.publication.approve.can_proceed(check_conditions=False))
+
+        # A genuinely absent transition must still report unavailable
+        # regardless of check_conditions.
+        self.assertFalse(self.publication.hide.can_proceed(check_conditions=False))
+
+
+class TestFalsyInstance(TestCase):  # noqa:D100
+    # `if instance:` (instead of `if instance is not None:`) in the
+    # descriptors meant a falsy-but-real instance fell through to the
+    # class-level (unbound) branch instead of the instance-bound one.
+    def setUp(self):
+        self.publication = FalsyPublication(text="empty")
+        self.assertFalse(self.publication)  # sanity: falsy, but not None
+
+    def test_state_read_on_falsy_instance(self):
+        self.assertEqual(self.publication.state, ReviewState.NEW)
+
+    def test_transition_call_on_falsy_instance(self):
+        self.publication.publish()
+        self.assertEqual(self.publication.state, ReviewState.PUBLISHED)

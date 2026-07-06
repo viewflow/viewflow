@@ -18,12 +18,15 @@ export class VTurbo extends HTMLElement {
   }
 
   disableTurboOnError = (event) => {
-    if(event.detail.fetchResponse.response.status>400) {
+    const status = event.detail.fetchResponse.response.status;
+    // 422 is HotwireTurboMiddleware's own convention for a re-rendered
+    // POST with form validation errors, not an actual error -- it must
+    // not disable Turbo drive.
+    if(status>400 && status !== 422) {
       Turbo.session.drive = false;
-      window.onpopstate = () => {
+      window.addEventListener('popstate', () => {
         window.location = window.location;
-      }
-
+      });
     }
   }
 }

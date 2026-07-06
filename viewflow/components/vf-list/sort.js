@@ -14,8 +14,10 @@ export class VList extends HTMLElement {
   }
 
   disconnectedCallback() {
-    this._headEl.removeEventListener('mousedown', this.onHeadSelectStart);
-    this._headEl.removeEventListener('click', this.onClick);
+    if (this._headEl) {
+      this._headEl.removeEventListener('mousedown', this.onHeadSelectStart);
+      this._headEl.removeEventListener('click', this.onHeadClick);
+    }
   }
 
   onHeadSelectStart = (event) => {

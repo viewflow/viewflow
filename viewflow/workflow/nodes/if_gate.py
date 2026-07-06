@@ -15,7 +15,7 @@ class IfActivation(Activation):
 
     @Activation.status.super()
     def activate(self):
-        with transaction.atomic(savepoint=True), self.exception_guard():
+        with self.exception_guard(), transaction.atomic(savepoint=True):
             self._condition_result = self.flow_task._condition(self)
 
     @Activation.status.super()

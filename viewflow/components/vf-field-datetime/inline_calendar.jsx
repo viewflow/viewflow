@@ -33,7 +33,7 @@ const VInlineCalendarField = customElement('vf-field-inline-calendar', defaultPr
   });
 
   const onChange = (value) => {
-    setState({...state, selected: value});
+    setState({...state(), selected: value});
   };
 
   return (
@@ -48,7 +48,7 @@ const VInlineCalendarField = customElement('vf-field-inline-calendar', defaultPr
         id={ props.id }
         name={ props.name }
         required={ !!props.required }
-        value={ state.selected }
+        value={ state().selected }
         type="hidden"/>
       { props.helpText || props.error ?
         <p class={ cc({

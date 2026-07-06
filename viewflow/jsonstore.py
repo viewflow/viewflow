@@ -33,7 +33,7 @@ class JSONFieldDescriptor(object):
                 value = json_value.get(self.field.attname, None)
                 if hasattr(self.field, "from_json"):
                     value = self.field.from_json(value)
-            elif self.field.default and self.field.default != fields.NOT_PROVIDED:
+            elif self.field.default is not fields.NOT_PROVIDED:
                 if callable(self.field.default):
                     value = self.field.default()
                 else:
@@ -53,7 +53,11 @@ class JSONFieldDescriptor(object):
         if hasattr(self.field, "to_json"):
             value = self.field.to_json(value)
 
-        if not value and self.field.blank and not self.field.null:
+        if (
+            (value is None or value == "")
+            and self.field.blank
+            and not self.field.null
+        ):
             try:
                 del json_value[self.field.attname]
             except KeyError:
@@ -111,6 +115,18 @@ class JSONFieldMixin(object):
     def get_lookup(self, lookup_name):
         # Always return None, to make get_transform been called
         return None
+
+    def get_col(self, alias, output_field=None):
+        # Route plain field references (e.g. order_by("field")) through the
+        # same key-transform SQL used for filtering, instead of a bare Col
+        # referencing the raw JSONField column -- otherwise ordering sorts
+        # by the JSON blob's text representation, not the extracted value.
+        json_field = self.model._meta.get_field(self.json_field_name)
+        transform_class = json_field.get_transform(self.name)
+        if transform_class is None:
+            return super().get_col(alias, output_field)
+        lhs = json_field.get_col(alias)
+        return transform_class(lhs)
 
     def formfield(self, **kwargs):
         if self.has_default():

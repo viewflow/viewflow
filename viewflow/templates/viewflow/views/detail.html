@@ -7,6 +7,18 @@
       <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-10-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone">
         {% include 'viewflow/includes/object_detail_card.html' %}
       </div>
+      {% if flow_chart %}
+      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone">
+        <div class="mdc-card vf-card">
+          <section class="vf-card__header">
+            <h2 class="vf-card__title">{% trans "Flow Chart" %}</h2>
+          </section>
+          <section style="height: 70vh">
+            <vf-network dot="{{ flow_chart }}" style="width: 100%; height: 100%; display: block"></vf-network>
+          </section>
+        </div>
+      </div>
+      {% endif %}
     </div>
   </div>
 {% endblock content %}

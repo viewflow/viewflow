@@ -191,7 +191,7 @@ class SplitFirst(
         if not_cancellable:
             raise FlowRuntimeError(
                 "Can't cancel {}".format(
-                    ",".join(activation.task for activation in not_cancellable)
+                    ",".join(str(activation.task) for activation in not_cancellable)
                 )
             )
 

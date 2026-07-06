@@ -46,11 +46,27 @@ class Test(TransactionTestCase):
         finally:
             connection.close()
 
+    def join_threads(self, *threads, timeout=15):
+        """Join lock threads with a timeout so a deadlock fails the test
+        instead of hanging the run forever."""
+        self.finished = True  # release any thread still holding the lock
+        for thread in threads:
+            thread.join(timeout)
+        for thread in threads:
+            self.assertFalse(
+                thread.is_alive(),
+                "lock thread did not finish within {}s -- deadlock".format(timeout),
+            )
+
     @skipUnlessDBFeature('has_select_for_update')
     def test_select_for_update_locks(self):
         lock_impl = lock.SelectForUpdateLock(attempts=1)
-        thread1 = threading.Thread(target=self.run_with_lock, args=[lock_impl])
-        thread2 = threading.Thread(target=self.run_with_lock, args=[lock_impl])
+        thread1 = threading.Thread(
+            target=self.run_with_lock, args=[lock_impl], daemon=True
+        )
+        thread2 = threading.Thread(
+            target=self.run_with_lock, args=[lock_impl], daemon=True
+        )
 
         thread1.start()
         thread2.start()
@@ -62,23 +78,21 @@ class Test(TransactionTestCase):
         finally:
             self.finished = True
 
-        thread1.join()
-        thread2.join()
+        self.join_threads(thread1, thread2)
 
     @skipUnlessDBFeature('has_select_for_update')
     def test_select_for_update_locks_released(self):
         lock_impl = lock.SelectForUpdateLock(attempts=4)
         thread1 = threading.Thread(
             target=self.run_with_lock_and_release,
-            args=[lock_impl])
+            args=[lock_impl], daemon=True)
         thread2 = threading.Thread(
             target=self.run_with_lock_and_release,
-            args=[lock_impl])
+            args=[lock_impl], daemon=True)
 
         thread1.start()
         thread2.start()
-        thread1.join()
-        thread2.join()
+        self.join_threads(thread1, thread2)
 
         try:
             self.exception_queue.get(True, 1)
@@ -102,8 +116,12 @@ class Test(TransactionTestCase):
 
     def test_cache_lock(self):
         lock_impl = lock.CacheLock(attempts=1)
-        thread1 = threading.Thread(target=self.run_with_lock, args=[lock_impl])
-        thread2 = threading.Thread(target=self.run_with_lock, args=[lock_impl])
+        thread1 = threading.Thread(
+            target=self.run_with_lock, args=[lock_impl], daemon=True
+        )
+        thread2 = threading.Thread(
+            target=self.run_with_lock, args=[lock_impl], daemon=True
+        )
 
         thread1.start()
         thread2.start()
@@ -115,5 +133,4 @@ class Test(TransactionTestCase):
         finally:
             self.finished = True
 
-        thread1.join()
-        thread2.join()
+        self.join_threads(thread1, thread2)

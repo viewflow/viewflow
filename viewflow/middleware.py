@@ -47,6 +47,8 @@ class SiteMiddleware(object):
     def process_template_response(self, request, response):
         app = getattr(request.resolver_match, "app", None)
         if app:
+            if response.context_data is None:
+                response.context_data = {}
             app_context = app.get_context_data(request)
             for key, value in app_context.items():
                 if key in response.context_data:

@@ -19,7 +19,7 @@ class FunctionActivation(mixins.NextNodeActivationMixin, Activation):
     @Activation.status.super()
     def activate(self):
         """Perform the callback within current exception propagation strategy."""
-        with transaction.atomic(savepoint=True), self.exception_guard():
+        with self.exception_guard(), transaction.atomic(savepoint=True):
             self.task.started = now()
             task_started.send(
                 sender=self.flow_class, process=self.process, task=self.task

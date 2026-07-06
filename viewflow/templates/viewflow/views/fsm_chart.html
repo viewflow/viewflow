@@ -1,0 +1,21 @@
+{% extends request.resolver_match.app.base_template_name|default:'viewflow/base_page.html' %}
+{% load i18n %}
+
+{% block page-title %}{% trans 'State chart' %}{% endblock %}
+
+{% block content %}
+  <div class="mdc-layout-grid vf-page__grid">
+    <div class="mdc-layout-grid__inner vf-page__grid-inner">
+      <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-12">
+        <div class="mdc-card vf-card">
+          <section class="vf-card__header">
+            <h1 class="vf-card__title">{% trans 'State chart' %}</h1>
+          </section>
+          <section style="height: 70vh">
+            <vf-network dot="{{ flow_chart }}" style="width: 100%; height: 100%; display: block"></vf-network>
+          </section>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock content %}

@@ -45,7 +45,7 @@ class NodeDetailMixin(metaclass=ViewsetMeta):
 
     def can_view(self, user, task):
         """Check if user has a view task detail permission."""
-        return self.flow_class.instance.has_view_permission(user, task)
+        return self.flow_class.instance.has_view_permission(user, task.process.coerced)
 
 
 class NodeExecuteMixin(metaclass=ViewsetMeta):

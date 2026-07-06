@@ -357,7 +357,7 @@ class Flow(Viewset, metaclass=FlowMetaClass):
         """
         Acquire a lock for the specified process.
         """
-        return cls.lock_impl(cls, process_pk)
+        return lock.lock_scope(cls.lock_impl, cls, process_pk)
 
     @property
     def app_label(self) -> str:
@@ -465,7 +465,10 @@ class Flow(Viewset, metaclass=FlowMetaClass):
         return []
 
     def cancel(self, process: Any) -> None:
-        with transaction.atomic(), self.lock(process.pk):
+        # Lock first, transaction second, so the lock outlives the commit --
+        # otherwise a CacheLock is released before cancel's writes are
+        # visible and a concurrent activation reads the pre-cancel snapshot.
+        with self.lock(process.pk), transaction.atomic():
             active_tasks = process.task_set.exclude(
                 status__in=[STATUS.DONE, STATUS.CANCELED, STATUS.REVIVED]
             )

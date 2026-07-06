@@ -1,3 +1,4 @@
+from django.db import transaction
 from django.utils.timezone import now
 from viewflow.this_object import this
 from ..activation import Activation
@@ -72,9 +73,34 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
         source=STATUS.STARTED, target=STATUS.DONE, conditions=[this.is_done]
     )
     def complete(self):
-        """Complete the join task and create next."""
-        #  with self.exception_guard(): TODO exception guard on join ??
-        super().complete.original()
+        """Complete the join task and create next.
+
+        The join's own work -- verifying a single incoming token, running the
+        ``continue_on_condition`` cancellation of still-active branches, and the
+        base completion -- runs inside the exception guard and a savepoint.
+
+        On error the guard follows the activation context: a background trigger
+        (``propagate_exception=False``, e.g. a Job node completing) records
+        ``STATUS.ERROR`` on the join and the savepoint rolls back any partial
+        cancel, so the process is left recoverable instead of crashing the
+        worker; a user/synchronous trigger propagates the exception up to the
+        node that triggered the join.
+        """
+        with self.exception_guard(), transaction.atomic(savepoint=True):
+            join_prefixes = self._join_token_prefixes()
+            if len(join_prefixes) > 1:
+                raise FlowRuntimeError(
+                    f"Multiple tokens {join_prefixes} came to join {self.flow_task.name}"
+                )
+
+            if join_prefixes and self.flow_task._continue_on_condition:
+                active_tasks = self._active_join_tasks(next(iter(join_prefixes)))
+                if active_tasks.exists() and self.flow_task._continue_on_condition(
+                    self, active_tasks
+                ):
+                    self.cancel_active_tasks(active_tasks)
+
+            super().complete.original()
 
     def cancel_active_tasks(self, active_tasks):
         activations = [task.flow_task.activation_class(task) for task in active_tasks]
@@ -87,43 +113,51 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
         if not_cancellable:
             raise FlowRuntimeError(
                 "Can't cancel {}".format(
-                    ",".join(activation.task for activation in not_cancellable)
+                    ",".join(str(activation.task) for activation in not_cancellable)
                 )
             )
 
         for activation in activations:
             activation.cancel()
 
-    def is_done(self):
-        """
-        Check that process can be continued further.
-
-        Join check the all task state in db with the common token prefix.
-
-        Join node would continue execution if all incoming tasks are DONE or CANCELED.
-        """
-        join_prefixes = set(
+    def _join_token_prefixes(self):
+        """Common split-token prefixes of the non-cancelled incoming tasks."""
+        return set(
             prev.token.get_common_split_prefix(self.task.token, prev.pk)
             for prev in self.task.previous.exclude(
                 status__in=[STATUS.CANCELED, STATUS.REVIVED]
             ).all()
         )
 
-        if len(join_prefixes) > 1:
-            raise FlowRuntimeError(
-                f"Multiple tokens {join_prefixes} came to join { self.flow_task.name}"
-            )
-
-        join_token_prefix = next(iter(join_prefixes))
-
-        active_tasks = self.flow_class.task_class._default_manager.filter(
+    def _active_join_tasks(self, join_token_prefix):
+        """Still-running tasks sharing the join's token prefix."""
+        return self.flow_class.task_class._default_manager.filter(
             process=self.process, token__startswith=join_token_prefix
         ).exclude(status__in=[STATUS.DONE, STATUS.CANCELED, STATUS.REVIVED])
 
+    def is_done(self):
+        """
+        Check that process can be continued further.
+
+        Join checks all task states in db with the common token prefix. It
+        continues execution if all incoming tasks are DONE or CANCELED, or if
+        the ``continue_on_condition`` predicate allows it.
+
+        This is a pure, side-effect-free predicate: it neither cancels tasks nor
+        raises. An ambiguous multi-token state is reported as "done" so that
+        ``complete()`` runs and surfaces the error under the exception guard,
+        rather than crashing the condition check.
+        """
+        join_prefixes = self._join_token_prefixes()
+        if len(join_prefixes) != 1:
+            # >1 is a flow-integrity error, handled in complete(); 0 means
+            # nothing has arrived to join yet.
+            return len(join_prefixes) > 1
+
+        active_tasks = self._active_join_tasks(next(iter(join_prefixes)))
+
         if self.flow_task._continue_on_condition:
-            continue_result = self.flow_task._continue_on_condition(self, active_tasks)
-            if continue_result:
-                self.cancel_active_tasks(active_tasks)
+            if self.flow_task._continue_on_condition(self, active_tasks):
                 return True
 
         return not active_tasks.exists()

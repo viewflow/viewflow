@@ -184,6 +184,42 @@ modifications of Viewflow. You can find the commercial license terms in
 
 For older releases, see [CHANGELOG.rst](./CHANGELOG.rst).
 
+## 2.3.2 2026-07-06
+
+Security and data-integrity release. Highlights:
+
+- Fix cross-flow privilege escalation and information disclosure: a user with
+  only flow A's permission could cancel, or read the full task list of, flow B's
+  process by posting/opening flow B's id on flow A's URL. `CancelProcessView` and
+  `DetailProcessView` now scope their querysets to the view's own flow
+- Fix the bulk-delete endpoint (`action/delete/`) deleting rows without checking
+  login or the `delete` permission; add the missing authentication checks to the
+  standalone `FlowChartView` and the `contrib.plotly` Dash endpoints
+- Fix a transaction-ordering bug that committed partial writes next to a task's
+  `ERROR` status in async mode; `Function`, `End`, `If`, `Split`, `Switch`,
+  `Subprocess`, and `Join` activation now roll back cleanly on failure
+- Fix a celery `Job` node treating `self.retry()`/`Reject` as a task failure and
+  crashing on redelivery of a `STARTED` retry
+- Fix task actions releasing their lock before the transaction commits, which let
+  a concurrent request double-execute an action under `CacheLock`
+- Fix `jsonstore` fields with a falsy `default` (`False`, `0`) returning `None`,
+  discarding a falsy assigned value, and mis-sorting on `order_by()`
+- Fix unbounded memory leaks in form rendering (widget-renderer cache keyed on the
+  widget instance) and in `ListModelView` (`lru_cache` keyed on the view instance)
+- Fix the "Administration" menu showing to every logged-in user instead of staff
+- Fix several `viewflow.fsm` bugs: chart crashes on self-transitions, `State` with
+  a custom getter replacing falsy-but-valid states, REST `transition` committing
+  field writes on a failed transition or allowing arbitrary field writes; add a
+  `chart/` state-chart view and action to `FlowViewsMixin`
+- Fix a crash on the admin change page of any FSM-backed model under Django 5.2+
+  (incl. 6.1) from the `change_form_fsm_tools` template tag
+- Fix grouped `<select>` options under an `<optgroup>` being dropped, a formset
+  validation bypass via a tampered ManagementForm, and `vf-field-select-multiple`
+  dropping or failing to toggle selected values
+- Fix a system check now warning when a flow has `Join` nodes but no real lock,
+  and `manage.py check`/`runserver` crashing for a Join-node flow defined outside
+  any installed app
+
 ## 2.3.1 2026-06-30
 
 - Add Django 6.1 support

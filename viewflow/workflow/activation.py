@@ -24,9 +24,9 @@ def parent_tasks_completed(activation: "Activation") -> bool:
     Returns:
         bool: True if all parent tasks are completed, False otherwise.
     """
-    previous = activation.task.previous.values("status")
+    previous = activation.task.previous.all()
     completed = (STATUS.DONE, STATUS.REVIVED)
-    return all(lambda task: task.status in completed, previous)
+    return all(task.status in completed for task in previous)
 
 
 def leading_tasks_canceled(activation: "Activation") -> bool:
@@ -285,6 +285,13 @@ class Activation:
         self.task.finished = now()
         self.task.save()
 
+    def prepare_revived_task(self, task: Any) -> None:
+        """
+        Hook to adjust the recreated task before :meth:`revive` saves and
+        activates it. Node types whose ``create()`` assigns extra fields
+        (e.g. a job's ``external_task_id``) mirror that here.
+        """
+
     @status.transition(
         source=[STATUS.CANCELED, STATUS.ERROR],
         target=STATUS.REVIVED,
@@ -303,6 +310,7 @@ class Activation:
         task.seed = self.task.seed
         task.data = self.task.data
         task.artifact = self.task.artifact
+        self.prepare_revived_task(task)
         task.save()
 
         for prev_task in self.task.previous.all():

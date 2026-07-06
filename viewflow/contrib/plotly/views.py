@@ -1,9 +1,32 @@
+import functools
 import json
 import re
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.views.generic import TemplateView
+
+
+def dash_view_permission_required(view_func):
+    """Require an authenticated user with view permission on the Dashboard.
+
+    Dash endpoints have no built-in auth of their own, and Dashboard's
+    default `has_view_permission` (inherited from AppMenuMixin, since
+    Dashboard isn't an Application) is always True -- so without this,
+    an anonymous user could read the dashboard layout/data and invoke
+    registered callbacks.
+    """
+
+    @functools.wraps(view_func)
+    def wrapper(request, viewset, *args, **kwargs):
+        if not request.user.is_authenticated:
+            raise PermissionDenied
+        if not viewset.has_view_permission(request.user):
+            raise PermissionDenied
+        return view_func(request, viewset, *args, **kwargs)
+
+    return wrapper
 
 
 def _extract_urls(data):
@@ -35,15 +58,18 @@ class DashboardView(TemplateView):
         )
 
 
+@dash_view_permission_required
 def layout_endpoint(request, viewset):
     dash_response = viewset.dash_app.serve_layout()
     return HttpResponse(dash_response.data, content_type="application/json")
 
 
+@dash_view_permission_required
 def dependencies_endpoint(request, viewset):
     return JsonResponse(viewset.dash_app._callback_list, safe=False)
 
 
+@dash_view_permission_required
 @csrf_exempt
 @require_POST
 def update_component_endpoint(request, viewset):

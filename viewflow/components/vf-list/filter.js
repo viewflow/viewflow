@@ -35,11 +35,8 @@ export class VListFilter extends HTMLElement {
   disconnectedCallback() {
     window.removeEventListener('turbo:load', this.onPageChange);
     window.removeEventListener('resize', this.onWindowResize);
-    if (this._mdcTemporalDrawer) {
-      this._mdcTemporalDrawer.destroy();
-    }
-    if (this._mdcPersistentDrawer) {
-      this._mdcPersistentDrawer.destroy();
+    if (this._mdcDrawer) {
+      this._mdcDrawer.destroy();
     }
   }
 

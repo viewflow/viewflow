@@ -112,6 +112,6 @@ class SearchableViewMixin(object):
     def get_queryset(self):
         queryset = super().get_queryset()
         search_term = self.get_search_term()
-        if self.search_enabled is not None and search_term is not None:
+        if self.search_enabled() and search_term is not None:
             queryset = get_search_results(queryset, self.search_fields, search_term)
         return queryset

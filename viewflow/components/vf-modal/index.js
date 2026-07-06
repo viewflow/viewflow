@@ -17,7 +17,7 @@ export class VFModalTrigger extends HTMLElement {
     this.removeEventListener('click', this.onCloseDialog);
     this._contentEl.removeEventListener('click', this.onOpenDialog);
     this._contentEl.removeEventListener('keydown', this.onOpenDialog);
-    this._buttonEl.removeEventListener('click', this.onOpenDialog);
+    this._buttonEl.removeEventListener('click', this.onCloseDialog);
   }
 
   onOpenDialog = (event) => {

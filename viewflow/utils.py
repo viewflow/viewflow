@@ -203,7 +203,7 @@ class Icon:
         icon_name = conditional_escape(self.icon_name)
         class_name = conditional_escape(self.class_)
         return mark_safe(
-            f'<i class="material-icons ${class_name}" aria-hidden="true">{icon_name}</i>'
+            f'<i class="material-icons {class_name}" aria-hidden="true">{icon_name}</i>'
         )
 
 

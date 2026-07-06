@@ -1,6 +1,6 @@
 from django.core.exceptions import PermissionDenied
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.utils.decorators import method_decorator
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -121,7 +121,9 @@ class DashboardTaskListView(
     @viewprop
     def queryset(self):
         queryset = self.model._default_manager.all()
-        return queryset.filter(process__flow_class=self.flow_class)
+        return queryset.filter(process__flow_class=self.flow_class).select_related(
+            "process"
+        )
 
 
 class DashboardProcessListView(
@@ -145,8 +147,7 @@ class DashboardProcessListView(
         return mark_safe(f'<a href="{process_url}">{process.pk}</a>')
 
     def active_tasks(self, obj):
-        manager = obj.flow_class.task_class._default_manager
-        return manager.filter(process=obj, finished__isnull=True).count()
+        return obj.active_tasks_count
 
     @property
     def model(self):
@@ -155,4 +156,6 @@ class DashboardProcessListView(
     def get_queryset(self):
         """Filtered process list."""
         queryset = super().get_queryset()
-        return queryset.filter(flow_class=self.flow_class)
+        return queryset.filter(flow_class=self.flow_class).annotate(
+            active_tasks_count=Count("task", filter=Q(task__finished__isnull=True))
+        )

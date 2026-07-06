@@ -7,7 +7,6 @@
 
 import datetime
 import decimal
-from functools import lru_cache
 
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import FieldDoesNotExist, PermissionDenied
@@ -329,10 +328,10 @@ class BaseListModelView(generic.ListView):
             return ["__str__"]
         return self.columns
 
-    @lru_cache(maxsize=None)
+    @cached_property
     def get_object_link_columns(self):
         if self.object_link_columns is None:
-            return self.get_columns()[0]
+            return [self.get_columns()[0]]
         return self.object_link_columns
 
     def get_column_def(self, attr_name):
@@ -368,7 +367,7 @@ class BaseListModelView(generic.ListView):
         if self.viewset is not None and hasattr(self.viewset, "get_object_url"):
             return self.viewset.get_object_url(self.request, obj)
         else:
-            if hasattr(obj, "get_absolute_url") and self.has_view_perm(
+            if hasattr(obj, "get_absolute_url") and self.has_view_permission(
                 self.request.user, obj
             ):
                 return obj.get_absolute_url()
@@ -382,7 +381,7 @@ class BaseListModelView(generic.ListView):
 
     def format_value(self, obj, column, value):
         result = column.format_value(obj, value)
-        if column.attr_name in self.get_object_link_columns():
+        if column.attr_name in self.get_object_link_columns:
             url = self.get_object_url(obj)
             if url:
                 result = format_html('<a href="{}">{}</a>', url, result)

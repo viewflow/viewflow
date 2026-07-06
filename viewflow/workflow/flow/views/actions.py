@@ -115,6 +115,7 @@ class UndoTaskView(
 
 class ReviveTaskView(
     mixins.SuccessMessageMixin,
+    mixins.TaskSuccessUrlMixin,
     mixins.TaskViewTemplateNames,
     generic.FormView,
 ):
@@ -133,7 +134,7 @@ class ReviveTaskView(
             return self.new_task.flow_task.reverse(
                 "index", args=[self.new_task.process_id, self.new_task.pk]
             )
-        return super().get_get_success_url()
+        return super().get_success_url()
 
     def form_valid(self, *args, **kwargs):
         """If the form is valid, save the associated model and revives the task."""
@@ -149,7 +150,9 @@ class CancelProcessView(mixins.ProcessViewTemplateNames, generic.DetailView):
 
     def get_queryset(self):
         """Flow processes."""
-        return self.flow_class.process_class._default_manager.all()
+        return self.flow_class.process_class._default_manager.filter(
+            flow_class=self.flow_class
+        )
 
     def dispatch(self, request, *args, **kwargs):
         """Canceling a process is a manage action, not a view action."""
@@ -177,7 +180,7 @@ class CancelProcessView(mixins.ProcessViewTemplateNames, generic.DetailView):
             messages.add_message(
                 self.request,
                 messages.ERROR,
-                _("Process #{self.object.pk} can not be canceled."),
+                _("Process #%(pk)s can not be canceled.") % {"pk": self.object.pk},
                 fail_silently=True,
             )
             return HttpResponseRedirect("../")
@@ -186,7 +189,7 @@ class CancelProcessView(mixins.ProcessViewTemplateNames, generic.DetailView):
             messages.add_message(
                 self.request,
                 messages.SUCCESS,
-                _("Process #{self.object.pk} has been canceled."),
+                _("Process #%(pk)s has been canceled.") % {"pk": self.object.pk},
                 fail_silently=True,
             )
             return HttpResponseRedirect("../")

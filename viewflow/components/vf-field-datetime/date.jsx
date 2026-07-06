@@ -43,6 +43,16 @@ const VDateField = customElement('vf-field-date', defaultProps, (props, {element
   createEffect(() => {
     setTimeout(() => {
       dialog = new MDCDialog(dialogEl);
+      dialog.listen('MDCDialog:closing', function(event) {
+        setState((state) => {
+          return {
+            ...state,
+            isOpen: false,
+            selected: event.detail.action == 'accept' ? getState().current || getState().selected : getState().selected,
+          }
+        });
+        element.querySelector('.mdc-text-field').textfield.layout();
+      });
     });
   });
 
@@ -60,16 +70,6 @@ const VDateField = customElement('vf-field-date', defaultProps, (props, {element
   const onBtnClick = () => {
     setState((state) => { return {...state, isOpen: true, current: undefined}});
     dialog.open();
-    dialog.listen('MDCDialog:closing', function(event) {
-      setState((state) => {
-        return {
-          ...state,
-          isOpen: false,
-          selected: event.detail.action == 'accept' ? getState().current || getState().selected : getState().selected,
-        }
-      });
-      element.querySelector('.mdc-text-field').textfield.layout();
-    });
   };
 
   const onInputChange = (event) => {

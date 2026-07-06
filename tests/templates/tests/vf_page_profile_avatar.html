@@ -1,0 +1,22 @@
+{% extends 'viewflow/base_page.html' %}
+
+{% block content %}
+<vf-page-profile-avatar class="mdc-card vf-page-profile__avatar">
+  <section class="mdc-card__media vf-page-profile__avatar-media">
+    <div>
+      <img src="">
+      <div class="vf-page-profile__avatar-shadow"></div>
+    </div>
+  </section>
+  <section class="mdc-card__actions vf-page-profile__avatar-actions">
+    <div class="mdc-button mdc-button--raised mdc-card__action vf-page-profile__avatar-change">
+      Change
+      <input type="file">
+    </div>
+  </section>
+  <form method="POST" enctype="multipart/form-data">
+    <input type="file" name="avatar" style="display:none">
+    <button type="submit" style="display:none">Submit</button>
+  </form>
+</vf-page-profile-avatar>
+{% endblock %}

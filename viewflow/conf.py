@@ -38,9 +38,16 @@ class Settings(object):
             custom = getattr(django_settings, "VIEWFLOW", {})
         self.settings = deepcopy(DEFAULTS)
 
-        for key, value in custom.get("WIDGET_RENDERERS", {}).items():
-            widget_class, renderer_class = import_string(key), import_string(value)
-            self.settings["WIDGET_RENDERERS"][widget_class] = renderer_class
+        for key, value in custom.items():
+            if key == "WIDGET_RENDERERS":
+                for widget_key, renderer_value in value.items():
+                    widget_class, renderer_class = (
+                        import_string(widget_key),
+                        import_string(renderer_value),
+                    )
+                    self.settings["WIDGET_RENDERERS"][widget_class] = renderer_class
+            elif key in self.settings:
+                self.settings[key] = value
 
     def __getattr__(self, attr):
         if attr not in self.settings:

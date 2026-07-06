@@ -7,6 +7,7 @@
 from enum import Enum
 from typing import List, Set, Tuple, Union
 from django.db.models import Choices
+from viewflow.utils import DEFAULT
 from .base import State, StateDescriptor, Transition
 from .typing import StateValue
 
@@ -51,7 +52,7 @@ def chart(flow_state: StateDescriptor, exclude_guards=True):
     # prepare data
     for method, transitions in flow_state.get_transitions().items():
         for transition in transitions:
-            if exclude_guards and transition.target is None:
+            if exclude_guards and transition.target is DEFAULT:
                 continue
             if transition.source == State.ANY:
                 postponed.append(transition)
