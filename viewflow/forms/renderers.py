@@ -68,13 +68,19 @@ class WidgetRenderer(object):
         return self.create_root(context)
 
     @staticmethod
-    @lru_cache(maxsize=None)
     def get_renderer(widget: forms.Widget) -> "Type[WidgetRenderer]":
+        return WidgetRenderer._get_renderer_for_class(type(widget))
+
+    @staticmethod
+    @lru_cache(maxsize=None)
+    def _get_renderer_for_class(
+        widget_class: "Type[forms.Widget]",
+    ) -> "Type[WidgetRenderer]":
         from viewflow.conf import settings
 
-        for widget_class in type(widget).mro()[:-2]:
+        for klass in widget_class.mro()[:-2]:
             try:
-                return settings.WIDGET_RENDERERS[widget_class]
+                return settings.WIDGET_RENDERERS[klass]
             except KeyError:
                 continue
 
@@ -254,11 +260,12 @@ class SelectRenderer(WidgetRenderer):
                     "name": name or "",
                     "options": {
                         key: value
-                        for key, value in options[0].items()
+                        for key, value in option.items()
                         if key not in ["template_name", "type", "wrap_label"]
                     },
                 }
                 for name, options, _ in context["widget"]["optgroups"]
+                for option in options
             ],
             cls=FormDataEncoder,
         )

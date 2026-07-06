@@ -1,10 +1,52 @@
+import json
+import re
+
 from django import forms
 from django.test import TestCase
-from viewflow.forms.renderers import FormLayout
+from viewflow.forms.renderers import FormLayout, WidgetRenderer
 
 
 class Test(TestCase):
     maxDiff = None
+
+    def test_get_renderer_cache_does_not_leak_per_instance(self):
+        # WidgetRenderer.get_renderer was @lru_cache(maxsize=None) keyed on
+        # the widget *instance*. Django deep-copies widgets per form, so
+        # every render created a fresh, never-evicted cache key -- pinning
+        # every rendered widget/field/form from GC forever, with zero cache
+        # hits.
+        WidgetRenderer._get_renderer_for_class.cache_clear()
+
+        class F(forms.Form):
+            name = forms.CharField()
+
+        for _ in range(5):
+            FormLayout().render(F())
+
+        info = WidgetRenderer._get_renderer_for_class.cache_info()
+        self.assertGreater(info.hits, 0)
+        self.assertLessEqual(info.currsize, 1)
+
+    def test_grouped_select_choices_are_not_dropped(self):
+        # Django's optgroups() yields (group_name, [option-dicts], index);
+        # the renderer used to keep only options[0], silently dropping the
+        # rest of each optgroup.
+        class GroupedChoiceForm(forms.Form):
+            fruit = forms.ChoiceField(
+                choices=[
+                    ("Fruits", [("a", "Apple"), ("b", "Banana")]),
+                    ("c", "Cherry"),
+                ]
+            )
+
+        html = FormLayout().render(GroupedChoiceForm())
+
+        match = re.search(r'optgroups="([^"]*)"', html)
+        self.assertIsNotNone(match)
+        optgroups = json.loads(match.group(1).replace("&quot;", '"'))
+        labels = [entry["options"]["label"] for entry in optgroups]
+
+        self.assertEqual(labels, ["Apple", "Banana", "Cherry"])
 
     def test_empty_form_render(self):
         renderer = FormLayout()
