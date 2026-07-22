@@ -1,6 +1,39 @@
 from django.contrib import admin, auth
 from django.db.models import Prefetch
+from django.utils.translation import gettext_lazy as _
+from .fields import get_flow_ref
 from .models import Process, Task
+
+
+class FlowClassListFilter(admin.SimpleListFilter):
+    """Filter processes by flow class.
+
+    Builds choices from the plain model manager instead of
+    ``ModelAdmin.get_queryset()``: executing the admin queryset with
+    ``values_list("flow_class")`` would run the participants prefetch
+    against materialized flow classes and raise an AttributeError.
+    """
+
+    title = _("flow")
+    parameter_name = "flow_class"
+
+    def lookups(self, request, model_admin):
+        flow_classes = (
+            model_admin.model._default_manager.order_by("flow_class")
+            .values_list("flow_class", flat=True)
+            .distinct()
+        )
+        return [
+            (get_flow_ref(flow_class), flow_class.process_title)
+            for flow_class in flow_classes
+            if flow_class is not None
+        ]
+
+    def queryset(self, request, queryset):
+        value = self.value()
+        if value:
+            queryset = queryset.filter(flow_class=value)
+        return queryset
 
 
 class TaskInline(admin.TabularInline):
@@ -29,7 +62,7 @@ class ProcessAdmin(admin.ModelAdmin):
     date_hierarchy = "created"
     list_display = ["pk", "created", "flow_class", "status", "participants", "brief"]
     list_display_links = ["pk", "created", "flow_class"]
-    list_filter = ["status", "flow_class"]
+    list_filter = ["status", FlowClassListFilter]
     readonly_fields = ["flow_class", "status", "finished", "parent_task"]
     inlines = [TaskInline]
 
