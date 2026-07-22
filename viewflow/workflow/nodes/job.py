@@ -115,4 +115,4 @@ class AbstractJob(mixins.NextNodeMixin, Node):
         """,
     }
 
-    bpmn_element = "scriptTask"
+    bpmn_element = "serviceTask"

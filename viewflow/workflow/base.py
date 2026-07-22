@@ -16,7 +16,8 @@ from viewflow.utils import (
     strip_suffixes,
 )
 from viewflow.urls import Viewset, ViewsetMeta
-from .activation import Activation
+from viewflow.this_object import this
+from .activation import Activation, _can_cancel
 from .exceptions import FlowRuntimeError
 from .status import STATUS, PROCESS
 from . import lock
@@ -36,13 +37,21 @@ class Edge:
 
     __slots__ = ("_src", "_dst", "_edge_class", "_label")
 
-    def __init__(self, src: str, dst: str, edge_class: str) -> None:
+    def __init__(
+        self, src: str, dst: str, edge_class: str, label: Optional[str] = None
+    ) -> None:
         """
         Initializes an Edge instance.
         """
         self._src = src
         self._dst = dst
         self._edge_class = edge_class
+        self._label = label
+
+    @property
+    def label(self) -> Optional[str]:
+        """Optional edge caption (e.g. 'yes'/'no' on an If gateway)."""
+        return self._label
 
     @property
     def src(self) -> str:
@@ -96,6 +105,11 @@ class Node(Viewset):
         **kwargs: Any,
     ):  # noqa D102
         self._incoming_edges = []
+        self._boundary_events = []
+        self._boundary_specs = []
+        self._compensation_handler = None
+        self._is_compensation_handler = False
+        self._multi_instance = False
 
         if activation_class:
             self.activation_class = activation_class
@@ -140,7 +154,96 @@ class Node(Viewset):
         return iter(self._incoming_edges)
 
     def bpmn_content(self):
+        if self._multi_instance and (self.bpmn_element or "").endswith(
+            ("Task", "Activity")
+        ):
+            return "<bpmn:multiInstanceLoopCharacteristics/>"
         return ""
+
+    def bpmn_attrs(self):
+        """Extra XML attributes for the node's BPMN element."""
+        if self._is_compensation_handler:
+            return {"isForCompensation": "true"}
+        return {}
+
+    def CompensateWith(self, node: Any) -> "Node":
+        """
+        Register a compensation handler for this task.
+
+        The handler is a ``flow.Function`` node without incoming connections,
+        executed by ``flow.CompensateThrow`` when the flow compensates.
+        """
+        self._compensation_handler = node
+        return self
+
+    def OnTimeout(
+        self,
+        delay: Any,
+        then: Any,
+        interrupting: bool = True,
+        title: Optional[str] = None,
+    ) -> "Node":
+        """
+        Attach a timer boundary event to this task.
+
+        Fires the ``then`` path when ``delay`` elapses before the task
+        completes. Interrupting by default (cancels the task);
+        ``interrupting=False`` starts a parallel path and leaves it running.
+        The boundary node is auto-named ``<task>__timeout``; pass ``title``
+        to set its chart label. Chain before ``.Next()``.
+        """
+        from .flow.nodes import TimerBoundary
+
+        boundary = TimerBoundary(None, delay=delay, interrupting=interrupting).Next(
+            then
+        )
+        if title is not None:
+            boundary.Annotation(title=title)
+        self._boundary_specs.append(("timeout", boundary))
+        return self
+
+    def OnError(
+        self,
+        then: Any,
+        code: Any = None,
+        interrupting: bool = True,
+        title: Optional[str] = None,
+    ) -> "Node":
+        """
+        Attach an error boundary event to this task.
+
+        Fires the ``then`` path when the task fails in a background context
+        (job, function, timer). Pass ``code`` to catch only a matching
+        ``flow.ErrorEnd`` code. The boundary node is auto-named
+        ``<task>__error``; pass ``title`` to set its chart label. Chain
+        before ``.Next()``.
+        """
+        from .flow.nodes import ErrorBoundary
+
+        boundary = ErrorBoundary(None, code=code, interrupting=interrupting).Next(then)
+        if title is not None:
+            boundary.Annotation(title=title)
+        self._boundary_specs.append(("error", boundary))
+        return self
+
+    def OnEscalation(
+        self, then: Any, code: Any = None, title: Optional[str] = None
+    ) -> "Node":
+        """
+        Attach a non-interrupting escalation boundary event to this task.
+
+        Fires the ``then`` path when a ``flow.EscalationThrow`` is raised
+        inside this subprocess, without interrupting it. The boundary node is
+        auto-named ``<task>__escalation``; pass ``title`` to set its chart
+        label. Chain before ``.Next()``.
+        """
+        from .flow.nodes import EscalationBoundary
+
+        boundary = EscalationBoundary(None, code=code).Next(then)
+        if title is not None:
+            boundary.Annotation(title=title)
+        self._boundary_specs.append(("escalation", boundary))
+        return self
 
     def __str__(self) -> str:
         if self.name:
@@ -178,9 +281,12 @@ class Node(Viewset):
         :returns: The new activation instance.
         :rtype: Activation
         """
-        return self.activation_class.create(
+        activation = self.activation_class.create(
             self, prev_activation, token, data=data, seed=seed
         )
+        for boundary_event in self._boundary_events:
+            boundary_event._arm(activation)
+        return activation
 
     def Annotation(
         self,
@@ -321,6 +427,28 @@ class Flow(Viewset, metaclass=FlowMetaClass):
             cls._nodes_by_name[attr_name] = node
             setattr(cls, attr_name, node)
 
+        # materialize fluent boundary events (.OnTimeout/.OnError/...) into
+        # auto-named nodes attached to their host, so they wire like any
+        # explicitly declared .OnTimeout boundary node
+        materialized = {}
+        for host_name, node in list(cls._nodes_by_name.items()):
+            for suffix, boundary in getattr(node, "_boundary_specs", []):
+                boundary = copy.copy(boundary)
+                boundary_name = "{}__{}".format(host_name, suffix)
+                index = 2
+                while (
+                    boundary_name in cls._nodes_by_name or boundary_name in materialized
+                ):
+                    boundary_name = "{}__{}_{}".format(host_name, suffix, index)
+                    index += 1
+                boundary.name = boundary_name
+                boundary.flow_class = cls
+                boundary._attached_to = node
+                materialized[boundary_name] = boundary
+                setattr(cls, boundary_name, boundary)
+        for boundary_name, boundary in materialized.items():
+            cls._nodes_by_name[boundary_name] = boundary
+
         # resolve inner links
         for _, node in cls._nodes_by_name.items():
             node._resolve(cls.instance)
@@ -332,6 +460,23 @@ class Flow(Viewset, metaclass=FlowMetaClass):
                 incoming[outgoing_edge.dst].append(outgoing_edge)
         for target, edges in incoming.items():
             target._incoming_edges = edges
+
+        # wire compensation handlers: mark the handler node and give it a
+        # synthetic edge so the chart places it next to its host
+        for _, node in cls._nodes_by_name.items():
+            if node._compensation_handler is not None:
+                handler = this.resolve(cls.instance, node._compensation_handler)
+                node._compensation_handler = handler
+                handler._is_compensation_handler = True
+                handler._incoming_edges.append(
+                    Edge(src=node, dst=handler, edge_class="compensation")
+                )
+
+        # mark multi-instance targets of data-source split branches
+        for _, node in cls._nodes_by_name.items():
+            for branch in getattr(node, "_branches", None) or []:
+                if len(branch) == 4 and (branch[2] or branch[3]):
+                    branch[0]._multi_instance = True
 
         # process permissions
         process_options = cls.process_class._meta
@@ -478,9 +623,7 @@ class Flow(Viewset, metaclass=FlowMetaClass):
             ]
 
             not_cancellable = [
-                activation
-                for activation in activations
-                if not activation.cancel.can_proceed()
+                activation for activation in activations if not _can_cancel(activation)
             ]
             if not_cancellable:
                 raise FlowRuntimeError(

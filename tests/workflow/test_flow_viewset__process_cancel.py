@@ -30,9 +30,7 @@ class TestProcessCancelPermission(TestCase):
         process = self._start_process()
         self.assertTrue(self.client.login(username="viewer", password="pwd"))
 
-        response = self.client.post(
-            f"/{process.pk}/cancel/", {"_cancel_process": ""}
-        )
+        response = self.client.post(f"/{process.pk}/cancel/", {"_cancel_process": ""})
 
         self.assertEqual(403, response.status_code)
         process.refresh_from_db()
@@ -42,9 +40,7 @@ class TestProcessCancelPermission(TestCase):
         process = self._start_process()
         self.assertTrue(self.client.login(username="manager", password="pwd"))
 
-        response = self.client.post(
-            f"/{process.pk}/cancel/", {"_cancel_process": ""}
-        )
+        response = self.client.post(f"/{process.pk}/cancel/", {"_cancel_process": ""})
 
         self.assertEqual(302, response.status_code)
         process.refresh_from_db()
@@ -69,23 +65,17 @@ class TestProcessCancelFlashMessages(TestCase):
         process = TestProcessCancelFlow.start.run()
         self.assertTrue(self.client.login(username="manager2", password="pwd"))
 
-        response = self.client.post(
-            f"/{process.pk}/cancel/", {"_cancel_process": ""}
-        )
+        response = self.client.post(f"/{process.pk}/cancel/", {"_cancel_process": ""})
 
         messages = [str(m) for m in get_messages(response.wsgi_request)]
-        self.assertEqual(
-            messages, [f"Process #{process.pk} has been canceled."]
-        )
+        self.assertEqual(messages, [f"Process #{process.pk} has been canceled."])
 
     def test_already_canceled_error_message_substitutes_the_pk(self):
         process = TestProcessCancelFlow.start.run()
         self.assertTrue(self.client.login(username="manager2", password="pwd"))
 
         self.client.post(f"/{process.pk}/cancel/", {"_cancel_process": ""})
-        response = self.client.post(
-            f"/{process.pk}/cancel/", {"_cancel_process": ""}
-        )
+        response = self.client.post(f"/{process.pk}/cancel/", {"_cancel_process": ""})
 
         # The test client's message storage doesn't get drained between
         # requests the way a real response cycle would, so both the
@@ -119,13 +109,60 @@ class TestProcessCancelCrossFlowIsolation(TestCase):
         )
         self.assertTrue(self.client.login(username="attacker", password="pwd"))
 
-        response = self.client.post(
-            f"/{process_b.pk}/cancel/", {"_cancel_process": ""}
-        )
+        response = self.client.post(f"/{process_b.pk}/cancel/", {"_cancel_process": ""})
 
         process_b.refresh_from_db()
         self.assertNotEqual(PROCESS.CANCELED, process_b.status)
         self.assertIn(response.status_code, (403, 404))
+
+
+@override_settings(ROOT_URLCONF=__name__)
+class TestProcessCancelUncancellableTask(TestCase):
+    # A View task the user still has open sits in STARTED, whose cancel
+    # transition (source=[NEW, ASSIGNED]) refuses to proceed. cancel()
+    # then raises FlowRuntimeError; CancelProcessView.post caught nothing,
+    # so it escaped as an HTTP 500. The view must instead refuse cleanly
+    # with a flash message and leave the process untouched.
+    @classmethod
+    def setUpTestData(cls):
+        cls.manager = User.objects.create_user(username="mgr3", password="pwd")
+        cls.manager.user_permissions.add(
+            Permission.objects.get(codename="view_testprocesscancelprocess"),
+            Permission.objects.get(codename="manage_testprocesscancelprocess"),
+        )
+
+    def test_started_view_task_does_not_500_the_cancel(self):
+        from viewflow.workflow.status import STATUS
+
+        process = TestProcessCancelFlow.start.run()
+        task = process.task_set.get(flow_task=TestProcessCancelFlow.task)
+        task.status = STATUS.STARTED
+        task.save(update_fields=["status"])
+
+        self.assertTrue(self.client.login(username="mgr3", password="pwd"))
+        response = self.client.post(f"/{process.pk}/cancel/", {"_cancel_process": ""})
+
+        self.assertEqual(302, response.status_code)  # not 500
+        process.refresh_from_db()
+        self.assertNotEqual(PROCESS.CANCELED, process.status)  # refused cleanly
+
+        messages = [str(m) for m in get_messages(response.wsgi_request)]
+        self.assertEqual(messages[-1], f"Process #{process.pk} can not be canceled.")
+
+    def test_cancel_page_disables_the_button_when_uncancellable(self):
+        from viewflow.workflow.status import STATUS
+
+        process = TestProcessCancelFlow.start.run()
+        task = process.task_set.get(flow_task=TestProcessCancelFlow.task)
+        task.status = STATUS.STARTED
+        task.save(update_fields=["status"])
+
+        self.assertTrue(self.client.login(username="mgr3", password="pwd"))
+        response = self.client.get(f"/{process.pk}/cancel/")
+
+        self.assertEqual(200, response.status_code)
+        self.assertFalse(response.context["can_cancel"])
+        self.assertContains(response, "disabled")
 
 
 class TestProcessCancelProcess(Process):

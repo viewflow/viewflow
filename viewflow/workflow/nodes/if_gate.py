@@ -79,8 +79,8 @@ class If(Node):
         self._on_false_seed = None
 
     def _outgoing(self):
-        yield Edge(src=self, dst=self._on_true, edge_class="cond_true")
-        yield Edge(src=self, dst=self._on_false, edge_class="cond_false")
+        yield Edge(src=self, dst=self._on_true, edge_class="cond_true", label="yes")
+        yield Edge(src=self, dst=self._on_false, edge_class="cond_false", label="no")
 
     def _resolve(self, instance):
         super()._resolve(instance)

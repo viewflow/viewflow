@@ -4,7 +4,7 @@ from django.utils.timezone import now
 from viewflow import this
 from viewflow.workflow.base import Node, Edge
 from viewflow.workflow.exceptions import FlowRuntimeError
-from viewflow.workflow.activation import Activation
+from viewflow.workflow.activation import Activation, has_manage_permission
 
 from . import mixins
 from ..status import STATUS
@@ -35,6 +35,15 @@ class SwitchActivation(Activation):
     def create_next(self):
         yield self.next_task._create(self, self.task.token)
 
+    @Activation.status.transition(
+        source=[STATUS.ERROR],
+        target=STATUS.CANCELED,
+        permission=has_manage_permission,
+    )
+    def cancel(self):
+        self.task.finished = now()
+        self.task.save()
+
 
 class Switch(Node):
     """
@@ -55,6 +64,23 @@ class Switch(Node):
 
     task_type = "SWITCH"
     activation_class = SwitchActivation
+
+    shape = {
+        "width": 50,
+        "height": 50,
+        "svg": """
+            <path class="gateway" d="M25,0L50,25L25,50L0,25L25,0"/>
+            <text class="gateway-marker" font-size="16px" x="25" y="31">X</text>
+        """,
+    }
+
+    bpmn_element = "exclusiveGateway"
+
+    def bpmn_attrs(self):
+        default = [node for node, cond in self._activate_next if cond is None]
+        if default:
+            return {"default": "id_edge_{}__{}".format(self.name, default[0].name)}
+        return {}
 
     def __init__(self, **kwargs):  # noqa D102
         super(Switch, self).__init__(**kwargs)

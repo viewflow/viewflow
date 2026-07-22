@@ -19,6 +19,9 @@
                   <span class="vf-modal-trigger__helper"></span>
                   <div class="vf-modal-trigger__content">
                     <div class="vf-modal-trigger__button">&times;</div>
+                    <a class="vf-modal-trigger__export" href="{% reverse request.resolver_match.flow_viewset 'chart' %}?format=bpmn" download title="{% trans 'Export BPMN' %}">
+                      <span class="material-icons">download</span>{% trans 'BPMN' %}
+                    </a>
                     <img class="responsive-img" src="{% reverse request.resolver_match.flow_viewset 'chart' %}" alt="flow graph" style="height:80%"/>
                   </div>
                 </vf-modal-trigger>
@@ -36,6 +39,7 @@
                       </button></div>
                   {% endif %}
                 {% endfor %}
+                {% block flow_start_card_actions %}{% endblock %}
               </div>
             </div>
           </div>

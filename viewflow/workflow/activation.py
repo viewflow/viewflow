@@ -76,6 +76,18 @@ def has_manage_permission(activation: "Activation", user: Any) -> bool:
     return activation.flow_class.instance.has_manage_permission(user)
 
 
+def _can_cancel(activation: "Activation") -> bool:
+    """Whether an active task's activation can be cancelled right now.
+
+    A node type may define no ``cancel`` transition at all (custom nodes),
+    or its ``cancel`` may not be allowed from the task's current status.
+    Both cases are treated as "not cancellable" so callers raise a clean
+    ``FlowRuntimeError`` instead of an ``AttributeError``.
+    """
+    cancel = getattr(activation, "cancel", None)
+    return cancel is not None and cancel.can_proceed()
+
+
 class Activation:
     """
     Base class for flow task activations.

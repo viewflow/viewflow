@@ -1,4 +1,5 @@
 """System checks warning about unsafe workflow configuration."""
+
 from django.core.checks import Warning, register
 
 
@@ -36,9 +37,7 @@ def check_join_nodes_require_a_real_lock(app_configs, **kwargs):
         app_label, _ = get_containing_app_data(module)
         if app_label is None:
             continue
-        has_join = any(
-            isinstance(node, Join) for node in flow_class.instance.nodes()
-        )
+        has_join = any(isinstance(node, Join) for node in flow_class.instance.nodes())
         if has_join:
             errors.append(
                 Warning(

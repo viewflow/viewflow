@@ -6,32 +6,48 @@
     xmlns:dc="http://www.omg.org/spec/DD/20100524/DC"
     xmlns:di="http://www.omg.org/spec/DD/20100524/DI"
     targetNamespace="http://bpmn.io/schema/bpmn">
-    <bpmn:process isExecutable="true" id="id_process">
+    <bpmn:process isExecutable="true" id="{{ process_id }}"{% if process_name %} name="{{ process_name }}"{% endif %}>
         {% for cell in cells %}
-        {% if cell.node.bpmn_element %}
-        <bpmn:{{ cell.node.bpmn_element }} id="id_node_{{ cell.node.name }}" {% if cell.shape.label or cell.title %}name="{% if cell.shape.label %}{{ cell.shape.label }}{% else %}{{ cell.title }}{% endif %}{% if cell.status %} ({{ cell.status }}){% endif %}"{% endif %}>{% for edge in cell.incoming %}
-            <bpmn:incoming>id_edge_{{ edge.src.name}}__{{ edge.dst.name }}</bpmn:incoming>{% endfor %}{% for edge in cell.outgoing %}
-            <bpmn:outgoing>id_edge_{{ edge.src.name}}__{{ edge.dst.name }}</bpmn:outgoing>{% endfor %}
+        <bpmn:{{ cell.node.bpmn_element }} id="id_node_{{ cell.node.name }}"{% for attr, value in cell.node.bpmn_attrs.items %} {{ attr }}="{{ value }}"{% endfor %} {% if cell.shape.label or cell.title %}name="{% if cell.shape.label %}{{ cell.shape.label }}{% else %}{{ cell.title }}{% endif %}{% if cell.status %} ({{ cell.status }}){% endif %}"{% endif %}>{% for edge in cell.incoming %}{% if edge.src.bpmn_element and edge.dst.bpmn_element and edge.edge_class != "boundary" and edge.edge_class != "compensation" %}
+            <bpmn:incoming>id_edge_{{ edge.src.name}}__{{ edge.dst.name }}</bpmn:incoming>{% endif %}{% endfor %}{% for edge in cell.outgoing %}{% if edge.src.bpmn_element and edge.dst.bpmn_element and edge.edge_class != "boundary" and edge.edge_class != "compensation" %}
+            <bpmn:outgoing>id_edge_{{ edge.src.name}}__{{ edge.dst.name }}</bpmn:outgoing>{% endif %}{% endfor %}
             {{ cell.node.bpmn_content|safe }}
         </bpmn:{{ cell.node.bpmn_element }}>
-        {% endif %}
+        {% endfor %}
+        {% for comp in compensations %}
+        <bpmn:boundaryEvent id="{{ comp.id }}" attachedToRef="id_node_{{ comp.host_name }}">
+            <bpmn:compensateEventDefinition/>
+        </bpmn:boundaryEvent>
         {% endfor %}
         {% for edge in edges %}
-        <bpmn:sequenceFlow id="id_edge_{{ edge.src.name}}__{{ edge.dst.name }}" sourceRef="id_node_{{ edge.src.name }}" targetRef="id_node_{{ edge.dst.name }}" />
+        <bpmn:sequenceFlow id="id_edge_{{ edge.src.name}}__{{ edge.dst.name }}"{% if edge.label %} name="{{ edge.label }}"{% endif %} sourceRef="id_node_{{ edge.src.name }}" targetRef="id_node_{{ edge.dst.name }}" />
+        {% endfor %}
+        {% for comp in compensations %}
+        <bpmn:association id="{{ comp.id }}_association" associationDirection="One" sourceRef="{{ comp.id }}" targetRef="id_node_{{ comp.handler_name }}" />
         {% endfor %}
     </bpmn:process>
     <bpmndi:BPMNDiagram>
-        <bpmndi:BPMNPlane bpmnElement="id_process">
+        <bpmndi:BPMNPlane bpmnElement="{{ process_id }}">
             {% for cell in cells %}
-            {% if cell.node.bpmn_element %}
             <bpmndi:BPMNShape id="id_shape_{{ cell.node.name }}" bpmnElement="id_node_{{ cell.node.name }}">
                 <dc:Bounds x="{{ cell.shape.x }}" y="{{ cell.shape.y }}" width="{{ cell.shape.width }}" height="{{ cell.shape.height }}" />
             </bpmndi:BPMNShape>
-            {% endif %}
+            {% endfor %}
+            {% for comp in compensations %}
+            <bpmndi:BPMNShape id="{{ comp.id }}_shape" bpmnElement="{{ comp.id }}">
+                <dc:Bounds x="{{ comp.x }}" y="{{ comp.y }}" width="{{ comp.size }}" height="{{ comp.size }}" />
+            </bpmndi:BPMNShape>
             {% endfor %}
             {% for edge in edges %}
             <bpmndi:BPMNEdge id="id_edge_shape_{{ edge.src.name}}__{{ edge.dst.name }}" bpmnElement="id_edge_{{ edge.src.name}}__{{ edge.dst.name }}" sourceElement="id_shape_{{ edge.src.name}}" targetElement="id_shape_{{ edge.dst.name}}">
                 {% for x,y in edge.segments %}
+                <di:waypoint xsi:type="dc:Point" x="{{ x }}" y="{{ y }}" />
+                {% endfor %}
+            </bpmndi:BPMNEdge>
+            {% endfor %}
+            {% for comp in compensations %}
+            <bpmndi:BPMNEdge id="{{ comp.id }}_association_shape" bpmnElement="{{ comp.id }}_association" sourceElement="{{ comp.id }}_shape" targetElement="id_shape_{{ comp.handler_name }}">
+                {% for x,y in comp.waypoints %}
                 <di:waypoint xsi:type="dc:Point" x="{{ x }}" y="{{ y }}" />
                 {% endfor %}
             </bpmndi:BPMNEdge>

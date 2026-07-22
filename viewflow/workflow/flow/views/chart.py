@@ -22,9 +22,9 @@ class FlowChartView(generic.View):
 
     @method_decorator(
         last_modified(
-            lambda *args, **kwargs: None
-            if "process_pk" in kwargs
-            else process_start_time
+            lambda *args, **kwargs: (
+                None if "process_pk" in kwargs else process_start_time
+            )
         )
     )
     def get(self, request, *args, **kwargs):
@@ -33,6 +33,15 @@ class FlowChartView(generic.View):
         grid = chart.calc_layout_data(self.flow_class)
         if process_pk is not None:
             chart.calc_cell_status(self.flow_class, grid, process_pk)
+
+        if request.GET.get("format") == "bpmn":
+            filename = self.flow_class.instance.flow_label.replace("/", "_")
+            response = HttpResponse(
+                chart.grid_to_bpmn(grid), content_type="application/xml"
+            )
+            response["Content-Disposition"] = f'attachment; filename="{filename}.bpmn"'
+            return response
+
         svg = chart.grid_to_svg(grid)
 
         return HttpResponse(svg, content_type="image/svg+xml")

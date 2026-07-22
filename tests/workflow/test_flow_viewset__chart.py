@@ -45,6 +45,15 @@ class TestFlowChartPermission(TestCase):
         response = self.client.get(f"/{process.pk}/chart/")
         self.assertEqual(200, response.status_code)
 
+    def test_permitted_user_can_download_bpmn(self):
+        self.assertTrue(self.client.login(username="viewer", password="pwd"))
+
+        response = self.client.get("/chart/?format=bpmn")
+        self.assertEqual(200, response.status_code)
+        self.assertEqual("application/xml", response["Content-Type"])
+        self.assertIn(b"<bpmn:definitions", response.content)
+        self.assertIn(".bpmn", response["Content-Disposition"])
+
 
 class TestFlowChartProcess(Process):
     class Meta:

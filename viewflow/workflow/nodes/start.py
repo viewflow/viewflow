@@ -184,6 +184,10 @@ class StartHandle(mixins.NextNodeMixin, Node):
 
     task_type = "START"
 
+    def bpmn_content(self):
+        # started by external code, the BPMN counterpart of a message trigger
+        return "<bpmn:messageEventDefinition/>"
+
     shape = {
         "width": 50,
         "height": 50,

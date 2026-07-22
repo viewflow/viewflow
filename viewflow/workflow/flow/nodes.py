@@ -193,6 +193,36 @@ class View(
                 name="unassign",
             )
 
+    """
+    Reassign a task to another user.
+
+    Off by default -- picking who a task may be delegated/substituted to is
+    application-specific (and often needs extra storage), so viewflow ships no
+    policy. Set ``reassign_view_class`` on a ``flow.View`` subclass to enable
+    it; the view collects the target user and calls ``activation.reassign(
+    user=...)``. When a URL named ``reassign`` exists, the built-in ``reassign``
+    transition (owner- or manager-gated) surfaces the action button
+    automatically. See the ``substitute`` cookbook sample for an example.
+    """
+    reassign_view_class = None
+
+    @viewprop
+    def reassign_view(self):
+        """View for a task reassign."""
+        if self.reassign_view_class:
+            return self.reassign_view_class.as_view()
+
+    @property
+    def reassign_path(self):
+        if self.reassign_view:
+            return path(
+                f"<int:process_pk>/{self.name}/<int:task_pk>/reassign/",
+                utils.wrap_task_view(
+                    self, self.reassign_view, permission=self.can_unassign
+                ),
+                name="reassign",
+            )
+
 
 class If(
     mixins.NodeDetailMixin,
@@ -528,4 +558,335 @@ class Switch(
     detail_view_class = views.DetailTaskView
     cancel_view_class = views.CancelTaskView
     undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
+
+
+class Timer(
+    mixins.NodeDetailMixin,
+    mixins.NodeCancelMixin,
+    mixins.NodeReviveMixin,
+    nodes.Timer,
+):
+    """
+    Database-backed wait until a specified time interval or moment.
+
+    Due timers are fired by the periodic ``workflow_timers`` dispatcher.
+
+    Example::
+
+        class MyFlow(flow.Flow):
+            ...
+            wait = flow.Timer(timedelta(days=1)).Next(this.escalate)
+            ...
+
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+    revive_view_class = views.ReviveTaskView
+
+
+class StartTimer(
+    mixins.NodeDetailMixin,
+    mixins.NodeUndoMixin,
+    nodes.StartTimer,
+):
+    """
+    Start a new process on a schedule, fired by the ``workflow_timers``
+    dispatcher.
+
+    Example::
+
+        class ReportFlow(flow.Flow):
+            start = flow.StartTimer(interval=timedelta(days=1)).Next(this.report)
+            ...
+
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
+
+
+class TimerBoundary(
+    mixins.NodeDetailMixin,
+    mixins.NodeCancelMixin,
+    nodes.TimerBoundary,
+):
+    """
+    Timer boundary node built by :meth:`~viewflow.workflow.Node.OnTimeout`.
+
+    Not declared directly -- chain ``.OnTimeout(delay, then)`` onto the host
+    task (before ``.Next()``). Fires when the delay elapses before the host
+    completes; interrupting (default) cancels the host task.
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+
+
+class ErrorBoundary(
+    mixins.NodeDetailMixin,
+    mixins.NodeCancelMixin,
+    nodes.ErrorBoundary,
+):
+    """
+    Error boundary node built by :meth:`~viewflow.workflow.Node.OnError`.
+
+    Not declared directly -- chain ``.OnError(then, code=...)`` onto the host
+    task (before ``.Next()``). Fires when the host task fails in a background
+    context.
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+
+
+class EscalationBoundary(
+    mixins.NodeDetailMixin,
+    mixins.NodeCancelMixin,
+    nodes.EscalationBoundary,
+):
+    """
+    Escalation boundary built by :meth:`~viewflow.workflow.Node.OnEscalation`.
+
+    Not declared directly -- chain ``.OnEscalation(then, code=...)`` onto the
+    subprocess task (before ``.Next()``). Non-interrupting: the subprocess
+    keeps running.
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+
+
+class EscalationThrow(
+    mixins.NodeDetailMixin,
+    mixins.NodeUndoMixin,
+    mixins.NodeReviveMixin,
+    mixins.NodeCancelMixin,
+    nodes.EscalationThrow,
+):
+    """
+    Escalation throw event raised inside a subprocess, caught by the parent's
+    ``.OnEscalation`` boundary. Nothing is interrupted.
+
+    Example::
+
+        over_budget = flow.EscalationThrow("over-budget").Next(this.keep_going)
+
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
+
+
+class TerminateEnd(
+    mixins.NodeDetailMixin,
+    mixins.NodeUndoMixin,
+    mixins.NodeReviveMixin,
+    nodes.TerminateEnd,
+):
+    """
+    Terminate end event: cancels all other active tasks and finishes the
+    process immediately.
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
+
+
+class ErrorEnd(
+    mixins.NodeDetailMixin,
+    mixins.NodeUndoMixin,
+    mixins.NodeReviveMixin,
+    nodes.ErrorEnd,
+):
+    """
+    Error end event: interrupts the process and records it as failed. In a
+    subprocess, marks the parent task ``ERROR`` so the parent's
+    ``.OnError`` boundary can catch it.
+
+    Example::
+
+        fail_end = flow.ErrorEnd("payment-failed")
+
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
+
+
+class CompensateThrow(
+    mixins.NodeDetailMixin,
+    mixins.NodeUndoMixin,
+    nodes.CompensateThrow,
+):
+    """
+    Compensation throw event: runs the ``.CompensateWith`` handlers of
+    completed tasks in reverse completion order, then continues.
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
+
+
+class SendHandle(Function, nodes.SendHandle):
+    """
+    Outbound message hook, executed synchronously (BPMN send task).
+
+    Example::
+
+        send = flow.SendHandle(this.notify_customer).Next(this.end)
+
+    """
+
+
+class BusinessRule(Function, nodes.BusinessRule):
+    """
+    Business rule evaluation, executed synchronously (BPMN business rule
+    task).
+
+    Example::
+
+        discount = flow.BusinessRule(this.calc_discount).Next(this.end)
+
+    """
+
+
+class ManualTask(View, nodes.ManualTask):
+    """
+    Task performed by a person outside of any system (BPMN manual task).
+
+    Shows up in the task list; the user picks it and marks it done -- by
+    default with a plain confirmation form, no fields.
+
+    Example::
+
+        greet = flow.ManualTask().Next(this.end)
+
+    """
+
+    def __init__(self, view=None, **kwargs):
+        if view is None:
+            view = views.UpdateProcessView.as_view(fields=[])
+        super().__init__(view, **kwargs)
+
+
+class MessageCatch(
+    mixins.NodeDetailMixin,
+    mixins.NodeCancelMixin,
+    mixins.NodeUndoMixin,
+    mixins.NodeReviveMixin,
+    nodes.MessageCatch,
+):
+    """
+    Intermediate message catch event, completed from external code.
+
+    Example::
+
+        wait_payment = flow.MessageCatch(this.on_payment).Next(this.ship)
+
+        # from external code
+        MyFlow.wait_payment.run(task, amount=100)
+
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
+
+
+class MessageThrow(Function, nodes.MessageThrow):
+    """
+    Intermediate message throw event -- an outbound hook executed
+    synchronously.
+
+    Example::
+
+        notify = flow.MessageThrow(this.send_receipt).Next(this.end)
+
+    """
+
+
+class SignalCatch(
+    mixins.NodeDetailMixin,
+    mixins.NodeCancelMixin,
+    mixins.NodeUndoMixin,
+    mixins.NodeReviveMixin,
+    nodes.SignalCatch,
+):
+    """
+    Intermediate signal catch event: waits until a matching signal is thrown
+    by any process.
+
+    Example::
+
+        wait = flow.SignalCatch("order-shipped").Next(this.notify)
+
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
+
+
+class SignalThrow(
+    mixins.NodeDetailMixin,
+    mixins.NodeUndoMixin,
+    mixins.NodeReviveMixin,
+    mixins.NodeCancelMixin,
+    nodes.SignalThrow,
+):
+    """
+    Intermediate signal throw event: broadcasts a named signal to every armed
+    ``flow.SignalCatch``, then continues.
+
+    Example::
+
+        fire = flow.SignalThrow("order-shipped").Next(this.end)
+
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    undo_view_class = views.UndoTaskView
+    revive_view_class = views.ReviveTaskView
+
+
+class ConditionalCatch(
+    mixins.NodeDetailMixin,
+    mixins.NodeCancelMixin,
+    mixins.NodeReviveMixin,
+    nodes.ConditionalCatch,
+):
+    """
+    Intermediate conditional catch event: waits until a condition over the
+    process data holds, evaluated by the ``workflow_timers`` dispatcher.
+
+    Example::
+
+        wait = flow.ConditionalCatch(
+            lambda activation: activation.process.approved
+        ).Next(this.proceed)
+
+    """
+
+    index_view_class = views.IndexTaskView
+    detail_view_class = views.DetailTaskView
+    cancel_view_class = views.CancelTaskView
     revive_view_class = views.ReviveTaskView

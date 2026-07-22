@@ -62,7 +62,7 @@ class Handle(mixins.NextNodeMixin, Node):
         """,
     }
 
-    bpmn_element = "scriptTask"
+    bpmn_element = "receiveTask"
 
     def __init__(self, func=None, undo_func=None, **kwargs):
         super().__init__(**kwargs)

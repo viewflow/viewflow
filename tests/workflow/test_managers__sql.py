@@ -97,7 +97,8 @@ class Test(TestCase):  # noqa: D101
             str(queryset.query).strip(),
             'SELECT "viewflow_task"."id", "viewflow_task"."flow_task", "viewflow_task"."flow_task_type",'
             ' "viewflow_task"."status", "viewflow_task"."created", "viewflow_task"."assigned",'
-            ' "viewflow_task"."started", "viewflow_task"."finished", "viewflow_task"."token",'
+            ' "viewflow_task"."started", "viewflow_task"."finished",'
+            ' "viewflow_task"."scheduled", "viewflow_task"."token",'
             ' "viewflow_task"."external_task_id", "viewflow_task"."owner_id",'
             ' "viewflow_task"."owner_permission", "viewflow_task"."owner_permission_content_type_id",'
             ' "viewflow_task"."owner_permission_obj_pk", "viewflow_task"."process_id",'

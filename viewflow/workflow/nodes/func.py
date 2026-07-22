@@ -66,3 +66,52 @@ class Function(mixins.NextNodeMixin, mixins.NodePermissionMixin, Node):
     def _resolve(self, instance):
         super()._resolve(instance)
         self._func = this.resolve(instance, self._func)
+
+
+class SendHandle(Function):
+    """
+    Outbound message hook, executed synchronously (BPMN send task).
+
+    Example::
+
+        send = flow.SendHandle(this.notify_customer).Next(this.end)
+
+    """
+
+    bpmn_element = "sendTask"
+
+    shape = {
+        "width": 150,
+        "height": 100,
+        "text-align": "middle",
+        "svg": """
+            <rect class="task" width="150" height="100" rx="5" ry="5"/>
+            <rect x="8" y="8" width="21" height="14" fill="rgb(0, 0, 0)" stroke="rgb(0, 0, 0)"/>
+            <path d="M 8 8 L 18.5 16 L 29 8" fill="none" stroke="rgb(255, 255, 255)" stroke-width="1.5"/>
+        """,
+    }
+
+
+class BusinessRule(Function):
+    """
+    Business rule evaluation, executed synchronously (BPMN business rule
+    task).
+
+    Example::
+
+        discount = flow.BusinessRule(this.calc_discount).Next(this.end)
+
+    """
+
+    bpmn_element = "businessRuleTask"
+
+    shape = {
+        "width": 150,
+        "height": 100,
+        "text-align": "middle",
+        "svg": """
+            <rect class="task" width="150" height="100" rx="5" ry="5"/>
+            <rect x="8" y="8" width="24" height="16" fill="none" stroke="rgb(0, 0, 0)"/>
+            <path d="M 8 13 L 32 13 M 8 18.5 L 32 18.5 M 16 13 L 16 24" fill="none" stroke="rgb(0, 0, 0)"/>
+        """,
+    }

@@ -12,6 +12,9 @@
               <span class="vf-modal-trigger__helper"></span>
               <div class="vf-modal-trigger__content">
                 <div class="vf-modal-trigger__button">&times;</div>
+                <a class="vf-modal-trigger__export" href="{% reverse process.flow_class 'process_chart' process.pk %}?format=bpmn" download title="{% trans 'Export BPMN' %}">
+                  <span class="material-icons">download</span>{% trans 'BPMN' %}
+                </a>
                 <vf-img>
                   <img class="responsive-img" src="{% reverse process.flow_class 'process_chart' process.pk %}" alt="flow graph" style="height:100%;max-width:100%"/>
                 </vf-img>

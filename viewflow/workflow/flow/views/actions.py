@@ -8,6 +8,8 @@ from django.utils.translation import gettext_lazy as _
 from django.views import generic
 
 from viewflow.views import BaseBulkActionView
+from viewflow.workflow.activation import _can_cancel
+from viewflow.workflow.exceptions import FlowRuntimeError
 from viewflow.workflow.models import Task
 from viewflow.workflow.status import PROCESS, STATUS
 from . import mixins
@@ -172,20 +174,51 @@ class CancelProcessView(mixins.ProcessViewTemplateNames, generic.DetailView):
             )
         ]
 
+    @cached_property
+    def uncancellable_activations(self):
+        """Active tasks that can't be cancelled from their current status.
+
+        A mid-execution task (e.g. a ``View`` a user still has open, in
+        STARTED) or a custom node without a ``cancel`` transition can't be
+        cancelled -- cancelling the process would raise ``FlowRuntimeError``.
+        """
+        return [act for act in self.active_activations if not _can_cancel(act)]
+
+    @cached_property
+    def can_cancel(self):
+        return not self.uncancellable_activations
+
+    def get_context_data(self, **kwargs):
+        kwargs.setdefault("can_cancel", self.can_cancel)
+        kwargs.setdefault("uncancellable_activations", self.uncancellable_activations)
+        return super().get_context_data(**kwargs)
+
+    def _cannot_cancel(self):
+        messages.add_message(
+            self.request,
+            messages.ERROR,
+            _("Process #%(pk)s can not be canceled.") % {"pk": self.object.pk},
+            fail_silently=True,
+        )
+        return HttpResponseRedirect("../")
+
     def post(self, request, *args, **kwargs):
         """Cancel active tasks and the process."""
         self.object = self.get_object()
 
         if self.object.status in [PROCESS.DONE, PROCESS.CANCELED]:
-            messages.add_message(
-                self.request,
-                messages.ERROR,
-                _("Process #%(pk)s can not be canceled.") % {"pk": self.object.pk},
-                fail_silently=True,
-            )
-            return HttpResponseRedirect("../")
+            return self._cannot_cancel()
         elif "_cancel_process" in request.POST:
-            self.object.flow_class.instance.cancel(self.object)
+            # Don't allow the cancel when an active task can't be cancelled
+            # -- refuse cleanly instead of letting FlowRuntimeError 500.
+            if not self.can_cancel:
+                return self._cannot_cancel()
+            try:
+                self.object.flow_class.instance.cancel(self.object)
+            except FlowRuntimeError:
+                # A task became uncancellable between the check and the
+                # locked cancel (concurrent start); still refuse cleanly.
+                return self._cannot_cancel()
             messages.add_message(
                 self.request,
                 messages.SUCCESS,

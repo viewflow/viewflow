@@ -58,7 +58,9 @@ class AbstractProcess(models.Model):
             template_content = self.flow_class.process_description
 
         if not template_content:
-            template_content = "{{ flow_class.process_title }} - {{ process.get_status_display }}"
+            template_content = (
+                "{{ flow_class.process_title }} - {{ process.get_status_display }}"
+            )
 
         return Template(force_str(template_content)).render(
             Context({"process": self.coerced, "flow_class": self.flow_class})
@@ -96,6 +98,11 @@ class AbstractTask(models.Model):
     assigned = models.DateTimeField(_("Assigned"), blank=True, null=True)
     started = models.DateTimeField(_("Started"), blank=True, null=True)
     finished = models.DateTimeField(_("Finished"), blank=True, null=True)
+
+    # the moment a Timer task is due to fire; queried by the timer dispatcher
+    scheduled = models.DateTimeField(
+        _("Scheduled"), blank=True, null=True, db_index=True
+    )
 
     previous = models.ManyToManyField(
         "self", symmetrical=False, related_name="leading", verbose_name=_("Previous")

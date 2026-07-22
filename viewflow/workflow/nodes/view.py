@@ -273,6 +273,34 @@ class View(
         # User have flow management permissions
         return self.flow_class.instance.has_manage_permission(user)
 
+
+class ManualTask(View):
     """
-    TODO: Reassign
+    Task performed by a person outside of any system (BPMN manual task).
+
+    Shows up in the task list; the user picks it and marks it done -- by
+    default with a plain confirmation form, no fields.
+
+    Example::
+
+        greet = flow.ManualTask().Next(this.end)
+
     """
+
+    bpmn_element = "manualTask"
+
+    shape = {
+        "width": 150,
+        "height": 100,
+        "text-align": "middle",
+        "svg": """
+            <rect class="task" width="150" height="100" rx="5" ry="5"/>
+            <path d="M 9 15 c 0 -3 2 -5 5 -5 l 10 0 c 2 0 3 1 3 3 c 0 2 -1 3 -3 3
+                     l -5 0 l 8 0 c 2 0 3 1 3 3 c 0 2 -1 3 -3 3 l -3 0 l 2 0
+                     c 2 0 3 1 3 3 c 0 2 -1 3 -3 3 l -12 0 c -3 0 -5 -2 -5 -5 z"
+                  fill="none" stroke="rgb(0, 0, 0)"/>
+        """,
+    }
+
+    def __init__(self, view=None, **kwargs):
+        super().__init__(view, **kwargs)

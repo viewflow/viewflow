@@ -1,7 +1,7 @@
 from django.db import transaction
 from django.utils.timezone import now
 from viewflow.this_object import this
-from ..activation import Activation
+from ..activation import Activation, _can_cancel
 from ..base import Node
 from ..exceptions import FlowRuntimeError
 from ..status import STATUS
@@ -106,9 +106,7 @@ class JoinActivation(mixins.NextNodeActivationMixin, Activation):
         activations = [task.flow_task.activation_class(task) for task in active_tasks]
 
         not_cancellable = [
-            activation
-            for activation in activations
-            if not activation.cancel.can_proceed()
+            activation for activation in activations if not _can_cancel(activation)
         ]
         if not_cancellable:
             raise FlowRuntimeError(
@@ -180,16 +178,29 @@ class Join(
 
     task_type = "JOIN"
 
-    shape = {
-        "width": 50,
-        "height": 50,
-        "svg": """
-            <path class="gateway" d="M25,0L50,25L25,50L0,25L25,0"/>
-            <text class="gateway-marker" font-size="32px" x="25" y="35">+</text>
-        """,
-    }
+    @property
+    def bpmn_element(self):
+        """N-of-M/discriminator behavior maps to the BPMN complex gateway."""
+        return "complexGateway" if self._continue_on_condition else "parallelGateway"
 
-    bpmn_element = "parallelGateway"
+    @property
+    def shape(self):
+        complex_gateway = self.bpmn_element == "complexGateway"
+        marker = "*" if complex_gateway else "+"
+        # the Arial asterisk glyph sits high in the em box, so its baseline
+        # needs to drop to sit centered in the diamond; the plus is centered
+        # on the baseline already
+        marker_y = 42 if complex_gateway else 35
+        return {
+            "width": 50,
+            "height": 50,
+            "svg": """
+                <path class="gateway" d="M25,0L50,25L25,50L0,25L25,0"/>
+                <text class="gateway-marker" font-size="32px" x="25" y="{y}">{marker}</text>
+            """.format(
+                y=marker_y, marker=marker
+            ),
+        }
 
     def __init__(
         self, continue_on_condition=None, cancel_active=True, **kwargs
