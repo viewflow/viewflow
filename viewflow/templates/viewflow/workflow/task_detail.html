@@ -42,7 +42,12 @@
     <h4 class="mdc-typography mdc-typography--headline5"  style="margin-bottom:10px">{% trans "Subprocess" %}</h4>
     <div>
       {% for subprocess in subprocesses %}
-        <a class="mdc-typography mdc-typography--subtitle1" href="{% reverse subprocess.flow_class 'process_detail' subprocess.pk %}">{{ subprocess }}</a>{% if not forloop.last %}, {% endif %}
+        {% reverse subprocess.flow_class 'process_detail' subprocess.pk as subprocess_url %}
+        {% if subprocess_url %}
+          <a class="mdc-typography mdc-typography--subtitle1" href="{{ subprocess_url }}">{{ subprocess }}</a>{% if not forloop.last %}, {% endif %}
+        {% else %}
+          <span class="mdc-typography mdc-typography--subtitle1">{{ subprocess }}</span>{% if not forloop.last %}, {% endif %}
+        {% endif %}
       {% endfor %}
     </div>
   </div>
