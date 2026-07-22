@@ -11,7 +11,11 @@
 .vf-dashboard {
   display: flex;
   align-items: stretch;
-  height: calc(100vh - 48px);
+  // Fill the full page height (which a long nav menu can push past the
+  // viewport) and grow with the columns' content when they are taller.
+  // A fixed height here would pin the columns to the viewport, leaving a
+  // gap below them on tall pages.
+  min-height: max(100%, calc(100vh - 48px));
   max-width:100%;
   padding-right: 10px;
 

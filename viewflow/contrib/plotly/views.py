@@ -90,9 +90,11 @@ def update_component_endpoint(request, viewset):
         )
     else:
         callback_args = [
-            [item.get("value") for item in items]
-            if isinstance(items, list)
-            else items.get("value")
+            (
+                [item.get("value") for item in items]
+                if isinstance(items, list)
+                else items.get("value")
+            )
             for items in inputs + state
         ]
 

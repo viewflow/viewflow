@@ -75,6 +75,17 @@ class Test(TestCase):  # noqa: D101
 
         self.assertContains(response, "/tickets/chart/")
 
+    def test_list_page_shows_flow_diagram_with_export(self):
+        response = self.client.get("/tickets/")
+
+        self.assertEqual(response.status_code, 200)
+        # The state diagram is embedded next to the object table ...
+        self.assertContains(response, "<vf-network")
+        self.assertContains(response, "digraph")
+        # ... together with a PNG export control.
+        self.assertContains(response, "data-vf-network-export")
+        self.assertContains(response, "chartticket-flow.png")
+
 
 urlpatterns = [
     path("tickets/", ChartTicketViewset(app_name="tickets").urls),

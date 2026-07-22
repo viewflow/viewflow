@@ -4,8 +4,19 @@ vf-modal-trigger {
  &:not(.vf-modal-trigger--open) {
     cursor: pointer;
 
-    .vf-modal-trigger__button  {
+    .vf-modal-trigger__button,
+    .vf-modal-trigger__export {
       display: none;
+    }
+
+    // As a thumbnail, a canvas diagram (vis-network) has no intrinsic size and
+    // would otherwise grow to fill -- and blow out -- its container. Keep it to
+    // a compact preview; it fits the whole graph via the network's auto-fit.
+    .vf-modal-trigger__content vf-network {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: 200px;
     }
   }
 
@@ -41,9 +52,43 @@ vf-modal-trigger {
       width: 30px;
       height: 30px;
       text-align: center;
+      // Stay above the panned/zoomed diagram, which -- being transformed --
+      // paints in the positioned layer and would otherwise cover the button.
+      z-index: 2;
 
       &:hover {
         text-shadow: 1px 1px 1px darkgrey
+      }
+    }
+
+    .vf-modal-trigger__export {
+      position: absolute;
+      bottom: 10px;
+      right: 10px;
+      // Stay above the panned/zoomed diagram, like the close button.
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px 4px 6px;
+      background-color: #fff;
+      border: 1px solid rgba(0, 0, 0, .2);
+      border-radius: 4px;
+      color: rgba(0, 0, 0, .75);
+      font-family: Roboto, arial, sans-serif;
+      font-size: 13px;
+      font-weight: 500;
+      line-height: 1;
+      text-decoration: none;
+      cursor: pointer;
+
+      .material-icons {
+        font-size: 18px;
+      }
+
+      &:hover {
+        background-color: #f5f5f5;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, .2);
       }
     }
 
@@ -58,6 +103,29 @@ vf-modal-trigger {
       width: 60%;
       position: relative;
       padding: 15px 5%;
+      // Keep the panned/zoomed diagram clipped to the dialog box instead of
+      // spilling the SVG out over the page.
+      overflow: hidden;
+
+      img {
+        cursor: grab;
+        // Take over touch gestures so the browser doesn't scroll/zoom the page.
+        touch-action: none;
+        user-select: none;
+        -webkit-user-drag: none;
+      }
+
+      // A canvas diagram (vis-network) fills the whole dialog; the network
+      // provides its own pan/zoom.
+      vf-network {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
     }
+  }
+
+  &.vf-modal-trigger--panning .vf-modal-trigger__content img {
+    cursor: grabbing;
   }
 }

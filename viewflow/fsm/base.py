@@ -209,7 +209,9 @@ class TransitionBoundMethod:
         current_state = self._state.get(self._instance)
         transition = self._descriptor.get_transition(current_state)
         if transition:
-            return transition.conditions_met(self._instance) if check_conditions else True
+            return (
+                transition.conditions_met(self._instance) if check_conditions else True
+            )
         return False
 
     def has_perm(self, user: UserModel) -> bool:

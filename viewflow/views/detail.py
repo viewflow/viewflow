@@ -49,6 +49,7 @@ class DetailModelView(generic.DetailView):
         context = super().get_context_data(**kwargs)
         if self.viewset is not None and hasattr(self.viewset, "get_flow_state"):
             from viewflow.fsm.chart import chart
+
             context["flow_chart"] = chart(self.viewset.get_flow_state(self.request))
         return context
 

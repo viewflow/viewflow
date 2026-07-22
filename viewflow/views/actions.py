@@ -49,6 +49,15 @@ class BaseBulkActionView(FilterableViewMixin, MultipleObjectMixin, generic.FormV
         }
 
     def get_queryset(self):
+        # Scope the base queryset through the viewset, the same way the list
+        # view does, so a "Select All" bulk action never operates on records
+        # outside the viewset's scope (e.g. other accounts' rows).
+        if (
+            self.queryset is None
+            and self.viewset is not None
+            and hasattr(self.viewset, "get_queryset")
+        ):
+            self.queryset = self.viewset.get_queryset(self.request)
         queryset = super().get_queryset()
         pks = self.request.POST.getlist("pk")
         select_all = self.request.POST.get("select_all")
@@ -59,9 +68,8 @@ class BaseBulkActionView(FilterableViewMixin, MultipleObjectMixin, generic.FormV
 
     @cached_property
     def objects_count(self):
-        if (
-            self.request.POST.get("select_all")
-            and not self.filterset.form.has_changed()
+        if self.request.POST.get("select_all") and (
+            self.filterset is None or not self.filterset.form.has_changed()
         ):
             return None
         return self.object_list.count()

@@ -2,6 +2,188 @@
 Changelog
 =========
 
+2.4.0
+-----
+
+- Fix 500 on the admin process changelist: the ``flow_class`` list filter
+  executed the changelist participants prefetch against materialized flow
+  classes (#523). The filter now builds its choices from the plain model
+  manager and labels them with the flow's ``process_title``.
+- Fix 500 on the workflow task detail page when a ``Subprocess`` child flow
+  is not registered as a viewset — the subprocess link degrades to plain
+  text instead of raising ``NoReverseMatch``.
+- BPMN 2.0 export overhaul: exported files now pass validation against the
+  official OMG schema and open in bpmn.io/Camunda Modeler. ``Switch``,
+  ``Subprocess`` and ``NSubprocess`` nodes are no longer dropped from the
+  export (previously leaving dangling ``sequenceFlow`` references); they map
+  to an exclusive gateway and call activities (with a multi-instance marker
+  for ``NSubprocess``).
+- More faithful BPMN element mapping: ``Handle`` exports as ``receiveTask``,
+  celery ``Job`` as ``serviceTask``, ``StartHandle`` as a message start
+  event, a conditional ``Split`` as an inclusive gateway, and a ``Join``
+  with ``continue_on_condition`` as a complex gateway. ``If`` branches are
+  labeled yes/no and ``Switch`` marks its default flow.
+- Download a flow's BPMN file from the chart view and the REST API with
+  ``?format=bpmn``, in addition to the ``flowexport`` management command.
+- New database-backed ``flow.Timer`` node: the due moment is stored on the
+  task row (new ``Task.scheduled`` field, migration included) and survives
+  a message broker restart or flush, unlike ``celery.Timer``. Due timers
+  are fired by the ``workflow_timers`` management command (cron) or the
+  ``viewflow.workflow.tasks.workflow_fire_timers`` celery beat task.
+- New ``flow.StartTimer(interval=...)`` node starts a process on schedule,
+  fired by the same dispatcher; exports as a BPMN timer start event.
+- New boundary events, declared fluently on the host task (chained before
+  ``.Next()``): ``.OnTimeout(delay, then)`` fires a deadline/escalation path
+  when the delay elapses before the task completes; ``.OnError(then,
+  code=...)`` catches a background task failure and routes it to a recovery
+  path. Interrupting by default (cancels the host task);
+  ``interrupting=False`` starts a parallel path instead. Exported as BPMN
+  boundary events drawn on the host task's border.
+- New ``flow.TerminateEnd()`` cancels all other active tasks and finishes
+  the process immediately (BPMN terminate end event).
+- New ``flow.ErrorEnd(code)`` interrupts the process and records it as
+  failed; inside a subprocess the parent task is marked ``ERROR`` so the
+  parent's ``.OnError(this.recover, code=...)`` boundary catches it.
+- Compensation support: ``.CompensateWith(this.handler)`` registers an
+  undo handler on any task; ``flow.CompensateThrow()`` runs the handlers
+  of completed tasks in reverse completion order, each at most once.
+  Exported as compensation boundary events with associations.
+- New task-type nodes with dedicated BPMN export and chart markers:
+  ``flow.SendHandle`` (send task), ``flow.BusinessRule`` (business rule
+  task), and ``flow.ManualTask`` -- work performed outside any system,
+  marked done from the task list with a no-field confirmation form.
+- ``flow.NSubprocess(..., sequential=True)`` runs one child process at a
+  time. ``flow.Split`` branches with ``task_data_source`` now mark their
+  target activity multi-instance in the BPMN export and SVG chart.
+- New intermediate events: ``flow.MessageCatch``/``flow.MessageThrow``
+  (message catch/throw), ``flow.SignalCatch``/``flow.SignalThrow``
+  (broadcast -- one throw releases every armed catch across processes and
+  flow classes), ``flow.EscalationThrow`` with a non-interrupting
+  ``.OnEscalation`` boundary (notify a parent subprocess without
+  interrupting it), and ``flow.ConditionalCatch`` (waits until a condition
+  over process data holds, fired by the ``workflow_timers`` dispatcher).
+  All exported with the matching BPMN event definitions.
+- Chart layout: empty grid rows/columns are now collapsed and cell
+  collisions resolved (fixing overlapping nodes); edge routing staggers
+  parallel channels, routes around node shapes, and renders ``If`` yes/no
+  labels in the SVG.
+- ``InlineFormSetField`` (and the other composite form fields) now honor a
+  field-level ``initial=[...]`` argument as a fallback when the bound form
+  provides no initial for that field, so pre-populated formset rows render
+  their values.
+- FSM (``viewflow.fsm``): the ``FlowViewsMixin`` list page now shows the state
+  diagram alongside the object table, in a click-to-zoom dialog matching the
+  BPMN process chart. The diagram (and the one in the Django admin change list)
+  can be exported as a PNG image. The admin change-list graph is now sized so
+  it no longer blows out the filter sidebar and hides the object list.
+- Workflow ``flow.View`` gained an optional ``reassign_view_class`` hook,
+  finishing the built-in (owner/manager-gated) ``reassign`` transition: point
+  it at a view that collects the target user and calls
+  ``activation.reassign(user=...)``, and a "Reassign" action button appears on
+  the task. Off by default (delegation policy is application-specific). See the
+  new ``substitute`` cookbook sample.
+- New ``snooze`` cookbook sample: hide a human task from the inbox until a
+  chosen time, with a dedicated "Snoozed" menu entry next to Inbox/Queue/
+  Archive (issue #219). Implemented entirely in application code -- a
+  ``flow.View`` subclass adds ``snooze``/``unsnooze`` task actions storing the
+  wake-up time in ``task.data``, and a ``FlowAppViewset`` subclass filters the
+  inbox and adds the Snoozed list. No background worker and no core change: a
+  task is snoozed only while its stored wake-up time is in the future.
+- New ``dynamic_subprocess`` cookbook sample: start additional ``NSubprocess``
+  children while the parent task is still running (issue #258). A custom
+  "Add item" action on the order's process-detail page attaches one more child
+  process to the still-``STARTED`` ``NSubprocess`` task -- calling the same
+  ``start_subprocess_task.run(_parent_task=task, item=...)`` the node uses to
+  fan out -- so the join now also waits for the added item. No core change.
+- Every built-in control node is now cancellable: ``Split``, ``Switch``,
+  ``End`` (and ``TerminateEnd``/``ErrorEnd``) and ``CompensateThrow`` gained
+  a ``cancel`` transition (from ``ERROR``), so cancelling a process that has
+  one of them stuck in ``ERROR`` no longer raises ``AttributeError``.
+- ``Flow.cancel`` (and the join/end cancel helpers) now raise the intended
+  ``FlowRuntimeError`` -- not ``AttributeError`` -- when an active task's node
+  defines no ``cancel`` transition (e.g. a custom node).
+- The process cancel view no longer 500s when an active task can't be
+  cancelled (e.g. a ``View`` a user still has open, in ``STARTED``): it
+  refuses cleanly with a flash message and disables the cancel button while
+  such tasks are active.
+- The flow diagram modal is now pan- and zoom-able: scroll to zoom toward
+  the cursor, drag to pan, pinch to zoom on touch devices, and double-click
+  to reset -- making large, complex flow charts readable. The zoomed diagram
+  is clipped to the dialog (no longer spilling over the page) and the close
+  button stays on top. Implemented natively in the ``vf-modal-trigger``
+  component with no added dependency.
+- The flow diagram dialog gained a BPMN export button that downloads the
+  chart as a ``.bpmn`` file (the same ``?format=bpmn`` the chart view already
+  served), on both the flow dashboard and the process detail panel.
+- ``process_dashboard.html`` now exposes a ``flow_start_card_actions`` block,
+  so projects can append controls to the start card by extending the template
+  instead of copying it (the bundled demo override now does this and no longer
+  drifts from the library template).
+- Fix a bulk-action crash on "Select All" for a model viewset without a
+  configured filter (no ``list_filterset_class`` / ``list_filter_fields``):
+  ``objects_count`` dereferenced a ``None`` filterset and raised
+  ``AttributeError: 'NoneType' object has no attribute 'form'`` (#422).
+- Bulk actions now scope their base queryset through the viewset's
+  ``get_queryset(request)``, the same way the list view does, so a
+  "Select All" delete no longer operates on rows outside the viewset's
+  scope (e.g. other accounts' records).
+- A virtual list column (a viewset/model method or property) can now be
+  made sortable by declaring an ``orderby_column`` -- a field-lookup string
+  (e.g. ``"data__price"`` to sort by a ``JSONField`` key) or a query
+  expression (e.g. ``Cast("data__price", IntegerField())`` for a numeric
+  sort). Expression-ordered columns now also render the sort-direction
+  indicator in the header (#361).
+- New ``jsonstore.ForeignKey`` field: reference another model from data kept
+  in a JSONField. The related object's pk is stored under ``<name>_id``,
+  ``instance.<name>`` loads it lazily, and ``formfield()`` is a
+  ``ModelChoiceField`` so it works in forms, viewsets and the admin. Like the
+  other JSON Store fields it needs no column or migration; being document-based
+  it has no DB constraint, reverse accessor, or join support (query via
+  ``filter(data__<name>_id=...)``). Target models with a non-integer (e.g.
+  ``UUIDField``) primary key are supported (#366).
+- New JSON Store field types: ``BigIntegerField``, ``SmallIntegerField``,
+  ``PositiveIntegerField``, ``PositiveSmallIntegerField``,
+  ``PositiveBigIntegerField``, ``SlugField``, ``FilePathField``,
+  ``UUIDField`` (stored as a string, read back as a ``uuid.UUID``),
+  ``DurationField`` (stored as an ISO-8601 duration, read back as a
+  ``timedelta``) and ``BinaryField`` (stored base64-encoded, read back as
+  ``bytes``).
+- New ``jsonstore.OneToOneField``: a one-to-one relation stored in the
+  JSONField, identical to ``jsonstore.ForeignKey`` on the forward side; being
+  document-based it enforces no ``UNIQUE`` constraint.
+- New ``jsonstore.ManyToManyField``: a many-to-many relation kept as a list of
+  primary keys inside the JSONField, with no join table. ``instance.<name>``
+  is a manager with ``all``/``add``/``remove``/``set``/``clear``/``count``, and
+  ``formfield()`` is a ``ModelMultipleChoiceField`` that persists a form
+  selection. The manager mutates the in-memory document (call ``save()`` to
+  persist); there is no ``through`` model or reverse accessor. UUID-pk targets
+  are supported (#366).
+- JSON Store fields gained a ``json_key`` argument to control where the value
+  is stored inside the document: a string for a custom key, or a list/tuple for
+  a nested path (``json_key=("address", "city")`` -> ``data["address"]["city"]``,
+  with intermediate dicts created automatically and shareable between fields).
+  The custom key / nested path is honored by reading, writing, filtering and
+  ordering, and works with every field type including the relation fields.
+- New ``jsonstore.EmbeddedModel`` / ``jsonstore.EmbeddedField``: a schema-only
+  "virtual model" (typed fields, no table) embedded in a host model as a nested
+  JSON document. Typed fields serialize at depth, ``json_key`` works inside the
+  document, an embedded model can nest another, and reading returns an instance
+  bound to the stored sub-document so in-place edits are saved. Query nested
+  values through the raw JSON key (``filter(data__price__amount=...)``) (#366).
+- New ``jsonstore.EmbeddedListField``: store a list of ``EmbeddedModel``
+  instances as an array of JSON documents (the embedded-document analogue of
+  ``ManyToManyField``). ``instance.<name>`` is a mutable, list-like accessor
+  (indexing, iteration, ``append``, ``insert``, ``del``); each element is bound
+  to its stored document so in-place edits are saved. Accepts ``json_key`` /
+  ``json_field_name`` (#366).
+- ``viewflow.forms`` can now edit embedded documents as nested forms:
+  ``EmbeddedModelForm`` builds a form from an ``EmbeddedModel`` schema, and the
+  ``EmbeddedFormField`` / ``EmbeddedFormSetField`` composite fields bind it to a
+  ``jsonstore.EmbeddedField`` / ``EmbeddedListField`` -- so a document edits as a
+  nested form and a list of them edits as inlines, all saved to the one JSON
+  column. New ``cookbook/embed101`` demo (mounted at ``/embedded/``) with a raw-
+  JSON admin (#366).
+
 2.3.2  2026-07-06
 -----------------
 

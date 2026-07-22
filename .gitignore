@@ -26,3 +26,5 @@ node_modules/
 /docs/_build/**
 /npm-debug.log
 /geckodriver.log
+
+celerybeat-schedule.db

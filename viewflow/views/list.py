@@ -34,6 +34,21 @@ def _get_method_attr(data_source, method_name, attr_name, default=None):
     return default
 
 
+def _orderby_base_prefix(orderby):
+    """Base sort direction declared by a column's ``orderby()`` value.
+
+    Returns ``"-"`` for a descending default and ``""`` otherwise. Works for
+    both string orderings (``"-created"``) and query expressions (an
+    ``OrderBy`` built with ``.desc()``); a plain expression -- e.g.
+    ``Cast("data__price", ...)`` for a JSONField key -- defaults to
+    ascending.
+    """
+    if isinstance(orderby, str):
+        _, prefix, _ = orderby.rpartition("-")
+        return prefix
+    return "-" if getattr(orderby, "descending", False) else ""
+
+
 class BaseColumn(object):
     def __init__(self, attr_name):
         self.attr_name = attr_name
@@ -216,17 +231,27 @@ class OrderableListViewMixin(object):
                 column_def = self.list_columns.get(param_name)
                 if column_def:
                     column_ordering = column_def.orderby()
-                    if column_ordering:
-                        if hasattr(column_ordering, "as_sql"):
+                    if column_ordering is None:
+                        continue
+                    if hasattr(column_ordering, "resolve_expression"):
+                        # a query expression -- F(), Cast(),
+                        # KeyTextTransform(), a prebuilt OrderBy(), ... --
+                        # e.g. to sort by a JSONField key or any other
+                        # virtual column. A plain expression carries no
+                        # direction, so apply the requested one; an OrderBy
+                        # (no .asc/.desc) is used as declared.
+                        if hasattr(column_ordering, "asc"):
                             ordering.append(
                                 column_ordering.desc()
                                 if prefix == "-"
                                 else column_ordering.asc()
                             )
-                        elif column_ordering.startswith("-") and prefix == "-":
-                            ordering.append(column_ordering[1:])
                         else:
-                            ordering.append(prefix + column_ordering)
+                            ordering.append(column_ordering)
+                    elif column_ordering.startswith("-") and prefix == "-":
+                        ordering.append(column_ordering[1:])
+                    else:
+                        ordering.append(prefix + column_ordering)
         else:
             # default view ordering
             if isinstance(self.ordering, (list, tuple)):
@@ -253,15 +278,14 @@ class OrderableListViewMixin(object):
                 column_def = self.list_columns.get(param_name)
                 if column_def:
                     column_ordering = column_def.orderby()
-                    if column_ordering is not None and isinstance(column_ordering, str):
-                        # TODO support custom OrderBy expressions
-                        (
-                            _,
-                            column_order_prefix,
-                            column_orderby,
-                        ) = column_ordering.rpartition("-")
+                    if column_ordering is not None:
+                        # str ("-created") or a query expression (Cast(),
+                        # KeyTextTransform(), OrderBy(), ... for a virtual /
+                        # JSONField column) -- flip the base direction when
+                        # the requested prefix differs from the declared one.
+                        base_prefix = _orderby_base_prefix(column_ordering)
                         ordering[column_def] = (
-                            "asc" if column_order_prefix == param_prefix else "desc"
+                            "asc" if base_prefix == param_prefix else "desc"
                         )
         else:
             # ordered by explicit self.ordering definition or by queryset.order_by
@@ -274,13 +298,17 @@ class OrderableListViewMixin(object):
                 raw_ordering.extend(self.queryset.query.order_by)
 
             for param in raw_ordering:
+                # queryset.query.order_by may hold expression objects; the
+                # default-order indicator is matched by field name, so only
+                # string terms can be resolved back to a column here.
+                if not isinstance(param, str):
+                    continue
                 _, param_prefix, param_name = param.rpartition("-")
                 for column_def in self.list_columns.values():
                     if column_def in ordering:  # column order already found
                         continue
                     column_ordering = column_def.orderby()
                     if column_ordering is not None and isinstance(column_ordering, str):
-                        # TODO support custom OrderBy expressions
                         (
                             _,
                             column_order_prefix,

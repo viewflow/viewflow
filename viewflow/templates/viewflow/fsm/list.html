@@ -1,0 +1,24 @@
+{% extends "viewflow/views/list.html" %}
+{% load i18n %}
+{% comment %}
+  List view for an FSM `FlowViewsMixin` viewset: the object table on the left
+  with the flow diagram (click to zoom, export as PNG) alongside it.
+{% endcomment %}
+
+{% block list-cell-span %}mdc-layout-grid__cell--span-9-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone{% endblock %}
+
+{% block list-cell %}
+  {{ block.super }}
+  {% if flow_chart %}
+    <div class="mdc-layout-grid__cell mdc-layout-grid__cell--span-3-desktop mdc-layout-grid__cell--span-8-tablet mdc-layout-grid__cell--span-4-phone">
+      <div class="mdc-card vf-card">
+        <section class="vf-card__header">
+          <h2 class="vf-card__title">{% trans 'Flow' %}</h2>
+        </section>
+        <section class="vf-card__body">
+          {% include "viewflow/fsm/includes/flow_chart_modal.html" %}
+        </section>
+      </div>
+    </div>
+  {% endif %}
+{% endblock list-cell %}

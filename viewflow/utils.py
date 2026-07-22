@@ -6,7 +6,17 @@
 # which is part of this source code package.
 
 import re
-from typing import Any, Callable, Iterator, List, Optional, Tuple, Type, TypeVar, Generic
+from typing import (
+    Any,
+    Callable,
+    Iterator,
+    List,
+    Optional,
+    Tuple,
+    Type,
+    TypeVar,
+    Generic,
+)
 
 from django.apps import apps
 from django.conf import settings

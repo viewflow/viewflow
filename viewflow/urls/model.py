@@ -45,7 +45,7 @@ class BaseModelViewset(Viewset):
                 "viewset": self,
                 "queryset": self.queryset,
                 **kwargs,
-            }
+            },
         )
 
     @property

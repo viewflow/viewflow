@@ -18,7 +18,7 @@ from viewflow.forms import ModelForm
 
 
 from .base import State, TransitionBoundMethod
-from .views import FSMChartView, FSMDetailModelView
+from .views import FSMChartView, FSMDetailModelView, FSMListModelView
 
 
 class ModelTransitionView(UpdateModelView):
@@ -96,6 +96,7 @@ class FlowViewsMixin(metaclass=ViewsetMeta):
     flow_state = None
     transition_view_class = ModelTransitionView
     detail_view_class = FSMDetailModelView
+    list_view_class = FSMListModelView
 
     def get_flow_state(self, request) -> State:
         if self.flow_state is None:
@@ -185,9 +186,7 @@ class FlowViewsMixin(metaclass=ViewsetMeta):
 
     def _get_urls(self):
         urlpatterns = super()._get_urls()
-        urlpatterns.append(
-            path("chart/", self.chart_view, name="chart")
-        )
+        urlpatterns.append(path("chart/", self.chart_view, name="chart"))
         urlpatterns.append(
             path(
                 "<path:pk>/transition/<slug:slug>/",

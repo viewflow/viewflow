@@ -65,7 +65,7 @@ class CreateModelView(
         if self.viewset is not None and hasattr(self.viewset, "get_queryset"):
             return self.viewset.get_queryset(self.request)
         return None
-        
+
     def get_form_widgets(self):
         if self.form_widgets is not None:
             return self.form_widgets

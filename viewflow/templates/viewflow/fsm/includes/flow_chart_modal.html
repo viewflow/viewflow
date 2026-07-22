@@ -1,0 +1,18 @@
+{% load i18n %}
+{% comment %}
+  A click-to-zoom flow diagram for an FSM flow, mirroring the BPMN process
+  chart modal. Expects ``flow_chart`` (a Graphviz DOT string) in the context;
+  ``flow_export_name`` optionally sets the exported PNG file name.
+{% endcomment %}
+<vf-modal-trigger class="vf-modal-trigger--closed">
+  <span class="vf-modal-trigger__helper"></span>
+  <div class="vf-modal-trigger__content">
+    <div class="vf-modal-trigger__button">&times;</div>
+    <a class="vf-modal-trigger__export" href="#"
+       data-vf-network-export="{{ flow_export_name|default:'flow' }}.png"
+       title="{% trans 'Export PNG' %}">
+      <span class="material-icons">download</span>{% trans 'PNG' %}
+    </a>
+    <vf-network dot="{{ flow_chart }}"></vf-network>
+  </div>
+</vf-modal-trigger>
