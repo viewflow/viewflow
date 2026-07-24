@@ -32,7 +32,7 @@
     "@hotwired/turbo": "^7.3.0",
     "@iconfu/svg-inject": "^1.2.3",
     "@material/textfield": "^14.0.0",
-    "@material/web": "^1.2.0",
+    "@material/web": "^1.5.1",
     "@open-wc/lit-helpers": "^0.7.0",
     "material-components-web": "^14.0.0",
     "material-icons": "^1.13.14",
