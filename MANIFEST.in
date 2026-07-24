@@ -1,7 +1,8 @@
 include LICENSE
-include LICENSE_EXCEPTION 
+include LICENSE_EXCEPTION
 include MANIFEST.in
 include README.rst
+include viewflow/py.typed
 recursive-include viewflow/templates *
 recursive-include viewflow/locale *
 recursive-include viewflow/static *
