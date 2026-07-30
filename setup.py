@@ -40,6 +40,9 @@ setuptools.setup(
     ],
     install_requires=[
         "Django>=4.2",
+        # viewflow.jsonstore is a re-export of this package.
+        # 0.5.1 was the deprecated merged-into-viewflow release; pin above it.
+        "django-jsonstore>=26.7.0",
         "django-filter>=2.3.0",
     ],
 )
