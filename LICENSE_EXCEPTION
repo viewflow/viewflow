@@ -1,10 +1,16 @@
 VIEWFLOW LIBRARY EXCEPTION
 
-Copyright (c) 2017-2021 Mikhail Podgurskiy <kmmbvnr@gmail.com>
+Copyright (c) 2017-2026 Mikhail Podgurskiy <kmmbvnr@gmail.com>
 
 This Viewflow Library Exception ("Exception") is an additional
 permission under section 7 of the GNU Affero General Public License,
-version 3 ("AGPLv3"). It applies to a viewflow library that bears a
+version 3 ("AGPLv3").
+
+The "Viewflow suite" is the set of libraries that the copyright holder
+publishes as part of Viewflow. The name of an individual package or
+distribution does not change whether that library belongs to the suite.
+
+This Exception applies to a library of the Viewflow suite that bears a
 notice placed by the copyright holder of the library stating that the
 library is governed by AGPLv3 along with this Exception.
 
@@ -12,7 +18,7 @@ library is governed by AGPLv3 along with this Exception.
 
 If you modify the Program or any covered work, without changing its
 source code, only by linking or combining some or all bundles of the
-Program with separate works covered by AGPL- incompatible license
+Program with separate works covered by AGPL-incompatible license
 terms, the licensors of this Program grant you the additional
 permission to convey the resulting work.
 
@@ -28,4 +34,4 @@ which such request was received.
 
 The availability of this Exception does not imply any general
 presumption that third-party software is unaffected by the copyleft
-requirements of the license of Viewflow
+requirements of the license of Viewflow.
