@@ -2,7 +2,7 @@
 
 from django.test import TestCase
 from viewflow import this
-from viewflow.fsm import State, TransitionNotAllowed
+from viewflow.fsm import State, TransitionConditionsUnmet, TransitionNotAllowed
 from .test_fsm__basics import ReviewState
 
 
@@ -31,6 +31,16 @@ class _Test(TestCase):
         publication = _Publication("test" * 249)
         with self.assertRaises(TransitionNotAllowed):
             publication.publish()
+
+    def test_unmet_conditions_raises_transition_conditions_unmet(self):
+        publication = _Publication("test" * 249)
+        with self.assertRaises(TransitionConditionsUnmet) as ctx:
+            publication.publish()
+
+        exc = ctx.exception
+        self.assertEqual(exc.failed_condition.__name__, "is_long")
+        self.assertEqual(exc.unmet_message, "Review is too short")
+        self.assertIn("Review is too short", str(exc))
 
     def test_message_when_unmet_empty(self):
         condition = State.CONDITION(True)

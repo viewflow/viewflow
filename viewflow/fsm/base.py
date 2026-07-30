@@ -10,7 +10,7 @@
 from __future__ import annotations
 
 import inspect
-from typing import Any, Dict, Mapping, Iterable, List, Type, Optional, TypeVar
+from typing import Any, Dict, Mapping, Iterable, List, Optional, Tuple, Type, TypeVar
 from viewflow.this_object import ThisObject
 from viewflow.utils import DEFAULT, MARKER
 from .typing import (
@@ -28,7 +28,75 @@ T = TypeVar("T")
 
 
 class TransitionNotAllowed(Exception):
-    """Exception raised when a state transition is not permitted."""
+    """Exception raised when a state transition is not permitted.
+
+    Base class for :class:`NoTransition` and :class:`TransitionConditionsUnmet`.
+    Catch this to handle any transition failure, or catch a subclass to
+    distinguish why the transition was refused.
+    """
+
+
+class NoTransition(TransitionNotAllowed):
+    """Raised when the current state has no transition registered for the call.
+
+    :ivar label: human-readable label of the transition method that was called.
+    :ivar state: the state the instance was in when the call was made.
+    """
+
+    def __init__(self, label: str, state: StateValue):
+        self.label = label
+        self.state = state
+        super().__init__(f'{label} :: no transition from "{state}"')
+
+
+class TransitionConditionsUnmet(TransitionNotAllowed):
+    """Raised when a transition's ``conditions`` callback returned false.
+
+    :ivar transition: the :class:`Transition` that was attempted.
+    :ivar failed_condition: the first condition callable that returned false.
+    :ivar unmet_message: human-readable reason from a ``State.CONDITION``
+        result, or ``""`` if the condition just returned a falsy value.
+    """
+
+    def __init__(
+        self,
+        transition: "Transition",
+        failed_condition: Condition,
+        unmet_message: str = "",
+    ):
+        self.transition = transition
+        self.failed_condition = failed_condition
+        self.unmet_message = unmet_message
+
+        condition_name = getattr(failed_condition, "__name__", repr(failed_condition))
+        message = f"'{transition.label}' transition conditions have not been met: {condition_name}"
+        if unmet_message:
+            message = f"{message} ({unmet_message})"
+        super().__init__(message)
+
+
+class InvalidTargetState(TransitionNotAllowed):
+    """Raised when a ``State.RETURN_VALUE``/``State.GET_STATE`` target resolves
+    to a state outside its declared allowed states.
+
+    :ivar transition: the :class:`Transition` that was attempted.
+    :ivar target: the resolved (invalid) state value.
+    :ivar allowed_states: the declared allowed states.
+    """
+
+    def __init__(
+        self,
+        transition: "Transition",
+        target: StateValue,
+        allowed_states: Iterable[StateValue],
+    ):
+        self.transition = transition
+        self.target = target
+        self.allowed_states = allowed_states
+        super().__init__(
+            f"'{transition.label}' resolved to {target!r}, which is not in the"
+            f" allowed target states {list(allowed_states)!r}"
+        )
 
 
 class Transition:
@@ -81,6 +149,14 @@ class Transition:
 
     def conditions_met(self, instance: object) -> bool:
         """Checks if all conditions are met for this transition."""
+        return self.get_unmet_condition(instance) is None
+
+    def get_unmet_condition(self, instance: object) -> Optional[Tuple[Condition, Any]]:
+        """Return the first ``(condition, result)`` pair that fails, or ``None``.
+
+        Conditions are evaluated in declaration order and short-circuit on
+        the first falsy result, same as :meth:`conditions_met`.
+        """
         conditions = [
             (
                 condition.resolve(instance.__class__)
@@ -89,7 +165,57 @@ class Transition:
             )
             for condition in self.conditions
         ]
-        return all(map(lambda condition: condition(instance), conditions))
+        for condition in conditions:
+            result = condition(instance)
+            if not result:
+                return condition, result
+        return None
+
+    def resolve_precall_target(
+        self, instance: object, args: Any, kwargs: Any
+    ) -> StateValue:
+        """Resolve the target before the transition method runs.
+
+        Returns ``self.target`` unchanged for a plain target or ``DEFAULT``.
+        For a ``State.GET_STATE`` target, calls its function and validates
+        the result against its declared ``states`` (if any). A
+        ``State.RETURN_VALUE`` target isn't resolvable here -- it is only
+        known after the method returns; see :meth:`resolve_return_value_target`.
+        """
+        target = self.target
+        if isinstance(target, State.GET_STATE):
+            resolved = target.func(instance, *args, **kwargs)
+            self._check_allowed(resolved, target.states)
+            return resolved
+        return target
+
+    def resolve_return_value_target(self, result: Any) -> StateValue:
+        """Resolve a ``State.RETURN_VALUE`` target from the method's return value."""
+        target = self.target
+        assert isinstance(target, State.RETURN_VALUE)
+        self._check_allowed(result, target.allowed_states)
+        return result
+
+    def _check_allowed(
+        self, value: StateValue, allowed_states: Iterable[StateValue]
+    ) -> None:
+        if allowed_states and value not in allowed_states:
+            raise InvalidTargetState(self, value, allowed_states)
+
+    def declared_targets(self) -> List[StateValue]:
+        """Concrete states this transition can be known to lead to ahead of a call.
+
+        A plain (or ``DEFAULT``) target is a single-element list. A
+        ``State.RETURN_VALUE``/``State.GET_STATE`` target contributes its
+        declared allowed states, or an empty list if left unrestricted --
+        its real target is only known once resolved at call time.
+        """
+        target = self.target
+        if isinstance(target, State.RETURN_VALUE):
+            return list(target.allowed_states)
+        if isinstance(target, State.GET_STATE):
+            return list(target.states)
+        return [target]
 
     def has_perm(self, instance: object, user: UserModel) -> bool:
         """Checks if the given user has permission to perform this transition."""
@@ -145,48 +271,69 @@ class TransitionBoundMethod:
     do_not_call_in_templates = True
 
     class Wrapper:
-        """Wrapper context object, to simplify __call__ method debug"""
+        """Stateful helper driving one transition call, to simplify __call__ debug.
 
-        def __init__(self, parent: "TransitionBoundMethod", kwargs: Mapping[str, Any]):
+        A ``State.RETURN_VALUE`` target can only be resolved from the
+        transition method's return value, so unlike a plain or
+        ``State.GET_STATE`` target -- both resolved and applied up front in
+        :meth:`begin` -- it is applied in :meth:`commit`, after the method
+        has run.
+        """
+
+        def __init__(
+            self,
+            parent: "TransitionBoundMethod",
+            args: Any,
+            kwargs: Mapping[str, Any],
+        ):
             self.parent = parent
+            self.caller_args = args
             self.caller_kwargs = kwargs
             self.initial_state: StateValue
             self.target_state: StateValue
+            self.transition: Transition
 
-        def __enter__(self) -> None:
+        def begin(self) -> None:
             self.initial_state = self.parent._state.get(self.parent._instance)
             transition = self.parent._descriptor.get_transition(self.initial_state)
 
             if transition is None:
-                raise TransitionNotAllowed(
-                    f'{self.parent.label} :: no transition from "{self.initial_state}"'
+                raise NoTransition(self.parent.label, self.initial_state)
+
+            unmet = transition.get_unmet_condition(self.parent._instance)
+            if unmet is not None:
+                failed_condition, result = unmet
+                unmet_message = getattr(result, "message", "")
+                raise TransitionConditionsUnmet(
+                    transition, failed_condition, unmet_message
                 )
 
-            if not transition.conditions_met(self.parent._instance):
-                raise TransitionNotAllowed(
-                    f" '{transition.label}' transition conditions have not been met"
-                )
-
-            self.target_state = transition.target
-            if self.target_state is not DEFAULT:
-                self.parent._state.set(self.parent._instance, self.target_state)
-
-        def __exit__(
-            self,
-            exc_type: Optional[Type[BaseException]],
-            exc_val: Optional[BaseException],
-            exc_tb: Any,
-        ) -> None:
-            if exc_type is not None:
-                self.parent._state.set(self.parent._instance, self.initial_state)
+            self.transition = transition
+            if isinstance(transition.target, State.RETURN_VALUE):
+                self.target_state = DEFAULT
             else:
-                self.parent._state.transition_succeed(
-                    self.parent._instance,
-                    self.parent,
-                    self.initial_state,
-                    self.target_state,
-                    **self.caller_kwargs,
+                self.target_state = transition.resolve_precall_target(
+                    self.parent._instance, self.caller_args, self.caller_kwargs
                 )
+                if self.target_state is not DEFAULT:
+                    self.parent._state.set(self.parent._instance, self.target_state)
+
+        def abort(self) -> None:
+            self.parent._state.set(self.parent._instance, self.initial_state)
+
+        def commit(self, result: Any) -> None:
+            if isinstance(self.transition.target, State.RETURN_VALUE):
+                self.target_state = self.transition.resolve_return_value_target(result)
+                if self.target_state is not DEFAULT:
+                    self.parent._state.set(self.parent._instance, self.target_state)
+
+            self.parent._state.transition_succeed(
+                self.parent._instance,
+                self.parent,
+                self.initial_state,
+                self.target_state,
+                **self.caller_kwargs,
+            )
 
     def __init__(
         self,
@@ -235,8 +382,16 @@ class TransitionBoundMethod:
                 return self._func.__name__.title()
 
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
-        with TransitionBoundMethod.Wrapper(self, kwargs=kwargs):
-            return self._func(self._instance, *args, **kwargs)
+        wrapper = TransitionBoundMethod.Wrapper(self, args, kwargs)
+        wrapper.begin()
+        try:
+            result = self._func(self._instance, *args, **kwargs)
+        except BaseException:
+            wrapper.abort()
+            raise
+        else:
+            wrapper.commit(result)
+            return result
 
     def get_transitions(self) -> Iterable[Transition]:
         return self._descriptor.get_transitions()
@@ -350,7 +505,10 @@ class StateDescriptor:
             for transitions in self.get_transitions().values()
             for transition in transitions
             if transition.source == state
-            or (transition.source == State.ANY and transition.target != state)
+            or (
+                transition.source == State.ANY
+                and state not in transition.declared_targets()
+            )
         ]
 
     def get_available_transitions(self, flow, state: State, user):
@@ -501,3 +659,48 @@ class State:
 
         def __bool__(self) -> bool:
             return self.is_true
+
+    class RETURN_VALUE:
+        """``target=State.RETURN_VALUE(*allowed_states)`` -- the transition
+        target is the method's own return value, resolved only after it
+        successfully returns (side effects in the method body already
+        happened by then; there's no way to know the target any sooner).
+
+        ``allowed_states``, if given, restricts and documents the possible
+        targets: :func:`~viewflow.fsm.chart` draws an edge for each, and a
+        return value outside the set raises :class:`InvalidTargetState`
+        instead of silently landing on an undeclared state. Omit it to allow
+        any return value.
+        """
+
+        def __init__(self, *allowed_states: StateValue):
+            self.allowed_states = allowed_states
+
+        def __repr__(self) -> str:
+            return f"RETURN_VALUE{self.allowed_states!r}"
+
+    class GET_STATE:
+        """``target=State.GET_STATE(func, states=[...])`` -- the transition
+        target is computed by ``func(instance, *args, **kwargs)`` from the
+        call's own arguments, resolved *before* the transition method runs
+        -- so, unlike ``State.RETURN_VALUE``, the method body already
+        observes the new state, and nothing runs if the computed target
+        turns out invalid.
+
+        ``states``, if given, restricts and documents the possible targets:
+        :func:`~viewflow.fsm.chart` draws an edge for each, and a computed
+        target outside the set raises :class:`InvalidTargetState`. Omit it
+        to allow any target ``func`` returns.
+        """
+
+        def __init__(
+            self,
+            func: TransitionFunction,
+            states: Optional[List[StateValue]] = None,
+        ):
+            self.func = func
+            self.states = states if states is not None else []
+
+        def __repr__(self) -> str:
+            name = getattr(self.func, "__name__", repr(self.func))
+            return f"GET_STATE({name})"

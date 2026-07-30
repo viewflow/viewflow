@@ -99,6 +99,16 @@ class Test(TestCase):  # noqa:D100
     def test_prohibited_transition_failed(self):
         self.assertRaises(fsm.TransitionNotAllowed, self.publication.hide)
 
+    def test_prohibited_transition_raises_no_transition(self):
+        self.assertRaises(fsm.NoTransition, self.publication.hide)
+
+    def test_no_transition_carries_state_and_label(self):
+        with self.assertRaises(fsm.NoTransition) as ctx:
+            self.publication.hide()
+
+        self.assertEqual(ctx.exception.state, ReviewState.NEW)
+        self.assertEqual(ctx.exception.label, "Hide")
+
     def test_transitions_can_proceed(self):
         self.assertTrue(self.publication.publish.can_proceed())
         self.assertTrue(self.publication.remove.can_proceed())

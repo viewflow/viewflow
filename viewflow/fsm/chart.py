@@ -42,8 +42,9 @@ def chart(flow_state: StateDescriptor, exclude_guards=True):
     states involved. It then generates a DOT language string, which can be used
     with tools like Graphviz to produce an image of the graph.
 
-    Note that the function ignores the `State.USE_RETURN_VALUE` and `State.SELECT`
-    states for now, as these are not supported yet.
+    A ``State.RETURN_VALUE``/``State.GET_STATE`` target charts one edge per
+    declared allowed state; if none are declared, the transition is charted
+    with no outgoing edge, since its real target is only known at runtime.
     """
     vertices: Set[StateValue] = set()
     postponed: List[Transition] = []
@@ -57,17 +58,19 @@ def chart(flow_state: StateDescriptor, exclude_guards=True):
             if transition.source == State.ANY:
                 postponed.append(transition)
             else:
-                # TODO: State.USE_RETURN_VALUE / State.SELECT
                 vertices.add(transition.source)
-                vertices.add(transition.target)
-                edges.add((transition.source, transition.target, transition))
+                for target in transition.declared_targets():
+                    vertices.add(target)
+                    edges.add((transition.source, target, transition))
 
     for transition in postponed:
-        vertices.add(transition.target)
-        for vertex in vertices:
-            if transition.source == State.ANY and vertex == transition.target:
-                continue
-            edges.add((vertex, transition.target, transition))
+        targets = transition.declared_targets()
+        vertices.update(targets)
+        for target in targets:
+            for vertex in vertices:
+                if vertex == target:
+                    continue
+                edges.add((vertex, target, transition))
 
     # build chart
     vertices_definition = "\n".join(

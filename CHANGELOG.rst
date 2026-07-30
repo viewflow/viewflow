@@ -2,9 +2,41 @@
 Changelog
 =========
 
-2.4.0
------
+2.4.0  2026-07-30
+-----------------
 
+- ``viewflow.fsm.FSMField``: a same-column drop-in for django-fsm's
+  ``FSMField``, for porting a model straight over -- swap the import and
+  ``@transition(field=..., source=..., target=...)`` keeps working, on top
+  of the same ``Transition``/``conditions``/``permission``/``on_success``
+  machinery the rest of ``viewflow.fsm`` already has. Two guarantees
+  django-fsm didn't have are opt-in via constructor flags, both off by
+  default so ported behavior is unchanged until you turn them on:
+  ``protected=True`` blocks direct assignment after the instance's first
+  value is set, and ``enforce_initial=True`` raises
+  ``NonInitialStateOnCreate`` (a ``TransitionNotAllowed`` subclass) if a new
+  row would be inserted at a value other than the field's declared
+  ``default`` (closes `django-fsm#218
+  <https://github.com/kmmbvnr/django-fsm/issues/218>`_ for callers who opt
+  in; ``bulk_create()``/raw SQL are out of scope, since both skip
+  ``pre_save`` entirely).
+- ``viewflow.fsm`` supports dynamic transition targets, ported from
+  django-fsm's ``RETURN_VALUE``/``GET_STATE``: ``target=State.RETURN_VALUE(*states)``
+  takes the target from the transition method's own return value (resolved
+  once it returns), and ``target=State.GET_STATE(func, states=[...])``
+  computes the target from the call's arguments before the method runs, so
+  the method body already observes the new state. Declaring the allowed
+  ``states``/``allowed_states`` charts an edge per state in ``fsm.chart()``
+  and raises ``InvalidTargetState`` (a ``TransitionNotAllowed`` subclass) if
+  the resolved target falls outside it; omit them to allow any state.
+- ``viewflow.fsm`` splits ``TransitionNotAllowed`` into two subclasses so
+  callers can tell why a transition was refused without parsing the message:
+  ``NoTransition`` (no transition registered from the current state) and
+  ``TransitionConditionsUnmet`` (a ``conditions=`` callback returned false).
+  ``TransitionConditionsUnmet`` carries the ``transition``, the
+  ``failed_condition`` callable, and ``unmet_message`` (populated from a
+  ``State.CONDITION(False, "...")`` result). Existing ``except
+  TransitionNotAllowed`` handlers keep working unchanged.
 - Fix 500 on the admin process changelist: the ``flow_class`` list filter
   executed the changelist participants prefetch against materialized flow
   classes (#523). The filter now builds its choices from the plain model

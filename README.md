@@ -184,74 +184,122 @@ modifications of Viewflow. You can find the commercial license terms in
 
 For older releases, see [CHANGELOG.rst](./CHANGELOG.rst).
 
-## 2.3.2 2026-07-06
+## 2.4.0 2026-07-30
 
-Security and data-integrity release. Highlights:
+The largest feature release of the 2.x line: complete BPMN 2.0 node coverage,
+document-oriented JSON Store fields, and a drop-in replacement for django-fsm.
 
-- Fix cross-flow privilege escalation and information disclosure: a user with
-  only flow A's permission could cancel, or read the full task list of, flow B's
-  process by posting/opening flow B's id on flow A's URL. `CancelProcessView` and
-  `DetailProcessView` now scope their querysets to the view's own flow
-- Fix the bulk-delete endpoint (`action/delete/`) deleting rows without checking
-  login or the `delete` permission; add the missing authentication checks to the
-  standalone `FlowChartView` and the `contrib.plotly` Dash endpoints
-- Fix a transaction-ordering bug that committed partial writes next to a task's
-  `ERROR` status in async mode; `Function`, `End`, `If`, `Split`, `Switch`,
-  `Subprocess`, and `Join` activation now roll back cleanly on failure
-- Fix a celery `Job` node treating `self.retry()`/`Reject` as a task failure and
-  crashing on redelivery of a `STARTED` retry
-- Fix task actions releasing their lock before the transaction commits, which let
-  a concurrent request double-execute an action under `CacheLock`
-- Fix `jsonstore` fields with a falsy `default` (`False`, `0`) returning `None`,
-  discarding a falsy assigned value, and mis-sorting on `order_by()`
-- Fix unbounded memory leaks in form rendering (widget-renderer cache keyed on the
-  widget instance) and in `ListModelView` (`lru_cache` keyed on the view instance)
-- Fix the "Administration" menu showing to every logged-in user instead of staff
-- Fix several `viewflow.fsm` bugs: chart crashes on self-transitions, `State` with
-  a custom getter replacing falsy-but-valid states, REST `transition` committing
-  field writes on a failed transition or allowing arbitrary field writes; add a
-  `chart/` state-chart view and action to `FlowViewsMixin`
-- Fix a crash on the admin change page of any FSM-backed model under Django 5.2+
-  (incl. 6.1) from the `change_form_fsm_tools` template tag
-- Fix grouped `<select>` options under an `<optgroup>` being dropped, a formset
-  validation bypass via a tampered ManagementForm, and `vf-field-select-multiple`
-  dropping or failing to toggle selected values
-- Fix a system check now warning when a flow has `Join` nodes but no real lock,
-  and `manage.py check`/`runserver` crashing for a Join-node flow defined outside
-  any installed app
+**Workflow and BPMN**
 
-## 2.3.1 2026-06-30
+- New database-backed `flow.Timer` and `flow.StartTimer(interval=...)` nodes. The
+  due moment is stored on the task row (new `Task.scheduled` field, migration
+  included), so a timer survives a broker restart, unlike `celery.Timer`. Due
+  timers fire from the `workflow_timers` management command or the
+  `workflow_fire_timers` celery beat task
+- Boundary events, declared on the host task before `.Next()`:
+  `.OnTimeout(delay, then)` for deadlines and escalation, `.OnError(then, code=...)`
+  to catch a background task failure. Interrupting by default;
+  `interrupting=False` starts a parallel path
+- `flow.TerminateEnd()` cancels all other active tasks and finishes the process;
+  `flow.ErrorEnd(code)` fails it. Inside a subprocess, `ErrorEnd` marks the parent
+  task `ERROR`, so the parent's `.OnError(..., code=...)` boundary catches it
+- Compensation: `.CompensateWith(this.handler)` registers an undo handler on any
+  task, and `flow.CompensateThrow()` runs the handlers of completed tasks in
+  reverse completion order, each at most once
+- New intermediate events: `MessageCatch`/`MessageThrow`,
+  `SignalCatch`/`SignalThrow` (one throw releases every armed catch, across
+  processes and flow classes), `EscalationThrow` with a non-interrupting
+  `.OnEscalation` boundary, and `ConditionalCatch`, which waits until a condition
+  over process data holds
+- New task types: `flow.SendHandle`, `flow.BusinessRule`, and `flow.ManualTask`
+  for work done outside any system, marked done with a no-field confirmation.
+  `NSubprocess(..., sequential=True)` runs one child process at a time
+- BPMN 2.0 export overhaul: exported files validate against the official OMG
+  schema and open in bpmn.io and Camunda Modeler. `Switch`, `Subprocess` and
+  `NSubprocess` are no longer dropped from the export, `Handle` maps to a receive
+  task, celery `Job` to a service task, and the new nodes above to their real BPMN
+  counterparts. Download a flow as `.bpmn` from the chart view, the REST API
+  (`?format=bpmn`), the diagram dialog, or the `flowexport` command
+- Chart layout: empty grid rows and columns are collapsed, cell collisions
+  resolved, parallel edge channels staggered and routed around node shapes, and
+  `If` branches labeled yes/no
+- The flow diagram dialog is now pan- and zoom-able: scroll to zoom toward the
+  cursor, drag to pan, pinch on touch, double-click to reset
+- Every built-in control node is cancellable, `Flow.cancel` raises the intended
+  `FlowRuntimeError` instead of `AttributeError` for a node with no `cancel`
+  transition, and the process cancel view refuses cleanly instead of returning a
+  500 when a task can't be cancelled
+- `flow.View` gained a `reassign_view_class` hook that finishes the built-in
+  reassign transition and shows a "Reassign" action on the task (off by default)
+- New cookbook samples, all in application code with no core changes:
+  `substitute` (reassignment), `snooze` (hide a task from the inbox until a chosen
+  time, #219), and `dynamic_subprocess` (attach another `NSubprocess` child while
+  the parent task still runs, #258)
 
-- Add Django 6.1 support
-- Fix the bulk task assign/unassign actions not enforcing the per-task
-  `can_assign`/`can_unassign` permission
-- Fix task views accepting a task pk from another flow; tasks are now scoped to
-  the flow in the URL
+**JSON Store**
 
-## 2.3.0 2026-06-30
+- Relation fields stored inside the JSON document, with no column, migration or
+  join table: `jsonstore.ForeignKey` (pk under `<name>_id`, lazy load,
+  `ModelChoiceField` in forms), `jsonstore.OneToOneField`, and
+  `jsonstore.ManyToManyField` (a manager with
+  `all`/`add`/`remove`/`set`/`clear`/`count`). Non-integer primary keys, e.g.
+  `UUIDField`, are supported (#366)
+- `jsonstore.EmbeddedModel` with `EmbeddedField` and `EmbeddedListField`:
+  schema-only virtual models (typed fields, no table) stored as a nested JSON
+  document, or a list of them. Embedded models nest, and reading returns an
+  instance bound to the stored sub-document, so in-place edits are saved
+- `viewflow.forms` edits embedded documents as nested forms: `EmbeddedModelForm`
+  builds a form from an embedded schema, and `EmbeddedFormField` /
+  `EmbeddedFormSetField` bind it to the model field, so a document edits as a
+  nested form and a list of them as inlines, all in one JSON column. New
+  `cookbook/embed101` demo
+- New field types: `BigIntegerField`, `SmallIntegerField`, the three
+  `Positive*IntegerField`s, `SlugField`, `FilePathField`, `UUIDField`,
+  `DurationField` (ISO-8601, read back as a `timedelta`) and `BinaryField`
+  (base64, read back as `bytes`)
+- A `json_key` argument controls where a value lives in the document: a custom
+  key, or a list/tuple for a nested path (`json_key=("address", "city")`), honored
+  by reading, writing, filtering and ordering for every field type
 
-- Fix `viewflow.fsm` chart generation crashing for `Enum` states and `State.ANY`
-  markers (#476)
-- Use the localized status label (`get_status_display`) in the default Task and
-  Process briefs (#504)
-- Add a `building-with-viewflow` skill for AI coding assistants (`skill/`, beta),
-  and ship `llms.txt`, `llms-full.txt` and `AGENTS.md` on docs.viewflow.io (#498)
-- Fix the `vf-field-input` `readonly` attribute not being treated as a boolean;
-  it now defaults to `false` and is coerced like `disabled`/`required` (#499),
-  applied consistently across the field widgets, and added `readonly` support to
-  the password and textarea widgets
-- Fix process cancel being allowed with only view permission; it now requires the
-  `manage` permission. `has_view_permission`/`has_manage_permission` also honor
-  object-level (e.g. django-guardian) permissions when an object is passed
-- Make `Condition`/`Permission` generic over the flow type, so typed predicates
-  like `Callable[[Publication], bool]` are accepted in `state.transition(...)`
-- Update frontend and tooling dependencies to their latest within-major versions
-- Upgrade the build to vite 7 and vite-plugin-static-copy 4; migrate the
-  `@material` typography imports to the modern Sass `@use` API (generated CSS
-  unchanged) and drop the unused `babel-core@4` dev dependency
-- Upgrade `vanilla-jsoneditor` 0.23 → 3 (bundles svelte 5); the JSON field
-  editor API is unchanged
+**FSM**
 
+- `viewflow.fsm.FSMField`: a same-column drop-in for django-fsm's `FSMField`.
+  Swap the import and `@transition(field=..., source=..., target=...)` keeps
+  working, on top of the `conditions`/`permission`/`on_success` machinery
+  `viewflow.fsm` already has. Two guarantees django-fsm didn't have are opt-in and
+  off by default: `protected=True` blocks direct assignment after the first value
+  is set, and `enforce_initial=True` raises `NonInitialStateOnCreate` when a new
+  row would be inserted at a non-default value
+- Dynamic transition targets, ported from django-fsm:
+  `target=State.RETURN_VALUE(*states)` takes the target from the method's return
+  value, and `target=State.GET_STATE(func, states=[...])` computes it from the
+  call's arguments before the method runs. Declared states are charted and
+  enforced with `InvalidTargetState`
+- `TransitionNotAllowed` split into `NoTransition` (nothing registered from the
+  current state) and `TransitionConditionsUnmet` (a `conditions=` callback
+  returned false, carrying the failed condition and its message). Existing
+  `except TransitionNotAllowed` handlers keep working
+- The `FlowViewsMixin` list page shows the state diagram next to the object table
+  in a click-to-zoom dialog, exportable as PNG. The admin change-list diagram no
+  longer blows out the filter sidebar
+
+**Viewsets and forms**
+
+- A virtual list column (a viewset or model method or property) can be made
+  sortable with `orderby_column` — a field lookup like `"data__price"`, or a query
+  expression like `Cast("data__price", IntegerField())` for a numeric sort (#361)
+- Bulk actions now scope their queryset through the viewset's
+  `get_queryset(request)`, so "Select All" no longer touches rows outside the
+  viewset's scope, and no longer crash for a viewset with no configured filter
+  (#422)
+- `InlineFormSetField` and the other composite fields honor a field-level
+  `initial=[...]` as a fallback, so pre-populated formset rows render their values
+- `process_dashboard.html` exposes a `flow_start_card_actions` block, so projects
+  can add start-card controls by extending the template instead of copying it
+
+Plus fixes for a 500 on the admin process changelist (#523) and on the task detail
+page of an unregistered subprocess. See [CHANGELOG.rst](./CHANGELOG.rst) for the
+full list.
 
 
 [build]: https://img.shields.io/github/actions/workflow/status/viewflow/viewflow/django.yml?branch=main

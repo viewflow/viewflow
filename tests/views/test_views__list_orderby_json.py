@@ -14,7 +14,7 @@ class JsonThing(models.Model):
     data = models.JSONField(default=dict)
 
 
-class Invoice(models.Model):
+class JsonInvoice(models.Model):
     """A workflow-style model whose typed fields live in a JSONField.
 
     ``jsonstore`` fields (as used by custom flow ``Process`` models) route
@@ -27,8 +27,8 @@ class Invoice(models.Model):
     amount = jsonstore.IntegerField()
 
 
-class InvoiceView(ListModelView):
-    model = Invoice
+class JsonInvoiceView(ListModelView):
+    model = JsonInvoice
     columns = ("number", "amount")
     ordering = "pk"
 
@@ -66,7 +66,7 @@ class ExprOrderView(ListModelView):
 urlpatterns = [
     path("str/", StringOrderView.as_view()),
     path("expr/", ExprOrderView.as_view()),
-    path("invoice/", InvoiceView.as_view()),
+    path("invoice/", JsonInvoiceView.as_view()),
 ]
 
 
@@ -117,9 +117,9 @@ class Test(TestCase):
         # A workflow-style model with typed jsonstore fields: the column is
         # the field itself, sortable by plain name with no orderby_column,
         # and jsonstore extracts the typed value so 2 sorts before 10.
-        Invoice.objects.create(number="c", amount=30)
-        Invoice.objects.create(number="a", amount=2)
-        Invoice.objects.create(number="b", amount=10)
+        JsonInvoice.objects.create(number="c", amount=30)
+        JsonInvoice.objects.create(number="a", amount=2)
+        JsonInvoice.objects.create(number="b", amount=10)
 
         response = self.client.get("/invoice/?_orderby=amount")
         content = response.content.decode()

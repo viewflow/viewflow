@@ -11,7 +11,7 @@ from .this_object import this
 from .utils import viewprop, Icon, DEFAULT
 
 __title__ = "Django-Viewflow"
-__version__ = "2.3.2"
+__version__ = "2.4.0"
 __author__ = "Mikhail Podgurskiy"
 __license__ = "AGPL"
 __copyright__ = "Copyright 2018-2021 Mikhail Podgurskiy"
