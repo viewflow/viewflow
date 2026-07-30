@@ -171,9 +171,6 @@ allows commercial use and distribution of the software. It is similar to the GNU
 GCC Runtime Library license, and it includes additional permissions that make it
 more friendly for commercial development.
 
-You can read more about AGPL and its compatibility with commercial use at the
-[AGPL FAQ](http://www.affero.org/oagf.html)
-
 If you use Linux already, this package license likely won't bring anything new to your stack.
 
 Viewflow PRO has a commercial-friendly license allowing private forks and
