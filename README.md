@@ -54,7 +54,7 @@ Add to INSTALLED_APPS in settings.py:
 
 ## Quick start
 
-Here is a pizza ordering workflow example.
+Here is a pizza ordering workflow example. Full runnable source: [demo/helloworld](demo/helloworld).
 
 ### 1. Create a model for process data
 

@@ -178,37 +178,36 @@ class ViewsetMeta(type):
     """Collect urls declared on the based classes."""
 
     def __new__(mcs, name, bases, attrs):
-        current_patterns = []
-        for key, value in list(attrs.items()):
-            if not key.endswith("_path") or key.startswith("get_"):
-                continue
-            current_patterns.append((key, value))
-
-        attrs["declared_patterns"] = OrderedDict()  # current_patterns removed
+        # Paths declared in this class body, in declaration order.
+        own_declared_patterns = OrderedDict(
+            (key, value)
+            for key, value in attrs.items()
+            if key.endswith("_path")
+            if not key.startswith("get_")
+        )
+        attrs["own_declared_patterns"] = own_declared_patterns
 
         new_class = super().__new__(mcs, name, bases, attrs)
 
-        # Walk through the MRO.
-        declared_patterns = OrderedDict()
-        for base in reversed(new_class.__mro__):
-            # Collect fields from base class.
-            if hasattr(base, "declared_patterns"):
-                declared_patterns.update(base.declared_patterns)
+        # Own paths first (so a class can override which view answers the index
+        # url), then the bases' *already collected* order. Taking it from the
+        # bases rather than re-deriving it from the MRO is what makes a subclass
+        # that declares no paths of its own inherit its parent's order verbatim:
+        # otherwise merely subclassing an app reshuffles its url patterns, and
+        # `IndexViewMixin` -- which redirects to the first non-parameterized
+        # path -- lands somewhere else than the parent does.
+        declared_patterns = OrderedDict(own_declared_patterns)
+        for base in reversed(bases):
+            for key, value in getattr(base, "declared_patterns", {}).items():
+                declared_patterns.setdefault(key, value)
 
-            # Field shadowing.
-            for attr, value in base.__dict__.items():
-                if value is None and attr in declared_patterns:
-                    declared_patterns.pop(attr)
-
-        # place current class items on top of inherited, to allow override first index view in a child class
-        # new_class.declared_patterns = declared_patterns
-        new_class.declared_patterns = OrderedDict(current_patterns)
-        new_class.declared_patterns.update(
-            {
-                key: value
-                for key, value in declared_patterns.items()
-                if key not in current_patterns
-            }
+        # `some_path = None` in a subclass drops the inherited path. The value
+        # kept above is the most derived one, so a re-declaration further down
+        # the MRO stays dropped only if the derived class asked for it.
+        new_class.declared_patterns = OrderedDict(
+            (key, value)
+            for key, value in declared_patterns.items()
+            if value is not None
         )
 
         return new_class

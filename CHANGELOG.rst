@@ -2,6 +2,29 @@
 Changelog
 =========
 
+2.5.0
+-----
+
+- ``viewflow.jsonstore`` moved out into its own package,
+  `django-jsonstore <https://github.com/viewflow/jsonstore>`_ (26.7.0), which
+  is now a Viewflow dependency. The module stays as a re-export, so
+  ``from viewflow import jsonstore`` keeps working and resolves to the same
+  classes as a plain ``import jsonstore`` -- no code, migration or data change.
+  The fields grew relations, embedded documents and nested key paths that
+  aren't workflow-specific, and they are easier to adopt, and to test against
+  PostgreSQL/MySQL/MariaDB/Oracle, on their own. The full reference stays on
+  docs.viewflow.io.
+
+- Fix subclassing a viewset reshuffling its URL patterns. ``declared_patterns``
+  collected inherited paths by walking the MRO, so the position of a name was
+  fixed by the least-derived class that introduced it; a subclass declaring no
+  paths of its own therefore got the mixins' paths first instead of its
+  parent's order. Since ``IndexViewMixin`` redirects to the first
+  non-parameterized path, subclassing ``WorkflowAppViewset`` silently moved the
+  app's landing page from the inbox to the ``queue/assign/`` bulk-action URL. A
+  class's own paths still come first, so overriding which view answers the
+  index URL keeps working.
+
 2.4.0  2026-07-30
 -----------------
 
