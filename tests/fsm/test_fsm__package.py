@@ -1,6 +1,7 @@
 """The historical Viewflow paths share the standalone FSM implementation."""
 
 import importlib
+import importlib.util
 
 from django.test import SimpleTestCase
 from django.utils.module_loading import import_string
@@ -40,6 +41,12 @@ class PackageCompatibilityTests(SimpleTestCase):
             "rest",
         ):
             with self.subTest(module=name):
+                # rest.py is PRO-only and is not shipped to the OSS tree.
+                if (
+                    name == "rest"
+                    and importlib.util.find_spec("viewflow.fsm.rest") is None
+                ):
+                    continue
                 self.assertIs(
                     importlib.import_module(f"viewflow.fsm.{name}"),
                     importlib.import_module(f"django_fsm.{name}"),

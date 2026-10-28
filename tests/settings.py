@@ -84,6 +84,12 @@ AUTHENTICATION_BACKENDS = (
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {
     'default': env.db(),
+    # A second alias for tests that exercise multi-database routing
+    # (e.g. create_permissions(using=...)).
+    'secondary': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': ':memory:',
+    },
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
