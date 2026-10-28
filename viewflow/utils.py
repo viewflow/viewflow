@@ -25,6 +25,7 @@ from django.core import mail
 from django.db import models
 from django.utils.html import conditional_escape
 from django.utils.safestring import mark_safe
+from django_fsm.utils import DEFAULT, MARKER  # noqa: F401
 
 __all__ = ("has_object_perm", "viewprop", "DEFAULT", "first_not_default")
 
@@ -32,22 +33,6 @@ __all__ = ("has_object_perm", "viewprop", "DEFAULT", "first_not_default")
 T = TypeVar("T")
 TCallable = TypeVar("TCallable", bound=Callable[..., Any])
 
-
-class MARKER(object):
-    def __init__(self, marker: str):
-        self.marker = marker
-
-    def __iter__(self):
-        return iter(())
-
-    def __repr__(self):
-        return self.marker
-
-    def __lt__(self, other) -> bool:
-        return self.marker < str(other)
-
-
-DEFAULT = MARKER("DEFAULT")
 
 IS_DEV = settings.DEBUG or not hasattr(mail, "outbox")  # DEBUG or test mode
 

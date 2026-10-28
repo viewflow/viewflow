@@ -1,41 +1,15 @@
-"""
-The viewflow.fsm module provides an implementation of finite state machine (FSM)
-workflows that enables users to define and execute sequential workflows with
-multiple states and transitions.
-"""
+"""Compatibility exports for the standalone django-fsm package."""
 
-# Copyright (c) 2017-2020, Mikhail Podgurskiy
-# All Rights Reserved.
+import django_fsm as _fsm
+from django_fsm import *  # noqa: F401,F403
+from django_fsm import __all__ as _core_all
 
-# This work is dual-licensed under AGPL defined in file 'LICENSE' with
-# LICENSE_EXCEPTION and the Commercial license defined in file 'COMM_LICENSE',
-# which is part of this source code package.
+# Load the compatibility submodule before assigning the chart function.
+from .chart import chart  # noqa: F401
 
-from .admin import FlowAdminMixin
-from .base import (
-    InvalidTargetState,
-    NoTransition,
-    Transition,
-    TransitionConditionsUnmet,
-    TransitionNotAllowed,
-    State,
-)
-from .chart import chart
-from .fields import FSMField, NonInitialStateOnCreate, transition
-from .viewset import FlowViewsMixin
+# The optional integrations are provided lazily through __getattr__.
+__all__ = (*_core_all, "FlowAdminMixin", "FlowViewsMixin")  # noqa: F405
 
 
-__all__ = (
-    "TransitionNotAllowed",
-    "NoTransition",
-    "TransitionConditionsUnmet",
-    "InvalidTargetState",
-    "State",
-    "FlowAdminMixin",
-    "chart",
-    "Transition",
-    "FlowViewsMixin",
-    "FSMField",
-    "NonInitialStateOnCreate",
-    "transition",
-)
+def __getattr__(name):
+    return getattr(_fsm, name)
