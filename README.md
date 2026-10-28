@@ -32,7 +32,7 @@ Viewflow comes in two versions:
 
 ## Installation
 
-Viewflow works with Python 3.10+ and Django 4.2+
+Viewflow works with Python 3.10+ and Django 5.2+
 
 Viewflow:
 

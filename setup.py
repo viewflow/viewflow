@@ -24,9 +24,6 @@ setuptools.setup(
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Framework :: Django",
-        "Framework :: Django :: 4.2",
-        "Framework :: Django :: 5.0",
-        "Framework :: Django :: 5.1",
         "Framework :: Django :: 5.2",
         "Framework :: Django :: 6.0",
         "Programming Language :: Python :: 3",
@@ -39,7 +36,8 @@ setuptools.setup(
         "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     ],
     install_requires=[
-        "Django>=4.2",
+        "Django>=5.2",
+        "django-fsm>=5.0.0,<6",
         # viewflow.jsonstore is a re-export of this package.
         # 0.5.1 was the deprecated merged-into-viewflow release; pin above it.
         "django-jsonstore>=26.7.0",
